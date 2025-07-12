@@ -164,7 +164,7 @@ export default function Home() {
                 </div>
                 <div className="w-full lg:w-auto">
                   <button className="w-full lg:w-32 h-10 bg-[#6FD6E5] text-white rounded-lg mt-2 lg:mt-0">
-                    درخواست نوبت
+                    بیشتر بدانید...
                   </button>
                 </div>
               </div>
@@ -252,21 +252,51 @@ export default function Home() {
       <section>
         <Pathsection />
         <div className="w-full">
-          <div className="w-11/12 m-auto relative ">
-            <h3 className="text-gray-800">قرص های پر بازدید کیلینیک</h3>
-            <h3 className="text-[#6FD6E5] pr-2">وب و فن</h3>
-            <div className="flex items-center">
-              <div className="w-[40%]">
-                <p>مشتریان ، درباره
-                  وبوفن چه میگویند ؟</p>
+          <div className="w-11/12 m-auto relative py-20">
+            <div className="relative w-full aspect-[13/2] rounded-lg overflow-hidden flex items-start">
+              <Image
+                src="/homepage/ourteam.png"
+                alt="Main slide"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute top-4 right-4  items-start z-10 p-4 rounded-xl">
+                <div className="mr-4 w-64">
+                  <div className="flex items-center gap-6">
+                    <p className="text-white text-xl whitespace-nowrap">تیم ما</p>
+                    <button
+                      className="bg-[#6FD6E5] text-white px-8 py-2 rounded-4xl text-sm hover:scale-105 transition-all"
+                    >
+                      مشاهده اعضا
+                    </button>
+                  </div>
+
+                </div>
+                <div className="w-[50%] mt-10">
+                  <p>
+                    لورم ایپسوم متن ساختگی با تولید سادگی  که لازم است، و برای شرایط فعلی تکنولوژی مورد نیاز، و کاربردهای متنوع با هدف بهبود  فراوان جامعه و متخصصان را می طلبد، تا با نرم افزارها شناخت بیشتری را برای طراحان رایانه ای علی  مورد نیاز  قرار گیرد.
+                  </p>
+                </div>
               </div>
-              <div className="w-[60%]">
-                <Commentsabtus />
-              </div>
+
             </div>
           </div>
         </div>
       </section>
+      <div className="md:flex items-center bg-[#f7f8fc] md:p-10 md:px-20">
+        <div className="md:w-[40%] w-full">
+          <p className="text-[#1d546b] text-4xl">
+            مشتریان ، درباره <span className="text-[#6FD6E5]">وبوفن</span> چه میگویند ؟
+          </p>
+          <p className="mt-5 text-gray-500">
+            لورم ایپسوم متن ساختگی با تولید  که لازم است، و برای شرایط فعلی  گیرد.
+            لورم ایپسوم متن ساختگی با تولید  که لازم است، و برای شرایط فعلی  گیرد.
+          </p>
+        </div>
+        <div className="md:w-[60%] w-full">
+          <Commentsabtus />
+        </div>
+      </div>
     </main>
   );
 }
