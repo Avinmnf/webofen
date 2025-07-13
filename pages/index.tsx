@@ -4,6 +4,7 @@ import Popularpills from "@/components/popularpills";
 import Pathsection from "@/components/pathsection";
 import Commentsabtus from "@/components/commentsabtus";
 import Reservetime from "@/components/reservetime";
+
 export default function Home() {
 
 
