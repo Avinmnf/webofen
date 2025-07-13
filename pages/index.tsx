@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { motion } from 'framer-motion';
 import Popularpills from "@/components/popularpills";
 import Pathsection from "@/components/pathsection";
 import Commentsabtus from "@/components/commentsabtus";
@@ -191,10 +192,10 @@ export default function Home() {
                 </g>
               </svg>
               <div className="mr-4">
-                <p className="text-[#1d546b] text-base md:text-lg">درباره ما</p>
+                <p className="text-[#1d546b] text-base md:text-lg font-semibold">درباره ما</p>
                 <div className="flex flex-wrap items-center text-base md:text-lg">
-                  <p className="text-gray-800">مرکز تخصصی درمان</p>
-                  <p className="text-[#1d546b] pr-2">وب سایت</p>
+                  <p className="text-gray-800 font-semibold">مرکز تخصصی درمان</p>
+                  <p className="text-[#1d546b] pr-2 font-semibold">وب سایت</p>
                 </div>
               </div>
             </div>
@@ -228,85 +229,83 @@ export default function Home() {
 
       <section className="relative mt-20">
         {/* Image container (no background color) */}
-<div className="w-full relative z-10">
-  <div className="w-11/12 m-auto">
-    <div className="relative w-full aspect-[22/6] rounded-lg overflow-hidden">
-      <Image
-        src="/homepage/bigslide.png"
-        alt="Main slide"
-        fill
-        className="object-cover"
-      />
+        <div className="w-full relative z-10">
+          <div className="w-11/12 m-auto">
+            <div className="relative w-full aspect-[22/6] rounded-lg overflow-hidden">
+              <Image
+                src="/homepage/bigslide.png"
+                alt="Main slide"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute top-4 right-4 flex items-start z-10 p-4 rounded-xl max-w-[90%]">
+                <svg
+                  className="w-8"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 54.59 52.11"
+                  fill="#1d546b"
+                  stroke="#1d546b"
+                  strokeMiterlimit={10}
+                >
+                  <g>
+                    <path d="M43.46,24.24h2.77v2.31c0,.26.21.46.46.46s.46-.21.46-.46v-2.31h2.77c2.29,0,4.16-1.87,4.16-4.16v-7.86c0-4.08-3.32-7.39-7.39-7.39s-7.39,3.32-7.39,7.39v7.86c0,2.29,1.87,4.16,4.16,4.16ZM40.23,12.23c0-3.57,2.9-6.47,6.47-6.47s6.47,2.9,6.47,6.47v7.86c0,1.78-1.45,3.23-3.23,3.23h-6.47c-1.78,0-3.23-1.45-3.23-3.23v-7.86ZM46.23,20.08v-2.77c0-.26.21-.46.46-.46s.46.21.46.46v2.77c0,.26-.21.46-.46.46s-.46-.21-.46-.46Z" />
+                    <path d="M45.59,23.77v10.96c0,8.38-6.82,15.2-15.2,15.2s-15.2-6.82-15.2-15.2v-2.21c7.28-.56,13.03-6.65,13.03-14.07V5.43c0-2.99-2.43-5.43-5.43-5.43h-5.43v2.17h5.43c1.8,0,3.26,1.46,3.26,3.26v13.03c0,6.59-5.36,11.94-11.94,11.94S2.17,25.04,2.17,18.45V5.43c0-1.8,1.46-3.26,3.26-3.26h5.43V0h-5.43C2.43,0,0,2.44,0,5.43v13.03c0,7.42,5.75,13.52,13.03,14.07v2.21c0,9.58,7.79,17.37,17.37,17.37s17.37-7.79,17.37-17.37v-10.96" />
+                  </g>
+                </svg>
+                <div className="mr-4">
+                  <p className="text-[#1d546b] text-xl font-semibold">حوزه تخصصی و درمان</p>
+                  <div className="flex flex-wrap items-center mt-1">
+                    <p className="text-gray-800 text-2xl font-semibold">خدمات تخصصی کلینیک</p>
+                    <p className="text-[#6FD6E5] text-2xl pr-2 font-semibold">وب و فن</p>
+                  </div>
+                </div>
+              </div>
 
-      {/* Header */}
-      <div className="absolute top-4 right-4 flex items-start z-10 p-4 rounded-xl max-w-[90%]">
-        <svg
-          className="w-6 sm:w-8"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 54.59 52.11"
-          fill="#1d546b"
-          stroke="#1d546b"
-          strokeMiterlimit={10}
-        >
-          <g>
-            <path d="M43.46,24.24h2.77v2.31c0,.26.21.46.46.46s.46-.21.46-.46v-2.31h2.77c2.29,0,4.16-1.87,4.16-4.16v-7.86c0-4.08-3.32-7.39-7.39-7.39s-7.39,3.32-7.39,7.39v7.86c0,2.29,1.87,4.16,4.16,4.16ZM40.23,12.23c0-3.57,2.9-6.47,6.47-6.47s6.47,2.9,6.47,6.47v7.86c0,1.78-1.45,3.23-3.23,3.23h-6.47c-1.78,0-3.23-1.45-3.23-3.23v-7.86ZM46.23,20.08v-2.77c0-.26.21-.46.46-.46s.46.21.46.46v2.77c0,.26-.21.46-.46.46s-.46-.21-.46-.46Z" />
-            <path d="M45.59,23.77v10.96c0,8.38-6.82,15.2-15.2,15.2s-15.2-6.82-15.2-15.2v-2.21c7.28-.56,13.03-6.65,13.03-14.07V5.43c0-2.99-2.43-5.43-5.43-5.43h-5.43v2.17h5.43c1.8,0,3.26,1.46,3.26,3.26v13.03c0,6.59-5.36,11.94-11.94,11.94S2.17,25.04,2.17,18.45V5.43c0-1.8,1.46-3.26,3.26-3.26h5.43V0h-5.43C2.43,0,0,2.44,0,5.43v13.03c0,7.42,5.75,13.52,13.03,14.07v2.21c0,9.58,7.79,17.37,17.37,17.37s17.37-7.79,17.37-17.37v-10.96" />
-          </g>
-        </svg>
-        <div className="mr-4 text-sm sm:text-base">
-          <p className="text-[#1d546b] font-semibold">حوزه تخصصی و درمان</p>
-          <div className="flex flex-wrap items-center mt-1">
-            <p className="text-gray-800 text-xl">خدمات تخصصی کلینیک</p>
-            <p className="text-[#6FD6E5] text-xl pr-2">وب و فن</p>
+              <div className="absolute right-[5%] bottom-[5%] flex flex-col sm:flex-row gap-6 z-20 w-7/12 px-4">
+                <div className="bg-[#1d546b] flex items-center text-white rounded-4xl p-10 w-1/2 h-full sm:w-auto text-center text-sm sm:text-base">
+                  <svg
+                    className="w-40 h-40"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 106.53 102.09"
+                  >
+                    <path
+                      fill="#f7f8fc"
+                      d="M86.55,0H19.97C8.96,0,0,8.96,0,19.97v57.7c0,11.01,8.96,19.97,19.97,19.97h31.07c1.23,0,2.22-.99,2.22-2.22s-.99-2.22-2.22-2.22h-31.07c-8.57,0-15.54-6.97-15.54-15.54v-42.17h97.65v19.97c0,1.23.99,2.22,2.22,2.22s2.22-.99,2.22-2.22V19.97c0-11.01-8.96-19.97-19.97-19.97ZM4.44,31.07v-11.1c0-8.57,6.97-15.54,15.54-15.54h66.58c8.57,0,15.54,6.97,15.54,15.54v11.1H4.44ZM22.19,17.75c0,2.45-1.99,4.44-4.44,4.44s-4.44-1.99-4.44-4.44,1.99-4.44,4.44-4.44,4.44,1.99,4.44,4.44ZM35.51,17.75c0,2.45-1.99,4.44-4.44,4.44s-4.44-1.99-4.44-4.44,1.99-4.44,4.44-4.44,4.44,1.99,4.44,4.44ZM48.82,17.75c0,2.45-1.99,4.44-4.44,4.44s-4.44-1.99-4.44-4.44,1.99-4.44,4.44-4.44,4.44,1.99,4.44,4.44ZM92.63,85.06c3.13-3.83,5.02-8.72,5.02-14.04,0-12.24-9.96-22.19-22.19-22.19s-22.19,9.96-22.19,22.19,9.96,22.19,22.19,22.19c5.32,0,10.21-1.88,14.04-5.02l13.24,13.24c.43.43,1,.65,1.57.65s1.14-.22,1.57-.65c.87-.87.87-2.27,0-3.14l-13.24-13.24h0ZM75.46,88.77c-9.79,0-17.75-7.96-17.75-17.75s7.96-17.75,17.75-17.75,17.75,7.96,17.75,17.75-7.96,17.75-17.75,17.75Z"
+                    />
+                  </svg>
+                  <div className="text-start pr-5">
+                    <h4 className="pb-1">خدمات درمانی سیو</h4>
+                    <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ</p>
+                  </div>
+                </div>
+
+                <div className="text-white flex items-center border border-white rounded-4xl p-10 w-1/2 sm:w-auto text-center text-sm sm:text-base">
+                  <svg
+                    className="w-40 h-40"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 107.48 103"
+                  >
+                    <path
+                      fill="#ffff"
+                      d="M87.33,0H20.15C9.04,0,0,9.04,0,20.15v58.22c0,11.11,9.04,20.15,20.15,20.15h8.96c1.24,0,2.24-1,2.24-2.24s-1-2.24-2.24-2.24h-8.96c-8.64,0-15.67-7.03-15.67-15.67v-42.54h98.52v42.54c0,8.64-7.03,15.67-15.67,15.67h-8.96c-1.24,0-2.24,1-2.24,2.24s1,2.24,2.24,2.24h8.96c11.11,0,20.15-9.04,20.15-20.15V20.15c0-11.11-9.04-20.15-20.15-20.15ZM4.48,31.35v-11.2c0-8.64,7.03-15.67,15.67-15.67h67.17c8.64,0,15.67,7.03,15.67,15.67v11.2H4.48ZM22.39,17.91c0,2.47-2.01,4.48-4.48,4.48s-4.48-2.01-4.48-4.48,2.01-4.48,4.48-4.48,4.48,2.01,4.48,4.48ZM35.83,17.91c0,2.47-2.01,4.48-4.48,4.48s-4.48-2.01-4.48-4.48,2.01-4.48,4.48-4.48,4.48,2.01,4.48,4.48ZM49.26,17.91c0,2.47-2.01,4.48-4.48,4.48s-4.48-2.01-4.48-4.48,2.01-4.48,4.48-4.48,4.48,2.01,4.48,4.48ZM80.61,64.93c0,8.48-3.89,16.28-10.66,21.4-1.76,1.34-2.78,3.3-2.78,5.4v9.02c0,1.24-1,2.24-2.24,2.24s-2.24-1-2.24-2.24v-9.02c0-3.51,1.66-6.78,4.55-8.97,5.65-4.27,8.88-10.77,8.88-17.83,0-5.61-2.09-10.97-5.88-15.11-.78-.85-1.72-.58-1.99-.47-.33.13-1.08.54-1.08,1.59v6.62c0,7.17-5.3,13.33-12.06,14-3.8.4-7.58-.86-10.39-3.4-2.81-2.54-4.42-6.18-4.42-9.96v-7.26c0-1.06-.76-1.47-1.08-1.59-.27-.1-1.2-.38-1.99.47-3.79,4.14-5.88,9.5-5.88,15.11,0,7.06,3.24,13.56,8.88,17.83,2.89,2.19,4.55,5.46,4.55,8.97v9.02c0,1.24-1,2.24-2.24,2.24s-2.24-1-2.24-2.24v-9.02c0-2.1-1.01-4.06-2.78-5.4-6.77-5.13-10.66-12.93-10.66-21.4,0-6.73,2.51-13.17,7.06-18.13,1.77-1.93,4.48-2.57,6.91-1.62,2.39.93,3.94,3.19,3.94,5.77v7.26c0,2.53,1.07,4.94,2.95,6.64,1.9,1.72,4.37,2.53,6.94,2.27,4.5-.46,8.03-4.65,8.03-9.55v-6.62c0-2.57,1.55-4.84,3.94-5.77,2.43-.95,5.14-.31,6.91,1.62,4.55,4.96,7.06,11.4,7.06,18.13Z"
+                    />
+                  </svg>
+                  <div className="text-start pr-5">
+                    <h4 className="pb-1">خدمات درمانی طراحی سایت</h4>
+                    <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Cards */}
-      <div className="absolute right-[5%] bottom-[5%] flex flex-col lg:flex-row gap-6 z-20 w-full px-4">
-        {/* First Card */}
-        <div className="bg-[#1d546b] text-white flex flex-col sm:flex-row items-center rounded-3xl p-6 sm:p-10 w-full lg:w-1/2 text-center sm:text-start text-sm sm:text-base">
-          <svg
-            className="w-24 h-24 sm:w-40 sm:h-40 mb-4 sm:mb-0"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 106.53 102.09"
-            fill="#f7f8fc"
-          >
-            <path d="..." />
-          </svg>
-          <div className="sm:pr-5">
-            <h4 className="pb-1">خدمات درمانی سیو</h4>
-            <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ</p>
-          </div>
-        </div>
-
-        {/* Second Card */}
-        <div className="text-white flex flex-col sm:flex-row items-center border border-white rounded-3xl p-6 sm:p-10 w-full lg:w-1/2 text-center sm:text-start text-sm sm:text-base">
-          <svg
-            className="w-24 h-24 sm:w-40 sm:h-40 mb-4 sm:mb-0"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 107.48 103"
-            fill="#fff"
-          >
-            <path d="..." />
-          </svg>
-          <div className="sm:pr-5">
-            <h4 className="pb-1">خدمات درمانی طراحی سایت</h4>
-            <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 
         {/* Background section starts from mid-image */}
         <div className="w-full mt-[-15%] pt-[15%] bg-[#f7f8fc] relative z-0">
           <div className="w-11/12 m-auto">
             <div className="mt-10">
-              <div className="flex items-center pr-18">
-                <h3 className="text-gray-800">قرص های پر بازدید کیلینیک</h3>
+              <div className="flex items-center md:pr-18 justify-center md:justify-start">
+                <h3 className="text-gray-800 font-semibold">قرص های پر بازدید کیلینیک</h3>
                 <h3 className="text-[#6FD6E5] pr-2">وب و فن</h3>
               </div>
               <Popularpills />
