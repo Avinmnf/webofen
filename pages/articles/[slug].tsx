@@ -14,7 +14,7 @@ export default function PostPage() {
   if (!post) return <p>Post not found</p>;
 
   return (
-    <article>
+    <article className='text-black'>
       <h1>{post.title}</h1>
       {post.imageUrl && <img src={post.imageUrl} alt={post.imageAlt || post.title} />}
       <p>{post.description}</p>
