@@ -2,28 +2,30 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Header() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const menuItems = ["خانه", "مشاوره", "خدمات درمانی", "درباره ما", "بیمه وب و فن"];
+  const menuItems = ["خانه", "مشاوره", "خدمات درمانی","وبلاگ", "درباره ما", "بیمه وب و فن"];
 
   return (
     <header dir="rtl" className="w-full p-4 bg-[#f7f8fc] text-black">
       <div className="flex justify-center">
         <div className="w-11/12 flex flex-col lg:flex-row items-center justify-between rounded-2xl bg-white p-4">
-          
+
           {/* Logo & Toggle Button */}
           <div className="w-full flex items-center justify-between lg:w-auto">
-            <Image
-              width={150}
-              height={100}
-              src="/homepage/logo.png"
-              alt="logo"
-              priority
-            />
-
+            <Link href="/">
+              <Image
+                width={150}
+                height={100}
+                src="/homepage/logo.png"
+                alt="logo"
+                priority
+              />
+            </Link>
             {/* Mobile menu toggle */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
@@ -46,11 +48,10 @@ export default function Header() {
 
           {/* Navigation Menu */}
           <nav
-            className={`w-full lg:w-auto transition-all duration-300 ${
-              menuOpen ? 'block mt-4' : 'hidden lg:flex'
-            }`}
+            className={`w-full lg:w-auto transition-all duration-300 ${menuOpen ? 'block mt-4' : 'hidden lg:flex'
+              }`}
           >
-            <ul className="flex flex-col lg:flex-row items-center gap-4 lg:gap-6">
+            <ul className="flex flex-col lg:flex-row items-center gap-4 lg:gap-10">
               {menuItems.map((item, index) => (
                 <li
                   key={index}
@@ -58,9 +59,8 @@ export default function Header() {
                     setActiveIndex(index);
                     setMenuOpen(false);
                   }}
-                  className={`cursor-pointer select-none ${
-                    activeIndex === index ? 'text-[#6fd6e5] font-bold' : 'text-gray-700'
-                  }`}
+                  className={`cursor-pointer select-none ${activeIndex === index ? 'text-[#6fd6e5] font-bold' : 'text-gray-700'
+                    }`}
                 >
                   {item}
                 </li>
@@ -70,7 +70,9 @@ export default function Header() {
 
           {/* CTA Button */}
           <div className={`mt-4 lg:mt-0 ${menuOpen ? 'block' : 'hidden lg:block'}`}>
-            <button className="bg-[#6FD6E5] w-24 h-10 rounded-lg text-white">ورود</button>
+            <button className="bg-[#6FD6E5] hover:bg-[#1d546b] w-24 h-10 rounded-lg text-white  hover:scale-102 transition-all cursor-pointer">
+              ورود
+              </button>
           </div>
         </div>
       </div>

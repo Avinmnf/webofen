@@ -330,9 +330,7 @@ export default function Home() {
                 <div className="mr-4 w-64">
                   <div className="flex items-center gap-6">
                     <p className="text-white text-xl whitespace-nowrap">تیم ما</p>
-                    <button
-                      className="bg-[#6FD6E5] text-white px-8 py-2 rounded-4xl text-sm hover:scale-105 transition-all"
-                    >
+                    <button className="bg-[#6FD6E5] hover:bg-[#1d546b] py-2 px-6 rounded-4xl text-white  hover:scale-102 transition-all cursor-pointer">
                       مشاهده اعضا
                     </button>
                   </div>
