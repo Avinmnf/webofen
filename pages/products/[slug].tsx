@@ -109,120 +109,115 @@ export default function ProductDetailPage() {
   if (!product) return <p className="text-center py-10 text-gray-600">محصول یافت نشد.</p>;
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md text-gray-900">
-      <h1 className="text-3xl font-extrabold mb-6">{product.title}</h1>
+    <main>
+      <div className='w-11/12 flex text-gray-700'>
+        <div className='w-2/3'>
 
-      {product.imageUrl && (
-        <div className="mb-8 flex justify-center">
-          <img src={product.imageUrl} alt={product.title} className="w-full max-w-md rounded-lg object-cover shadow-lg" />
+          <h1 className="text-3xl font-extrabold mb-6">{product.title}</h1>
         </div>
-      )}
+        <div className="w-1/3 mx-auto p-6 bg-white rounded-lg border border-gray-400 text-gray-900">
 
-      <p className="mb-6 leading-relaxed text-gray-700">{product.description}</p>
 
-      <div className="prose max-w-none mb-10 text-gray-800" dangerouslySetInnerHTML={{ __html: product.content }} />
 
-      <h2 className="text-2xl font-semibold mb-4">انتخاب ویژگی‌ها</h2>
+          <p className="mb-6 leading-relaxed text-gray-700">{product.description}</p>
 
-      <div className="space-y-6 mb-8">
-        {Object.entries(attributeMap).map(([attrName, values]) => (
-          <div key={attrName}>
-            <h4 className="font-medium mb-2">{attrName}:</h4>
-            <div className="flex flex-wrap gap-2">
-              {values.map(value => (
-                <button
-                  key={value}
-                  onClick={() => setSelectedAttributes(prev => ({ ...prev, [attrName]: value }))}
-                  className={`px-4 py-2 rounded border ${selectedAttributes[attrName] === value
-                    ? 'bg-indigo-600 text-white border-indigo-600'
-                    : 'bg-white border-gray-300'
-                    }`}
-                >
-                  {value}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
+          <div className="prose max-w-none mb-10 text-gray-800" dangerouslySetInnerHTML={{ __html: product.content }} />
 
-      {matchedVariant ? (
-        <div className="p-4 border rounded bg-gray-50 mb-6">
-          <p><strong>قیمت:</strong> {matchedVariant.price.toLocaleString()} ریال</p>
-          <p><strong>موجودی:</strong> {matchedVariant.stock > 0 ? matchedVariant.stock : 'ناموجود'}</p>
-        </div>
-      ) : (
-        Object.keys(selectedAttributes).length === Object.keys(attributeMap).length && (
-          <p className="text-red-600 mb-6">واریانت مناسب با این ترکیب پیدا نشد.</p>
-        )
-      )}
+          <h2 className="text-2xl font-semibold mb-4">انتخاب ویژگی‌ها</h2>
 
-      <div className="max-w-xs mb-6">
-        <label htmlFor="quantity" className="block mb-1 font-semibold text-gray-700">تعداد سفارش</label>
-        <input
-          id="quantity"
-          type="number"
-          min={1}
-          max={matchedVariant?.stock || 1}
-          value={quantity}
-          onChange={handleQuantityChange}
-          className="w-full border border-gray-300 rounded px-3 py-2"
-          disabled={!matchedVariant}
-        />
-      </div>
-
-      <div className="mb-8">
-        <button
-          onClick={handleTestOrder}
-          className="px-6 py-3 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition disabled:opacity-50"
-          disabled={!matchedVariant || quantity < 1 || quantity > (matchedVariant?.stock || 0)}
-        >
-          ثبت سفارش
-        </button>
-        {orderMessage && <p className="mt-4 text-center text-sm text-gray-700">{orderMessage}</p>}
-      </div>
-
-      <button
-        onClick={() =>
-          addItem({
-            productId: product.id,
-            variantId: matchedVariant?.id,
-            quantity,
-            price: matchedVariant?.price,
-          })
-        }
-      >
-        Add to Cart
-      </button>
-
-      {!loadingRelated && related.length > 0 && (
-        <div className="mt-10">
-          <h2 className="text-xl font-bold mb-4">محصولات مرتبط</h2>
-          <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {related.map((item) => (
-              <li key={item.id} className="border p-4 rounded shadow-sm bg-white">
-                <a href={`/products/${item.slug}`} className="font-semibold text-blue-700">
-                  {item.title}
-                </a>
-                {item.imageUrl && (
-                  <img
-                    src={item.imageUrl}
-                    alt={item.title}
-                    className="w-full h-40 object-cover mt-2 rounded"
-                  />
-                )}
-                {item.description && <p className="text-sm mt-2">{item.description}</p>}
-              </li>
+          <div className="space-y-6 mb-8">
+            {Object.entries(attributeMap).map(([attrName, values]) => (
+              <div key={attrName}>
+                <h4 className="font-medium mb-2">{attrName}:</h4>
+                <div className="flex flex-wrap gap-2">
+                  {values.map(value => (
+                    <button
+                      key={value}
+                      onClick={() => setSelectedAttributes(prev => ({ ...prev, [attrName]: value }))}
+                      className={`px-4 py-2 rounded border ${selectedAttributes[attrName] === value
+                        ? 'bg-indigo-600 text-white border-indigo-600'
+                        : 'bg-white border-gray-300'
+                        }`}
+                    >
+                      {value}
+                    </button>
+                  ))}
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
+
+          {matchedVariant ? (
+            <div className="p-4 border rounded bg-gray-50 mb-6">
+              <p><strong>قیمت:</strong> {matchedVariant.price.toLocaleString()} ریال</p>
+              <p><strong>موجودی:</strong> {matchedVariant.stock > 0 ? matchedVariant.stock : 'ناموجود'}</p>
+            </div>
+          ) : (
+            Object.keys(selectedAttributes).length === Object.keys(attributeMap).length && (
+              <p className="text-red-600 mb-6">واریانت مناسب با این ترکیب پیدا نشد.</p>
+            )
+          )}
+
+          <div className="max-w-xs mb-6">
+            <label htmlFor="quantity" className="block mb-1 font-semibold text-gray-700">تعداد سفارش</label>
+            <input
+              id="quantity"
+              type="number"
+              min={1}
+              max={matchedVariant?.stock || 1}
+              value={quantity}
+              onChange={handleQuantityChange}
+              className="w-full border border-gray-300 rounded px-3 py-2"
+              disabled={!matchedVariant}
+            />
+          </div>
+
+
           <button
-            onClick={() => setSkip(prev => prev + take)}
-            className="mt-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
+            className='bg-blue-500 p-2 rounded-xl text-white cursor-pointer'
+            onClick={() =>
+              addItem({
+                productId: product.id,
+                variantId: matchedVariant?.id,
+                quantity,
+                price: matchedVariant?.price,
+              })
+            }
           >
-            بارگذاری بیشتر
+            افزودن به سبد
           </button>
         </div>
-      )}
-    </div>
+      </div>
+      <div className='w-11/12 text-gray-700 m-auto'>
+        {!loadingRelated && related.length > 0 && (
+          <div className="mt-10">
+            <h2 className="text-xl font-bold mb-4">محصولات مرتبط</h2>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {related.map((item) => (
+                <li key={item.id} className="border p-4 rounded shadow-sm bg-white">
+                  <a href={`/products/${item.slug}`} className="font-semibold text-blue-700">
+                    {item.title}
+                  </a>
+                  {item.imageUrl && (
+                    <img
+                      src={item.imageUrl}
+                      alt={item.title}
+                      className="w-full h-40 object-cover mt-2 rounded"
+                    />
+                  )}
+                  {item.description && <p className="text-sm mt-2">{item.description}</p>}
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={() => setSkip(prev => prev + take)}
+              className="mt-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
+            >
+              بارگذاری بیشتر
+            </button>
+          </div>
+        )}
+      </div>
+    </main>
   );
 }
