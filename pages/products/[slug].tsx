@@ -2,8 +2,10 @@ import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import useProductBySlug from '@/hooks/useProductBySlug';
 import useRelatedProducts from '@/hooks/useRelatedProducts';
+import { useCart } from '@/contexts/CartContext';
 
 export default function ProductDetailPage() {
+  const { addItem } = useCart();
   const router = useRouter();
   const { slug } = router.query;
 
@@ -132,8 +134,8 @@ export default function ProductDetailPage() {
                   key={value}
                   onClick={() => setSelectedAttributes(prev => ({ ...prev, [attrName]: value }))}
                   className={`px-4 py-2 rounded border ${selectedAttributes[attrName] === value
-                      ? 'bg-indigo-600 text-white border-indigo-600'
-                      : 'bg-white border-gray-300'
+                    ? 'bg-indigo-600 text-white border-indigo-600'
+                    : 'bg-white border-gray-300'
                     }`}
                 >
                   {value}
@@ -179,6 +181,19 @@ export default function ProductDetailPage() {
         </button>
         {orderMessage && <p className="mt-4 text-center text-sm text-gray-700">{orderMessage}</p>}
       </div>
+
+      <button
+        onClick={() =>
+          addItem({
+            productId: product.id,
+            variantId: matchedVariant?.id,
+            quantity,
+            price: matchedVariant?.price,
+          })
+        }
+      >
+        Add to Cart
+      </button>
 
       {!loadingRelated && related.length > 0 && (
         <div className="mt-10">
