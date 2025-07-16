@@ -13,71 +13,91 @@ export default function ProductDetailPage() {
   const { related, loading: loadingRelated } = useRelatedProducts(product?.slug, skip, take);
 
   const [orderMessage, setOrderMessage] = useState('');
-  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
+  const [attributeMap, setAttributeMap] = useState<Record<string, string[]>>({});
 
-  // Set default selected variant once product loads
+  // Extract attribute buttons from product variants
   useEffect(() => {
-    if (product?.variants?.length) {
-      setSelectedVariantId(product.variants[0].id);
-      setQuantity(1);
+    if (!product?.variants?.length) return;
+
+    const map: Record<string, Set<string>> = {};
+
+    product.variants.forEach(variant => {
+      variant.attributeValues.forEach(({ attribute, value }) => {
+        if (!map[attribute.name]) map[attribute.name] = new Set();
+        map[attribute.name].add(value);
+      });
+    });
+
+    const grouped: Record<string, string[]> = {};
+    for (const attr in map) {
+      grouped[attr] = Array.from(map[attr]);
     }
+
+    setAttributeMap(grouped);
+    setSelectedAttributes({});
+    setQuantity(1);
   }, [product]);
 
-  // Get currently selected variant object for stock check
-  const selectedVariant = product?.variants.find(v => v.id === selectedVariantId);
+  // Find variant matching all selected attributes
+  const matchedVariant = product?.variants.find(variant => {
+    const attrs = variant.attributeValues;
+    return (
+      Object.entries(selectedAttributes).every(
+        ([attrName, value]) =>
+          attrs.some(av => av.attribute.name === attrName && av.value === value)
+      ) && attrs.length === Object.keys(selectedAttributes).length
+    );
+  });
 
   function handleQuantityChange(e: React.ChangeEvent<HTMLInputElement>) {
     let val = parseInt(e.target.value);
     if (isNaN(val) || val < 1) val = 1;
-    if (selectedVariant && val > selectedVariant.stock) val = selectedVariant.stock;
+    if (matchedVariant && val > matchedVariant.stock) val = matchedVariant.stock;
     setQuantity(val);
   }
 
   async function handleTestOrder() {
-    if (!product || !product.variants || product.variants.length === 0) {
-      setOrderMessage('هیچ ویژگی‌ای برای سفارش موجود نیست.');
+    if (!product || !matchedVariant) {
+      setOrderMessage('لطفا ویژگی‌ها را کامل انتخاب کنید.');
       return;
     }
 
-    if (!selectedVariant) {
-      setOrderMessage('لطفا یک ویژگی را انتخاب کنید.');
-      return;
-    }
-
-    if (selectedVariant.stock < quantity) {
-      setOrderMessage('موجودی این ویژگی کافی نیست.');
+    if (matchedVariant.stock < quantity) {
+      setOrderMessage('موجودی کافی نیست.');
       return;
     }
 
     const orderData = {
-      customerName: 'mahsa',
+      customerName: 'ساجده حسینی',
       customerPhone: '09214892475',
       address: 'آدرس تستی',
       items: [
         {
-          variantId: selectedVariant.id,
+          variantId: matchedVariant.id,
           quantity,
-          price: selectedVariant.price,
+          price: matchedVariant.price,
         },
       ],
     };
 
     try {
-      const res = await fetch('http://localhost:3003/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData),
-      });
+      const res = await
+        fetch(`/api/proxy/orders`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(orderData),
+        });
 
       const json = await res.json();
 
       if (res.ok) {
-        setOrderMessage(`سفارش با موفقیت ثبت شد! شناسه سفارش: ${json.orderId}`);
+        setOrderMessage(`سفارش ثبت شد! شناسه سفارش: ${json.orderId}`);
       } else {
-        setOrderMessage(`خطا در ثبت سفارش: ${json.error || 'خطای نامشخص'}`);
+        setOrderMessage(`خطا در ثبت سفارش: ${json.error || 'نامشخص'}`);
       }
-    } catch (err) {
+    } catch {
       setOrderMessage('خطای شبکه، لطفا دوباره تلاش کنید.');
     }
   }
@@ -92,90 +112,68 @@ export default function ProductDetailPage() {
 
       {product.imageUrl && (
         <div className="mb-8 flex justify-center">
-          <img
-            src={product.imageUrl}
-            alt={product.title}
-            className="w-full max-w-md rounded-lg object-cover shadow-lg"
-          />
+          <img src={product.imageUrl} alt={product.title} className="w-full max-w-md rounded-lg object-cover shadow-lg" />
         </div>
       )}
 
       <p className="mb-6 leading-relaxed text-gray-700">{product.description}</p>
 
-      <div
-        className="prose max-w-none mb-10 text-gray-800"
-        dangerouslySetInnerHTML={{ __html: product.content }}
-      />
+      <div className="prose max-w-none mb-10 text-gray-800" dangerouslySetInnerHTML={{ __html: product.content }} />
 
-      <h2 className="text-2xl font-semibold mb-6 border-b pb-2">ویژگی‌ها و قیمت‌ها</h2>
+      <h2 className="text-2xl font-semibold mb-4">انتخاب ویژگی‌ها</h2>
 
-      <div className="space-y-6">
-        {product.variants.map((v) => (
-          <label
-            key={v.id}
-            className={`border rounded-lg p-5 shadow-sm flex justify-between items-center cursor-pointer
-              ${
-                selectedVariantId === v.id
-                  ? 'border-indigo-600 bg-indigo-50'
-                  : 'border-gray-300 hover:shadow-md'
-              }`}
-          >
-            <div>
-              <p className="mb-2 font-medium text-gray-800">
-                ویژگی‌ها:{' '}
-                <span className="font-normal text-gray-600">
-                  {v.attributeValues
-                    .map((av) => `${av.attribute.name}: ${av.value}`)
-                    .join(', ')}
-                </span>
-              </p>
-              <p className="mb-1 text-lg font-semibold text-indigo-600">
-                قیمت: {v.price.toLocaleString()} ریال
-              </p>
-              <p
-                className={`font-semibold ${v.stock > 0 ? 'text-green-600' : 'text-red-600'}`}
-              >
-                موجودی: {v.stock > 0 ? v.stock : 'ناموجود'}
-              </p>
+      <div className="space-y-6 mb-8">
+        {Object.entries(attributeMap).map(([attrName, values]) => (
+          <div key={attrName}>
+            <h4 className="font-medium mb-2">{attrName}:</h4>
+            <div className="flex flex-wrap gap-2">
+              {values.map(value => (
+                <button
+                  key={value}
+                  onClick={() => setSelectedAttributes(prev => ({ ...prev, [attrName]: value }))}
+                  className={`px-4 py-2 rounded border ${selectedAttributes[attrName] === value
+                      ? 'bg-indigo-600 text-white border-indigo-600'
+                      : 'bg-white border-gray-300'
+                    }`}
+                >
+                  {value}
+                </button>
+              ))}
             </div>
-            <input
-              type="radio"
-              name="variant"
-              value={v.id}
-              checked={selectedVariantId === v.id}
-              disabled={v.stock < 1}
-              onChange={() => setSelectedVariantId(v.id)}
-              className="w-5 h-5"
-            />
-          </label>
+          </div>
         ))}
       </div>
 
-      {/* Quantity input */}
-      <div className="mt-4 max-w-xs">
-        <label htmlFor="quantity" className="block mb-1 font-semibold text-gray-700">
-          تعداد سفارش
-        </label>
+      {matchedVariant ? (
+        <div className="p-4 border rounded bg-gray-50 mb-6">
+          <p><strong>قیمت:</strong> {matchedVariant.price.toLocaleString()} ریال</p>
+          <p><strong>موجودی:</strong> {matchedVariant.stock > 0 ? matchedVariant.stock : 'ناموجود'}</p>
+        </div>
+      ) : (
+        Object.keys(selectedAttributes).length === Object.keys(attributeMap).length && (
+          <p className="text-red-600 mb-6">واریانت مناسب با این ترکیب پیدا نشد.</p>
+        )
+      )}
+
+      <div className="max-w-xs mb-6">
+        <label htmlFor="quantity" className="block mb-1 font-semibold text-gray-700">تعداد سفارش</label>
         <input
           id="quantity"
           type="number"
           min={1}
-          max={selectedVariant?.stock || 1}
+          max={matchedVariant?.stock || 1}
           value={quantity}
           onChange={handleQuantityChange}
           className="w-full border border-gray-300 rounded px-3 py-2"
-          disabled={!selectedVariant}
+          disabled={!matchedVariant}
         />
-        {selectedVariant && quantity > selectedVariant.stock && (
-          <p className="text-red-600 text-sm mt-1">موجودی کافی نیست.</p>
-        )}
       </div>
 
-      <div className="mt-8">
+      <div className="mb-8">
         <button
           onClick={handleTestOrder}
           className="px-6 py-3 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition disabled:opacity-50"
-          disabled={!selectedVariantId || quantity < 1 || (selectedVariant && quantity > selectedVariant.stock)}
+          disabled={!matchedVariant || quantity < 1 || quantity > (matchedVariant?.stock || 0)}
         >
           ثبت سفارش
         </button>
@@ -202,7 +200,12 @@ export default function ProductDetailPage() {
               </li>
             ))}
           </ul>
-          <button onClick={() => setSkip((prev) => prev + take)}>Load More</button>
+          <button
+            onClick={() => setSkip(prev => prev + take)}
+            className="mt-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
+          >
+            بارگذاری بیشتر
+          </button>
         </div>
       )}
     </div>

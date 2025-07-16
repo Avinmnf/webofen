@@ -43,7 +43,11 @@ export function usePosts(options: UsePostsOptions) {
 
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003';
 
-                const res = await fetch(`${apiUrl}/posts?${params.toString()}`); const data = await res.json();
+                const res = await
+                    fetch(`/api/proxy/posts?${params.toString()}`, {
+                        method: 'GET',
+                    })
+                const data = await res.json();
                 setPosts(data.posts);
                 setTotal(data.total);
             } catch (error) {

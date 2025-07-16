@@ -4,7 +4,7 @@ type Post = {
   id: string;
   title: string;
   slug: string;
-  content?: any; // adjust type as needed
+  content?: string;
   imageUrl?: string;
   imageAlt?: string;
   description?: string;
@@ -13,7 +13,7 @@ type Post = {
   tags?: { name: string }[];
 };
 
-export function usePostBySlug(slug: string | null) {
+export function usePostBySlug(slug?: string) {
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,15 +21,19 @@ export function usePostBySlug(slug: string | null) {
   useEffect(() => {
     if (!slug) return;
 
+    const safeSlug = encodeURIComponent(slug);
+
     async function fetchPost() {
       setLoading(true);
       setError(null);
 
       try {
-        const res = await fetch(`http://localhost:3003/posts/${slug}`);
-        if (!res.ok) {
-          throw new Error('Failed to fetch post');
-        }
+        const res = await
+          fetch(`/api/proxy/postbyslug/${safeSlug}`, {
+            method: 'GET',
+          })
+        if (!res.ok) throw new Error('Failed to fetch post');
+
         const data = await res.json();
         setPost(data);
       } catch (err: any) {

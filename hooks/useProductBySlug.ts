@@ -37,7 +37,9 @@ export default function useProductBySlug(slug?: string) {
     if (!slug) return;
 
     setLoading(true);
-    fetch(`http://localhost:3003/productbyslug/${encodeURIComponent(slug)}`)
+        fetch(`/api/proxy/productbyslug/${encodeURIComponent(slug)}`, {
+      method: 'GET',
+    })
       .then(async res => {
         if (!res.ok) throw new Error(await res.text());
         const data = await res.json();

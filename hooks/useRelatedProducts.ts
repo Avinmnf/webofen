@@ -21,8 +21,9 @@ export default function useRelatedProducts(slug?: string, skip = 0, take = 10) {
     setError(null);
 
     const queryParams = new URLSearchParams({ skip: String(skip), take: String(take) });
-
-    fetch(`http://localhost:3003/related-products/${encodeURIComponent(slug)}?${queryParams}`)
+    fetch(`/api/proxy/related-products/${encodeURIComponent(slug)}?${queryParams}`, {
+      method: 'GET',
+    })
       .then(async res => {
         if (!res.ok) throw new Error(await res.text());
         return res.json();

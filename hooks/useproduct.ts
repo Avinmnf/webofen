@@ -1,4 +1,3 @@
-// hooks/Useproducts.ts
 import { useEffect, useState } from 'react';
 
 type Product = {
@@ -7,10 +6,10 @@ type Product = {
   slug: string;
   description?: string;
   imageUrl?: string;
-  createdAt: string;
+  createdAt?: string;
 };
 
-export default function Useproducts(limit = 10) {
+export default function useProducts(limit = 10) {
   const [products, setProducts] = useState<Product[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -21,18 +20,23 @@ export default function Useproducts(limit = 10) {
     setLoading(true);
     setError(null);
 
-    fetch(`http://localhost:3003/products?page=${page}&limit=${limit}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.products?.length < limit) setHasMore(false);
-        setProducts((prev) => [...prev, ...(data.products || [])]);
+    fetch(`/api/proxy/products?page=${page}&limit=${limit}`, {
+      method: 'GET',
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch products');
+        return res.json();
       })
-      .catch((err) => setError(err.message || 'Unknown error'))
+      .then(data => {
+        if (data.products?.length < limit) setHasMore(false);
+        setProducts(prev => [...prev, ...(data.products || [])]);
+      })
+      .catch(err => setError(err.message || 'Unknown error'))
       .finally(() => setLoading(false));
-  }, [page]);
+  }, [page, limit]);
 
   function loadMore() {
-    if (hasMore) setPage((prev) => prev + 1);
+    if (hasMore) setPage(prev => prev + 1);
   }
 
   return { products, loading, error, loadMore, hasMore };

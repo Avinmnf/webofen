@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { usePosts } from '@/hooks/useposts';
+import Link from 'next/link';
 import { usePostBySlug } from '@/hooks/usePostBySlug';
 
 
@@ -15,7 +16,7 @@ type Slider = {
     priority: number;
 };
 type Props = {
-  slug: string;
+    slug: string;
 };
 export default function PostsPage() {
     const [page, setPage] = useState(1);
@@ -186,27 +187,24 @@ export default function PostsPage() {
             {/* Posts List */}
             <div className="space-y-6">
                 {posts.map(post => (
-                    <div
-                        key={post.id}
-                        className="flex gap-4 p-4 border border-gray-200 rounded-lg shadow-sm bg-white"
-                    >
-                        {post.imageUrl && (
-                            <img
-                                src={post.imageUrl}
-                                alt={post.imageAlt || post.title}
-                                className="w-28 h-20 object-cover rounded-md"
-                            />
-                        )}
-                        <div className="flex flex-col justify-between">
-                            <div>
-                                <h3 className="text-lg font-semibold">{post.title}</h3>
-                                <p className="text-sm text-gray-700">{post.description}</p>
+                    <Link key={post.id} href={`/articles/${post.slug}`} passHref>
+                            {post.imageUrl && (
+                                <img
+                                    src={post.imageUrl}
+                                    alt={post.imageAlt || post.title}
+                                    className="w-28 h-20 object-cover rounded-md"
+                                />
+                            )}
+                            <div className="flex flex-col justify-between">
+                                <div>
+                                    <h3 className="text-lg font-semibold">{post.title}</h3>
+                                    <p className="text-sm text-gray-700">{post.description}</p>
+                                </div>
+                                <div className="text-xs text-gray-500 mt-1">
+                                    تاریخ: {new Date(post.createdAt).toLocaleDateString()} | برچسب‌ها: {post.tags.map(t => t.name).join(', ')}
+                                </div>
                             </div>
-                            <div className="text-xs text-gray-500 mt-1">
-                                تاریخ: {new Date(post.createdAt).toLocaleDateString()} | برچسب‌ها: {post.tags.map(t => t.name).join(', ')}
-                            </div>
-                        </div>
-                    </div>
+                    </Link>
                 ))}
             </div>
 
