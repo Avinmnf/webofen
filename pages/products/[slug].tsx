@@ -1,8 +1,10 @@
+
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import useProductBySlug from '@/hooks/useProductBySlug';
 import useRelatedProducts from '@/hooks/useRelatedProducts';
 import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ProductDetailPage() {
   const { addItem } = useCart();
@@ -172,11 +174,11 @@ export default function ProductDetailPage() {
             />
           </div>
 
-
           <button
             className='bg-blue-500 p-2 rounded-xl text-white cursor-pointer'
             onClick={() =>
               addItem({
+                title: product.title,
                 productId: product.id,
                 variantId: matchedVariant?.id,
                 quantity,
@@ -186,6 +188,7 @@ export default function ProductDetailPage() {
           >
             افزودن به سبد
           </button>
+
         </div>
       </div>
       <div className='w-11/12 text-gray-700 m-auto'>

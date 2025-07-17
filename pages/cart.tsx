@@ -1,10 +1,14 @@
 'use client';
-
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { useCart } from '@/contexts/CartContext';
-import { title } from 'process';
+import { useAuth } from '@/contexts/AuthContext';
+
 
 export default function CartPage() {
+  const { user } = useAuth();
+const router = useRouter();
   const { cart, removeItem, updateItemQuantity, placeOrder } = useCart();
 
   const [customerName, setCustomerName] = useState('');
@@ -14,17 +18,48 @@ export default function CartPage() {
 
   const totalPrice = cart.reduce((sum, i) => sum + (i.price ?? 0) * i.quantity, 0);
 
-  async function handlePlaceOrder() {
-    const res = await placeOrder(customerName, customerPhone, address);
-    if (res.success) {
-      setOrderMessage(`سفارش شما ثبت شد! شناسه سفارش: ${res.orderId}`);
-      setCustomerName('');
-      setCustomerPhone('');
-      setAddress('');
-    } else {
-      setOrderMessage(`خطا در ثبت سفارش: ${res.error}`);
-    }
+async function handlePlaceOrder() {
+  if (!user) {
+    // Save cart & form state before redirecting
+    localStorage.setItem('cartBackup', JSON.stringify(cart));
+    localStorage.setItem('customerInfo', JSON.stringify({
+      customerName,
+      customerPhone,
+      address
+    }));
+    router.push('/login?redirect=/cart');
+    return;
   }
+
+  const res = await placeOrder(customerName, customerPhone, address);
+  if (res.success) {
+    setOrderMessage(`سفارش شما ثبت شد! شناسه سفارش: ${res.orderId}`);
+    setCustomerName('');
+    setCustomerPhone('');
+    setAddress('');
+  } else {
+    setOrderMessage(`خطا در ثبت سفارش: ${res.error}`);
+  }
+}
+useEffect(() => {
+  const savedCart = localStorage.getItem('cartBackup');
+  const savedInfo = localStorage.getItem('customerInfo');
+  if (savedCart) {
+    const parsed = JSON.parse(savedCart);
+    parsed.forEach((item: any) => {
+      updateItemQuantity(item.productId, item.variantId, item.quantity); // add to cart
+    });
+    localStorage.removeItem('cartBackup');
+  }
+  if (savedInfo) {
+    const info = JSON.parse(savedInfo);
+    setCustomerName(info.customerName || '');
+    setCustomerPhone(info.customerPhone || '');
+    setAddress(info.address || '');
+    localStorage.removeItem('customerInfo');
+  }
+}, []);
+
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded shadow text-black">
@@ -32,10 +67,10 @@ export default function CartPage() {
 
       {cart.length === 0 && <p>سبد خرید شما خالی است.</p>}
 
-      {cart.map(({ productId, variantId, quantity, price }, idx) => (
+      {cart.map(({ productId, variantId, quantity, price, title }, idx) => (
         <div key={`${productId}-${variantId ?? 'no-variant'}`} className="mb-4 border p-4 rounded flex justify-between items-center">
           <div>
-            <p>محصول: {title}</p>
+            <p>محصول: {title ?? 'نامشخص'}</p>
             <p>شناسه خرید: {variantId || 'اصلی'}</p>
             <p>قیمت واحد: {price?.toLocaleString('fa-IR') ?? 0} ریال</p>
           </div>

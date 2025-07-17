@@ -1,4 +1,7 @@
+'use client';
+
 import Useproducts from "@/hooks/useproduct";
+
 export default function ProductList() {
   const { products, loading, error, loadMore, hasMore } = Useproducts(10);
 
@@ -10,8 +13,12 @@ export default function ProductList() {
       <ul>
         {products.map((product) => (
           <li key={product.id} className="mb-6 border-b pb-4">
-            <a href={`/products/${product.slug}`} className="text-lg font-semibold">{product.title}</a>
-            {product.imageUrl && <img src={product.imageUrl} alt={product.title} className="w-40 mt-2" />}
+            <a href={`/products/${product.slug}`} className="text-lg font-semibold">
+              {product.title}
+            </a>
+            {product.imageUrl && (
+              <img src={product.imageUrl} alt={product.title} className="w-40 mt-2" />
+            )}
             {product.description && <p className="mt-2 text-sm">{product.description}</p>}
           </li>
         ))}
