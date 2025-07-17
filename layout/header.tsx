@@ -11,7 +11,7 @@ export default function Header() {
   const menuItems = [
     { label: "خانه", href: "/" },
     { label: "مشاوره", href: "/" },
-    { label: "خدمات درمانی", href: "/" },
+    { label: "خدمات درمانی", href: "/products" },
     { label: "وبلاگ", href: "/articles" },
     { label: "درباره ما", href: "/" },
     { label: "بیمه وب و فن", href: "/" }

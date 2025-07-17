@@ -37,7 +37,7 @@ export default function CartPage() {
           <div>
             <p>محصول: {title}</p>
             <p>شناسه خرید: {variantId || 'اصلی'}</p>
-            <p>قیمت واحد: {price?.toLocaleString() ?? 0} ریال</p>
+            <p>قیمت واحد: {price?.toLocaleString('fa-IR') ?? 0} ریال</p>
           </div>
 
           <div>
@@ -60,7 +60,7 @@ export default function CartPage() {
 
       {cart.length > 0 && (
         <>
-          <p className="text-xl font-semibold mb-6">جمع کل: {totalPrice.toLocaleString()} ریال</p>
+          <p className="text-xl font-semibold mb-6">جمع کل: {totalPrice.toLocaleString('fa-IR')} ریال</p>
 
           <div className="space-y-4 mb-6">
             <input
