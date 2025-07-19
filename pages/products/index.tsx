@@ -1,11 +1,21 @@
 'use client';
-
-import Useproducts from "@/hooks/useproduct";
+import { useState } from "react";
+import { useProducts } from "@/hooks/useproduct";
 
 export default function ProductList() {
-  const { products, loading, error, loadMore, hasMore } = Useproducts(10);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [category, setCategory] = useState('');
+  const [sort, setSort] = useState('createdAt');
+  const [order, setOrder] = useState<'asc' | 'desc'>('desc');
 
-  if (error) return <p className="text-red-500">Error: {error}</p>;
+  const { products, total, loading } = useProducts({
+    page,
+    limit,
+    category,
+    sort,
+    order,
+  });
 
   return (
     <div className="text-black p-4">
@@ -25,12 +35,24 @@ export default function ProductList() {
       </ul>
 
       {loading && <p>Loading more...</p>}
-      {hasMore && !loading && (
-        <button onClick={loadMore} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">
-          Load More
+      <div className="mt-8 flex justify-center items-center gap-4">
+        <button
+          onClick={() => setPage(p => Math.max(p - 1, 1))}
+          disabled={page === 1}
+          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
+        >
+          Previous
         </button>
-      )}
-      {!hasMore && <p className="mt-4 text-gray-500">No more products.</p>}
+        <span className="text-sm">Page {page}</span>
+        <button
+          onClick={() => setPage(p => p + 1)}
+          disabled={products.length < limit}
+          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
+
     </div>
   );
 }

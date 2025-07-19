@@ -1,43 +1,56 @@
+// web/hooks/useProducts.ts
 import { useEffect, useState } from 'react';
 
-type Product = {
+export type Product = {
   id: string;
   title: string;
   slug: string;
-  description?: string;
   imageUrl?: string;
-  createdAt?: string;
+  description?: string;
+  createdAt: string;
+  category?: { id: string };
+  tags?: { name: string }[];
 };
 
-export default function useProducts(limit = 10) {
+type UseProductsOptions = {
+  limit?: number;
+  page?: number;
+  category?: string;
+  tag?: string;
+  sort?: string;
+  order?: 'asc' | 'desc';
+};
+
+export function useProducts(options: UseProductsOptions) {
   const [products, setProducts] = useState<Product[]>([]);
-  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const params = new URLSearchParams();
+        params.append('limit', String(options.limit ?? 10));
+        params.append('skip', String(((options.page ?? 1) - 1) * (options.limit ?? 10)));
+        if (options.category) params.append('category', options.category);
+        if (options.tag) params.append('tag', options.tag);
+        if (options.sort) params.append('sort', options.sort);
+        if (options.order) params.append('order', options.order);
 
-    fetch(`/api/proxy/products?page=${page}&limit=${limit}`, {
-      method: 'GET',
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch products');
-        return res.json();
-      })
-      .then(data => {
-        if (data.products?.length < limit) setHasMore(false);
-        setProducts(prev => [...prev, ...(data.products || [])]);
-      })
-      .catch(err => setError(err.message || 'Unknown error'))
-      .finally(() => setLoading(false));
-  }, [page, limit]);
+        const res = await fetch(`/api/proxy/products?${params.toString()}`);
+        const data = await res.json();
+        setProducts(data.products);
+        setTotal(data.total);
+      } catch (err) {
+        console.error('Failed to fetch products:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  function loadMore() {
-    if (hasMore) setPage(prev => prev + 1);
-  }
+    fetchProducts();
+  }, [options.limit, options.page, options.category, options.tag, options.sort, options.order]);
 
-  return { products, loading, error, loadMore, hasMore };
+  return { products, total, loading };
 }

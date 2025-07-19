@@ -4,8 +4,8 @@ import { useRouter } from 'next/navigation';
 
 type User = {
   id: string;
-  name: string;
   email: string;
+  role: string;
 };
 
 type AuthContextType = {
@@ -22,21 +22,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    // Try to fetch user info with existing token
+    const fetchUser = async () => {
+      try {
+        const res = await fetch('http://localhost:3003/me', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) throw new Error('Token invalid or expired');
+
+        const userData = await res.json();
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+      } catch (err) {
+        console.error('Auto-login failed:', err);
+        logout();
+      }
+    };
+
+    fetchUser();
   }, []);
 
   const login = async (token: string) => {
-    // store token and fetch user info from your CMS or API
-    localStorage.setItem('token', token);
-    const res = await fetch('/api/me', {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const userData = await res.json();
-    localStorage.setItem('user', JSON.stringify(userData));
-    setUser(userData);
+    try {
+      localStorage.setItem('token', token);
+
+      const res = await fetch('http://localhost:3003/me', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) throw new Error('Login failed');
+
+      const userData = await res.json();
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+    } catch (err) {
+      console.error('Login error:', err);
+      logout();
+    }
   };
 
   const logout = () => {

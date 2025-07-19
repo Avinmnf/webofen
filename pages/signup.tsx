@@ -17,7 +17,7 @@ export default function SignupPage() {
     setError('');
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/signup`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
@@ -38,7 +38,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 mt-10 border rounded-md shadow-sm">
+    <div className="max-w-md mx-auto p-6  border rounded-md shadow-sm text-black">
       <h1 className="text-2xl font-bold mb-4">Sign Up</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
