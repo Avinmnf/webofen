@@ -1,52 +1,110 @@
-'use client';
+// pages/login.tsx
+import React, { useState, FormEvent } from 'react';
 
-import { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
+type User = {
+  id: string;
+  name: string;
+  email: string;
+  role?: {
+    id: string;
+    name: string;
+  };
+};
 
 export default function LoginPage() {
-  const { login } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const router = useRouter();
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [user, setUser] = useState<User | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setError(null);
+    setLoading(true);
+
     try {
-      const res = await fetch('http://localhost:3003/login', {
+      const res = await fetch('http://localhost:3003/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // مهم برای ارسال و دریافت کوکی
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ email, password }),
       });
-      const data = await res.json();
-      if (data.token) {
-        await login(data.token);
-        router.push('/cart?autoSubmit=true');
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Login failed');
       }
-    } catch (err) {
-      console.error('Login error:', err);
+
+      const data = await res.json();
+      setUser(data.user);
+    } catch (err: unknown) {
+      // چون err از نوع unknown هست، باید اینطوری چک کنیم
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Unknown error');
+      }
+    } finally {
+      setLoading(false);
     }
-  };
+  }
+
+  if (user) {
+    return (
+      <div style={{ maxWidth: 400, margin: 'auto', padding: 20 }}>
+        <h2>خوش آمدید، {user.name}!</h2>
+        <p>ایمیل شما: {user.email}</p>
+      </div>
+    );
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 max-w-sm mx-auto text-black">
-      <h2 className="text-xl font-bold mb-4">Login</h2>
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email"
-        className="w-full p-2 mb-2 border"
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-        className="w-full p-2 mb-4 border"
-      />
-      <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">
-        Login
+    <form className='text-black' onSubmit={handleSubmit} style={{ maxWidth: 400, margin: 'auto', padding: 20 }}>
+      <h2>ورود</h2>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+
+      <div style={{ marginBottom: 10 }}>
+        <label htmlFor="email">ایمیل:</label><br />
+        <input
+          id="email"
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          required
+          autoComplete="username"
+          style={{ width: '100%', padding: 8, boxSizing: 'border-box' }}
+        />
+      </div>
+
+      <div style={{ marginBottom: 10 }}>
+        <label htmlFor="password">رمز عبور:</label><br />
+        <input
+          id="password"
+          type="password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          required
+          autoComplete="current-password"
+          style={{ width: '100%', padding: 8, boxSizing: 'border-box' }}
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={loading}
+        style={{
+          width: '100%',
+          padding: 10,
+          backgroundColor: '#0070f3',
+          color: 'white',
+          border: 'none',
+          cursor: loading ? 'not-allowed' : 'pointer',
+        }}
+      >
+        {loading ? 'در حال ورود...' : 'ورود'}
       </button>
     </form>
   );
