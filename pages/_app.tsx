@@ -7,12 +7,12 @@ import { AuthProvider } from "@/contexts/AuthContext";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <Layout>
-      <AuthProvider>
+    <AuthProvider>
+      <Layout>
         <CartProvider>
           <Component {...pageProps} />
         </CartProvider>
-      </AuthProvider>
-    </Layout>
+      </Layout>
+    </AuthProvider>
   );
 }

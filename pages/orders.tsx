@@ -71,6 +71,7 @@ export default function ProductOrderForm({ productTitle, variants }: { productTi
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(orderData),
+                credentials: 'include',
             });
 
             const json = await res.json();

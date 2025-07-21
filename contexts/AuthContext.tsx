@@ -1,8 +1,10 @@
 'use client';
+
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 type User = {
+  name: string;
   id: string;
   email: string;
   role: string;
@@ -10,8 +12,8 @@ type User = {
 
 type AuthContextType = {
   user: User | null;
-  login: (token: string) => Promise<void>;
-  logout: () => void;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => Promise<void>;
   isLoggedIn: boolean;
 };
 
@@ -22,54 +24,59 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
-    // Try to fetch user info with existing token
     const fetchUser = async () => {
       try {
         const res = await fetch('http://localhost:3003/me', {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include', // Send cookie
         });
 
-        if (!res.ok) throw new Error('Token invalid or expired');
+        if (!res.ok) throw new Error('Not authenticated');
 
-        const userData = await res.json();
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
+        const data = await res.json();
+        setUser(data.user);
       } catch (err) {
-        console.error('Auto-login failed:', err);
-        logout();
+        console.log('Not logged in');
+        setUser(null);
       }
     };
 
     fetchUser();
   }, []);
 
-  const login = async (token: string) => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      localStorage.setItem('token', token);
-
-      const res = await fetch('http://localhost:3003/me', {
-        headers: { Authorization: `Bearer ${token}` },
+      const res = await fetch('http://localhost:3003/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Important to receive cookie
+        body: JSON.stringify({ email, password }),
       });
 
-      if (!res.ok) throw new Error('Login failed');
+      if (!res.ok) throw new Error('Invalid login');
 
-      const userData = await res.json();
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
+      const data = await res.json();
+      setUser(data.user);
+      return true;
     } catch (err) {
       console.error('Login error:', err);
-      logout();
+      return false;
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+  const logout = async (redirect = true) => {
+    try {
+      await fetch('http://localhost:3003/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+
     setUser(null);
-    router.push('/login');
+    if (redirect) {
+      router.push('/login');
+    }
   };
 
   return (

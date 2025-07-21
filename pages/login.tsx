@@ -1,4 +1,6 @@
 // pages/login.tsx
+import { body } from 'framer-motion/client';
+import Link from 'next/link';
 import React, { useState, FormEvent } from 'react';
 
 type User = {
@@ -26,12 +28,13 @@ export default function LoginPage() {
     try {
       const res = await fetch('http://localhost:3003/auth/login', {
         method: 'POST',
-        credentials: 'include', // مهم برای ارسال و دریافت کوکی
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
       });
+      console.log(email, password);
 
       if (!res.ok) {
         const data = await res.json();
@@ -41,7 +44,6 @@ export default function LoginPage() {
       const data = await res.json();
       setUser(data.user);
     } catch (err: unknown) {
-      // چون err از نوع unknown هست، باید اینطوری چک کنیم
       if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -54,55 +56,74 @@ export default function LoginPage() {
 
   if (user) {
     return (
-      <div style={{ maxWidth: 400, margin: 'auto', padding: 20 }}>
-        <h2>خوش آمدید، {user.name}!</h2>
-        <p>ایمیل شما: {user.email}</p>
+      <div className="max-w-md mx-auto p-8 pt-20 bg-white rounded-xl shadow-lg text-center">
+        <h2 className="text-2xl font-semibold mb-4 text-blue-900">خوش آمدید، {user.name} !</h2>
+        <p className="text-gray-600">ایمیل شما: {user.email}</p>
       </div>
     );
   }
 
   return (
-    <form className='text-black' onSubmit={handleSubmit} style={{ maxWidth: 400, margin: 'auto', padding: 20 }}>
-      <h2>ورود</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <form
+      onSubmit={handleSubmit}
+      className="max-w-md mx-auto pt-20 bg-white p-8 rounded-xl shadow-md"
+    >
+      <h2 className="text-3xl font-bold mb-6 text-center text-gray-900">ورود</h2>
 
-      <div style={{ marginBottom: 10 }}>
-        <label htmlFor="email">ایمیل:</label><br />
+      {error && (
+        <p className="mb-4 text-red-600 font-medium bg-red-100 p-3 rounded">
+          {error}
+        </p>
+      )}
+
+      <div className="mb-5">
+        <label
+          htmlFor="email"
+          className="block mb-2 text-sm font-medium text-gray-700"
+        >
+          ایمیل
+        </label>
         <input
           id="email"
           type="email"
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
           required
           autoComplete="username"
-          style={{ width: '100%', padding: 8, boxSizing: 'border-box' }}
+          className="text-gray-600 w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          placeholder="example@example.com"
         />
       </div>
 
-      <div style={{ marginBottom: 10 }}>
-        <label htmlFor="password">رمز عبور:</label><br />
+      <div className="mb-6">
+        <label
+          htmlFor="password"
+          className="block mb-2 text-sm font-medium text-gray-700"
+        >
+          رمز عبور
+        </label>
         <input
           id="password"
           type="password"
           value={password}
-          onChange={e => setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
           required
           autoComplete="current-password"
-          style={{ width: '100%', padding: 8, boxSizing: 'border-box' }}
+          className="text-gray-600 w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          placeholder="********"
         />
       </div>
-
+      <Link
+      className='text-blue-950 text-sm'
+      href={'/signup'}>
+        ایجاد حساب کاربری
+      </Link>
       <button
         type="submit"
         disabled={loading}
-        style={{
-          width: '100%',
-          padding: 10,
-          backgroundColor: '#0070f3',
-          color: 'white',
-          border: 'none',
-          cursor: loading ? 'not-allowed' : 'pointer',
-        }}
+        className={`w-full py-3 rounded-md text-white font-semibold transition mt-5
+          ${loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}
+        `}
       >
         {loading ? 'در حال ورود...' : 'ورود'}
       </button>
