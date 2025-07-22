@@ -1,4 +1,3 @@
-
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import useProductBySlug from '@/hooks/useProductBySlug';
@@ -18,6 +17,7 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
   const [attributeMap, setAttributeMap] = useState<Record<string, string[]>>({});
+  const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
     if (!product?.variants?.length) return;
@@ -41,7 +41,6 @@ export default function ProductDetailPage() {
     setQuantity(1);
   }, [product]);
 
-  // Find variant matching all selected attributes
   const matchedVariant = product?.variants.find(variant => {
     const attrs = variant.attributeValues;
     return (
@@ -84,12 +83,11 @@ export default function ProductDetailPage() {
     };
 
     try {
-      const res = await
-        fetch(`/api/proxy/orders`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(orderData),
-        });
+      const res = await fetch(`/api/proxy/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData),
+      });
 
       const json = await res.json();
 
@@ -111,13 +109,10 @@ export default function ProductDetailPage() {
     <main>
       <div className='w-11/12 flex text-gray-700'>
         <div className='w-2/3'>
-
           <h1 className="text-3xl font-extrabold mb-6">{product.title}</h1>
         </div>
+
         <div className="w-1/3 mx-auto p-6 bg-white rounded-lg border border-gray-400 text-gray-900">
-
-
-
           <p className="mb-6 leading-relaxed text-gray-700">{product.description}</p>
 
           <div className="prose max-w-none mb-10 text-gray-800" dangerouslySetInnerHTML={{ __html: product.content }} />
@@ -173,21 +168,23 @@ export default function ProductDetailPage() {
 
           <button
             className='bg-blue-500 p-2 rounded-xl text-white cursor-pointer'
-            onClick={() =>
+            onClick={() => {
               addItem({
                 title: product.title,
                 productId: product.id,
                 variantId: matchedVariant?.id,
                 quantity,
                 price: matchedVariant?.price,
-              })
-            }
+              });
+              setShowToast(true);
+              setTimeout(() => setShowToast(false), 3000);
+            }}
           >
             افزودن به سبد
           </button>
-
         </div>
       </div>
+
       <div className='w-11/12 text-gray-700 m-auto'>
         {!loadingRelated && related.length > 0 && (
           <div className="mt-10">
@@ -218,6 +215,13 @@ export default function ProductDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed bottom-6 left-[15%] transform -translate-x-1/2 bg-blue-900 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all">
+          محصول با موفقیت به سبد خرید افزوده شد 
+        </div>
+      )}
     </main>
   );
 }

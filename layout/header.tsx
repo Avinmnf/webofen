@@ -104,7 +104,7 @@ export default function Header() {
               <>
                 <div className='flex items-center cursor-pointer'>
                   <div
-                    className="flex items-center select-none border rounded-xl px-4 py-1 border-gray-300 ml-5"
+                    className="flex items-center select-none border rounded-lg px-4 py-1 border-gray-200 ml-5"
                     onClick={() => setProfileDropdownOpen((open) => !open)}
                     aria-haspopup="true"
                     aria-expanded={profileDropdownOpen}
