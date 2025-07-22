@@ -1,13 +1,20 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useAuth } from './AuthContext';
 
 export type CartItem = {
   title: string;
   productId: string;
   variantId?: string;
   quantity: number;
-  price?: number; // optional, could store price snapshot
+  price?: number;
+};
+
+type CustomerInfo = {
+  customerName: string;
+  customerPhone: string;
+  address: string;
 };
 
 type CartContextType = {
@@ -16,91 +23,87 @@ type CartContextType = {
   removeItem: (productId: string, variantId?: string) => void;
   updateItemQuantity: (productId: string, variantId: string | undefined, quantity: number) => void;
   clearCart: () => void;
-  placeOrder: (
-    customerName: string,
-    customerPhone: string,
-    address: string
-  ) => Promise<{ success: boolean; orderId?: string; error?: string }>;
+  placeOrder: (customerInfo: CustomerInfo) => Promise<{ success: boolean; message: string; orderId?: string }>;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+export const useCart = () => {
+  const context = useContext(CartContext);
+  if (!context) throw new Error('useCart must be used within a CartProvider');
+  return context;
+};
+
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
+  const { user } = useAuth();
   const [cart, setCart] = useState<CartItem[]>([]);
 
-  // Load from localStorage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem('cart');
-    if (saved) {
-      try {
-        setCart(JSON.parse(saved));
-      } catch {}
-    }
-  }, []);
+  const storageKey = user ? `cart_${user.id}` : 'cart_guest';
 
-  // Save to localStorage on cart change
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
-  }, [cart]);
+    const storedCart = localStorage.getItem(storageKey);
+    if (storedCart) setCart(JSON.parse(storedCart));
+    else setCart([]);
+  }, [user?.id]);
+
+  useEffect(() => {
+    localStorage.setItem(storageKey, JSON.stringify(cart));
+  }, [cart, storageKey]);
 
   const addItem = (item: CartItem) => {
-    setCart((prev) => {
-      const existing = prev.find(
-        (i) => i.productId === item.productId && i.variantId === item.variantId
-      );
+    setCart(prev => {
+      const existing = prev.find(i => i.productId === item.productId && i.variantId === item.variantId);
       if (existing) {
-        return prev.map((i) =>
+        return prev.map(i =>
           i.productId === item.productId && i.variantId === item.variantId
             ? { ...i, quantity: i.quantity + item.quantity }
             : i
         );
+      } else {
+        return [...prev, item];
       }
-      return [...prev, item];
     });
   };
 
   const removeItem = (productId: string, variantId?: string) => {
-    setCart((prev) =>
-      prev.filter((i) => !(i.productId === productId && i.variantId === variantId))
-    );
+    setCart(prev => prev.filter(i => i.productId !== productId || i.variantId !== variantId));
   };
 
   const updateItemQuantity = (productId: string, variantId: string | undefined, quantity: number) => {
-    if (quantity < 1) return;
-    setCart((prev) =>
-      prev.map((i) =>
-        i.productId === productId && i.variantId === variantId ? { ...i, quantity } : i
+    setCart(prev =>
+      prev.map(item =>
+        item.productId === productId && item.variantId === variantId
+          ? { ...item, quantity }
+          : item
       )
     );
   };
 
-  const clearCart = () => setCart([]);
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem(storageKey);
+  };
 
-  // Call your backend API to place the order
-  const placeOrder = async (customerName: string, customerPhone: string, address: string) => {
-    if (cart.length === 0) return { success: false, error: 'Cart is empty' };
-
-    // Construct items for API: must include variantId, quantity, price
-    // You can add price to CartItem or fetch price on server-side
-    const items = cart.map(({ variantId, quantity, price }) => {
-      if (!variantId) throw new Error('variantId missing from cart item');
-      if (!price) throw new Error('price missing from cart item');
-      return { variantId, quantity, price };
-    });
-
+  const placeOrder = async (customerInfo: CustomerInfo) => {
     try {
-      const res = await fetch('/api/proxy/orders', {
+      const res = await fetch('http://localhost:3003/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ customerName, customerPhone, address, items }),
+        credentials: 'include',
+        body: JSON.stringify({ ...customerInfo, items: cart }),
       });
-      const json = await res.json();
-      if (!res.ok) return { success: false, error: json.error || 'Order failed' };
 
-      clearCart();
-      return { success: true, orderId: json.orderId };
-    } catch {
-      return { success: false, error: 'Network error' };
+      const data = await res.json();
+
+      if (res.ok) {
+        setCart([]);
+        localStorage.removeItem(storageKey);
+        return { success: true, message: 'سفارش با موفقیت ثبت شد.', orderId: data.id };
+      } else {
+        return { success: false, message: data.message || 'خطا در ثبت سفارش.' };
+      }
+    } catch (error) {
+      return { success: false, message: 'خطای شبکه یا سرور.' };
     }
   };
 
@@ -111,10 +114,4 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       {children}
     </CartContext.Provider>
   );
-};
-
-export const useCart = () => {
-  const ctx = useContext(CartContext);
-  if (!ctx) throw new Error('useCart must be used within CartProvider');
-  return ctx;
 };

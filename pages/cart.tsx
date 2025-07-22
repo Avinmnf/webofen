@@ -1,136 +1,92 @@
 'use client';
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
-import React, { useState } from 'react';
-import { useCart } from '@/contexts/CartContext';
-import { useAuth } from '@/contexts/AuthContext';
 
+import { useState } from 'react';
+import { useCart } from '@/contexts/CartContext';
 
 export default function CartPage() {
-  const { user } = useAuth();
-const router = useRouter();
   const { cart, removeItem, updateItemQuantity, placeOrder } = useCart();
-
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [address, setAddress] = useState('');
   const [orderMessage, setOrderMessage] = useState('');
 
-  const totalPrice = cart.reduce((sum, i) => sum + (i.price ?? 0) * i.quantity, 0);
-
-async function handlePlaceOrder() {
-  if (!user) {
-    // Save cart & form state before redirecting
-    localStorage.setItem('cartBackup', JSON.stringify(cart));
-    localStorage.setItem('customerInfo', JSON.stringify({
-      customerName,
-      customerPhone,
-      address
-    }));
-    router.push('/login?redirect=/cart');
-    return;
-  }
-
-  const res = await placeOrder(customerName, customerPhone, address);
-  if (res.success) {
-    setOrderMessage(`سفارش شما ثبت شد! شناسه سفارش: ${res.orderId}`);
-    setCustomerName('');
-    setCustomerPhone('');
-    setAddress('');
-  } else {
-    setOrderMessage(`خطا در ثبت سفارش: ${res.error}`);
-  }
-}
-useEffect(() => {
-  const savedCart = localStorage.getItem('cartBackup');
-  const savedInfo = localStorage.getItem('customerInfo');
-  if (savedCart) {
-    const parsed = JSON.parse(savedCart);
-    parsed.forEach((item: any) => {
-      updateItemQuantity(item.productId, item.variantId, item.quantity); // add to cart
-    });
-    localStorage.removeItem('cartBackup');
-  }
-  if (savedInfo) {
-    const info = JSON.parse(savedInfo);
-    setCustomerName(info.customerName || '');
-    setCustomerPhone(info.customerPhone || '');
-    setAddress(info.address || '');
-    localStorage.removeItem('customerInfo');
-  }
-}, []);
-
+  const handlePlaceOrder = async () => {
+    const res = await placeOrder({ customerName, customerPhone, address });
+    if (res.success) {
+      setOrderMessage(`سفارش شما ثبت شد! ${res.orderId ? `شناسه سفارش: ${res.orderId}` : ''}`);
+      setCustomerName('');
+      setCustomerPhone('');
+      setAddress('');
+    } else {
+      setOrderMessage(`خطا در ثبت سفارش: ${res.message}`);
+    }
+  };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white rounded shadow text-black">
-      <h1 className="text-3xl font-bold mb-6">سبد خرید شما</h1>
-
-      {cart.length === 0 && <p>سبد خرید شما خالی است.</p>}
-
-      {cart.map(({ productId, variantId, quantity, price, title }, idx) => (
-        <div key={`${productId}-${variantId ?? 'no-variant'}`} className="mb-4 border p-4 rounded flex justify-between items-center">
-          <div>
-            <p>محصول: {title ?? 'نامشخص'}</p>
-            <p>شناسه خرید: {variantId || 'اصلی'}</p>
-            <p>قیمت واحد: {price?.toLocaleString('fa-IR') ?? 0} ریال</p>
-          </div>
-
-          <div>
-            <input
-              type="number"
-              min={1}
-              value={quantity}
-              onChange={(e) => updateItemQuantity(productId, variantId, parseInt(e.target.value) || 1)}
-              className="w-16 border rounded px-2 py-1"
-            />
-            <button
-              onClick={() => removeItem(productId, variantId)}
-              className="ml-4 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-            >
-              حذف
-            </button>
-          </div>
-        </div>
-      ))}
+    <div className="p-6 max-w-3xl mx-auto text-black">
+      <h1 className="text-2xl font-bold mb-4">سبد خرید</h1>
+      {cart.length === 0 ? (
+        <p>سبد خرید خالی است.</p>
+      ) : (
+        <ul className="space-y-4">
+          {cart.map((item, index) => (
+            <li key={index} className="flex justify-between items-center bg-gray-100 p-4 rounded">
+              <div>
+                <p className="font-semibold">{item.title}</p>
+                <p>تعداد: {item.quantity}</p>
+                {item.price && <p>قیمت: {item.price}</p>}
+              </div>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="number"
+                  value={item.quantity}
+                  onChange={(e) =>
+                    updateItemQuantity(item.productId, item.variantId, parseInt(e.target.value))
+                  }
+                  className="w-16 border rounded px-2 py-1"
+                />
+                <button
+                  onClick={() => removeItem(item.productId, item.variantId)}
+                  className="bg-red-500 text-white px-3 py-1 rounded"
+                >
+                  حذف
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
 
       {cart.length > 0 && (
-        <>
-          <p className="text-xl font-semibold mb-6">جمع کل: {totalPrice.toLocaleString('fa-IR')} ریال</p>
-
-          <div className="space-y-4 mb-6">
-            <input
-              type="text"
-              placeholder="نام و نام خانوادگی"
-              value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
-              className="w-full border px-3 py-2 rounded"
-            />
-            <input
-              type="tel"
-              placeholder="شماره تلفن"
-              value={customerPhone}
-              onChange={(e) => setCustomerPhone(e.target.value)}
-              className="w-full border px-3 py-2 rounded"
-            />
-            <textarea
-              placeholder="آدرس"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="w-full border px-3 py-2 rounded"
-              rows={3}
-            />
-          </div>
-
+        <div className="mt-8 space-y-4">
+          <input
+            type="text"
+            placeholder="نام مشتری"
+            value={customerName}
+            onChange={(e) => setCustomerName(e.target.value)}
+            className="w-full border px-4 py-2 rounded"
+          />
+          <input
+            type="text"
+            placeholder="شماره تماس"
+            value={customerPhone}
+            onChange={(e) => setCustomerPhone(e.target.value)}
+            className="w-full border px-4 py-2 rounded"
+          />
+          <textarea
+            placeholder="آدرس"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            className="w-full border px-4 py-2 rounded"
+          />
           <button
             onClick={handlePlaceOrder}
-            disabled={!customerName || !customerPhone || !address}
-            className="w-full py-3 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition disabled:opacity-50"
+            className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
           >
             ثبت سفارش
           </button>
-
-          {orderMessage && <p className="mt-4 text-center text-sm">{orderMessage}</p>}
-        </>
+          {orderMessage && <p className="text-sm mt-2">{orderMessage}</p>}
+        </div>
       )}
     </div>
   );

@@ -72,8 +72,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (err) {
       console.error('Logout error:', err);
     }
+    localStorage.removeItem('cartBackup');
+    localStorage.removeItem('customerInfo');
 
     setUser(null);
+    window.dispatchEvent(new Event('user-logged-out'));
     if (redirect) {
       router.push('/login');
     }

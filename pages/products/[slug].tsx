@@ -10,18 +10,15 @@ export default function ProductDetailPage() {
   const { addItem } = useCart();
   const router = useRouter();
   const { slug } = router.query;
-
   const { product, loading, error } = useProductBySlug(typeof slug === 'string' ? slug : undefined);
   const [skip, setSkip] = useState(0);
   const take = 5;
   const { related, loading: loadingRelated } = useRelatedProducts(product?.slug, skip, take);
-
   const [orderMessage, setOrderMessage] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
   const [attributeMap, setAttributeMap] = useState<Record<string, string[]>>({});
 
-  // Extract attribute buttons from product variants
   useEffect(() => {
     if (!product?.variants?.length) return;
 

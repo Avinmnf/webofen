@@ -19,7 +19,7 @@ export default function ProductList() {
 
   return (
     <div className="text-black p-4">
-      <h2 className="text-2xl font-bold mb-4">Products</h2>
+      <h2 className="text-2xl text-gray-800 font-bold mb-4">محصولات</h2>
       <ul>
         {products.map((product) => (
           <li key={product.id} className="mb-6 border-b pb-4">
@@ -41,7 +41,7 @@ export default function ProductList() {
           disabled={page === 1}
           className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
         >
-          Previous
+          قبلی
         </button>
         <span className="text-sm">Page {page}</span>
         <button
@@ -49,7 +49,7 @@ export default function ProductList() {
           disabled={products.length < limit}
           className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
         >
-          Next
+          بعدی
         </button>
       </div>
 
