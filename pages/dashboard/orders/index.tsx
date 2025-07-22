@@ -25,6 +25,20 @@ type Order = {
   items: OrderItem[];
 };
 
+const statusLabels: Record<string, string> = {
+  pending: 'در انتظار تایید',
+  processing: 'در حال پردازش',
+  completed: 'تکمیل شده',
+  cancelled: 'لغو شده',
+};
+
+const statusColors: Record<string, string> = {
+  pending: 'bg-yellow-100 text-yellow-700',
+  processing: 'bg-blue-100 text-blue-700',
+  completed: 'bg-green-100 text-green-700',
+  cancelled: 'bg-red-100 text-red-700',
+};
+
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,51 +66,78 @@ export default function OrdersPage() {
     fetchOrders();
   }, []);
 
-  if (loading) return <div className="p-4">Loading orders...</div>;
-  if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
+  if (loading) return <div className="p-6 text-gray-600">در حال بارگذاری سفارش‌ها...</div>;
+  if (error) return <div className="p-6 text-red-500">خطا: {error}</div>;
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Your Orders</h1>
+    <div className="max-w-5xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold text-gray-800 mb-6 border-b border-gray-300 pb-2">
+        سفارشات شما
+      </h1>
+
       {orders.length === 0 ? (
-        <p>No orders found.</p>
+        <div className="text-center text-gray-500">سفارشی یافت نشد.</div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-8">
           {orders.map((order) => (
             <div
               key={order.id}
-              className="border rounded-lg p-4 shadow-sm bg-white"
+              className="rounded-2xl shadow-md bg-white hover:shadow-xl transition-shadow duration-300 border border-gray-100"
             >
-              <div className="mb-2">
-                <strong>Order ID:</strong> {order.id}
-              </div>
-              <div className="mb-2">
-                <strong>Date:</strong>{' '}
-                {new Date(order.createdAt).toLocaleDateString()}
-              </div>
-              <div className="mb-2">
-                <strong>Status:</strong> {order.status}
-              </div>
-              <div className="mb-2">
-                <strong>Total:</strong> ${order.totalPrice}
-              </div>
-              <div>
-                <strong>Items:</strong>
-                <ul className="list-disc list-inside">
-                  {order.items.map((item, idx) => (
-                    <li key={idx}>
-                      {item.variant.product.title} × {item.quantity} – $
-                      {item.price}
-                      <ul className="ml-5 text-sm text-gray-600">
-                        {item.variant.attributeValues.map((av, i) => (
-                          <li key={i}>
-                            {av.attribute.name}: {av.value}
-                          </li>
-                        ))}
-                      </ul>
-                    </li>
-                  ))}
-                </ul>
+              <div className="p-6 space-y-4">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-700">
+                      سفارش #{order.id}
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                      تاریخ: {new Date(order.createdAt).toLocaleDateString('fa-IR')}
+                    </p>
+                  </div>
+                  <span
+                    className={`text-sm px-3 py-1 rounded-full font-medium ${statusColors[order.status]}`}
+                  >
+                    {statusLabels[order.status] || order.status}
+                  </span>
+                </div>
+
+                <div className="text-gray-600 text-sm">
+                  <strong>پرداخت شده: </strong>{' '}
+                  <span className="text-lg font-bold text-green-600">
+                    {order.totalPrice.toLocaleString('fa-IR')} تومان
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-gray-700 mb-2">محصولات:</h3>
+                  <ul className="space-y-3">
+                    {order.items.map((item, idx) => (
+                      <li
+                        key={idx}
+                        className="bg-gray-50 border rounded-lg p-3 text-sm text-gray-700"
+                      >
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <span className="font-medium">
+                              {item.variant.product.title}
+                            </span>{' '}
+                            × {item.quantity.toLocaleString('fa-IR')}
+                          </div>
+                          <div className="text-green-700 font-semibold">
+                            {item.price.toLocaleString('fa-IR')} تومان
+                          </div>
+                        </div>
+                        <ul className="mt-2 text-xs text-gray-500 ml-4 space-y-1">
+                          {item.variant.attributeValues.map((av, i) => (
+                            <li key={i}>
+                              {av.attribute.name}: {av.value}
+                            </li>
+                          ))}
+                        </ul>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </div>
           ))}
