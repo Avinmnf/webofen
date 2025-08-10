@@ -75,7 +75,7 @@ export default function PostPage() {
           <div dangerouslySetInnerHTML={{ __html: post.content || "" }} />
         </section>
       </article>
-      <CommentForm />
+      <CommentForm contentType="post" pageSlug="" />ّ
     </main>
   );
 }
