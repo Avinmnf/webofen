@@ -5,12 +5,7 @@
   --foreground: #171717;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -20,7 +15,47 @@
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'IRANSansWeb', Arial, Helvetica, sans-serif;
+}
+@font-face {
+  font-family: 'IRANSansWeb';
+  src: url('/fonts/IRANSansWeb.woff') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+h1{font-size: 1.9rem;}
+h2{font-size: 1.7rem;}
+h3{font-size: 1.5rem;}
+h4{font-size: 1.3rem;}
+
+
+
+.centered-swiper .swiper-slide {
+  width: 200px;
+  height: 200px;
+  background: #6FD6E5;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s ease;
+  filter: blur(2px);
+  transform: scale(0.85);
+  opacity: 0.6;
+}
+
+.centered-swiper .swiper-slide-active {
+  filter: none;
+  transform: scale(1);
+  opacity: 1;
+  background: #3db4c6;
+  color: white;
+}
+
+.slide-content {
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-align: center;
 }
