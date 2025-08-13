@@ -6,6 +6,7 @@ interface CommentFormProps {
   contentType: 'post' | 'product';
   pageSlug: string;
   parentId?: string;
+  orderItemId?: string;
   productId?: string; // required when contentType === 'product'
 }
 
@@ -14,6 +15,7 @@ export default function CommentForm({
   pageSlug,
   parentId,
   productId,
+  orderItemId,
 }: CommentFormProps) {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -47,6 +49,7 @@ export default function CommentForm({
         pageSlug,
         parentId,
         productId,
+        orderItemId,
       };
 
       const res = await fetch('http://localhost:3003/comments', {

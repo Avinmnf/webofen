@@ -11,7 +11,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const { cart, removeItem, updateItemQuantity, placeOrder } = useCart();
+  const { cart } = useCart();
   const { user, isLoggedIn, logout } = useAuth();
   const dropdownRef = useRef<HTMLDivElement>(null);
 

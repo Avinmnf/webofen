@@ -70,7 +70,7 @@ export default function CommentsList({
   if (loading) {
     return (
       <div className="max-w-3xl mx-auto mt-8 space-y-3">
-        <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">نظرات کاربران</h2>
+        <h2 className="text-lg font-bold text-gray-800">نظرات کاربران</h2>
         {[...Array(3)].map((_, i) => (
           <Skeleton key={i} />
         ))}

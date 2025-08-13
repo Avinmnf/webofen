@@ -1,28 +1,43 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
-import useProductBySlug from '@/hooks/useProductBySlug';
-import useRelatedProducts from '@/hooks/useRelatedProducts';
-import { useCart } from '@/contexts/CartContext';
-import { useAuth } from '@/contexts/AuthContext';
-import CommentForm from '@/components/comments/comments';
-import CommentsList from '@/components/comments/CommentsList';
-import RatingForm from '@/components/rating/rating';
+import { useRouter } from "next/router";
+import { useState, useEffect } from "react";
+import useProductBySlug from "@/hooks/useProductBySlug";
+import useRelatedProducts from "@/hooks/useRelatedProducts";
+import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
+import CommentForm from "@/components/comments/comments";
+import CommentsList from "@/components/comments/CommentsList";
+import RatingForm from "@/components/rating/rating";
 
 export default function ProductDetailPage() {
   const { addItem } = useCart();
   const router = useRouter();
   const { slug } = router.query;
-  const { product, loading, error } = useProductBySlug(typeof slug === 'string' ? slug : undefined);
+  const { product, loading, error } = useProductBySlug(
+    typeof slug === "string" ? slug : undefined
+  );
   const [skip, setSkip] = useState(0);
   const take = 5;
-  const { related, loading: loadingRelated } = useRelatedProducts(product?.slug, skip, take);
-  const [orderMessage, setOrderMessage] = useState('');
+  const { related, loading: loadingRelated } = useRelatedProducts(
+    product?.slug,
+    skip,
+    take
+  );
+  const [orderMessage, setOrderMessage] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
-  const [attributeMap, setAttributeMap] = useState<Record<string, string[]>>({});
+  const [selectedAttributes, setSelectedAttributes] = useState<
+    Record<string, string>
+  >({});
+  const [attributeMap, setAttributeMap] = useState<Record<string, string[]>>(
+    {}
+  );
   const [showToast, setShowToast] = useState(false);
+  const [orderItemId, setOrderItemId] = useState<string | undefined>();
+  const [userOrderItems, setUserOrderItems] = useState<{ id: string }[]>([]);
+  const [selectedOrderItemId, setSelectedOrderItemId] = useState<
+    string | undefined
+  >();
 
   const { user } = useAuth();
 
@@ -31,38 +46,86 @@ export default function ProductDetailPage() {
   const [checkingBought, setCheckingBought] = useState(true);
 
   // Check if the logged-in user has bought this product
-useEffect(() => {
-  if (!user || !product?.id) {
-    setHasBought(false);
-    setCheckingBought(false);
-    return;
-  }
-
-  const checkBought = async () => {
-    setCheckingBought(true);
-    try {
-      const res = await fetch(`http://localhost:3003/hasBoughtProduct?productId=${product.id}`, {
-        credentials: 'include',  // send cookies
-      });
-      const data = await res.json();
-      setHasBought(data.hasBought === true);
-    } catch (err) {
-      console.error('Error checking purchase:', err);
+  useEffect(() => {
+    if (!user || !product?.id) {
       setHasBought(false);
-    } finally {
       setCheckingBought(false);
+      return;
     }
-  };
 
-  checkBought();
-}, [user, product?.id]);
+    const checkBought = async () => {
+      setCheckingBought(true);
+      try {
+        const res = await fetch(
+          `http://localhost:3003/hasBoughtProduct?productId=${product.id}`,
+          {
+            credentials: "include", // send cookies
+          }
+        );
+        const data = await res.json();
+        setHasBought(data.hasBought === true);
+      } catch (err) {
+        console.error("Error checking purchase:", err);
+        setHasBought(false);
+      } finally {
+        setCheckingBought(false);
+      }
+    };
+
+    checkBought();
+  }, [user, product?.id]);
+
+  useEffect(() => {
+    if (!user || !product?.id) {
+      setOrderItemId(undefined);
+      return;
+    }
+
+    async function fetchLatestOrderItem() {
+      try {
+        const res = await fetch("http://localhost:3003/userorders", {
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error("Failed to fetch user orders");
+        const data = await res.json();
+
+        if (!data.orders || !Array.isArray(data.orders)) {
+          setOrderItemId(undefined);
+          return;
+        }
+
+        // Sort orders descending by createdAt
+        const sortedOrders = data.orders.sort(
+          (a: any, b: any) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+
+        for (const order of sortedOrders) {
+          const matchingItem = order.items.find(
+            (item: any) => item.variant.product.id === product!.id
+          );
+          if (matchingItem) {
+            setOrderItemId(matchingItem.id);
+            return; // Stop after first found
+          }
+        }
+
+        setOrderItemId(undefined); // No matching item found
+      } catch (err) {
+        console.error("Error fetching latest order item:", err);
+        setOrderItemId(undefined);
+      }
+    }
+
+    fetchLatestOrderItem();
+  }, [user, product?.id]);
 
   useEffect(() => {
     if (!product?.variants?.length) return;
 
     const map: Record<string, Set<string>> = {};
 
-    product.variants.forEach(variant => {
+    product.variants.forEach((variant) => {
       variant.attributeValues.forEach(({ attribute, value }) => {
         if (!map[attribute.name]) map[attribute.name] = new Set();
         map[attribute.name].add(value);
@@ -79,12 +142,11 @@ useEffect(() => {
     setQuantity(1);
   }, [product]);
 
-  const matchedVariant = product?.variants.find(variant => {
+  const matchedVariant = product?.variants.find((variant) => {
     const attrs = variant.attributeValues;
     return (
-      Object.entries(selectedAttributes).every(
-        ([attrName, value]) =>
-          attrs.some(av => av.attribute.name === attrName && av.value === value)
+      Object.entries(selectedAttributes).every(([attrName, value]) =>
+        attrs.some((av) => av.attribute.name === attrName && av.value === value)
       ) && attrs.length === Object.keys(selectedAttributes).length
     );
   });
@@ -92,25 +154,26 @@ useEffect(() => {
   function handleQuantityChange(e: React.ChangeEvent<HTMLInputElement>) {
     let val = parseInt(e.target.value);
     if (isNaN(val) || val < 1) val = 1;
-    if (matchedVariant && val > matchedVariant.stock) val = matchedVariant.stock;
+    if (matchedVariant && val > matchedVariant.stock)
+      val = matchedVariant.stock;
     setQuantity(val);
   }
 
   async function handleTestOrder() {
     if (!product || !matchedVariant) {
-      setOrderMessage('لطفا ویژگی‌ها را کامل انتخاب کنید.');
+      setOrderMessage("لطفا ویژگی‌ها را کامل انتخاب کنید.");
       return;
     }
 
     if (matchedVariant.stock < quantity) {
-      setOrderMessage('موجودی کافی نیست.');
+      setOrderMessage("موجودی کافی نیست.");
       return;
     }
 
     const orderData = {
-      customerName: 'ساجده حسینی',
-      customerPhone: '09214892475',
-      address: 'آدرس تستی',
+      customerName: "ساجده حسینی",
+      customerPhone: "09214892475",
+      address: "آدرس تستی",
       items: [
         {
           variantId: matchedVariant.id,
@@ -122,8 +185,8 @@ useEffect(() => {
 
     try {
       const res = await fetch(`/api/proxy/orders`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderData),
       });
 
@@ -132,16 +195,25 @@ useEffect(() => {
       if (res.ok) {
         setOrderMessage(`سفارش ثبت شد! شناسه سفارش: ${json.orderId}`);
       } else {
-        setOrderMessage(`خطا در ثبت سفارش: ${json.error || 'نامشخص'}`);
+        setOrderMessage(`خطا در ثبت سفارش: ${json.error || "نامشخص"}`);
       }
     } catch {
-      setOrderMessage('خطای شبکه، لطفا دوباره تلاش کنید.');
+      setOrderMessage("خطای شبکه، لطفا دوباره تلاش کنید.");
     }
   }
 
-  if (loading) return <p className="text-center py-10 text-gray-500">در حال بارگذاری...</p>;
-  if (error) return <p className="text-center py-10 text-red-600 font-semibold">خطا: {error}</p>;
-  if (!product) return <p className="text-center py-10 text-gray-600">محصول یافت نشد.</p>;
+  if (loading)
+    return (
+      <p className="text-center py-10 text-gray-500">در حال بارگذاری...</p>
+    );
+  if (error)
+    return (
+      <p className="text-center py-10 text-red-600 font-semibold">
+        خطا: {error}
+      </p>
+    );
+  if (!product)
+    return <p className="text-center py-10 text-gray-600">محصول یافت نشد.</p>;
 
   return (
     <main>
@@ -151,7 +223,9 @@ useEffect(() => {
         </div>
 
         <div className="w-1/3 mx-auto p-6 bg-white rounded-lg border border-gray-400 text-gray-900">
-          <p className="mb-6 leading-relaxed text-gray-700">{product.description}</p>
+          <p className="mb-6 leading-relaxed text-gray-700">
+            {product.description}
+          </p>
 
           <div
             className="prose max-w-none mb-10 text-gray-800"
@@ -165,14 +239,19 @@ useEffect(() => {
               <div key={attrName}>
                 <h4 className="font-medium mb-2">{attrName}:</h4>
                 <div className="flex flex-wrap gap-2">
-                  {values.map(value => (
+                  {values.map((value) => (
                     <button
                       key={value}
-                      onClick={() => setSelectedAttributes(prev => ({ ...prev, [attrName]: value }))}
+                      onClick={() =>
+                        setSelectedAttributes((prev) => ({
+                          ...prev,
+                          [attrName]: value,
+                        }))
+                      }
                       className={`px-4 py-2 rounded border ${
                         selectedAttributes[attrName] === value
-                          ? 'bg-indigo-600 text-white border-indigo-600'
-                          : 'bg-white border-gray-300'
+                          ? "bg-indigo-600 text-white border-indigo-600"
+                          : "bg-white border-gray-300"
                       }`}
                     >
                       {value}
@@ -186,21 +265,28 @@ useEffect(() => {
           {matchedVariant ? (
             <div className="p-4 border rounded bg-gray-50 mb-6">
               <p>
-                <strong>قیمت:</strong> {matchedVariant.price.toLocaleString()} ریال
+                <strong>قیمت:</strong> {matchedVariant.price.toLocaleString()}{" "}
+                ریال
               </p>
               <p>
-                <strong>موجودی:</strong>{' '}
-                {matchedVariant.stock > 0 ? matchedVariant.stock : 'ناموجود'}
+                <strong>موجودی:</strong>{" "}
+                {matchedVariant.stock > 0 ? matchedVariant.stock : "ناموجود"}
               </p>
             </div>
           ) : (
-            Object.keys(selectedAttributes).length === Object.keys(attributeMap).length && (
-              <p className="text-red-600 mb-6">واریانت مناسب با این ترکیب پیدا نشد.</p>
+            Object.keys(selectedAttributes).length ===
+              Object.keys(attributeMap).length && (
+              <p className="text-red-600 mb-6">
+                واریانت مناسب با این ترکیب پیدا نشد.
+              </p>
             )
           )}
 
           <div className="max-w-xs mb-6">
-            <label htmlFor="quantity" className="block mb-1 font-semibold text-gray-700">
+            <label
+              htmlFor="quantity"
+              className="block mb-1 font-semibold text-gray-700"
+            >
               تعداد سفارش
             </label>
             <input
@@ -239,9 +325,15 @@ useEffect(() => {
           <div className="mt-10">
             <h2 className="text-xl font-bold mb-4">محصولات مرتبط</h2>
             <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {related.map(item => (
-                <li key={item.id} className="border p-4 rounded shadow-sm bg-white">
-                  <a href={`/products/${item.slug}`} className="font-semibold text-blue-700">
+              {related.map((item) => (
+                <li
+                  key={item.id}
+                  className="border p-4 rounded shadow-sm bg-white"
+                >
+                  <a
+                    href={`/products/${item.slug}`}
+                    className="font-semibold text-blue-700"
+                  >
                     {item.title}
                   </a>
                   {item.imageUrl && (
@@ -251,12 +343,14 @@ useEffect(() => {
                       className="w-full h-40 object-cover mt-2 rounded"
                     />
                   )}
-                  {item.description && <p className="text-sm mt-2">{item.description}</p>}
+                  {item.description && (
+                    <p className="text-sm mt-2">{item.description}</p>
+                  )}
                 </li>
               ))}
             </ul>
             <button
-              onClick={() => setSkip(prev => prev + take)}
+              onClick={() => setSkip((prev) => prev + take)}
               className="mt-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
             >
               بارگذاری بیشتر
@@ -264,10 +358,19 @@ useEffect(() => {
           </div>
         )}
       </div>
-      <RatingForm contentType="product" contentId={product?.id ?? ''}/>
-      {/* Show comment form only if user bought the product */}
+
+      <RatingForm
+        contentType="product"
+        contentId={product?.id ?? ""}
+        orderItemId={orderItemId}
+      />
       {!checkingBought && hasBought ? (
-        <CommentForm contentType="product" pageSlug={typeof slug === 'string' ? slug : ''} productId={product?.id}/>
+        <CommentForm
+          contentType="product"
+          pageSlug={typeof slug === "string" ? slug : ""}
+          productId={product?.id}
+          orderItemId={orderItemId}
+        />
       ) : !checkingBought && !hasBought ? (
         <p className="max-w-3xl mx-auto mt-10 text-center text-red-600 font-semibold">
           برای ارسال نظر، ابتدا باید این محصول را خریداری کنید.
@@ -279,7 +382,10 @@ useEffect(() => {
       )}
 
       {/* Comments list is always shown */}
-      <CommentsList contentType="product" pageSlug={typeof slug === 'string' ? slug : ''} />
+      <CommentsList
+        contentType="product"
+        pageSlug={typeof slug === "string" ? slug : ""}
+      />
 
       {/* Toast Notification */}
       {showToast && (
