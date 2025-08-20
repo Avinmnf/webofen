@@ -15,6 +15,16 @@ type CustomerInfo = {
   customerName: string;
   customerPhone: string;
   address: string;
+  couponCode?: string;
+};
+
+// Extra info we send to backend
+type OrderExtraInfo = {
+  items: any[];
+  subtotal: number;
+  totalPrice: number;
+  discountTotal: number;
+  couponId?: string | null;
 };
 
 type CartContextType = {
@@ -23,7 +33,10 @@ type CartContextType = {
   removeItem: (productId: string, variantId?: string) => void;
   updateItemQuantity: (productId: string, variantId: string | undefined, quantity: number) => void;
   clearCart: () => void;
-  placeOrder: (customerInfo: CustomerInfo) => Promise<{ success: boolean; message: string; orderId?: string }>;
+  placeOrder: (
+    customerInfo: CustomerInfo,
+    extra?: OrderExtraInfo
+  ) => Promise<{ success: boolean; message: string; orderId?: string }>;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -84,13 +97,18 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem(storageKey);
   };
 
-  const placeOrder = async (customerInfo: CustomerInfo) => {
+  const placeOrder = async (customerInfo: CustomerInfo, extra?: OrderExtraInfo) => {
     try {
+      const payload = {
+        ...customerInfo,
+        ...extra, // merge extra order details
+      };
+
       const res = await fetch('http://localhost:3003/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ ...customerInfo, items: cart }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();

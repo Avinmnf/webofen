@@ -3,6 +3,15 @@
 import { useState } from 'react';
 import { useCart } from '@/contexts/CartContext';
 
+type Coupon = {
+  id: string;
+  title: string;
+  code: string;
+  discountPercentage: number;
+  minTotal?: string;
+  maxDiscount?: string;
+};
+
 export default function CartPage() {
   const { cart, removeItem, updateItemQuantity, placeOrder } = useCart();
   const [customerName, setCustomerName] = useState('');
@@ -11,33 +20,117 @@ export default function CartPage() {
   const [orderMessage, setOrderMessage] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
+  const [couponMessage, setCouponMessage] = useState('');
+
+  // --- Calculate totals ---
+  const subtotal = cart.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0);
+
+  let discountTotal = 0;
+  let totalPrice = subtotal;
+  const lines = cart.map((item) => ({
+    ...item,
+    finalUnit: item.price || 0,
+    couponApplied: false,
+  }));
+
+  if (appliedCoupon) {
+    const minTotalOk = !appliedCoupon.minTotal || subtotal >= Number(appliedCoupon.minTotal);
+    if (minTotalOk) {
+      let rawDiscount = Math.floor(subtotal * (appliedCoupon.discountPercentage / 100));
+      if (appliedCoupon.maxDiscount) rawDiscount = Math.min(rawDiscount, Number(appliedCoupon.maxDiscount));
+      discountTotal = rawDiscount;
+      totalPrice = subtotal - discountTotal;
+
+      // Proportionally distribute discount across items
+      let remainingDiscount = discountTotal;
+      lines.forEach((line, idx) => {
+        const lineSubtotal = line.price! * line.quantity;
+        const portion =
+          idx === lines.length - 1
+            ? remainingDiscount
+            : Math.floor((lineSubtotal / subtotal) * discountTotal);
+        remainingDiscount -= portion;
+        const perUnitReduction = Math.floor(portion / line.quantity);
+        line.finalUnit = Math.max(0, line.price! - perUnitReduction);
+        line.couponApplied = perUnitReduction > 0;
+      });
+    } else {
+      // Coupon not eligible
+      discountTotal = 0;
+      totalPrice = subtotal;
+    }
+  }
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode) return setCouponMessage("❌ لطفا کد تخفیف را وارد کنید");
+
+    try {
+      const res = await fetch("http://localhost:3003/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: couponCode, cartTotal: subtotal }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setCouponMessage("❌ " + (data.error || "خطا در اعمال کوپن"));
+        setAppliedCoupon(null);
+      } else {
+        setAppliedCoupon(data.coupon);
+        setCouponMessage(`✅ کوپن اعمال شد: ${data.coupon.discountPercentage}% تخفیف`);
+      }
+    } catch (err) {
+      console.error(err);
+      setCouponMessage("❌ خطا در ارتباط با سرور");
+      setAppliedCoupon(null);
+    }
+  };
+
   const handlePlaceOrder = async () => {
-    const res = await placeOrder({ customerName, customerPhone, address });
+    const itemsForOrder = lines.map((line) => ({
+      variantId: line.variantId,
+      quantity: line.quantity,
+      originalPrice: line.price || 0,
+      finalPrice: line.finalUnit,
+      appliedCouponId: line.couponApplied ? appliedCoupon?.id || null : null,
+    }));
+
+    const res = await placeOrder(
+      { customerName, customerPhone, address, couponCode: appliedCoupon?.id || undefined },
+      { items: itemsForOrder, subtotal, totalPrice, discountTotal, couponId: appliedCoupon?.id || null }
+    );
+
     if (res.success) {
-      setOrderMessage(`سفارش شما با موفقیت ثبت شد! ${res.orderId ? `شناسه سفارش: ${res.orderId}` : ''}`);
+      setOrderMessage(
+        `سفارش شما با موفقیت ثبت شد! ${res.orderId ? `شناسه سفارش: ${res.orderId}` : ''}`
+      );
       setCustomerName('');
       setCustomerPhone('');
       setAddress('');
-      setShowSuccessModal(true); // Show modal on success
+      setAppliedCoupon(null);
+      setCouponCode('');
+      setCouponMessage('');
+      setShowSuccessModal(true);
     } else {
       setOrderMessage(`خطا در ثبت سفارش: ${res.message}`);
     }
   };
 
-  const totalPrice = cart.reduce((sum, item) => {
-    return sum + (item.price || 0) * item.quantity;
-  }, 0);
-
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-3xl text-gray-700 font-semibold mb-6 text-center border-b pb-2">سبد خرید</h1>
+    <div className="p-6 max-w-3xl mx-auto space-y-6 text-black">
+      <h1 className="text-3xl text-gray-700 font-semibold mb-6 text-center border-b pb-2">
+        سبد خرید
+      </h1>
 
       {cart.length === 0 ? (
         <div className="text-center text-gray-600 mt-10 text-lg">سبد خرید خالی است.</div>
       ) : (
         <>
           <ul className="space-y-5">
-            {cart.map((item, index) => (
+            {lines.map((item, index) => (
               <li
                 key={index}
                 className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white shadow-md p-4 rounded-lg border border-gray-400"
@@ -45,8 +138,13 @@ export default function CartPage() {
                 <div className="flex-1 space-y-1 mb-3 sm:mb-0">
                   <p className="font-bold text-lg">{item.title}</p>
                   <p className="text-sm text-gray-700">تعداد: {item.quantity}</p>
-                  {item.price && (
-                    <p className="text-sm text-gray-700">قیمت واحد: {item.price.toLocaleString()} تومان</p>
+                  <p className="text-sm text-gray-700">
+                    قیمت واحد: {item.price?.toLocaleString()} تومان
+                  </p>
+                  {item.couponApplied && (
+                    <p className="text-sm text-green-600">
+                      قیمت بعد از کوپن: {item.finalUnit.toLocaleString()} تومان
+                    </p>
                   )}
                 </div>
                 <div className="flex gap-2 items-center">
@@ -70,8 +168,31 @@ export default function CartPage() {
             ))}
           </ul>
 
-          <div className="text-right mt-4 text-lg font-bold text-gray-800">
-            مجموع نهایی: {totalPrice.toLocaleString()} تومان
+          {/* Coupon input */}
+          <div className="mt-4 flex gap-2 items-center">
+            <input
+              type="text"
+              placeholder="کد تخفیف"
+              value={couponCode}
+              onChange={(e) => setCouponCode(e.target.value)}
+              className="border p-2 rounded flex-1"
+            />
+            <button
+              onClick={handleApplyCoupon}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              اعمال کوپن
+            </button>
+          </div>
+          {couponMessage && <div className="mt-2 text-sm">{couponMessage}</div>}
+
+          {/* Totals */}
+          <div className="mt-4 text-right text-lg font-bold text-gray-800 space-y-1">
+            <p>جمع جزء: {subtotal.toLocaleString()} تومان</p>
+            {discountTotal > 0 && (
+              <p className="text-green-600">تخفیف: {discountTotal.toLocaleString()} تومان</p>
+            )}
+            <p>مجموع نهایی: {totalPrice.toLocaleString()} تومان</p>
           </div>
         </>
       )}
@@ -108,14 +229,16 @@ export default function CartPage() {
             ثبت سفارش
           </button>
           {orderMessage && (
-            <div className="text-center text-sm text-blue-700 mt-2 font-medium">{orderMessage}</div>
+            <div className="text-center text-sm text-blue-700 mt-2 font-medium">
+              {orderMessage}
+            </div>
           )}
         </div>
       )}
 
       {/* Success Modal */}
       {showSuccessModal && (
-        <div className="fixed inset-0 bg-black/70 bg-opacity-40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full text-center">
             <p className="text-green-700 text-base mb-4">{orderMessage}</p>
             <button

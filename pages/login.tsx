@@ -1,24 +1,17 @@
-// pages/login.tsx
-import { body } from 'framer-motion/client';
+'use client';
+
 import Link from 'next/link';
 import React, { useState, FormEvent } from 'react';
-
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  role?: {
-    id: string;
-    name: string;
-  };
-};
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [user, setUser] = useState<User | null>(null);
+
+  // use the context so header updates when user changes
+  const { login, user } = useAuth();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -26,29 +19,11 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('http://localhost:3003/auth/login', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-      console.log(email, password);
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Login failed');
-      }
-
-      const data = await res.json();
-      setUser(data.user);
+      const ok = await login(email, password);
+      if (!ok) throw new Error('Login failed');
+      // at this point AuthContext.user is set, header re-renders automatically
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('Unknown error');
-      }
+      setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
     }
@@ -57,7 +32,9 @@ export default function LoginPage() {
   if (user) {
     return (
       <div className="max-w-md mx-auto p-8 pt-20 bg-white rounded-xl shadow-lg text-center">
-        <h2 className="text-2xl font-semibold mb-4 text-blue-900">خوش آمدید، {user.name} !</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-blue-900">
+          خوش آمدید، {user.name} !
+        </h2>
         <p className="text-gray-600">ایمیل شما: {user.email}</p>
       </div>
     );
@@ -77,10 +54,7 @@ export default function LoginPage() {
       )}
 
       <div className="mb-5">
-        <label
-          htmlFor="email"
-          className="block mb-2 text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-700">
           ایمیل
         </label>
         <input
@@ -96,10 +70,7 @@ export default function LoginPage() {
       </div>
 
       <div className="mb-6">
-        <label
-          htmlFor="password"
-          className="block mb-2 text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-700">
           رمز عبور
         </label>
         <input
@@ -113,17 +84,17 @@ export default function LoginPage() {
           placeholder="********"
         />
       </div>
-      <Link
-      className='text-blue-950 text-sm'
-      href={'/signup'}>
+
+      <Link className="text-blue-950 text-sm" href="/signup">
         ایجاد حساب کاربری
       </Link>
+
       <button
         type="submit"
         disabled={loading}
-        className={`w-full py-3 rounded-md text-white font-semibold transition mt-5
-          ${loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}
-        `}
+        className={`w-full py-3 rounded-md text-white font-semibold transition mt-5 ${
+          loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+        }`}
       >
         {loading ? 'در حال ورود...' : 'ورود'}
       </button>

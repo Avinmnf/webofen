@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import CommentForm from "@/components/comments/comments";
 import CommentsList from "@/components/comments/CommentsList";
 import RatingForm from "@/components/rating/rating";
+import AverageRating from "@/components/rating/AverageRating";
 
 export default function ProductDetailPage() {
   const { addItem } = useCart();
@@ -358,7 +359,7 @@ export default function ProductDetailPage() {
           </div>
         )}
       </div>
-
+      <AverageRating productId={product?.id} />
       <RatingForm
         contentType="product"
         contentId={product?.id ?? ""}
