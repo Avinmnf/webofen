@@ -104,7 +104,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         ...extra, // merge extra order details
       };
 
-      const res = await fetch('http://localhost:3003/orders', {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_CMS_API}/orders` ||`http://localhost:3003/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

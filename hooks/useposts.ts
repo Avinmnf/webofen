@@ -41,8 +41,6 @@ export function usePosts(options: UsePostsOptions) {
                 if (options.sort) params.append('sort', options.sort);
                 if (options.order) params.append('order', options.order);
 
-                const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
                 const res = await
                     fetch(`/api/proxy/posts?${params.toString()}`, {
                         method: 'GET',

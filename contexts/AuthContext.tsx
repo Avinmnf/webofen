@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { createContext, useContext, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type User = {
   name: string;
@@ -27,11 +27,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Fetch current user from backend
   const fetchUser = async () => {
     try {
-      const res = await fetch('http://localhost:3003/me', {
-        credentials: 'include',
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_CMS_API}/me` ||`http://localhost:3003/me`, {
+        credentials: "include",
       });
 
-      if (!res.ok) throw new Error('Not authenticated');
+      if (!res.ok) throw new Error("Not authenticated");
 
       const data = await res.json();
       setUser(data.user);
@@ -48,12 +49,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const handleLogin = () => fetchUser();
     const handleLogout = () => setUser(null);
 
-    window.addEventListener('user-logged-in', handleLogin);
-    window.addEventListener('user-logged-out', handleLogout);
+    window.addEventListener("user-logged-in", handleLogin);
+    window.addEventListener("user-logged-out", handleLogout);
 
     return () => {
-      window.removeEventListener('user-logged-in', handleLogin);
-      window.removeEventListener('user-logged-out', handleLogout);
+      window.removeEventListener("user-logged-in", handleLogin);
+      window.removeEventListener("user-logged-out", handleLogout);
     };
   }, []);
 
@@ -63,24 +64,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Login function
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const res = await fetch('http://localhost:3003/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email, password }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_CMS_API}/auth/login` ||
+          `http://localhost:3003/auth/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
-      if (!res.ok) throw new Error('Invalid login');
+      if (!res.ok) throw new Error("Invalid login");
 
       const data = await res.json();
       setUser(data.user);
 
       // Notify other components
-      window.dispatchEvent(new Event('user-logged-in'));
+      window.dispatchEvent(new Event("user-logged-in"));
 
       return true;
     } catch (err) {
-      console.error('Login error:', err);
+      console.error("Login error:", err);
       return false;
     }
   };
@@ -88,25 +93,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Logout function
   const logout = async () => {
     try {
-      await fetch('http://localhost:3003/auth/logout', {
-        method: 'POST',
-        credentials: 'include',
-      });
+      await fetch(
+        `${process.env.NEXT_PUBLIC_CMS_API}/auth/signup` ||`http://localhost:3003/auth/login`, {
+          method: "POST",
+          credentials: "include",
+        }
+      );
     } catch (err) {
-      console.error('Logout error:', err);
+      console.error("Logout error:", err);
     }
 
     // Clear localStorage
-    localStorage.removeItem('cartBackup');
-    localStorage.removeItem('customerInfo');
+    localStorage.removeItem("cartBackup");
+    localStorage.removeItem("customerInfo");
 
     setUser(null);
 
     // Notify other components
-    window.dispatchEvent(new Event('user-logged-out'));
+    window.dispatchEvent(new Event("user-logged-out"));
 
     // Optionally redirect
-    router.push('/login');
+    router.push("/login");
   };
 
   return (
@@ -126,6 +133,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within AuthProvider');
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
 }

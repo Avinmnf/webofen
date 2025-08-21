@@ -46,7 +46,7 @@ export default function PostsPage() {
     useEffect(() => {
         async function fetchMenus() {
             try {
-                const res = await fetch('http://localhost:3003/menus');
+                const res = await fetch(`${process.env.NEXT_PUBLIC_CMS_API}/menus` ||`http://localhost:3003/menus`);
                 const data = await res.json();
                 console.log('Menus response:', data);
 
@@ -67,7 +67,7 @@ export default function PostsPage() {
     useEffect(() => {
         async function fetchSliders() {
             try {
-                const res = await fetch('http://localhost:3003/sliders');
+                const res = await fetch(`${process.env.NEXT_PUBLIC_CMS_API}/sliders` ||`http://localhost:3003/sliders`);
                 const data = await res.json();
 
                 if (Array.isArray(data.sliders)) {

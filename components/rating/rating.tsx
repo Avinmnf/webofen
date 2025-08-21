@@ -21,7 +21,8 @@ export default function RatingForm({ contentType, contentId, orderItemId }: Rati
     setSuccess(null);
 
     try {
-      const res = await fetch('http://localhost:3003/ratings', {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_CMS_API}/ratings` ||`http://localhost:3003/ratings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

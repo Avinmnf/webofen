@@ -18,33 +18,35 @@ export function usePostBySlug(slug?: string) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!slug) return;
+useEffect(() => {
+  if (!slug) return;
 
-    const safeSlug = encodeURIComponent(slug);
+  const safeSlug = encodeURIComponent(slug);
 
-    async function fetchPost() {
-      setLoading(true);
-      setError(null);
+  async function fetchPost() {
+    setLoading(true);
+    setError(null);
 
-      try {
-        const res = await
-          fetch(`/api/proxy/postbyslug/${safeSlug}`, {
-            method: 'GET',
-          })
-        if (!res.ok) throw new Error('Failed to fetch post');
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_CMS_API || "http://localhost:3003";
+      const res = await fetch(`${baseUrl}/postbyslug/${safeSlug}`, {
+        method: "GET",
+      });
 
-        const data = await res.json();
-        setPost(data);
-      } catch (err: any) {
-        setError(err.message || 'Unknown error');
-      } finally {
-        setLoading(false);
-      }
+      if (!res.ok) throw new Error(`Failed to fetch post (status ${res.status})`);
+
+      const data = await res.json();
+      setPost(data);
+    } catch (err: any) {
+      setError(err.message || "Unknown error");
+    } finally {
+      setLoading(false);
     }
+  }
 
-    fetchPost();
-  }, [slug]);
+  fetchPost();
+}, [slug]);
+
 
   return { post, loading, error };
 }

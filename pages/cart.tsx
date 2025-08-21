@@ -67,7 +67,7 @@ export default function CartPage() {
     if (!couponCode) return setCouponMessage("❌ لطفا کد تخفیف را وارد کنید");
 
     try {
-      const res = await fetch("http://localhost:3003/coupons/validate", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_CMS_API}/validate` ||`http://localhost:3003/validate`,{
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code: couponCode, cartTotal: subtotal }),

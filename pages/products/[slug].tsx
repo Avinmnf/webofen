@@ -58,7 +58,7 @@ export default function ProductDetailPage() {
       setCheckingBought(true);
       try {
         const res = await fetch(
-          `http://localhost:3003/hasBoughtProduct?productId=${product.id}`,
+          `${process.env.NEXT_PUBLIC_CMS_API}/hasBoughtProduct?productId=${product.id}` ||`http://localhost:3003/hasBoughtProduct?productId=${product.id}`,
           {
             credentials: "include", // send cookies
           }

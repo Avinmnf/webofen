@@ -47,7 +47,7 @@ export default function OrdersPage() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await fetch('http://localhost:3003/userorders', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_CMS_API}/useorders` ||`http://localhost:3003/useorders`, {
           credentials: 'include',
         });
         const data = await res.json();

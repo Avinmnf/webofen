@@ -8,22 +8,29 @@ export default function AverageRating({ productId }: AverageRatingProps) {
   const [average, setAverage] = useState<number | null>(null);
   const [count, setCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
+useEffect(() => {
+  async function fetchAverage() {
+    if (!productId) return;
 
-  useEffect(() => {
-    async function fetchAverage() {
-      try {
-        const res = await fetch(`http://localhost:3003/ratings-average?productId=${productId}`);
-        const data = await res.json();
-        setAverage(data.average);
-        setCount(data.count);
-      } catch (err) {
-        console.error("Failed to load average rating:", err);
-      } finally {
-        setLoading(false);
-      }
+    setLoading(true);
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_CMS_API || "http://localhost:3003";
+      const res = await fetch(`${baseUrl}/ratings-average?productId=${productId}`);
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+      const data = await res.json();
+      setAverage(data.average);
+      setCount(data.count);
+    } catch (err) {
+      console.error("Failed to load average rating:", err);
+    } finally {
+      setLoading(false);
     }
-    fetchAverage();
-  }, [productId]);
+  }
+
+  fetchAverage();
+}, [productId]);
+
 
   if (loading) {
     return <p className="text-gray-500 text-sm">Loading rating...</p>;

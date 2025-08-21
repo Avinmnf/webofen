@@ -52,7 +52,8 @@ export default function CommentForm({
         orderItemId,
       };
 
-      const res = await fetch('http://localhost:3003/comments', {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_CMS_API}/comments` ||`http://localhost:3003/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
