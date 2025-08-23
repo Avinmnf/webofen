@@ -17,11 +17,11 @@
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: 'IRANSansWeb', Arial, Helvetica, sans-serif;
+  font-family: 'YekanBakhFaNum-Regular', Arial, Helvetica, sans-serif;
 }
 @font-face {
-  font-family: 'IRANSansWeb';
-  src: url('/fonts/IRANSansWeb.woff') format('truetype');
+  font-family: 'YekanBakhFaNum-Regular';
+  src: url('/fonts/YekanBakhFaNum-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
