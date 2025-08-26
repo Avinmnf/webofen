@@ -37,7 +37,7 @@ useEffect(() => {
   }
 
   if (average === null) {
-    return <p className="text-gray-500 text-sm">No ratings yet</p>;
+    return <p className="text-gray-500 text-sm text-center">No ratings yet</p>;
   }
 
   return (

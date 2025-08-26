@@ -218,7 +218,8 @@ export default function ProductDetailPage() {
 
   return (
     <main>
-      <div className="w-11/12 flex text-gray-700">
+      <div className="max-w-[1440px] m-auto">
+      <div className=" flex text-gray-700 pt-10">
         <div className="w-2/3">
           <h1 className="text-3xl font-extrabold mb-6">{product.title}</h1>
         </div>
@@ -394,6 +395,7 @@ export default function ProductDetailPage() {
           محصول با موفقیت به سبد خرید افزوده شد
         </div>
       )}
+      </div>
     </main>
   );
 }

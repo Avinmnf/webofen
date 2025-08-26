@@ -49,7 +49,7 @@ export default function guidance() {
   };
   return (
     <main>
-      <div className=" w-11/12 m-auto">
+      <div className="max-w-[1440px] w-11/12 m-auto pt-12">
         <div className="w-full bg-gray-500 rounded-2xl h-64"></div>
 
         <section className="mt-10 px-4">
@@ -459,7 +459,7 @@ export default function guidance() {
                   </p>
                 </div>
 
-                <div className="text-center w-full mt-2">
+                <div className="text-center w-full mt-10">
                   <input
                     className="w-full border border-gray-200 py-2 rounded-md px-1 text-gray-500"
                     placeholder="نام"

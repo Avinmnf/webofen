@@ -194,7 +194,7 @@ export default function Pathsection() {
 
                 {/* Steps labels - Horizontal for larger screens */}
                 <div className="hidden lg:block w-full mt-6 md:mt-10">
-                    <div className="w-10/12 mx-auto">
+                    <div className="w-full mx-auto">
                         <div className="flex items-center justify-between rounded-full bg-[#f7f8fc] p-4 px-8">
                             <p className="text-sm text-gray-600">شروع درمان سایت</p>
                             <span className="inline-block w-3 h-3 bg-[#6FD6E5] rounded-full mx-4" aria-hidden="true" />

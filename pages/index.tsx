@@ -1,70 +1,67 @@
 import Image from "next/image";
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 import Popularpills from "@/components/popularpills";
 import Pathsection from "@/components/pathsection";
 import Commentsabtus from "@/components/commentsabtus";
 import Reservetime from "@/components/reservetime";
 
 export default function Home() {
-
-
-
   return (
-    <main>
-      <section className="bg-[#f7f8fc] flex justify-center">
-        <div className="flex flex-col lg:flex-row w-11/12 justify-center items-center gap-2 md:gap-8">
+    <main className="max-w-[1440px] m-auto pt-10">
+      <section className="bg-[#f7f8fc] rounded-2xl">
+        <div className=" flex justify-center">
+          <div className="flex flex-col lg:flex-row w-11/12 justify-center items-center gap-2 md:gap-8">
+            {/* Main Image */}
+            <div className="relative w-full lg:w-3/5 aspect-[16/9] rounded-lg overflow-hidden">
+              <Image
+                src="/homepage/slider.png"
+                alt="Main slide"
+                fill
+                className="object-contain"
+                priority
+              />
+              <button
+                className="absolute md:text-[1.2vw] text-sm md:rounded-[1.2rem] rounded-lg"
+                style={{
+                  bottom: "6%",
+                  width: "27%",
+                  height: "16%",
+                  backgroundColor: "#6FD6E5",
+                  color: "#fff",
+                  boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
+                  transition: "all 0.3s ease",
+                }}
+              >
+                خدمات درمانی
+              </button>
+            </div>
 
-          {/* Main Image */}
-          <div className="relative w-full lg:w-3/5 aspect-[16/9] rounded-lg overflow-hidden">
-            <Image
-              src="/homepage/slider.png"
-              alt="Main slide"
-              fill
-              className="object-contain"
-              priority
-            />
-            <button
-              className="absolute md:text-[1.2vw] text-sm md:rounded-[1.2rem] rounded-lg"
-              style={{
-                bottom: "6%",
-                width: "27%",
-                height: "16%",
-                backgroundColor: "#6FD6E5",
-                color: "#fff",
-                boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
-                transition: "all 0.3s ease",
-              }}
-            >
-              خدمات درمانی
-            </button>
-          </div>
-
-          {/* Side Image - Mobile Version */}
-          <div className="relative w-full aspect-[9/3] rounded-lg overflow-hidden lg:hidden">
-            <Image
-              src="/homepage/sideslidemobile.png"
-              alt="Side slide mobile"
-              fill
-              className="object-contain"
-              priority
-            />
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 71.21 71.21"
-              className="absolute md:rounded-r-3xl md:rounded-tl-3xl rounded-r-xl rounded-tl-xl"
-              style={{
-                left: '0%',
-                bottom: '3%',
-                width: '11%',
-                height: 'auto',
-                backgroundColor: '#1d546b',
-                padding: '1.9%',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              }}
-            >
-              <path
-                fill="#fff"
-                d="M62.31,56.48v-17.91c0-14.73-11.98-26.7-26.7-26.7s-26.7,11.98-26.7,26.7v17.91C3.88,57.21,0,61.54,0,66.76
+            {/* Side Image - Mobile Version */}
+            <div className="relative w-full aspect-[9/3] rounded-lg overflow-hidden lg:hidden">
+              <Image
+                src="/homepage/sideslidemobile.png"
+                alt="Side slide mobile"
+                fill
+                className="object-contain"
+                priority
+              />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 71.21 71.21"
+                className="absolute md:rounded-r-3xl md:rounded-tl-3xl rounded-r-xl rounded-tl-xl"
+                style={{
+                  left: "0%",
+                  bottom: "3%",
+                  width: "11%",
+                  height: "auto",
+                  backgroundColor: "#1d546b",
+                  padding: "1.9%",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                }}
+              >
+                <path
+                  fill="#fff"
+                  d="M62.31,56.48v-17.91c0-14.73-11.98-26.7-26.7-26.7s-26.7,11.98-26.7,26.7v17.91C3.88,57.21,0,61.54,0,66.76
     c0,2.45,2,4.45,4.45,4.45h62.31c2.45,0,4.45-2,4.45-4.45c0-5.22-3.88-9.56-8.9-10.28ZM11.87,38.57
     c0-13.09,10.65-23.74,23.74-23.74s23.74,10.65,23.74,23.74v17.8H11.87v-17.8ZM66.76,68.25H4.45c-.82,0-1.48-.67-1.48-1.48
     c0-4.09,3.33-7.42,7.42-7.42h50.44c4.09,0,7.42,3.33,7.42,7.42C68.24,67.58,67.57,68.25,66.76,68.25ZM50.6,6.75l2.97-5.93
@@ -75,36 +72,36 @@ export default function Home() {
     s1.52-.58,2.1,0l5.93,5.93c.58.58.58,1.52,0,2.1c-.29.29-.67.43-1.05.43s-.76-.15-1.05-.43L.43,11.44ZM35.61,28.19
     c0,.82-.66,1.48-1.48,1.48c-4.09,0-7.42,3.33-7.42,7.42c0,.82-.66,1.48-1.48,1.48s-1.48-.66-1.48-1.48
     c0-5.73,4.66-10.39,10.39-10.39c.82,0,1.48.66,1.48,1.48Z"
-              />
-            </svg>
-          </div>
+                />
+              </svg>
+            </div>
 
-          {/* Side Image - Desktop Version */}
-          <div className="relative w-full lg:w-2/5 aspect-[4/3] rounded-lg overflow-hidden hidden lg:block">
-            <Image
-              src="/homepage/sideslide.png"
-              alt="Side slide"
-              fill
-              className="object-contain"
-              priority
-            />
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 71.21 71.21"
-              className="absolute rounded-r-3xl rounded-tl-3xl"
-              style={{
-                left: '6%',
-                bottom: '1%',
-                width: '16%',
-                height: 'auto',
-                backgroundColor: '#1d546b',
-                padding: '1.9%',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              }}
-            >
-              <path
-                fill="#fff"
-                d="M62.31,56.48v-17.91c0-14.73-11.98-26.7-26.7-26.7s-26.7,11.98-26.7,26.7v17.91C3.88,57.21,0,61.54,0,66.76
+            {/* Side Image - Desktop Version */}
+            <div className="relative w-full lg:w-2/5 aspect-[4/3] rounded-lg overflow-hidden hidden lg:block">
+              <Image
+                src="/homepage/sideslide.png"
+                alt="Side slide"
+                fill
+                className="object-contain"
+                priority
+              />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 71.21 71.21"
+                className="absolute rounded-r-3xl rounded-tl-3xl"
+                style={{
+                  left: "6%",
+                  bottom: "1%",
+                  width: "16%",
+                  height: "auto",
+                  backgroundColor: "#1d546b",
+                  padding: "1.9%",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                }}
+              >
+                <path
+                  fill="#fff"
+                  d="M62.31,56.48v-17.91c0-14.73-11.98-26.7-26.7-26.7s-26.7,11.98-26.7,26.7v17.91C3.88,57.21,0,61.54,0,66.76
     c0,2.45,2,4.45,4.45,4.45h62.31c2.45,0,4.45-2,4.45-4.45c0-5.22-3.88-9.56-8.9-10.28ZM11.87,38.57
     c0-13.09,10.65-23.74,23.74-23.74s23.74,10.65,23.74,23.74v17.8H11.87v-17.8ZM66.76,68.25H4.45c-.82,0-1.48-.67-1.48-1.48
     c0-4.09,3.33-7.42,7.42-7.42h50.44c4.09,0,7.42,3.33,7.42,7.42C68.24,67.58,67.57,68.25,66.76,68.25ZM50.6,6.75l2.97-5.93
@@ -115,16 +112,15 @@ export default function Home() {
     s1.52-.58,2.1,0l5.93,5.93c.58.58.58,1.52,0,2.1c-.29.29-.67.43-1.05.43s-.76-.15-1.05-.43L.43,11.44ZM35.61,28.19
     c0,.82-.66,1.48-1.48,1.48c-4.09,0-7.42,3.33-7.42,7.42c0,.82-.66,1.48-1.48,1.48s-1.48-.66-1.48-1.48
     c0-5.73,4.66-10.39,10.39-10.39c.82,0,1.48.66,1.48,1.48Z"
-              />
-            </svg>
+                />
+              </svg>
+            </div>
           </div>
         </div>
-      </section>
 
-      <div className="w-full p-4 bg-[#f7f8fc] text-black font-bold">
+      <div className="w-full p-4 text-black font-bold">
         <div className="flex justify-center">
           <div className="w-11/12 flex flex-col gap-4 lg:flex-row lg:items-center justify-between rounded-2xl bg-white p-4">
-
             {/* Input Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
               <input
@@ -158,10 +154,10 @@ export default function Home() {
           </div>
         </div>
       </div>
+      </section>
 
       <section className="mt-10 px-4">
         <div className="flex flex-col lg:flex-row gap-8 justify-center mx-auto items-center w-11/12">
-
           {/* Left Image */}
           <div className="w-full lg:w-5/12">
             <div className="relative w-full aspect-[16/14] rounded-lg overflow-hidden flex items-start">
@@ -193,9 +189,13 @@ export default function Home() {
                 </g>
               </svg>
               <div className="mr-4">
-                <p className="text-[#1d546b] text-base md:text-lg font-semibold">درباره ما</p>
+                <p className="text-[#1d546b] text-base md:text-lg font-semibold">
+                  درباره ما
+                </p>
                 <div className="flex flex-wrap items-center text-base md:text-lg">
-                  <p className="text-gray-800 font-semibold">مرکز تخصصی درمان</p>
+                  <p className="text-gray-800 font-semibold">
+                    مرکز تخصصی درمان
+                  </p>
                   <p className="text-[#1d546b] pr-2 font-semibold">وب سایت</p>
                 </div>
               </div>
@@ -203,7 +203,14 @@ export default function Home() {
 
             {/* Paragraph */}
             <p className="pt-6 text-sm md:text-base text-gray-600 leading-relaxed">
-              لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با استفاده از طراحان گرافیک است، چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است، و برای شرایط فعلی تکنولوژی مورد نیاز، و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد، کتابهای زیادی در شصت و سه درصد گذشته حال و آینده، شناخت فراوان جامعه و متخصصان را می طلبد، تا با نرم افزارها شناخت بیشتری را برای طراحان رایانه ای علی الخصوص طراحان خلاقی، و فرهنگ پیشرو در زبان فارسی ایجاد قرار گیرد.
+              لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با
+              استفاده از طراحان گرافیک است، چاپگرها و متون بلکه روزنامه و مجله
+              در ستون و سطرآنچنان که لازم است، و برای شرایط فعلی تکنولوژی مورد
+              نیاز، و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد،
+              کتابهای زیادی در شصت و سه درصد گذشته حال و آینده، شناخت فراوان
+              جامعه و متخصصان را می طلبد، تا با نرم افزارها شناخت بیشتری را برای
+              طراحان رایانه ای علی الخصوص طراحان خلاقی، و فرهنگ پیشرو در زبان
+              فارسی ایجاد قرار گیرد.
             </p>
 
             {/* Footer */}
@@ -212,8 +219,12 @@ export default function Home() {
               <div className="flex items-center">
                 <div className="w-1 h-12 bg-[#1d546b] rounded-lg"></div>
                 <div className="mr-4">
-                  <p className="text-gray-800 text-sm md:text-base">دکتر مجتبی خداخواه</p>
-                  <p className="text-[#6FD6E5] text-xs md:text-sm">متخصص سئو سایت</p>
+                  <p className="text-gray-800 text-sm md:text-base">
+                    دکتر مجتبی خداخواه
+                  </p>
+                  <p className="text-[#6FD6E5] text-xs md:text-sm">
+                    متخصص سئو سایت
+                  </p>
                 </div>
               </div>
 
@@ -254,16 +265,22 @@ export default function Home() {
                   </g>
                 </svg>
                 <div className="mr-4">
-                  <p className="text-[#1d546b] text-xl font-semibold">حوزه تخصصی و درمان</p>
+                  <p className="text-[#1d546b] text-xl font-semibold">
+                    حوزه تخصصی و درمان
+                  </p>
                   <div className="flex flex-wrap items-center mt-1">
-                    <p className="text-gray-800 text-2xl font-semibold">خدمات تخصصی کلینیک</p>
-                    <p className="text-[#6FD6E5] text-2xl pr-2 font-semibold">وب و فن</p>
+                    <p className="text-gray-800 text-2xl font-semibold">
+                      خدمات تخصصی کلینیک
+                    </p>
+                    <p className="text-[#6FD6E5] text-2xl pr-2 font-semibold">
+                      وب و فن
+                    </p>
                   </div>
                 </div>
               </div>
 
               <div className="absolute right-[5%] bottom-[5%] flex flex-col sm:flex-row gap-6 z-20 w-7/12 px-4">
-                <div className="bg-[#1d546b] flex items-center text-white rounded-4xl p-10 w-1/2 h-full sm:w-auto text-center text-sm sm:text-base">
+                <div className="bg-[#1d546b] flex items-center text-white rounded-4xl p-7 w-1/2 h-full sm:w-auto text-center text-sm sm:text-base">
                   <svg
                     className="w-40 h-40"
                     xmlns="http://www.w3.org/2000/svg"
@@ -276,11 +293,13 @@ export default function Home() {
                   </svg>
                   <div className="text-start pr-5">
                     <h4 className="pb-1">خدمات درمانی سیو</h4>
-                    <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ</p>
+                    <p>
+                      لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ
+                    </p>
                   </div>
                 </div>
 
-                <div className="text-white flex items-center border border-white rounded-4xl p-10 w-1/2 sm:w-auto text-center text-sm sm:text-base">
+                <div className="text-white flex items-center border border-white rounded-4xl p-6 w-1/2 sm:w-auto text-center text-sm sm:text-base">
                   <svg
                     className="w-40 h-40"
                     xmlns="http://www.w3.org/2000/svg"
@@ -293,7 +312,9 @@ export default function Home() {
                   </svg>
                   <div className="text-start pr-5">
                     <h4 className="pb-1">خدمات درمانی طراحی سایت</h4>
-                    <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ</p>
+                    <p>
+                      لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ
+                    </p>
                   </div>
                 </div>
               </div>
@@ -306,7 +327,9 @@ export default function Home() {
           <div className="w-11/12 m-auto">
             <div className="mt-10">
               <div className="flex items-center md:pr-18 justify-center md:justify-start">
-                <h3 className="text-gray-800 font-semibold">قرص های پر بازدید کیلینیک</h3>
+                <h3 className="text-gray-800 font-semibold">
+                  قرص های پر بازدید کیلینیک
+                </h3>
                 <h3 className="text-[#6FD6E5] pr-2">وب و فن</h3>
               </div>
               <Popularpills />
@@ -317,45 +340,55 @@ export default function Home() {
 
       <section>
         <Pathsection />
-        <div className="w-full">
-          <div className="w-11/12 m-auto relative py-20">
-            <div className="relative w-full aspect-[13/2] rounded-lg overflow-hidden flex items-start">
-              <Image
-                src="/homepage/ourteam.png"
-                alt="Main slide"
-                fill
-                className="object-cover"
-              />
-              <div className="absolute top-4 right-4  items-start z-10 p-4 rounded-xl">
-                <div className="mr-4 w-64">
-                  <div className="flex items-center gap-6">
-                    <p className="text-white text-xl whitespace-nowrap">تیم ما</p>
-                    <button className="bg-[#6FD6E5] hover:bg-[#1d546b] py-2 px-6 rounded-4xl text-white  hover:scale-102 transition-all cursor-pointer">
-                      مشاهده اعضا
-                    </button>
-                  </div>
+<div className="w-full">
+  <div className="w-11/12 m-auto relative py-10 md:py-20">
+    <div className="relative w-full aspect-[13/5] md:aspect-[13/2] rounded-lg overflow-hidden flex items-start">
+      <Image
+        src="/homepage/ourteam.png"
+        alt="Main slide"
+        fill
+        className="object-cover"
+      />
 
-                </div>
-                <div className="w-[50%] mt-10">
-                  <p>
-                    لورم ایپسوم متن ساختگی با تولید سادگی  که لازم است، و برای شرایط فعلی تکنولوژی مورد نیاز، و کاربردهای متنوع با هدف بهبود  فراوان جامعه و متخصصان را می طلبد، تا با نرم افزارها شناخت بیشتری را برای طراحان رایانه ای علی  مورد نیاز  قرار گیرد.
-                  </p>
-                </div>
-              </div>
-
-            </div>
+      {/* Overlay Content */}
+      <div className="absolute top-2 md:top-4 right-2 md:right-4 z-10 p-3 md:p-4 rounded-xl max-w-full md:max-w-[70%]">
+        <div className="mr-2 md:mr-4 w-full md:w-64">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-6">
+            <p className="text-white text-lg md:text-xl whitespace-nowrap">
+              تیم ما
+            </p>
+            <button className="bg-[#6FD6E5] hover:bg-[#1d546b] py-2 px-4 md:px-6 rounded-4xl text-white hover:scale-105 transition-all cursor-pointer text-sm md:text-base">
+              مشاهده اعضا
+            </button>
           </div>
         </div>
+
+        <div className="w-full md:w-[50%] mt-3 md:mt-4 text-sm md:text-base text-white">
+          <p>
+            لورم ایپسوم متن ساختگی با تولید سادگی که لازم است، و برای شرایط فعلی
+            تکنولوژی مورد نیاز، و کاربردهای متنوع با هدف بهبود فراوان جامعه و
+            متخصصان را می‌طلبد، تا با نرم‌افزارها شناخت بیشتری را برای طراحان
+            رایانه‌ای علی مورد نیاز قرار گیرد.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
       </section>
       <div className="w-full bg-[#f7f8fc] px-4 md:px-20 flex flex-col md:flex-row items-center md:items-start gap-10">
         {/* Left Section: Centered Text */}
         <div className="w-full md:w-[40%] flex justify-center items-center text-center md:text-right mt-30">
           <div>
             <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
-              مشتریان ، درباره <span className="text-[#3db4c6]">وبوفن</span> چه می‌گویند ؟
+              مشتریان ، درباره <span className="text-[#3db4c6]">وبوفن</span> چه
+              می‌گویند ؟
             </h2>
             <p className="text-sm text-gray-600 leading-relaxed">
-              لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است...
+              لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با
+              استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله
+              در ستون و سطرآنچنان که لازم است...
             </p>
           </div>
         </div>
@@ -371,7 +404,6 @@ export default function Home() {
           <Reservetime />
         </div>
       </div>
-
     </main>
   );
 }

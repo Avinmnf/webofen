@@ -19,7 +19,7 @@ export default function ProductList() {
   });
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 max-w-[1440px] mx-auto">
       <h2 className="text-3xl font-bold text-gray-800 mb-6"> لیست محصولات</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
