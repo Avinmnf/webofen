@@ -11,6 +11,8 @@ type Post = {
   createdAt?: string;
   category?: { id: string; title: string };
   tags?: { name: string }[];
+    ratings?: { value: number }[];
+  _ratingsMeta?: { count: number };
 };
 
 export function usePostBySlug(slug?: string) {
