@@ -2,13 +2,26 @@
 import Image from "next/image";
 import React from "react";
 import { useState } from "react";
+import { useRef } from "react";
 export default function guidance() {
   const [activeDiv, setActiveDiv] = useState<string | null>("first");
   const [activeIndex, setActiveIndex] = useState<number | null>(0);
 
+  // Refs for each section
+  const firstRef = useRef<HTMLDivElement | null>(null);
+  const secondRef = useRef<HTMLDivElement | null>(null);
+  const thirdRef = useRef<HTMLDivElement | null>(null);
+
   const handleClick = (divName: string) => {
-    // If the clicked div is already active, close it; otherwise open it
-    setActiveDiv((prev) => (prev === divName ? null : divName));
+    setActiveDiv(divName);
+
+    // Scroll to the selected section
+    let ref: React.RefObject<HTMLDivElement | null> | null = null;
+    if (divName === "first") ref = firstRef;
+    if (divName === "second") ref = secondRef;
+    if (divName === "third") ref = thirdRef;
+
+    ref?.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const faqs = [
@@ -49,11 +62,11 @@ export default function guidance() {
   };
   return (
     <main>
-      <div className="max-w-[1440px] w-11/12 m-auto pt-12">
+      <div className="max-w-[1440px] m-auto pt-12">
         <div className="w-full bg-gray-500 rounded-2xl h-64"></div>
 
-        <section className="mt-10 px-4">
-          <div className="flex flex-col lg:flex-row gap-8 justify-center mx-auto items-center w-11/12">
+        <section className="mt-10 max-w-[1440px]">
+          <div className="flex flex-col lg:flex-row gap-8 justify-center mx-auto items-center">
             {/* Left Image */}
             <div className="w-full lg:w-5/12">
               <div className="relative w-full aspect-[16/14] rounded-lg overflow-hidden flex items-start">
@@ -158,34 +171,35 @@ export default function guidance() {
                 <span className="block">برای بهترین عملکرد سئو</span>
               </div>
             </div>
-            <div className="md:ml-2 flex gap-4 bg-gray-300 rounded-4xl h-12 md:w-3/4 md:mt-0 mt-2">
+            <div className="relative md:ml-2 flex gap-4 bg-gray-300 rounded-4xl h-12 md:w-3/4 md:mt-0 mt-2">
+              <div
+                className="absolute top-0 left-0 h-full bg-[#1d546b] rounded-full transition-all duration-300"
+                style={{
+                  width: `${100 / 3}%`,
+                  transform:
+                    activeDiv === "first"
+                      ? "translateX(200%)"
+                      : activeDiv === "second"
+                      ? "translateX(100%)"
+                      : "translateX(0%)",
+                }}
+              ></div>
+              {/* Buttons */}
               <button
                 onClick={() => handleClick("first")}
-                className={`md:px-6 text-sm md:text-md py-1 rounded-full h-12 w-1/3 ${
-                  activeDiv === "first"
-                    ? "bg-[#1d546b] text-white"
-                    : " text-black"
-                }`}
+                className="flex-1 z-10 text-sm md:text-md py-1 rounded-full h-12 text-white"
               >
                 تمامی قرص ها
               </button>
               <button
                 onClick={() => handleClick("second")}
-                className={`md:px-6 text-sm md:text-md py-1 rounded-full h-12 w-1/3 ${
-                  activeDiv === "second"
-                    ? "bg-[#1d546b] text-white"
-                    : " text-black"
-                }`}
+                className="flex-1 z-10 text-sm md:text-md py-1 rounded-full h-12 text-white"
               >
                 قرص های سئو داخلی
               </button>
               <button
                 onClick={() => handleClick("third")}
-                className={`md:px-6 text-sm md:text-md py-1 rounded-full h-12 w-1/3 ${
-                  activeDiv === "third"
-                    ? "bg-[#1d546b] text-white"
-                    : " text-black"
-                }`}
+                className="flex-1 z-10 text-sm md:text-md py-1 rounded-full h-12 text-white"
               >
                 قرص های سئو خارجی
               </button>

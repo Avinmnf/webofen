@@ -32,7 +32,7 @@ export default function Header() {
 
   const menuItems = [
     { label: "خانه", href: "/" },
-    { label: "مشاوره", href: "/guidance" },
+    { label: "داروخانه", href: "/guidance" },
     { label: "خدمات درمانی", href: "/products" },
     { label: "وبلاگ", href: "/articles" },
     { label: "درباره ما", href: "/" },
