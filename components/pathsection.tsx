@@ -39,8 +39,8 @@ export default function Pathsection() {
     );
 
     return (
-        <div className="w-full mt-8 md:mt-16 lg:mt-22 px-4 sm:px-6">
-            <div className="w-11/12 mx-auto">
+        <div className="w-full mt-8 md:mt-16 lg:mt-22 ">
+            <div className="">
                 <div className="text-right mb-6 md:mb-10">
                     <p className="text-[#1d546b] text-sm md:text-base">مراحل درمان</p>
                     <div className="flex items-center flex-wrap ">
@@ -50,7 +50,7 @@ export default function Pathsection() {
                 </div>
 
                 {/* Steps - Horizontal for larger screens */}
-                <div className="hidden lg:flex items-center justify-center mt-6 md:mt-10 gap-2 md:gap-4">
+                <div className="hidden lg:flex items-center justify-between mt-6 md:mt-10 gap-2 md:gap-4 px-4">
                     {/* Step 1 */}
                     <StepIcon>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 84 84.01" fill="#fff">

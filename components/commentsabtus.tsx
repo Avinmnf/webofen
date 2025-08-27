@@ -54,7 +54,7 @@ export default function Commentsabtus() {
           resistance={true}
           resistanceRatio={0.7}
           modules={[EffectCoverflow, Pagination, Autoplay]}
-          className="h-full w-[90%] md:w-[70%] z-0"
+          className="h-full z-0 m-0"
           style={{
             backfaceVisibility: 'hidden',
             transformStyle: 'preserve-3d'

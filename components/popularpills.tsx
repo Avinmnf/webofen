@@ -22,7 +22,7 @@ const slides: Slide[] = [
 
 export default function Popularpills() {
   return (
-    <div className="w-full px-6 py-8"> {/* Outer padding (X and Y axis) */}
+    <div className=""> {/* Outer padding (X and Y axis) */}
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
         navigation

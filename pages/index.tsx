@@ -7,10 +7,10 @@ import Reservetime from "@/components/reservetime";
 
 export default function Home() {
   return (
-    <main className="max-w-[1440px] m-auto pt-10">
-      <section className="bg-[#f7f8fc] rounded-2xl">
-        <div className=" flex justify-center">
-          <div className="flex flex-col lg:flex-row w-11/12 justify-center items-center gap-2 md:gap-8">
+    <main className=" m-auto pt-10">
+      <section className="bg-[#f7f8fc] w-full rounded-2xl">
+        <div className="max-w-[1440px] m-auto flex justify-center">
+          <div className="flex flex-col lg:flex-row w-full justify-center items-center gap-2 md:gap-8">
             {/* Main Image */}
             <div className="relative w-full lg:w-3/5 aspect-[16/9] rounded-lg overflow-hidden">
               <Image
@@ -119,8 +119,8 @@ export default function Home() {
         </div>
 
       <div className="w-full p-4 text-black font-bold">
-        <div className="flex justify-center">
-          <div className="w-11/12 flex flex-col gap-4 lg:flex-row lg:items-center justify-between rounded-2xl bg-white p-4">
+        <div className="max-w-[1440px] m-auto flex justify-center">
+          <div className="w-full flex flex-col gap-4 lg:flex-row lg:items-center justify-between rounded-2xl bg-white p-4">
             {/* Input Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
               <input
@@ -156,8 +156,8 @@ export default function Home() {
       </div>
       </section>
 
-      <section className="mt-10 px-4">
-        <div className="flex flex-col lg:flex-row gap-8 justify-center mx-auto items-center w-11/12">
+      <section className="max-w-[1440px] m-auto mt-20 px-4">
+        <div className="flex flex-col lg:flex-row gap-8 justify-center mx-auto items-centerY">
           {/* Left Image */}
           <div className="w-full lg:w-5/12">
             <div className="relative w-full aspect-[16/14] rounded-lg overflow-hidden flex items-start">
@@ -241,8 +241,8 @@ export default function Home() {
 
       <section className="relative mt-20">
         {/* Image container (no background color) */}
-        <div className="w-full relative z-10">
-          <div className="w-11/12 m-auto">
+        <div className="max-w-[1440px] m-auto relative z-10">
+          <div className=" m-auto">
             <div className="relative w-full aspect-[22/6] rounded-lg overflow-hidden">
               <Image
                 src="/homepage/bigslide.png"
@@ -324,7 +324,7 @@ export default function Home() {
 
         {/* Background section starts from mid-image */}
         <div className="w-full mt-[-15%] pt-[15%] bg-[#f7f8fc] relative z-0">
-          <div className="w-11/12 m-auto">
+          <div className="max-w-[1440px] m-auto">
             <div className="mt-10">
               <div className="flex items-center md:pr-18 justify-center md:justify-start">
                 <h3 className="text-gray-800 font-semibold">
@@ -338,10 +338,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section>
+      <section className="max-w-[1440px] m-auto ">
         <Pathsection />
 <div className="w-full">
-  <div className="w-11/12 m-auto relative py-10 md:py-20">
+  <div className="relative py-10 md:py-20">
     <div className="relative w-full aspect-[13/5] md:aspect-[13/2] rounded-lg overflow-hidden flex items-start">
       <Image
         src="/homepage/ourteam.png"
@@ -363,7 +363,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="w-full md:w-[50%] mt-3 md:mt-4 text-sm md:text-base text-white">
+        <div className="w-full md:w-[70%] mt-3 md:mt-4 text-sm md:text-base text-white">
           <p>
             لورم ایپسوم متن ساختگی با تولید سادگی که لازم است، و برای شرایط فعلی
             تکنولوژی مورد نیاز، و کاربردهای متنوع با هدف بهبود فراوان جامعه و
@@ -377,7 +377,8 @@ export default function Home() {
 </div>
 
       </section>
-      <div className="w-full bg-[#f7f8fc] px-4 md:px-20 flex flex-col md:flex-row items-center md:items-start gap-10">
+      <div className="bg-[#f7f8fc] w-full">
+      <div className="max-w-[1440px] m-auto px-4 md:px-20 flex flex-col md:flex-row items-center md:items-start gap-10">
         {/* Left Section: Centered Text */}
         <div className="w-full md:w-[40%] flex justify-center items-center text-center md:text-right mt-30">
           <div>
@@ -398,9 +399,9 @@ export default function Home() {
           <Commentsabtus />
         </div>
       </div>
-
-      <div className="w-full">
-        <div className="w-11/12 m-auto relative py-10">
+</div>
+      <div className="max-w-[1440px] m-auto">
+        <div className=" relative py-10">
           <Reservetime />
         </div>
       </div>
