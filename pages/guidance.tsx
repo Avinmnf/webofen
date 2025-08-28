@@ -444,7 +444,7 @@ export default function guidance() {
                   <div className="border-b border-white/30">
                     <button
                       onClick={() => toggleFAQ(index)}
-                      className="w-full flex justify-between items-center text-right"
+                      className="w-full flex justify-between items-center text-right cursor-pointer"
                     >
                       <span className="font-medium">{faq.question}</span>
                     </button>
