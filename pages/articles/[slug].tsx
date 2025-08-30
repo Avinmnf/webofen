@@ -6,7 +6,7 @@ import CommentsList from "@/components/comments/CommentsList";
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
-
+import { usePageView } from "@/hooks/usePageView";
 export default function PostPage() {
   const { user } = useAuth();
 
@@ -27,6 +27,10 @@ export default function PostPage() {
       setDislikes(post.ratings?.filter((r) => r.value === 1).length || 0);
     }
   }, [post]);
+
+  usePageView({ slug: post?.slug || "", title: post?.title || "" });
+
+
   const handleLike = async () => {
     if (!post || !user) return;
     await fetch("/api/proxy/post-ratings", {
@@ -83,7 +87,7 @@ export default function PostPage() {
   return (
     <main className="relative w-full">
       {/*Background Section */}
-      <div className="relative pt-20 bg-gray-50  rounded-4xl">
+      <div className="relative pt-20 bg-[#fafafa]  rounded-4xl">
         <div className="w-7/12 m-auto">
           {/* Hero Section */}
           {post.imageUrl && (
@@ -130,11 +134,11 @@ export default function PostPage() {
                 <p className="text-blue-500">{post.category?.title}</p>
               </div>
               <div className="">
-                <h1 className="text-gray-800 font-semibold mt-4">
-                  {post.description}
+                <h1 className="text-gray-800 font-semibold mt-2">
+                  {post.title}
                 </h1>
               </div>
-              <div className="mt-2 flex items-center justify-between">
+              <div className="mt-5 flex items-center justify-between">
                 <div className="flex items-center">
                   <svg
                     className="w-6 h-6 opacity-45"
@@ -167,6 +171,7 @@ export default function PostPage() {
 
         <div className="flex w-3/5 m-auto justify-between">
           <div className="text-gray-700 mt-6 w-4/5 mr-14">
+          
             <div dangerouslySetInnerHTML={{ __html: post.content || "" }} />
           </div>
           {/* Sidebar */}

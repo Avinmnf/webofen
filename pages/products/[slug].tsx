@@ -10,6 +10,7 @@ import CommentForm from "@/components/comments/comments";
 import CommentsList from "@/components/comments/CommentsList";
 import RatingForm from "@/components/rating/rating";
 import AverageRating from "@/components/rating/AverageRating";
+import { usePageView } from "@/hooks/usePageView";
 
 export default function ProductDetailPage() {
   const { addItem } = useCart();
@@ -45,6 +46,12 @@ export default function ProductDetailPage() {
   // New states to track if user bought the product
   const [hasBought, setHasBought] = useState(false);
   const [checkingBought, setCheckingBought] = useState(true);
+
+  useEffect(() => {
+    if (product) {
+      usePageView({ slug: product.slug, title: product.title });
+    }
+  }, [product]);
 
   // Check if the logged-in user has bought this product
   useEffect(() => {

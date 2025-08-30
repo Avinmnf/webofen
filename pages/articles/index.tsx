@@ -1,22 +1,25 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePosts } from "@/hooks/useposts";
 
 type Post = {
-  category?: string;
   id: string;
   title: string;
   slug: string;
   description: string;
   imageUrl?: string;
   imageAlt?: string;
+  category?: { id: string; title: string };
   createdAt: string;
   readtime: number;
   desc: string;
   likes: number;
   tags: { id: string; name: string }[];
 };
-
+function isRecommended(post: Post) {
+  return post.tags.some((tag) => tag.name === "پیشنهاد ما");
+}
 export default function PostsPage() {
   const [page, setPage] = useState(1);
   const limit = 10;
@@ -37,140 +40,22 @@ export default function PostsPage() {
     },
   ];
 
-  const posts: Post[] = [
-    {
-      id: "1",
-      title: "سئو اینستاگرام چیست؟ (۱۱ تکنیک تضمینی برای بیشتر دیده شدن!)",
-      slug: "post-1",
-      category: "بازاریابی شبکه های اجتماعی",
-      description:
-        "در این مقاله با سئو اینستاگرام آشنا می‌شوید اینکه چطور هم داخل اینستا دیده شوید و هم پیج شما در در نتایج جستجوی گوگل قرار بگیرد.",
-      imageUrl: "/blog/سئو-اینستاگرام-2.webp",
-      desc: "با این مقاله، به همه روش‌های کسب درآمد از اینستاگرام مسلط شوید! از فروش محصولات تا بلاگری و افیلیت مارکتینگ، همه چیز را قدم به قدم یاد بگیرید.",
-      imageAlt: "پست اول",
-      readtime: 20,
-      likes: 5,
-      createdAt: "2025-08-21T09:00:00Z",
-      tags: [
-        { id: "t1", name: "React" },
-        { id: "t2", name: "Next.js" },
-      ],
-    },
-    {
-      id: "2",
-      title: " بازاریابی شبکه های اجتماعی",
-      slug: "post-2",
-      category: "بازاریابی اینترنتی",
+  const { posts, total, loading } = usePosts({
+    page,
+    limit,
+    status: "published",
+    sort: "createdAt",
+    order: "desc",
+  });
 
-      description: "آموزش روش‌های کسب درآمد از اینستاگرام: از ایده تا موفقیت!",
-      desc: "با این مقاله، به همه روش‌های کسب درآمد از اینستاگرام مسلط شوید! از فروش محصولات تا بلاگری و افیلیت مارкетینگ، همه چیز را قدم به قدم یاد بگیرید.",
-      imageUrl: "/blog/make_money_from_instagram_cover.webp",
-      imageAlt: "پست دوم",
-      readtime: 20,
-      likes: 5,
-
-      createdAt: "2025-08-20T12:00:00Z",
-      tags: [{ id: "t3", name: "JavaScript" }],
-    },
-    {
-      id: "3",
-      title: "بازاریابی اینترنتی",
-      slug: "post-3",
-      category: "تبلیغات اینترنتی",
-
-      description: "آموزش گام به گام ساخت سایت رایگان با گوگل سایت",
-      desc: "گوگل سایت بهترین گزینه برای ساخت سایت رایگان و بدون کدنویسی است! با این آموزش می‌توانید در 15 دقیقهサイト خودتان را داشته باشید...!",
-
-      imageUrl: "/blog/working_with_googleSite.webp",
-      imageAlt: "پست سوم",
-      readtime: 20,
-      likes: 5,
-
-      createdAt: "2025-08-19T15:30:00Z",
-      tags: [{ id: "t4", name: "CSS" }],
-    },
-    {
-      id: "4",
-      title: "تبلیغات اینترنتی",
-      slug: "post-3",
-      category: "بازاریابی اینترنتی",
-
-      description:
-        "پرفورمنس مارکتینگ: میانبری به سوی تبلیغات هدفمند و پربازده!",
-      desc: "با پرفورمنس مارکتینگ، هزینه تبلیغات به نتایج قابل اندازه‌گیری و موفقیت‌های واقعی تبدیل می‌شود. اگر نمی‌دانید پرفورمنس مارکتینگ چیست! این مقاله را بخوانید...!",
-
-      imageUrl: "/blog/performance_marketing_cover2.webp",
-      imageAlt: "پست سوم",
-      readtime: 20,
-      likes: 5,
-
-      createdAt: "2025-08-19T15:30:00Z",
-      tags: [{ id: "t4", name: "CSS" }],
-    },
-    {
-      id: "5",
-      title: "تبلیغات اینترنتی",
-      slug: "post-3",
-      category: "تحلیل و آنالیز دیجیتال",
-
-      description:
-        "پرفورمنس مارکتیشستیسیشینگ: میانبری به سوی تبلیغات هدفمند و پربازده!",
-      desc: "با پرفورمنس مارکتینگ، هزینه تبلیغات به نتایج قابل اندازه‌گیری و موفقیت‌های واقعی تبدیل می‌شود. اگر نمی‌دانید پرفورمنس مارکتینگ چیست! این مقاله را بخوانید...!",
-
-      imageUrl: "/blog/performance_marketing_cover2.webp",
-      imageAlt: "پست سوم",
-      readtime: 20,
-      likes: 5,
-
-      createdAt: "2025-08-19T15:30:00Z",
-      tags: [{ id: "t4", name: "CSS" }],
-    },
-    {
-      id: "6",
-      title: "تبلیغات اینترنتی",
-      slug: "post-3",
-      category: "راه‌اندازی کسب و کار",
-
-      description: " هدفمند و پربازده!",
-      desc: "با پرفورمنس مارکتینگ، هزینه تبلیغات به نتایج قابل اندازه‌گیری و موفقیت‌های واقعی تبدیل می‌شود. اگر نمی‌دانید پرفورمنس مارکتینگ چیست! این مقاله را بخوانید...!",
-
-      imageUrl: "/blog/performance_marketing_cover2.webp",
-      imageAlt: "پست سوم",
-      readtime: 20,
-      likes: 5,
-
-      createdAt: "2025-08-19T15:30:00Z",
-      tags: [{ id: "t4", name: "CSS" }],
-    },
-    {
-      id: "7",
-      title: "تبلیغات اینترنتی",
-      slug: "post-3",
-      category: "افزایش مشتری و فروش",
-
-      description: ": میانبری به سوی تبلیغات هدفمند و پربازده!",
-      desc: "با پرفورمنس مارکتینگ، هزینه تبلیغات به نتایج قابل اندازه‌گیری و موفقیت‌های ...!",
-
-      imageUrl: "/blog/performance_marketing_cover2.webp",
-      imageAlt: "پست سوم",
-      readtime: 20,
-      likes: 5,
-
-      createdAt: "2025-08-19T15:30:00Z",
-      tags: [{ id: "t4", name: "CSS" }],
-    },
-  ];
-  const total = posts.length;
   const totalPages = Math.ceil(total / limit);
 
   // Create cards array with fixed positions for social cards
-  const cards: (Post | (typeof socialCards)[0])[] = [...posts.slice(1)];
-
-  // Insert Telegram at position 1 (second card)
-  cards.splice(1, 0, socialCards[0]);
-
-  // Insert Instagram at position 5 (sixth card)
-  cards.splice(5, 0, socialCards[1]);
+  const cards: ((typeof posts)[number] | (typeof socialCards)[0])[] = [
+    ...posts.slice(1),
+  ];
+  if (cards.length > 1) cards.splice(1, 0, socialCards[0]);
+  if (cards.length > 5) cards.splice(5, 0, socialCards[1]);
 
   return (
     <main className="bg-gradient-to-b from-white to-stone-200 pb-10">
@@ -186,8 +71,8 @@ export default function PostsPage() {
                     {posts[0].imageUrl && (
                       <Image
                         className="rounded-t-2xl"
-                        width={1000}
-                        height={600}
+                        width={700}
+                        height={300}
                         src={posts[0].imageUrl}
                         alt={posts[0].imageAlt || posts[0].title}
                       />
@@ -205,9 +90,18 @@ export default function PostsPage() {
                             fill="#ff5084"
                           />
                         </svg>
-
+                        {isRecommended(posts[0]) && (
+                          <svg
+                            className="w-5 h-5 text-yellow-400 ml-2"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.954a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.953c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.539-1.118l1.286-3.953a1 1 0 00-.364-1.118L2.073 9.38c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.954z" />
+                          </svg>
+                        )}
                         <p className="text-sm text-gray-500">
-                          {posts[0].category}
+                          {posts[0].category?.title}
                         </p>
                       </div>
                       <p className="text-gray-700 mt-1 text-xl font-semibold">
@@ -230,7 +124,11 @@ export default function PostsPage() {
                           />
                         </svg>
                         <p className="text-gray-400 text-sm">
-                          زمان مطالعه: {posts[0].readtime} دقیقه
+                          زمان مطالعه:{" "}
+                          {new Date(posts[0].createdAt).toLocaleDateString(
+                            "fa-IR"
+                          )}{" "}
+                          دقیقه
                         </p>
                       </div>
                     </div>
@@ -315,9 +213,7 @@ export default function PostsPage() {
                     <div className="rounded-2xl bg-white shadow hover:shadow-sm transition cursor-pointer block w-full">
                       {/* SVG Icon */}
                       {card.id === "telegram" && (
-                    <div
-                          className="rounded-2xl bg-white text-white  transition cursor-pointer block"
-                        >
+                        <div className="rounded-2xl bg-white text-white  transition cursor-pointer block">
                           <div className="flex items-center justify-between w-full">
                             <div className="flex items-center">
                               <div className="bg-[#5ebae8] shadow-[-12px_0_rgba(94,186,232,.2),-22px_0_rgba(94,186,232,.1)] transform -skew-l-2 p-8 ml-10 rounded-2xl">
@@ -363,7 +259,10 @@ export default function PostsPage() {
                             </div>
 
                             <div>
-                              <Link href="https://t.me/yourchannel" className="bg-gray-400">
+                              <Link
+                                href="https://t.me/yourchannel"
+                                className="bg-gray-400"
+                              >
                                 <svg
                                   className="w-8 h-8 bg-blue-50 rounded-full ml-8"
                                   viewBox="0 0 24 24"
@@ -381,9 +280,7 @@ export default function PostsPage() {
                         </div>
                       )}
                       {card.id === "instagram" && (
-                        <div
-                          className="rounded-2xl bg-white text-white  transition cursor-pointer block"
-                        >
+                        <div className="rounded-2xl bg-white text-white  transition cursor-pointer block">
                           <div className="flex items-center justify-between w-full">
                             <div className="flex items-center">
                               <div className="[background:linear-gradient(295deg,#f76290,#fe7464)] [box-shadow:-12px_0_hsla(4,99%,70%,.2),-22px_0_hsla(4,99%,70%,.1)] transform -skew-l-2 p-8 ml-10 rounded-2xl">
@@ -425,7 +322,10 @@ export default function PostsPage() {
                             </div>
 
                             <div>
-                              <Link href="https://t.me/yourchannel" className="bg-gray-400">
+                              <Link
+                                href="https://t.me/yourchannel"
+                                className="bg-gray-400"
+                              >
                                 <svg
                                   className="w-8 h-8 bg-red-50 rounded-full ml-8"
                                   viewBox="0 0 24 24"
@@ -471,12 +371,39 @@ export default function PostsPage() {
                               fill="#ff5084"
                             />
                           </svg>
+                          <div className="relative group inline-block">
+                            {isRecommended(card as Post) && (
+                              <>
+                                <svg
+                                  className="w-5 h-5 ml-2 text-yellow-400 cursor-pointer"
+                                  fill="#f06330"
+                                  viewBox="0 0 20 20"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.954a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.953c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.539-1.118l1.286-3.953a1 1 0 00-.364-1.118L2.073 9.38c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.954z" />
+                                </svg>
+
+                                {/* Tooltip */}
+                                <div
+                                  className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 
+                      hidden group-hover:block px-2 py-1 rounded-md 
+                      bg-gray-800 text-white text-xs shadow-md whitespace-nowrap"
+                                >
+                                  پیشنهاد ما
+                                </div>
+                              </>
+                            )}
+                          </div>
 
                           <p className="text-sm text-gray-500">
-                            {posts[0].category}
+                            {posts[0].category?.title}
                           </p>
                         </div>
-                        <p className="text-lg text-gray-700 font-semibold hover:text-[#1d546b]">
+                        <p className="text-base font-semibold text-gray-700  hover:text-[#1d546b]">
+                          {(card as Post).title}
+                        </p>
+
+                        <p className="text-sm text-gray-700  hover:text-[#1d546b]">
                           {(card as Post).description}
                         </p>
                         <p className="text-md text-gray-400 mt-2 line-clamp-2">
@@ -498,7 +425,7 @@ export default function PostsPage() {
                             />
                           </svg>
                           <p className="text-gray-400 text-sm">
-                            زمان مطالعه: {posts[0].readtime} دقیقه
+                            زمان مطالعه: {(card as Post).readtime} دقیقه
                           </p>
                         </div>
                       </div>
