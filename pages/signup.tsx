@@ -23,7 +23,7 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_CMS_API}/signup`, {
+      const res = await fetch(`api/proxy/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
