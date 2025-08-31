@@ -105,7 +105,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       };
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_CMS_API}/orders` ||`http://localhost:3003/orders`, {
+        `api/proxy/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

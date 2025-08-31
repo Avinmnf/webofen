@@ -28,7 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchUser = async () => {
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_CMS_API}/me` ||`http://localhost:3003/me`, {
+        `api/proxy/me`, {
         credentials: "include",
       });
 
@@ -65,8 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_CMS_API}/auth/login` ||
-          `http://localhost:3003/auth/login`,
+          `api/proxy/auth/login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -94,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     try {
       await fetch(
-        `${process.env.NEXT_PUBLIC_CMS_API}/auth/signup` ||`http://localhost:3003/auth/login`, {
+        `api/proxy/auth/login`, {
           method: "POST",
           credentials: "include",
         }
