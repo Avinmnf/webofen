@@ -28,7 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchUser = async () => {
     try {
       const res = await fetch(
-        `api/proxy/me`, {
+        `/api/proxy/me`, {
         credentials: "include",
       });
 
@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       const res = await fetch(
-          `api/proxy/auth/login`,
+          `/api/proxy/auth/login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -93,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     try {
       await fetch(
-        `api/proxy/auth/login`, {
+        `/api/proxy/auth/logout`, {
           method: "POST",
           credentials: "include",
         }
