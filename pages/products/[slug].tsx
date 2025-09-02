@@ -42,6 +42,15 @@ export default function ProductDetailPage() {
   >();
 
   const { user } = useAuth();
+useEffect(() => {
+  if (!product) return;
+
+  usePageView({
+    slug: product.slug,
+    title: product.title,
+    type: "product",
+  });
+}, [product]);
 
   // New states to track if user bought the product
   const [hasBought, setHasBought] = useState(false);

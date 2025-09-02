@@ -1,16 +1,18 @@
 'use client'
 import { useEffect, useState } from 'react';
 
+type AttributeValue = {
+  value: string;
+  attribute: { name: string };
+};
+
 type Variant = {
   id: string;
   price: number;
   stock: number;
-  attributeValues: {
-    value: string;
-    attribute: {
-      name: string;
-    };
-  }[];
+  attributeValues: AttributeValue[];
+  ratingsCount: number;
+  ratingsValues: number[];
 };
 
 type Product = {
@@ -22,10 +24,7 @@ type Product = {
   imageUrl?: string;
   galleryUrls?: string[];
   createdAt: string;
-  category: {
-    id: string;
-    title: string;
-  };
+  category: { id: string; title: string };
   variants: Variant[];
 };
 
@@ -38,15 +37,24 @@ export default function useProductBySlug(slug?: string) {
     if (!slug) return;
 
     setLoading(true);
-        fetch(`/api/proxy/productbyslug/${encodeURIComponent(slug)}`, {
-      method: 'GET',
-    })
-      .then(async res => {
+
+    fetch(`/api/proxy/productbyslug/${encodeURIComponent(slug)}`)
+      .then(async (res) => {
         if (!res.ok) throw new Error(await res.text());
         const data = await res.json();
-        setProduct(data.product ?? null);
+
+        // Map variants with ratings and stock
+        const variants: Variant[] = (data.product.variants || []).map((v: any) => ({
+          ...v,
+          stock: v.stock ?? 0,
+          price: v.price ?? 0,
+          ratingsCount: v.ratingsCount ?? 0,
+          ratingsValues: v.ratingsValues ?? [],
+        }));
+
+        setProduct({ ...data.product, variants });
       })
-      .catch(err => setError(err.message || 'Failed to fetch'))
+      .catch((err) => setError(err.message || 'Failed to fetch'))
       .finally(() => setLoading(false));
   }, [slug]);
 
