@@ -42,25 +42,17 @@ export default function ProductDetailPage() {
   >();
 
   const { user } = useAuth();
-useEffect(() => {
-  if (!product) return;
 
-  usePageView({
-    slug: product.slug,
-    title: product.title,
-    type: "product",
-  });
-}, [product]);
 
   // New states to track if user bought the product
   const [hasBought, setHasBought] = useState(false);
   const [checkingBought, setCheckingBought] = useState(true);
 
-  useEffect(() => {
-    if (product) {
-      usePageView({ slug: product.slug, title: product.title });
-    }
-  }, [product]);
+usePageView({
+  slug: product?.slug || "",
+  title: product?.title || "",
+  type: "product",
+});
 
   // Check if the logged-in user has bought this product
   useEffect(() => {
