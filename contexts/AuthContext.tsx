@@ -90,30 +90,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Logout function
-  const logout = async () => {
-    try {
-      await fetch(
-        `/api/proxy/auth/logout`, {
-          method: "POST",
-          credentials: "include",
-        }
-      );
-    } catch (err) {
-      console.error("Logout error:", err);
-    }
+const logout = async () => {
+  try {
+    await fetch(`/api/proxy/auth/logout`, {
+      method: 'POST',
+      credentials: 'include', // send cookie
+    });
+  } catch (err) {
+    console.error("Logout error:", err);
+  }
 
-    // Clear localStorage
-    localStorage.removeItem("cartBackup");
-    localStorage.removeItem("customerInfo");
+  setUser(null);
+  localStorage.removeItem('cartBackup');
+  localStorage.removeItem('customerInfo');
+  window.dispatchEvent(new Event("user-logged-out"));
+  router.push("/login");
+};
 
-    setUser(null);
-
-    // Notify other components
-    window.dispatchEvent(new Event("user-logged-out"));
-
-    // Optionally redirect
-    router.push("/login");
-  };
 
   return (
     <AuthContext.Provider

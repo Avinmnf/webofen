@@ -25,26 +25,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const targetUrl = `${apiUrl}/${slug}${queryString ? '?' + queryString : ''}`;
 
   try {
-    // ✅ normalize headers
     const headers: Record<string, string> = {};
     for (const [key, value] of Object.entries(req.headers)) {
       if (typeof value === "string") headers[key] = value;
       else if (Array.isArray(value)) headers[key] = value.join(", ");
     }
+
     headers["x-api-key"] = generateApiKey(SHARED_SECRET);
 
-    const proxyRes = await fetch(targetUrl, {
+    const fetchOptions: RequestInit = {
       method: req.method,
       headers,
-      body: ['POST', 'PUT', 'PATCH'].includes(req.method || '')
-        ? JSON.stringify(req.body)
-        : undefined,
-    });
+    };
 
-    // ✅ forward Set-Cookie from API → browser
-    const setCookie = proxyRes.headers.get('set-cookie');
-    if (setCookie) {
-      res.setHeader('Set-Cookie', setCookie);
+    // Only include body if necessary
+    if (['POST', 'PUT', 'PATCH'].includes(req.method || '') && Object.keys(req.body || {}).length > 0) {
+      fetchOptions.body = JSON.stringify(req.body);
+    }
+
+    const proxyRes = await fetch(targetUrl, fetchOptions);
+
+    // Forward Set-Cookie **except for logout**
+    if (slug !== "auth/logout") {
+      const setCookie = proxyRes.headers.get('set-cookie');
+      if (setCookie) {
+        res.setHeader('Set-Cookie', setCookie);
+      }
     }
 
     const data = await proxyRes.json();
