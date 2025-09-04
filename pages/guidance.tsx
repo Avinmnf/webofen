@@ -63,9 +63,16 @@ export default function guidance() {
   return (
     <main>
       <div className="max-w-[1440px] m-auto pt-12">
-        <div className="w-full bg-gray-500 rounded-2xl h-64"></div>
-
-        <section className="mt-10 max-w-[1440px]">
+    <div className="relative w-full aspect-[13/5] md:aspect-[12/2] rounded-lg overflow-hidden flex items-start">
+                <Image
+                  src="/guidance/container.png"
+                  alt="Main slide"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
+        <section className="mt-14 max-w-[1440px]">
           <div className="flex flex-col lg:flex-row gap-8 justify-center mx-auto items-center">
             {/* Left Image */}
             <div className="w-full lg:w-5/12">
