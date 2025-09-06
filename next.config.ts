@@ -4,7 +4,13 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactStrictMode: true,
     images: {
-    domains: ['cms.webofen.com'],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "cms.webofen.com",
+        pathname: "/uploads/**",
+      },
+    ],
   },
 };
 
