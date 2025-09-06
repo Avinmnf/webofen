@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePageView } from "@/hooks/usePageView";
 export default function PostPage() {
+  const NEXT_PUBLIC_CMS_URL = process.env.NEXT_PUBLIC_CMS_URL;
   const { user } = useAuth();
 
   const [likes, setLikes] = useState(0);
@@ -92,7 +93,7 @@ export default function PostPage() {
           {post.imageUrl && (
             <div className="relative w-full h-[500px]">
               <Image
-                src={`https://cms.webofen.com${post.imageUrl}`}
+                src={`${NEXT_PUBLIC_CMS_URL}${post.imageUrl}`}
                 alt={post.imageAlt || post.title}
                 fill
                 className="bg-gray-200 rounded-2xl"
