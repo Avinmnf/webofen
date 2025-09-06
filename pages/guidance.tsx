@@ -634,55 +634,65 @@ export default function guidance() {
           {/* Conditionally render only the active div */}
           {activeDiv === "first" && (
             <div className="mt-4 md:px-20">
-            <div className="grid md:grid-cols-3 grid-cols-1 gap-10 text-gray-600">
-  {[
-    "/guidance/Hailuo_Video_Create_a_smooth_looping_animat_420401581408546819.mp4",
-    "/guidance/Hailuo_Video_A_futuristic_glowing_pill_with_420392168333352962_1.mp4",
-    "/guidance/Hailuo_Video_A_futuristic_glowing_pill_with_420392168333352962.mp4",
-    "/guidance/Hailuo_Video_A_futuristic_glowing_pill_with_420392168333352962_2.mp4",
-    "/guidance/Hailuo_Video_A_futuristic_glowing_capsule_s_420385176478949377.mp4",
-    "/guidance/Hailuo_Video_A_futuristic_glowing_pill_with_420392168333352962_3.mp4",
-  ].map((src, idx) => (
-    <div
-      key={idx}
-      className="relative w-full aspect-[16/8] bg-[#001933] rounded-xl overflow-hidden flex items-start"
-      onMouseEnter={(e) => {
-        const video = e.currentTarget.querySelector('video');
-        video?.play();
-      }}
-      onMouseLeave={(e) => {
-        const video = e.currentTarget.querySelector('video');
-        if (!video) return;
-        video.pause();
-        video.currentTime = 0;
-      }}
-    >
-      <HoverVideo
-        src={src}
-        className="h-full absolute left-0 w-auto object-cover"
-      />
+              <div className="grid md:grid-cols-3 grid-cols-1 gap-10 text-gray-600">
+                {[
+                  "/guidance/Hailuo_Video_Create_a_smooth_looping_animat_420401581408546819.mp4",
+                  "/guidance/Hailuo_Video_A_futuristic_glowing_pill_with_420392168333352962_1.mp4",
+                  "/guidance/Hailuo_Video_A_futuristic_glowing_pill_with_420392168333352962.mp4",
+                  "/guidance/Hailuo_Video_A_futuristic_glowing_pill_with_420392168333352962_2.mp4",
+                  "/guidance/Hailuo_Video_A_futuristic_glowing_capsule_s_420385176478949377.mp4",
+                  "/guidance/Hailuo_Video_A_futuristic_glowing_pill_with_420392168333352962_3.mp4",
+                ].map((src, idx) => (
+                  <div
+                    key={idx}
+                    className="relative w-full aspect-[16/8] bg-[#001933] rounded-xl overflow-hidden flex items-start"
+                    onMouseEnter={(e) => {
+                      const video = e.currentTarget.querySelector("video");
+                      video?.play();
+                    }}
+                    onMouseLeave={(e) => {
+                      const video = e.currentTarget.querySelector("video");
+                      if (!video) return;
+                      video.pause();
+                      video.currentTime = 0;
+                    }}
+                  >
+                    <HoverVideo
+                      src={src}
+                      className="h-full absolute left-0 w-auto object-cover"
+                    />
 
-      <div className="absolute top-10 right-10 z-10 flex flex-col gap-2">
-        <span className="text-white font-bold text-2xl">قرص امنیت سایت</span>
-        <span className="text-white text-md w-2/3">ایمن سازی سایت</span>
-        <button className="flex justify-between items-center bg-white rounded-full py-1 w-3/5">
-          <span className="text-sm mr-2">مشاهده</span>
-          <svg
-            className="w-5 h-5 p-1 ml-1 rounded-full bg-[#f63e2f]"
-            fill="#ffffff"
-            version="1.1"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 330 330"
-            stroke="#ffffff"
-          >
-            <path d="M111.213,165.004L250.607,25.607c5.858-5.858,5.858-15.355,0-21.213c-5.858-5.858-15.355-5.858-21.213,0.001 l-150,150.004C76.58,157.211,75,161.026,75,165.004c0,3.979,1.581,7.794,4.394,10.607l150,149.996 C232.322,328.536,236.161,330,240,330s7.678-1.464,10.607-4.394c5.858-5.858,5.858-15.355,0-21.213L111.213,165.004z" />
-          </svg>
-        </button>
-      </div>
-    </div>
-  ))}
-</div>
-
+                    <div className="absolute top-10 right-10 z-10 flex flex-col gap-2">
+                      <span className="text-white font-bold text-2xl">
+                        قرص امنیت سایت
+                      </span>
+                      <span className="text-white text-md w-2/3">
+                        ایمن سازی سایت
+                      </span>
+                      <button
+                        className="
+    flex justify-between items-center 
+    bg-white rounded-full py-1 w-3/5
+    transform transition duration-300 ease-in-out
+    hover:-translate-x-1 hover:shadow-lg cursor-pointer
+  "
+                      >
+                        <span className="text-sm mr-2">مشاهده</span>
+                        <svg
+                          className="w-5 h-5 p-1 ml-1 rounded-full bg-[#f63e2f] transition duration-300 ease-in-out hover:bg-[#ff5a3c]"
+                          fill="#ffffff"
+                          version="1.1"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 330 330"
+                          stroke="#ffffff"
+                        >
+                          <path d="M111.213,165.004L250.607,25.607c5.858-5.858,5.858-15.355,0-21.213c-5.858-5.858-15.355-5.858-21.213,0.001 l-150,150.004C76.58,157.211,75,161.026,75,165.004c0,3.979,1.581,7.794,4.394,10.607l150,149.996 C232.322,328.536,236.161,330,240,330s7.678-1.464,10.607-4.394c5.858-5.858,5.858-15.355,0-21.213L111.213,165.004z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
           {activeDiv === "second" && (

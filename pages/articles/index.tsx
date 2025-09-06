@@ -73,7 +73,7 @@ export default function PostsPage() {
                         className="rounded-t-2xl"
                         width={700}
                         height={300}
-                        src={posts[0].imageUrl}
+                        src={`https://cms.webofen.com${posts[0].imageUrl}`}
                         alt={posts[0].imageAlt || posts[0].title}
                       />
                     )}
@@ -353,7 +353,8 @@ export default function PostsPage() {
                         <Image
                           width={500}
                           height={200}
-                          src={(card as Post).imageUrl!}
+
+                          src={`https://cms.webofen.com${(card as Post).imageUrl!}`}
                           alt={(card as Post).imageAlt || (card as Post).title}
                           className="rounded-t-2xl w-full h-42 object-cover"
                         />

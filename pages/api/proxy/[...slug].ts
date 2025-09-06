@@ -43,6 +43,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       fetchOptions.body = JSON.stringify(req.body);
     }
 
+    console.log("Proxying request to:", targetUrl);
+
     const proxyRes = await fetch(targetUrl, fetchOptions);
 
     // Forward Set-Cookie **except for logout**
@@ -53,8 +55,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     }
 
-    const data = await proxyRes.json();
-    res.status(proxyRes.status).json(data);
+    const contentType = proxyRes.headers.get("content-type");
+
+    if (contentType && contentType.includes("application/json")) {
+      const data = await proxyRes.json();
+      res.status(proxyRes.status).json(data);
+    } else {
+      const text = await proxyRes.text();
+      console.error(`Proxy returned non-JSON (${proxyRes.status}):`, text.slice(0, 300));
+      res.status(proxyRes.status).send(text);
+    }
   } catch (err) {
     console.error('Proxy error:', err);
     res.status(500).json({ error: 'Proxy failed' });

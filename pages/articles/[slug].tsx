@@ -30,7 +30,6 @@ export default function PostPage() {
 
   usePageView({ slug: post?.slug || "", title: post?.title || "" });
 
-
   const handleLike = async () => {
     if (!post || !user) return;
     await fetch("/api/proxy/post-ratings", {
@@ -93,10 +92,10 @@ export default function PostPage() {
           {post.imageUrl && (
             <div className="relative w-full h-[500px]">
               <Image
-                src="/blog/SEO_Strategy_3.webp"
+                src={`https://cms.webofen.com${post.imageUrl}`}
                 alt={post.imageAlt || post.title}
                 fill
-                className="bg-black rounded-2xl"
+                className="bg-gray-200 rounded-2xl"
               />
             </div>
           )}
@@ -171,7 +170,6 @@ export default function PostPage() {
 
         <div className="flex w-3/5 m-auto justify-between">
           <div className="text-gray-700 mt-6 w-4/5 mr-14">
-          
             <div dangerouslySetInnerHTML={{ __html: post.content || "" }} />
           </div>
           {/* Sidebar */}
