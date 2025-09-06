@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <main className=" m-auto pt-10">
       <section className="bg-[#f7f8fc] w-full rounded-2xl">
-        <div className="max-w-[1440px] m-auto flex justify-center">
+        <div className="max-w-[1440px]  m-auto flex justify-center">
           <div className="flex flex-col lg:flex-row w-full justify-center items-center gap-2 md:gap-8">
             {/* Main Image */}
             <div className="relative w-full lg:w-3/5 aspect-[16/9] rounded-lg overflow-hidden">

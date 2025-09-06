@@ -1,29 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
-type AttributeValue = {
-  attribute: { name: string };
-  value: string;
-};
-
-type OrderItem = {
-  quantity: number;
-  price: number;
-  variant: {
-    product: { title: string };
-    attributeValues: AttributeValue[];
-  };
-};
-
-type Order = {
-  id: string;
-  customerName: string;
-  status: string;
-  totalPrice: number;
-  createdAt: string;
-  items: OrderItem[];
-};
+import { useOrders } from '@/hooks/getorders';
+// <-- import the hook
+import { useEffect } from 'react';
 
 const statusLabels: Record<string, string> = {
   pending: 'در انتظار تایید',
@@ -40,31 +19,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default function OrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const res = await fetch(`api/proxy/useorders`, {
-          credentials: 'include',
-        });
-        const data = await res.json();
-        if (res.ok) {
-          setOrders(data.orders || []);
-        } else {
-          setError(data.error || 'Failed to load orders');
-        }
-      } catch (err) {
-        setError('Something went wrong');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrders();
-  }, []);
+  const { orders, loading, error, refetch } = useOrders(); // <-- use the hook
 
   if (loading) return <div className="p-6 text-gray-600">در حال بارگذاری سفارش‌ها...</div>;
   if (error) return <div className="p-6 text-red-500">خطا: {error}</div>;
@@ -74,6 +29,14 @@ export default function OrdersPage() {
       <h1 className="text-3xl font-bold text-gray-800 mb-6 border-b border-gray-300 pb-2">
         سفارشات شما
       </h1>
+
+      {/* Optional Refresh Button */}
+      <button
+        onClick={refetch}
+        className="mb-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg"
+      >
+        بروزرسانی سفارش‌ها
+      </button>
 
       {orders.length === 0 ? (
         <div className="text-center text-gray-500">سفارشی یافت نشد.</div>
@@ -124,7 +87,7 @@ export default function OrdersPage() {
                             × {item.quantity.toLocaleString('fa-IR')}
                           </div>
                           <div className="text-green-700 font-semibold">
-                            {item.price.toLocaleString('fa-IR')} تومان
+                            {item.finalPrice.toLocaleString('fa-IR')} تومان
                           </div>
                         </div>
                         <ul className="mt-2 text-xs text-gray-500 ml-4 space-y-1">
