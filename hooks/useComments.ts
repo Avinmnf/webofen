@@ -29,7 +29,14 @@ export const useComments = ({ contentType, pageSlug }: UseCommentsParams) => {
       setError(null);
 
       try {
-        const res = await fetch(`/api/proxy/comments?contentType=${encodeURIComponent(contentType)}&pageSlug=${encodeURIComponent(pageSlug)}`);
+        // ✅ Use the correct proxy path for "getcomments"
+        const res = await fetch(
+          `/api/proxy/getcomments?contentType=${encodeURIComponent(
+            contentType
+          )}&pageSlug=${encodeURIComponent(pageSlug)}`,
+          { credentials: "include" } // just in case cookies are needed
+        );
+
         const data = await res.json();
 
         if (!res.ok) {

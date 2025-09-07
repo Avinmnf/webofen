@@ -19,6 +19,7 @@ export default function CommentsList({
     pageSlug,
   });
 
+  // Recursively normalize children
   const normalizeComments = (list: Comment[]): CommentNode[] => {
     return list.map((c) => ({
       ...c,
@@ -93,13 +94,13 @@ export default function CommentsList({
           </div>
         </div>
 
-        {c.children?.length ? (
+        {c.children?.length > 0 && (
           <div className="mt-4 space-y-2">
             {c.children.map((child) => (
               <CommentCard key={child.id} c={child} level={level + 1} />
             ))}
           </div>
-        ) : null}
+        )}
       </div>
     </div>
   );

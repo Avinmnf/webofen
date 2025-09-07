@@ -1,48 +1,33 @@
-import React, { useEffect, useState } from "react";
+"use client";
+
+import React from "react";
+import { useRatings } from "@/hooks/useRatings";
 
 interface AverageRatingProps {
   productId: string;
 }
 
 export default function AverageRating({ productId }: AverageRatingProps) {
-  const [average, setAverage] = useState<number | null>(null);
-  const [count, setCount] = useState<number>(0);
-  const [loading, setLoading] = useState(true);
-useEffect(() => {
-  async function fetchAverage() {
-    if (!productId) return;
-
-    setLoading(true);
-    try {
-      const baseUrl = process.env.NEXT_PUBLIC_CMS_API || "http://localhost:3003";
-      const res = await fetch(`${baseUrl}/ratings-average?productId=${productId}`);
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-
-      const data = await res.json();
-      setAverage(data.average);
-      setCount(data.count);
-    } catch (err) {
-      console.error("Failed to load average rating:", err);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  fetchAverage();
-}, [productId]);
-
+  const { data, loading, error } = useRatings({ productId });
 
   if (loading) {
     return <p className="text-gray-500 text-sm">Loading rating...</p>;
   }
 
-  if (average === null) {
+  if (error) {
+    return <p className="text-red-500 text-sm">Failed to load rating</p>;
+  }
+
+  if (!data || data.average === null) {
     return <p className="text-gray-500 text-sm text-center">No ratings yet</p>;
   }
 
+  // ✅ Tell TS that average is definitely a number
+  const average: number = data.average;
+
   return (
     <div className="flex items-center space-x-2">
-      {/* Star icons */}
+      {/* Stars */}
       <div className="flex">
         {Array.from({ length: 5 }).map((_, i) => (
           <svg
@@ -65,7 +50,7 @@ useEffect(() => {
       </span>
 
       {/* Count */}
-      <span className="text-sm text-gray-500">({count})</span>
+      <span className="text-sm text-gray-500">({data.count})</span>
     </div>
   );
 }

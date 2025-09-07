@@ -12,6 +12,8 @@ import CommentsList from "@/components/comments/CommentsList";
 import RatingForm from "@/components/rating/rating";
 import AverageRating from "@/components/rating/AverageRating";
 import { usePageView } from "@/hooks/usePageView";
+import { useCheckPurchase } from "@/hooks/useCheckPurchase"; // ✅ add this import
+import { useUserOrders } from "@/hooks/useUserOrders";
 
 export default function ProductDetailPage() {
   const NEXT_PUBLIC_CMS_URL = process.env.NEXT_PUBLIC_CMS_URL;
@@ -45,91 +47,45 @@ export default function ProductDetailPage() {
 
   const { user } = useAuth();
 
-  // New states to track if user bought the product
-  const [hasBought, setHasBought] = useState(false);
-  const [checkingBought, setCheckingBought] = useState(true);
-
   usePageView({
     slug: product?.slug || "",
     title: product?.title || "",
     type: "product",
   });
 
-  // Check if the logged-in user has bought this product
-  useEffect(() => {
-    if (!user || !product?.id) {
-      setHasBought(false);
-      setCheckingBought(false);
-      return;
+  // Correct usage
+  const {
+    hasBought,
+    loading: checkingBought,
+    error: purchaseError,
+  } = useCheckPurchase(product?.id);
+
+ const { orders: userOrders, loading: loadingOrders, error: ordersError } = useUserOrders();
+
+useEffect(() => {
+  if (!product?.id || !userOrders) {
+    setOrderItemId(undefined);
+    return;
+  }
+
+  // Sort orders descending by createdAt
+  const sortedOrders = [...userOrders].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+
+  for (const order of sortedOrders) {
+    const matchingItem = order.items.find(
+      (item) => item.variant.product.id === product.id
+    );
+    if (matchingItem) {
+      setOrderItemId(matchingItem.id);
+      return; // Stop after first match
     }
+  }
 
-    const checkBought = async () => {
-      setCheckingBought(true);
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_CMS_API}/hasBoughtProduct?productId=${product.id}` ||
-            `http://localhost:3003/hasBoughtProduct?productId=${product.id}`,
-          {
-            credentials: "include", // send cookies
-          }
-        );
-        const data = await res.json();
-        setHasBought(data.hasBought === true);
-      } catch (err) {
-        console.error("Error checking purchase:", err);
-        setHasBought(false);
-      } finally {
-        setCheckingBought(false);
-      }
-    };
+  setOrderItemId(undefined);
+}, [product?.id, userOrders]);
 
-    checkBought();
-  }, [user, product?.id]);
-
-  useEffect(() => {
-    if (!user || !product?.id) {
-      setOrderItemId(undefined);
-      return;
-    }
-
-    async function fetchLatestOrderItem() {
-      try {
-        const res = await fetch("http://localhost:3003/userorders", {
-          credentials: "include",
-        });
-        if (!res.ok) throw new Error("Failed to fetch user orders");
-        const data = await res.json();
-
-        if (!data.orders || !Array.isArray(data.orders)) {
-          setOrderItemId(undefined);
-          return;
-        }
-
-        // Sort orders descending by createdAt
-        const sortedOrders = data.orders.sort(
-          (a: any, b: any) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-
-        for (const order of sortedOrders) {
-          const matchingItem = order.items.find(
-            (item: any) => item.variant.product.id === product!.id
-          );
-          if (matchingItem) {
-            setOrderItemId(matchingItem.id);
-            return; // Stop after first found
-          }
-        }
-
-        setOrderItemId(undefined); // No matching item found
-      } catch (err) {
-        console.error("Error fetching latest order item:", err);
-        setOrderItemId(undefined);
-      }
-    }
-
-    fetchLatestOrderItem();
-  }, [user, product?.id]);
 
   useEffect(() => {
     if (!product?.variants?.length) return;
@@ -402,17 +358,19 @@ export default function ProductDetailPage() {
           contentId={product?.id ?? ""}
           orderItemId={orderItemId}
         />
-        {!checkingBought && hasBought ? (
-          <CommentForm
-            contentType="product"
-            pageSlug={typeof slug === "string" ? slug : ""}
-            productId={product?.id}
-            orderItemId={orderItemId}
-          />
-        ) : !checkingBought && !hasBought ? (
-          <p className="max-w-3xl mx-auto mt-10 text-center text-red-600 font-semibold">
-            برای ارسال نظر، ابتدا باید این محصول را خریداری کنید.
-          </p>
+        {!checkingBought ? (
+          hasBought ? (
+            <CommentForm
+              contentType="product"
+              pageSlug={typeof slug === "string" ? slug : ""}
+              productId={product?.id}
+              orderItemId={orderItemId}
+            />
+          ) : (
+            <p className="max-w-3xl mx-auto mt-10 text-center text-red-600 font-semibold">
+              برای ارسال نظر، ابتدا باید این محصول را خریداری کنید.
+            </p>
+          )
         ) : (
           <p className="max-w-3xl mx-auto mt-10 text-center text-gray-500 animate-pulse">
             در حال بررسی وضعیت خرید شما...

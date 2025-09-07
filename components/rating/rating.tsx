@@ -1,48 +1,26 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { useSubmitRating } from "@/hooks/useSubmitRating";
 
 interface RatingFormProps {
-  contentType: 'post' | 'product';
-  contentId: string;      // productId or postId
-  orderItemId?: string;   // required for product rating
+  contentType: "post" | "product";
+  contentId: string; // productId or postId
+  orderItemId?: string; // required for product rating
 }
 
 export default function RatingForm({ contentType, contentId, orderItemId }: RatingFormProps) {
   const [value, setValue] = useState<number>(0);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const { submitRating, loading, error, success } = useSubmitRating();
 
   const handleClick = async (starValue: number) => {
     setValue(starValue);
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
-
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_CMS_API}/ratings` ||`http://localhost:3003/ratings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          value: starValue,
-          productId: contentType === 'product' ? contentId : undefined,
-          postId: contentType === 'post' ? contentId : undefined,
-          orderItemId: contentType === 'product' ? orderItemId : undefined,
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error submitting rating');
-
-      setSuccess('✅ Thank you for your rating!');
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong.');
-    } finally {
-      setLoading(false);
-    }
+    await submitRating({
+      value: starValue,
+      productId: contentType === "product" ? contentId : undefined,
+      postId: contentType === "post" ? contentId : undefined,
+      orderItemId: contentType === "product" ? orderItemId : undefined,
+    });
   };
 
   return (
@@ -60,7 +38,7 @@ export default function RatingForm({ contentType, contentId, orderItemId }: Rati
       </div>
       {loading && <p className="mt-2 text-gray-600">Submitting...</p>}
       {error && <p className="mt-2 text-red-600">{error}</p>}
-      {success && <p className="mt-2 text-green-600">{success}</p>}
+      {success && <p className="mt-2 text-green-600">✅ Thank you for your rating!</p>}
     </div>
   );
 }
@@ -78,10 +56,10 @@ function Star({
     <svg
       onClick={disabled ? undefined : onClick}
       xmlns="http://www.w3.org/2000/svg"
-      fill={filled ? 'gold' : 'gray'}
+      fill={filled ? "gold" : "gray"}
       viewBox="0 0 24 24"
       stroke="none"
-      className={`w-8 h-8 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+      className={`w-8 h-8 ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
     >
       <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
     </svg>
