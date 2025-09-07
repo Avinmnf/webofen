@@ -1,17 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import type { JSX } from "react";
-
-interface Comment {
-  id: string;
-  fullName: string;
-  subject?: string;
-  body: string;
-  createdAt: string;
-  parent?: { id: string } | null;
-  children?: Comment[];
-}
+import React from "react";
+import { useComments, Comment } from "@/hooks/useComments";
 
 interface CommentNode extends Comment {
   children: CommentNode[];
@@ -24,8 +14,10 @@ export default function CommentsList({
   contentType: "post" | "product";
   pageSlug: string;
 }) {
-  const [comments, setComments] = useState<CommentNode[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { comments: fetchedComments, loading, error } = useComments({
+    contentType,
+    pageSlug,
+  });
 
   const normalizeComments = (list: Comment[]): CommentNode[] => {
     return list.map((c) => ({
@@ -34,27 +26,7 @@ export default function CommentsList({
     }));
   };
 
-  useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        const baseUrl =
-          process.env.NEXT_PUBLIC_CMS_API || "http://localhost:3003";
-        const url = `${baseUrl}/getcomments?contentType=${contentType}&pageSlug=${encodeURIComponent(
-          pageSlug
-        )}`;
-
-        const res = await fetch(url);
-        const data: Comment[] = await res.json();
-        setComments(normalizeComments(data));
-      } catch (err) {
-        console.error("Error fetching comments:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchComments();
-  }, [contentType, pageSlug]);
+  const comments: CommentNode[] = normalizeComments(fetchedComments);
 
   const Skeleton = () => (
     <div className="rounded-2xl border border-gray-200/60 dark:border-gray-800/60 bg-white/70 dark:bg-gray-900/50 backdrop-blur shadow-sm p-4 pb-4 animate-pulse">
@@ -70,35 +42,6 @@ export default function CommentsList({
     </div>
   );
 
-  if (loading) {
-    return (
-      <div className="max-w-3xl mx-auto mt-8 space-y-3">
-        <h2 className="text-lg font-bold text-gray-800">نظرات کاربران</h2>
-        {[...Array(3)].map((_, i) => (
-          <Skeleton key={i} />
-        ))}
-      </div>
-    );
-  }
-
-  if (!comments.length) {
-    return (
-      <div className="max-w-3xl mx-auto mt-8">
-        <div className="rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 bg-gradient-to-b from-white via-gray-50 to-gray-100 dark:from-gray-900 dark:via-gray-900/60 dark:to-gray-900 p-8 text-center">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center shadow-inner">
-            <span className="text-2xl">💬</span>
-          </div>
-          <h3 className="mt-4 text-gray-800 dark:text-gray-100 font-semibold">
-            هنوز نظری ثبت نشده است
-          </h3>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            اولین نفری باشید که نظر می‌دهد.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   const Avatar = ({ name }: { name: string }) => {
     const initial = (name?.trim()?.charAt(0) || "؟").toUpperCase();
     return (
@@ -111,22 +54,14 @@ export default function CommentsList({
     );
   };
 
-  const CommentCard = ({
-    c,
-    level = 0,
-  }: {
-    c: CommentNode;
-    level?: number;
-  }) => (
+  const CommentCard = ({ c, level = 0 }: { c: CommentNode; level?: number }) => (
     <div className="relative">
-      {/* thread line */}
       {level > 0 && (
         <div
           className="absolute -right-4 top-6 h-full border-r-2 border-dashed border-gray-200 dark:border-gray-800"
           aria-hidden
         />
       )}
-
       <div
         className={[
           "rounded-2xl border border-gray-200/60 dark:border-gray-800/60",
@@ -146,39 +81,18 @@ export default function CommentsList({
               <span className="text-[11px] leading-none text-gray-500 dark:text-gray-400 bg-gray-100/70 dark:bg-gray-800/70 px-2 py-1 rounded-full">
                 {new Date(c.createdAt).toLocaleDateString("fa-IR")}
               </span>
-              {c.subject ? (
+              {c.subject && (
                 <span className="text-[11px] leading-none bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 px-2 py-1 rounded-full">
                   {c.subject}
                 </span>
-              ) : null}
+              )}
             </div>
-
             <p className="mt-2 text-[15px] text-gray-700 dark:text-gray-200 leading-relaxed">
               {c.body}
             </p>
-
-            {/* action row (placeholder for reply, share, etc.) */}
-            <div className="mt-3 flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
-              <span className="inline-flex items-center gap-1 hover:text-gray-700 dark:hover:text-gray-200 cursor-default">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  className="opacity-70"
-                  aria-hidden
-                >
-                  <path
-                    fill="currentColor"
-                    d="M12 12c2.7 0 4.9-2.2 4.9-4.9S14.7 2.2 12 2.2 7.1 4.4 7.1 7.1 9.3 12 12 12m0 2.4C9 14.4 3.8 15.9 3.8 19v2h16.4v-2c0-3.1-5.2-4.6-8.2-4.6"
-                  />
-                </svg>
-                کاربر تایید شده
-              </span>
-            </div>
           </div>
         </div>
 
-        {/* children */}
         {c.children?.length ? (
           <div className="mt-4 space-y-2">
             {c.children.map((child) => (
@@ -201,11 +115,33 @@ export default function CommentsList({
         </h2>
       </div>
 
-      <div className="space-y-2">
-        {comments.map((c) => (
-          <CommentCard key={c.id} c={c} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="space-y-3">
+          {[...Array(3)].map((_, i) => (
+            <Skeleton key={i} />
+          ))}
+        </div>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
+      ) : comments.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 bg-gradient-to-b from-white via-gray-50 to-gray-100 dark:from-gray-900 dark:via-gray-900/60 dark:to-gray-900 p-8 text-center">
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center shadow-inner">
+            <span className="text-2xl">💬</span>
+          </div>
+          <h3 className="mt-4 text-gray-800 dark:text-gray-100 font-semibold">
+            هنوز نظری ثبت نشده است
+          </h3>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            اولین نفری باشید که نظر می‌دهد.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {comments.map((c) => (
+            <CommentCard key={c.id} c={c} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

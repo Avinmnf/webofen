@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
+import { useCreateComment } from '@/hooks/useCreateComment';
 
 interface CommentFormProps {
   contentType: 'post' | 'product';
@@ -21,57 +22,42 @@ export default function CommentForm({
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   const bodyLimit = 1200;
   const bodyCount = body.length;
   const remaining = useMemo(() => Math.max(0, bodyLimit - bodyCount), [bodyCount]);
 
+  const { createComment, loading, error, comment } = useCreateComment();
+  const [success, setSuccess] = useState<string | null>(null);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setSuccess(null);
-    setError(null);
 
-    try {
-      if (contentType === 'product' && !productId) {
-        throw new Error('شناسه محصول یافت نشد. لطفاً صفحه را مجدداً بارگذاری کنید.');
-      }
+    if (contentType === 'product' && !productId) {
+      setSuccess(null);
+      return alert('شناسه محصول یافت نشد. لطفاً صفحه را مجدد بارگذاری کنید.');
+    }
 
-      const payload = {
-        fullName,
-        email,
-        subject,
-        body,
-        contentType,
-        pageSlug,
-        parentId,
-        productId,
-        orderItemId,
-      };
+    const payload = {
+      fullName,
+      email,
+      subject,
+      body,
+      contentType,
+      pageSlug,
+      parentId,
+      productId,
+      orderItemId,
+    };
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_CMS_API}/comments` ||`http://localhost:3003/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'خطا در ارسال نظر');
-
+    const created = await createComment(payload);
+    if (created) {
       setSuccess('✅ نظر شما ارسال شد و پس از بررسی نمایش داده خواهد شد.');
       setFullName('');
       setEmail('');
       setSubject('');
       setBody('');
-    } catch (err: any) {
-      setError(err.message || 'مشکلی پیش آمد.');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -98,7 +84,6 @@ export default function CommentForm({
             </p>
           </div>
 
-          {/* status badges */}
           {contentType === 'product' && !productId && (
             <span className="text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">
               شناسه محصول موجود نیست
@@ -106,7 +91,6 @@ export default function CommentForm({
           )}
         </div>
 
-        {/* Alerts */}
         {success && (
           <div className="mt-4 rounded-xl border border-green-300/70 bg-green-50 text-green-800 px-4 py-2">
             {success}
@@ -119,51 +103,43 @@ export default function CommentForm({
         )}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4 text-gray-700 dark:text-gray-200">
-          {/* Name + Email row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="group">
               <label className="block text-sm font-medium mb-1 text-gray-700">نام و نام خانوادگی</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="مثلاً: علی رضایی"
-                  className="w-full px-4 py-3 rounded-2xl border border-gray-300 text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400/70 focus:border-indigo-300 transition-all shadow-sm group-hover:shadow"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required
-                />
-                <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 dark:text-gray-600"></div>
-              </div>
+              <input
+                type="text"
+                placeholder="مثلاً: علی رضایی"
+                className="w-full px-4 py-3 rounded-2xl border border-gray-300 text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400/70 focus:border-indigo-300 transition-all shadow-sm group-hover:shadow"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+              />
             </div>
 
             <div className="group">
               <label className="block text-sm font-medium mb-1 text-gray-700">ایمیل</label>
-              <div className="relative">
-                <input
-                  type="email"
-                  placeholder="you@example.com"
-                  className="w-full px-4 py-3 rounded-2xl border border-gray-300 text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400/70 focus:border-indigo-300 transition-all shadow-sm group-hover:shadow"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
+              <input
+                type="email"
+                placeholder="you@example.com"
+                className="w-full px-4 py-3 rounded-2xl border border-gray-300 text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400/70 focus:border-indigo-300 transition-all shadow-sm group-hover:shadow"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
           </div>
 
-          {/* Subject */}
           <div className="group">
             <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">موضوع (اختیاری)</label>
             <input
               type="text"
               placeholder="مثلاً: تجربه خرید"
-                  className="w-full px-4 py-3 rounded-2xl border border-gray-300 text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400/70 focus:border-indigo-300 transition-all shadow-sm group-hover:shadow"
+              className="w-full px-4 py-3 rounded-2xl border border-gray-300 text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400/70 focus:border-indigo-300 transition-all shadow-sm group-hover:shadow"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
             />
           </div>
 
-          {/* Body */}
           <div className="group">
             <div className="flex items-center justify-between">
               <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">متن نظر</label>
@@ -187,11 +163,10 @@ export default function CommentForm({
               value={body}
               onChange={(e) => setBody(e.target.value)}
               required
-              maxLength={bodyLimit + 200} // soft guard to prevent runaway typing
+              maxLength={bodyLimit + 200}
             />
           </div>
 
-          {/* Submit */}
           <div className="flex items-center justify-end gap-3 pt-2">
             <button
               type="submit"
