@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePosts } from "@/hooks/useposts";
+import usePageViews from "@/hooks/usePageViews";
 
 type Post = {
   id: string;
@@ -16,6 +17,9 @@ type Post = {
   desc: string;
   likes: number;
   tags: { id: string; name: string }[];
+};
+type PostWithViews = Post & {
+  views: number;
 };
 function isRecommended(post: Post) {
   return post.tags.some((tag) => tag.name === "پیشنهاد ما");
@@ -50,11 +54,17 @@ export default function PostsPage() {
   });
 
   const totalPages = Math.ceil(total / limit);
-
+  const { data, loading: viewsLoading } = usePageViews();
+  const pageViewCounts = data?.counts || {};
+  const postsWithViews: PostWithViews[] = posts.map((post) => ({
+    ...post,
+    views: pageViewCounts[`/articles/${post.slug}`] || 0,
+  }));
   // Create cards array with fixed positions for social cards
-  const cards: ((typeof posts)[number] | (typeof socialCards)[0])[] = [
-    ...posts.slice(1),
-  ];
+  const cards: (
+    | (typeof postsWithViews)[number]
+    | { id: string; title: string; type: string }
+  )[] = [...postsWithViews.slice(1)];
   if (cards.length > 1) cards.splice(1, 0, socialCards[0]);
   if (cards.length > 5) cards.splice(5, 0, socialCards[1]);
 
@@ -80,17 +90,20 @@ export default function PostsPage() {
                     )}
                     <div className="w-full mt-6 p-6">
                       <div className="flex items-center">
-                        <svg
-                          className="w-5 h-5 ml-2"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M2 9.1371C2 14 6.01943 16.5914 8.96173 18.9109C10 19.7294 11 20.5 12 20.5C13 20.5 14 19.7294 15.0383 18.9109C17.9806 16.5914 22 14 22 9.1371C22 4.27416 16.4998 0.825464 12 5.50063C7.50016 0.825464 2 4.27416 2 9.1371Z"
-                            fill="#ff5084"
-                          />
-                        </svg>
+                        {postsWithViews[0].views > 10 && (
+                          <svg
+                            className="w-5 h-5 ml-2"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M2 9.1371C2 14 6.01943 16.5914 8.96173 18.9109C10 19.7294 11 20.5 12 20.5C13 20.5 14 19.7294 15.0383 18.9109C17.9806 16.5914 22 14 22 9.1371C22 4.27416 16.4998 0.825464 12 5.50063C7.50016 0.825464 2 4.27416 2 9.1371Z"
+                              fill="#ff5084"
+                            />
+                          </svg>
+                        )}
+
                         {isRecommended(posts[0]) && (
                           <svg
                             className="w-5 h-5 text-yellow-400 ml-2"
@@ -103,6 +116,12 @@ export default function PostsPage() {
                         )}
                         <p className="text-sm text-gray-500">
                           {posts[0].category?.title}
+                          <p>
+                            بازدید:{" "}
+                            {viewsLoading
+                              ? "در حال بارگذاری..."
+                              : postsWithViews[0].views}
+                          </p>
                         </p>
                       </div>
                       <p className="text-gray-700 mt-1 text-xl font-semibold">
@@ -362,17 +381,19 @@ export default function PostsPage() {
                       )}
                       <div className="flex flex-col justify-between p-8">
                         <div className="flex items-center">
-                          <svg
-                            className="w-5 h-5 ml-2"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M2 9.1371C2 14 6.01943 16.5914 8.96173 18.9109C10 19.7294 11 20.5 12 20.5C13 20.5 14 19.7294 15.0383 18.9109C17.9806 16.5914 22 14 22 9.1371C22 4.27416 16.4998 0.825464 12 5.50063C7.50016 0.825464 2 4.27416 2 9.1371Z"
-                              fill="#ff5084"
-                            />
-                          </svg>
+                          {(card as PostWithViews).views > 10 && (
+                            <svg
+                              className="w-5 h-5 ml-2"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M2 9.1371C2 14 6.01943 16.5914 8.96173 18.9109C10 19.7294 11 20.5 12 20.5C13 20.5 14 19.7294 15.0383 18.9109C17.9806 16.5914 22 14 22 9.1371C22 4.27416 16.4998 0.825464 12 5.50063C7.50016 0.825464 2 4.27416 2 9.1371Z"
+                                fill="#ff5084"
+                              />
+                            </svg>
+                          )}
                           <div className="relative group inline-block">
                             {isRecommended(card as Post) && (
                               <>
@@ -399,6 +420,13 @@ export default function PostsPage() {
 
                           <p className="text-sm text-gray-500">
                             {posts[0].category?.title}
+                            <p className="text-sm text-gray-500">
+                              {(card as Post).category?.title}
+                              <span>
+                                {" "}
+                                | بازدید: {(card as PostWithViews).views}
+                              </span>
+                            </p>
                           </p>
                         </div>
                         <p className="text-base font-semibold text-gray-700  hover:text-[#1d546b]">
