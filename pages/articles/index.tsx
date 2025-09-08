@@ -69,7 +69,7 @@ export default function PostsPage() {
   if (cards.length > 5) cards.splice(5, 0, socialCards[1]);
 
   return (
-    <main className="bg-gradient-to-b from-white to-stone-200 pb-10">
+    <main className="bg-[#f7f8fc] pb-10">
       <div className="w-full pt-20">
         <div className="md:w-[70%] mx-auto">
           <div className="md:flex justify-between">
@@ -89,39 +89,55 @@ export default function PostsPage() {
                       />
                     )}
                     <div className="w-full mt-6 p-6">
-                      <div className="flex items-center">
+                      <div className="flex items-center relative group ">
                         {postsWithViews[0].views > 10 && (
-                          <svg
-                            className="w-5 h-5 ml-2"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M2 9.1371C2 14 6.01943 16.5914 8.96173 18.9109C10 19.7294 11 20.5 12 20.5C13 20.5 14 19.7294 15.0383 18.9109C17.9806 16.5914 22 14 22 9.1371C22 4.27416 16.4998 0.825464 12 5.50063C7.50016 0.825464 2 4.27416 2 9.1371Z"
-                              fill="#ff5084"
-                            />
-                          </svg>
+                          <>
+                            <svg
+                              className="w-5 h-5 ml-2 "
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M2 9.1371C2 14 6.01943 16.5914 8.96173 18.9109C10 19.7294 11 20.5 12 20.5C13 20.5 14 19.7294 15.0383 18.9109C17.9806 16.5914 22 14 22 9.1371C22 4.27416 16.4998 0.825464 12 5.50063C7.50016 0.825464 2 4.27416 2 9.1371Z"
+                                fill="#ff5084"
+                              />
+                            </svg>
+                            <div
+                              className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 
+                      hidden group-hover:block px-2 py-1 rounded-md 
+                      bg-gray-800 text-white text-xs shadow-md whitespace-nowrap"
+                            >
+                              پیشنهاد ما
+                            </div>
+                          </>
                         )}
 
-                        {isRecommended(posts[0]) && (
-                          <svg
-                            className="w-5 h-5 text-yellow-400 ml-2"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.954a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.953c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.539-1.118l1.286-3.953a1 1 0 00-.364-1.118L2.073 9.38c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.954z" />
-                          </svg>
-                        )}
+                        <div className="relative group inline-block">
+                          {isRecommended(posts[0]) && (
+                            <>
+                              <svg
+                                className="w-5 h-5 ml-2 text-yellow-400 cursor-pointer"
+                                fill="#f06330"
+                                viewBox="0 0 20 20"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.954a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.953c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.539-1.118l1.286-3.953a1 1 0 00-.364-1.118L2.073 9.38c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.954z" />
+                              </svg>
+
+                              {/* Tooltip */}
+                              <div
+                                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 
+                      hidden group-hover:block px-2 py-1 rounded-md 
+                      bg-gray-800 text-white text-xs shadow-md whitespace-nowrap"
+                              >
+                                پیشنهاد ما
+                              </div>
+                            </>
+                          )}
+                        </div>
                         <p className="text-sm text-gray-500">
                           {posts[0].category?.title}
-                          <p>
-                            بازدید:{" "}
-                            {viewsLoading
-                              ? "در حال بارگذاری..."
-                              : postsWithViews[0].views}
-                          </p>
                         </p>
                       </div>
                       <p className="text-gray-700 mt-1 text-xl font-semibold">
@@ -132,17 +148,25 @@ export default function PostsPage() {
                       </p>
 
                       <div className="text-xs text-gray-400 mt-2 flex justify-between items-center">
-                        <svg
-                          className="w-5 h-5"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M5.926 20.574a7.26 7.26 0 0 0 3.039 1.511c.107.035.179-.105.107-.175-2.395-2.285-1.079-4.758-.107-5.873.693-.796 1.68-2.107 1.608-3.865 0-.176.18-.317.322-.211 1.359.703 2.288 2.25 2.538 3.515.394-.386.537-.984.537-1.511 0-.176.214-.317.393-.176 1.287 1.16 3.503 5.097-.072 8.19-.071.071 0 .212.072.177a8.761 8.761 0 0 0 3.003-1.442c5.827-4.5 2.037-12.48-.43-15.116-.321-.317-.893-.106-.893.351-.036.95-.322 2.004-1.072 2.707-.572-2.39-2.478-5.105-5.195-6.441-.357-.176-.786.105-.75.492.07 3.27-2.063 5.352-3.922 8.059-1.645 2.425-2.717 6.89.822 9.808z"
-                            fill="#e16f23"
-                          />
-                        </svg>
+                        <div className="flex items-center">
+                          <svg
+                            className="w-5 h-5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M5.926 20.574a7.26 7.26 0 0 0 3.039 1.511c.107.035.179-.105.107-.175-2.395-2.285-1.079-4.758-.107-5.873.693-.796 1.68-2.107 1.608-3.865 0-.176.18-.317.322-.211 1.359.703 2.288 2.25 2.538 3.515.394-.386.537-.984.537-1.511 0-.176.214-.317.393-.176 1.287 1.16 3.503 5.097-.072 8.19-.071.071 0 .212.072.177a8.761 8.761 0 0 0 3.003-1.442c5.827-4.5 2.037-12.48-.43-15.116-.321-.317-.893-.106-.893.351-.036.95-.322 2.004-1.072 2.707-.572-2.39-2.478-5.105-5.195-6.441-.357-.176-.786.105-.75.492.07 3.27-2.063 5.352-3.922 8.059-1.645 2.425-2.717 6.89.822 9.808z"
+                              fill="#e16f23"
+                            />
+                          </svg>
+
+                          <p className="mt-2 mr-1 text-sm">
+                            {viewsLoading
+                              ? "در حال بارگذاری..."
+                              : postsWithViews[0].views}
+                          </p>
+                        </div>
                         <p className="text-gray-400 text-sm">
                           زمان مطالعه:{" "}
                           {new Date(posts[0].createdAt).toLocaleDateString(
@@ -422,10 +446,6 @@ export default function PostsPage() {
                             {posts[0].category?.title}
                             <p className="text-sm text-gray-500">
                               {(card as Post).category?.title}
-                              <span>
-                                {" "}
-                                | بازدید: {(card as PostWithViews).views}
-                              </span>
                             </p>
                           </p>
                         </div>
@@ -443,17 +463,23 @@ export default function PostsPage() {
                           {(card as Post).desc}
                         </p>
                         <div className="text-xs text-gray-400 mt-2 flex justify-between items-center">
-                          <svg
-                            className="w-5 h-5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M5.926 20.574a7.26 7.26 0 0 0 3.039 1.511c.107.035.179-.105.107-.175-2.395-2.285-1.079-4.758-.107-5.873.693-.796 1.68-2.107 1.608-3.865 0-.176.18-.317.322-.211 1.359.703 2.288 2.25 2.538 3.515.394-.386.537-.984.537-1.511 0-.176.214-.317.393-.176 1.287 1.16 3.503 5.097-.072 8.19-.071.071 0 .212.072.177a8.761 8.761 0 0 0 3.003-1.442c5.827-4.5 2.037-12.48-.43-15.116-.321-.317-.893-.106-.893.351-.036.95-.322 2.004-1.072 2.707-.572-2.39-2.478-5.105-5.195-6.441-.357-.176-.786.105-.75.492.07 3.27-2.063 5.352-3.922 8.059-1.645 2.425-2.717 6.89.822 9.808z"
-                              fill="#e16f23"
-                            />
-                          </svg>
+                          <div className="flex items-center">
+                            <svg
+                              className="w-5 h-6"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M5.926 20.574a7.26 7.26 0 0 0 3.039 1.511c.107.035.179-.105.107-.175-2.395-2.285-1.079-4.758-.107-5.873.693-.796 1.68-2.107 1.608-3.865 0-.176.18-.317.322-.211 1.359.703 2.288 2.25 2.538 3.515.394-.386.537-.984.537-1.511 0-.176.214-.317.393-.176 1.287 1.16 3.503 5.097-.072 8.19-.071.071 0 .212.072.177a8.761 8.761 0 0 0 3.003-1.442c5.827-4.5 2.037-12.48-.43-15.116-.321-.317-.893-.106-.893.351-.036.95-.322 2.004-1.072 2.707-.572-2.39-2.478-5.105-5.195-6.441-.357-.176-.786.105-.75.492.07 3.27-2.063 5.352-3.922 8.059-1.645 2.425-2.717 6.89.822 9.808z"
+                                fill="#e16f23"
+                              />
+                            </svg>
+                            <span className="mt-2 mr-1 text-sm">
+                              {" "}
+                              {(card as PostWithViews).views}
+                            </span>
+                          </div>
                           <p className="text-gray-400 text-sm">
                             زمان مطالعه: {(card as Post).readtime} دقیقه
                           </p>

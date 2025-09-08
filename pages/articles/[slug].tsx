@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePageView } from "@/hooks/usePageView";
+import { useGuestToken } from "@/contexts/GuestTokenContext";
 export default function PostPage() {
   const NEXT_PUBLIC_CMS_URL = process.env.NEXT_PUBLIC_CMS_URL;
   const { user } = useAuth();
@@ -22,6 +23,8 @@ export default function PostPage() {
 
   const [mounted, setMounted] = useState(false);
 
+  const { token, loading: tokenLoading } = useGuestToken();
+
   useEffect(() => {
     if (post) {
       setLikes(post.ratings?.filter((r) => r.value === 5).length || 0);
@@ -30,26 +33,62 @@ export default function PostPage() {
   }, [post]);
 
   usePageView({ slug: post?.slug || "", title: post?.title || "" });
-
   const handleLike = async () => {
-    if (!post || !user) return;
-    await fetch("/api/proxy/post-ratings", {
+    if (tokenLoading || !token) return; // wait for token
+    const res = await fetch("/api/graphql", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ postId: post.id, userId: user.id, value: 5 }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        query: `
+          mutation LikePost($slug: String!) {
+            likePost(slug: $slug) {
+              likes
+              dislikes
+            }
+          }
+        `,
+        variables: { slug: post?.slug ?? "" },
+      }),
     });
-    setLikes((prev) => prev + 1);
+
+    const data = await res.json();
+    if (data.data?.likePost) {
+      setLikes(data.data.likePost.likes);
+      setDislikes(data.data.likePost.dislikes);
+    }
   };
 
   const handleDislike = async () => {
-    if (!post || !user) return;
-    await fetch("/api/proxy/post-ratings", {
+    if (tokenLoading || !token) return;
+    const res = await fetch("/api/graphql", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ postId: post.id, userId: user.id, value: 1 }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        query: `
+          mutation DislikePost($slug: String!) {
+            dislikePost(slug: $slug) {
+              likes
+              dislikes
+            }
+          }
+        `,
+        variables: { slug: post?.slug ?? "" },
+      }),
     });
-    setDislikes((prev) => prev + 1);
+
+    const data = await res.json();
+    if (data.data?.dislikePost) {
+      setLikes(data.data.dislikePost.likes);
+      setDislikes(data.data.dislikePost.dislikes);
+    }
   };
+
 
   useEffect(() => {
     if (!loading && post) setMounted(true);
@@ -228,7 +267,7 @@ export default function PostPage() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
-                    </svg>{" "}
+                    </svg>
                     <span>{dislikes}</span>
                   </button>
                 </div>
