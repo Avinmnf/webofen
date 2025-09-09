@@ -58,7 +58,8 @@ const DashboardContent: React.FC<DashboardContentProps> = ({ jobs, backlinks }) 
   ];
 
   return (
-    <div className="flex flex-col md:flex-row relative bg-gray-100">
+    <div className='bg-white p-4'>
+    <div className="flex flex-col md:flex-row relative bg-[#1d546b] rounded-2xl">
       {/* Sidebar */}
       <div className={`${isMobile ? 'hidden' : 'block'} md:w-44 bg-white`}>
         <div className="pr-2">
@@ -68,8 +69,8 @@ const DashboardContent: React.FC<DashboardContentProps> = ({ jobs, backlinks }) 
               onClick={() => setActiveSection(service.id)}
               className={`w-full flex items-center space-x-3 space-x-reverse p-3 mb-2 rounded-r-xl transition-all duration-300 ${
                 activeSection === service.id
-                  ? `text-blue-950 shadow-r-md bg-gray-100`
-                  : 'hover:bg-gray-300 text-gray-700'
+                  ? `text-white shadow-r-md bg-[#1d546b]`
+                  : 'hover:bg-gray-300 text-black'
               }`}
             >
               <div
@@ -92,9 +93,8 @@ const DashboardContent: React.FC<DashboardContentProps> = ({ jobs, backlinks }) 
       </div>
 
       {/* Main content */}
-      <div className="flex-1 overflow-hidden p-6">
+      <div className="flex-1 rounded-2xl overflow-hidden p-6">
         <div className="text-gray-800">
-          <h2 className="text-lg font-semibold mb-4">{activeSection.toUpperCase()}</h2>
 
           {activeSection === 'backlink' ? (
             <Backlink backlinks={backlinks} />
@@ -134,6 +134,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({ jobs, backlinks }) 
           </Swiper>
         </div>
       )}
+    </div>
     </div>
   );
 };

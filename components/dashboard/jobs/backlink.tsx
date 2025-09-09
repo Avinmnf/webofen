@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useOrderInput } from '@/hooks/useOrderInput'; // adjust the path
 import ProgressList from '../progress';
 
 interface BacklinkItem {
@@ -16,52 +17,30 @@ interface BacklinkProps {
 }
 
 const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
-  const [selected, setSelected] = useState<string>('bazarpanel.com');
-  const options: string[] = ['bazarpanel.com', 'ansarion.com', 'markazpanel.com'];
-
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [formData, setFormData] = useState<{ id: string; field1: string; field2: string }>({
-    id: '',
-    field1: '',
-    field2: '',
-  });
+  const [selectedOrderItemId, setSelectedOrderItemId] = useState<string | null>(null);
+
+  // Hook for order input fields
+  const { fields, values, loading, error, handleChange, submitValues } = useOrderInput(
+    selectedOrderItemId
+  );
 
   const handleClick = (id: string) => {
-    setFormData((prev) => ({ ...prev, id }));
+    setSelectedOrderItemId(id);
     setShowModal(true);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = () => {
-    console.log('ورودی‌ها:', formData);
-    // 🔧 Static mode: no fetch call, just close modal
-    setShowModal(false);
+  const handleSubmit = async () => {
+    try {
+      await submitValues();
+      setShowModal(false);
+    } catch (err) {
+      console.error('Failed to submit input values');
+    }
   };
 
   return (
     <>
-      <div className="flex justify-end">
-        <div className="flex w-3/5 md:w-56">
-          <select
-            className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-blue-500"
-            value={selected}
-            onChange={(e) => setSelected(e.target.value)}
-          >
-            <option value="" disabled>
-              انتخاب کنید...
-            </option>
-            {options.map((option, index) => (
-              <option key={index} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
       <div className="flex">
         <div className="w-1/3 text-end rounded-md shadow">
           <div className="bg-white text-black rounded-t-lg h-full flex justify-center items-end">
@@ -94,7 +73,9 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
           {backlinks.find((item) => item.status === '0') && (
             <div className="flex justify-center w-full mt-6">
               <button
-                onClick={() => handleClick(backlinks.find((item) => item.status === '0')!.id)}
+                onClick={() =>
+                  handleClick(backlinks.find((item) => item.status === '0')!.id)
+                }
               >
                 <svg
                   className="animate-bounce"
@@ -126,9 +107,8 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
         </div>
       </div>
 
-
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-gray-600/50 bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl shadow-xl w-[90%] max-w-md p-6 relative">
             <button
               onClick={() => setShowModal(false)}
@@ -137,25 +117,26 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
               &times;
             </button>
             <h2 className="text-xl font-semibold mb-4">ثبت اطلاعات لینک</h2>
-            <input
-              type="text"
-              name="field1"
-              placeholder="لینک صفحه فرود"
-              value={formData.field1}
-              onChange={handleChange}
-              className="w-full mb-3 p-2 border rounded-lg"
-            />
-            <input
-              type="text"
-              name="field2"
-              placeholder="کلمه کلیدی"
-              value={formData.field2}
-              onChange={handleChange}
-              className="w-full mb-4 p-2 border rounded-lg"
-            />
+
+            {loading && <p>در حال بارگذاری فیلدها...</p>}
+            {error && <p className="text-red-500">{error}</p>}
+
+            {fields.map((field) => (
+              <input
+                key={field.id}
+                type={field.fieldType === 'number' ? 'number' : 'text'}
+                name={field.id}
+                placeholder={field.placeholder || field.label}
+                value={values[field.id] || ''}
+                onChange={(e) => handleChange(field.id, e.target.value)}
+                className="w-full mb-3 p-2 border border-gray-200 rounded-lg"
+                required={field.required === 'true'}
+              />
+            ))}
+
             <button
               onClick={handleSubmit}
-              className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
+              className="w-full bg-[#6fd6e5] text-white py-2 rounded hover:bg-green-700"
             >
               ثبت
             </button>

@@ -60,32 +60,36 @@ export default function ProductDetailPage() {
     error: purchaseError,
   } = useCheckPurchase(product?.id);
 
- const { orders: userOrders, loading: loadingOrders, error: ordersError } = useUserOrders();
+  const {
+    orders: userOrders,
+    loading: loadingOrders,
+    error: ordersError,
+  } = useUserOrders();
 
-useEffect(() => {
-  if (!product?.id || !userOrders) {
-    setOrderItemId(undefined);
-    return;
-  }
-
-  // Sort orders descending by createdAt
-  const sortedOrders = [...userOrders].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
-
-  for (const order of sortedOrders) {
-    const matchingItem = order.items.find(
-      (item) => item.variant.product.id === product.id
-    );
-    if (matchingItem) {
-      setOrderItemId(matchingItem.id);
-      return; // Stop after first match
+  useEffect(() => {
+    if (!product?.id || !userOrders) {
+      setOrderItemId(undefined);
+      return;
     }
-  }
 
-  setOrderItemId(undefined);
-}, [product?.id, userOrders]);
+    // Sort orders descending by createdAt
+    const sortedOrders = [...userOrders].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
 
+    for (const order of sortedOrders) {
+      const matchingItem = order.items.find(
+        (item) => item.variant.product.id === product.id
+      );
+      if (matchingItem) {
+        setOrderItemId(matchingItem.id);
+        return; // Stop after first match
+      }
+    }
+
+    setOrderItemId(undefined);
+  }, [product?.id, userOrders]);
 
   useEffect(() => {
     if (!product?.variants?.length) return;
@@ -229,31 +233,64 @@ useEffect(() => {
             <h2 className="text-2xl font-semibold mb-4">انتخاب ویژگی‌ها</h2>
 
             <div className="space-y-6 mb-8">
-              {Object.entries(attributeMap).map(([attrName, values]) => (
-                <div key={attrName}>
-                  <h4 className="font-medium mb-2">{attrName}:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {values.map((value) => (
-                      <button
-                        key={value}
-                        onClick={() =>
-                          setSelectedAttributes((prev) => ({
-                            ...prev,
-                            [attrName]: value,
-                          }))
-                        }
-                        className={`px-4 py-2 rounded border ${
-                          selectedAttributes[attrName] === value
-                            ? "bg-indigo-600 text-white border-indigo-600"
-                            : "bg-white border-gray-300"
-                        }`}
-                      >
-                        {value}
-                      </button>
-                    ))}
+              {product.slug === "content" && product.variants.length > 0 ? (
+                // Slider for "words"
+                <div>
+                  <h4 className="font-medium mb-2">تعداد کلمات:</h4>
+                  <input
+                    type="range"
+                    min={100}
+                    max={2000}
+                    step={50}
+                    value={quantity}
+                    onChange={(e) => setQuantity(Number(e.target.value))}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-sm text-gray-600 mt-1">
+                    <span>100 کلمه</span>
+                    <span>2000 کلمه</span>
                   </div>
+                  <p className="mt-2">
+                    تعداد انتخاب شده: <strong>{quantity}</strong> کلمه
+                  </p>
+                  <p className="mt-1">
+                    قیمت تقریبی:{" "}
+                    <strong>
+                      {(
+                        (quantity * (product.variants[0]?.price ?? 0))
+                      ).toLocaleString()}{" "}
+                      تومان
+                    </strong>
+                  </p>
                 </div>
-              ))}
+              ) : (
+                // Regular variant buttons for other products
+                Object.entries(attributeMap).map(([attrName, values]) => (
+                  <div key={attrName}>
+                    <h4 className="font-medium mb-2">{attrName}:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {values.map((value) => (
+                        <button
+                          key={value}
+                          onClick={() =>
+                            setSelectedAttributes((prev) => ({
+                              ...prev,
+                              [attrName]: value,
+                            }))
+                          }
+                          className={`px-4 py-2 rounded border ${
+                            selectedAttributes[attrName] === value
+                              ? "bg-indigo-600 text-white border-indigo-600"
+                              : "bg-white border-gray-300"
+                          }`}
+                        >
+                          {value}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
 
             {matchedVariant ? (
