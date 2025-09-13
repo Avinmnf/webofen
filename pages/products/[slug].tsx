@@ -202,12 +202,7 @@ export default function ProductDetailPage() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {product.galleryUrls.map((url, idx) => (
                     <div key={idx} className="relative w-full h-[150px]">
-                      <Image
-                        src={`${NEXT_PUBLIC_CMS_URL}${url}`}
-                        alt={`${product.title} - image ${idx + 1}`}
-                        fill
-                        className="object-cover rounded-xl bg-gray-100"
-                      />
+
                     </div>
                   ))}
                 </div>

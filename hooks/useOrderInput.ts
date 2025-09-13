@@ -7,7 +7,7 @@ export type InputField = {
   label: string;
   fieldType: 'text' | 'textarea' | 'number' | 'url';
   placeholder?: string;
-  required: string;
+  required: boolean;        // changed to boolean for easier checks
   value?: string;           // current saved value
   inputValueId?: string;    // id of the existing OrderItemInputValue
 };
@@ -25,7 +25,12 @@ export function useOrderInput(orderItemId: string | null) {
   const [error, setError] = useState<string | null>(null);
 
   const fetchFields = useCallback(async () => {
-    if (!orderItemId) return;
+    if (!orderItemId) {
+      setFields([]);
+      setValues({});
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -34,16 +39,32 @@ export function useOrderInput(orderItemId: string | null) {
       if (!res.ok) throw new Error(`Failed to fetch fields (${res.status})`);
 
       const data = await res.json();
-      const fetchedFields: InputField[] = data.inputFields || [];
-      setFields(fetchedFields);
+      const fetchedFields: InputField[] = Array.isArray(data.inputFields) ? data.inputFields : [];
 
+      // Defensive: ensure each field has required properties
+const safeFields = fetchedFields.map((f) => ({
+  id: f.id,
+  label: f.label || '',
+  fieldType: f.fieldType || 'text',
+  placeholder: f.placeholder || '',
+  required: !!f.required,
+  value: f.value || '',
+  inputValueId: f.inputValueId || undefined, // <- use undefined instead of null
+}));
+
+
+      setFields(safeFields);
+
+      // Initialize values
       const initValues: Record<string, string> = {};
-      fetchedFields.forEach((f) => {
+      safeFields.forEach((f) => {
         initValues[f.id] = f.value || '';
       });
       setValues(initValues);
     } catch (err: any) {
       console.error('❌ Error fetching input fields:', err);
+      setFields([]); // fallback
+      setValues({});
       setError(err.message || 'Failed to fetch input fields');
     } finally {
       setLoading(false);
@@ -60,13 +81,15 @@ export function useOrderInput(orderItemId: string | null) {
 
   const submitValues = useCallback(async () => {
     if (!orderItemId) throw new Error('Missing orderItemId');
+    if (!fields.length) return { success: true }; // nothing to submit
+
     setLoading(true);
     setError(null);
 
     try {
       const payload: InputValuePayload[] = fields.map((f) => ({
         inputValueId: f.inputValueId || null,
-        fieldId: !f.inputValueId ? f.id : undefined, // only needed for new input values
+        fieldId: !f.inputValueId ? f.id : undefined,
         value: values[f.id] || '',
       }));
 

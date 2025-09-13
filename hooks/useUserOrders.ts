@@ -1,4 +1,3 @@
-// hooks/useUserOrders.ts
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext"; // make sure you have this
 
@@ -17,11 +16,22 @@ export interface Variant {
   attributeValues: AttributeValue[];
 }
 
+export interface OrderItemInputValue {
+  id: string;
+  field: {
+    label: string;
+  };
+  value: string;
+}
+
 export interface OrderItem {
   id: string;
   quantity: number;
   price: number;
+  originalPrice?: number;
+  finalPrice?: number;
   variant: Variant;
+  inputValues?: OrderItemInputValue[];
 }
 
 export interface Order {
@@ -40,14 +50,13 @@ interface UseUserOrdersResult {
 }
 
 export function useUserOrders(): UseUserOrdersResult {
-  const { user } = useAuth(); // get logged-in user
+  const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState<boolean>(!!user); // only loading if user exists
+  const [loading, setLoading] = useState<boolean>(!!user);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
-      // If not logged in, no need to fetch
       setOrders([]);
       setLoading(false);
       setError(null);
@@ -58,7 +67,7 @@ export function useUserOrders(): UseUserOrdersResult {
       setLoading(true);
       try {
         const res = await fetch("/api/proxy/userorders", {
-          credentials: "include", // send cookies
+          credentials: "include",
         });
         if (!res.ok) {
           throw new Error(`Failed to fetch orders: ${res.statusText}`);
@@ -76,7 +85,7 @@ export function useUserOrders(): UseUserOrdersResult {
     }
 
     fetchOrders();
-  }, [user]); // refetch only if user changes
+  }, [user]);
 
   return { orders, loading, error };
 }
