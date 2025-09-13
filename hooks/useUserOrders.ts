@@ -1,5 +1,6 @@
 // hooks/useUserOrders.ts
 import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext"; // make sure you have this
 
 export interface AttributeValue {
   value: string;
@@ -38,12 +39,21 @@ interface UseUserOrdersResult {
   error: string | null;
 }
 
-export function useUserOrders() {
+export function useUserOrders(): UseUserOrdersResult {
+  const { user } = useAuth(); // get logged-in user
   const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(!!user); // only loading if user exists
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!user) {
+      // If not logged in, no need to fetch
+      setOrders([]);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     async function fetchOrders() {
       setLoading(true);
       try {
@@ -66,7 +76,7 @@ export function useUserOrders() {
     }
 
     fetchOrders();
-  }, []);
+  }, [user]); // refetch only if user changes
 
   return { orders, loading, error };
 }

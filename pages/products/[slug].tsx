@@ -195,12 +195,7 @@ export default function ProductDetailPage() {
             <div className="space-y-4 border rounded-2xl border-gray-200 w-2/3">
               {/* Main Product Image */}
               <div className="relative group w-full h-72">
-                <Image
-                  src={`${NEXT_PUBLIC_CMS_URL}${product.imageUrl}`}
-                  alt={product.title}
-                  fill
-                  className="bg-gray-200 rounded-2xl"
-                />
+         
               </div>
               {/* Gallery Images */}
               {product.galleryUrls && product.galleryUrls.length > 0 && (

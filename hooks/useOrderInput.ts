@@ -8,34 +8,40 @@ export type InputField = {
   fieldType: 'text' | 'textarea' | 'number' | 'url';
   placeholder?: string;
   required: string;
+  value?: string;           // current saved value
+  inputValueId?: string;    // id of the existing OrderItemInputValue
 };
 
 export type InputValuePayload = {
-  productInputFieldId: string;
+  inputValueId: string | null; // null for new fields
+  fieldId?: string;            // required for creating new field
   value: string;
 };
 
 export function useOrderInput(orderItemId: string | null) {
   const [fields, setFields] = useState<InputField[]>([]);
   const [values, setValues] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // fetch fields
   const fetchFields = useCallback(async () => {
     if (!orderItemId) return;
     setLoading(true);
     setError(null);
+
     try {
       const res = await fetch(`/api/proxy/orderinput?orderItemId=${orderItemId}`);
       if (!res.ok) throw new Error(`Failed to fetch fields (${res.status})`);
-      const data = await res.json();
-      setFields(data.inputFields || []);
 
-      // Initialize values for each field
-      const init: Record<string, string> = {};
-      (data.inputFields || []).forEach((f: InputField) => (init[f.id] = ''));
-      setValues(init);
+      const data = await res.json();
+      const fetchedFields: InputField[] = data.inputFields || [];
+      setFields(fetchedFields);
+
+      const initValues: Record<string, string> = {};
+      fetchedFields.forEach((f) => {
+        initValues[f.id] = f.value || '';
+      });
+      setValues(initValues);
     } catch (err: any) {
       console.error('❌ Error fetching input fields:', err);
       setError(err.message || 'Failed to fetch input fields');
@@ -48,23 +54,23 @@ export function useOrderInput(orderItemId: string | null) {
     fetchFields();
   }, [fetchFields]);
 
-  // handle input change
   const handleChange = useCallback((fieldId: string, val: string) => {
     setValues((prev) => ({ ...prev, [fieldId]: val }));
   }, []);
 
-  // submit values
   const submitValues = useCallback(async () => {
     if (!orderItemId) throw new Error('Missing orderItemId');
     setLoading(true);
     setError(null);
+
     try {
-      const payload: InputValuePayload[] = Object.keys(values).map((fieldId) => ({
-        productInputFieldId: fieldId,
-        value: values[fieldId],
+      const payload: InputValuePayload[] = fields.map((f) => ({
+        inputValueId: f.inputValueId || null,
+        fieldId: !f.inputValueId ? f.id : undefined, // only needed for new input values
+        value: values[f.id] || '',
       }));
 
-      const res = await fetch('/api/proxy/orderinput', {
+      const res = await fetch(`/api/proxy/orderinput`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderItemId, inputValues: payload }),
@@ -79,7 +85,7 @@ export function useOrderInput(orderItemId: string | null) {
     } finally {
       setLoading(false);
     }
-  }, [orderItemId, values]);
+  }, [orderItemId, fields, values]);
 
   return { fields, values, loading, error, fetchFields, handleChange, submitValues };
 }
