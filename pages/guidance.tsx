@@ -640,8 +640,12 @@ export default function guidance() {
                   "/guidance/Hailuo_Video_A_futuristic_glowing_pill_with_420392168333352962_1.mp4",
                   "/guidance/Hailuo_Video_A_futuristic_glowing_pill_with_420392168333352962.mp4",
                   "/guidance/Hailuo_Video_A_futuristic_glowing_pill_with_420392168333352962_2.mp4",
+                  "/guidance/Hailuo_Video_Create_a_smooth_looping_animat_422515129102688262.mp4",
                   "/guidance/Hailuo_Video_A_futuristic_glowing_capsule_s_420385176478949377.mp4",
+                  "/guidance/Hailuo_Video_Create_a_smooth_looping_animat_422472950887911433.mp4",
                   "/guidance/Hailuo_Video_A_futuristic_glowing_pill_with_420392168333352962_3.mp4",
+                  "/guidance/Hailuo_Video_Create_a_smooth_looping_animat_422480692549722119_1.mp4",
+                  "/guidance/Hailuo_Video_Create_a_smooth_looping_animat_422500566735044610_1.mp4",
                 ].map((src, idx) => (
                   <div
                     key={idx}

@@ -11,6 +11,7 @@ export interface AttributeValue {
 export interface Variant {
   product: {
     id: string;
+    slug: string;
     title: string;
   };
   attributeValues: AttributeValue[];

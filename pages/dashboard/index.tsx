@@ -1,50 +1,108 @@
-'use client';
+"use client";
 
 import React from "react";
 import DashboardLayout from "@/components/dashboard/layout";
-import DashboardContent, { Jobs, BacklinkItem } from "@/components/dashboard/content";
+import DashboardContent, { Jobs } from "@/components/dashboard/content";
 import HeaderPanel from "@/components/dashboard/header";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserOrders } from "@/hooks/useUserOrders";
+
+
+export interface BacklinkItem {
+  id: string;
+  slug: string;
+  productTitle: string;
+  attributes: { name: string; value: string }[];
+  quantity: number;
+  price: number;
+  orderId: string;
+  status: string;
+  createdAt: string;
+  siteurl?: string;
+  keyword: string;
+}
+
+export interface SecurityItem {
+  id: string;
+  slug: string;
+  productTitle: string;
+  attributes: { name: string; value: string }[];
+  quantity: number;
+  price: number;
+  orderId: string;
+  status: string;
+  createdAt: string;
+  siteurl?: string;
+  keyword: string;
+}
 
 const Page: React.FC = () => {
   const { isLoggedIn } = useAuth();
   const { orders, loading, error } = useUserOrders();
 
-  // Convert orders -> backlinks
-const backlinks: BacklinkItem[] = orders.flatMap((order) =>
-  order.items.map((item) => ({
-    id: item.id,
-    productTitle: item.variant.product.title,
-    attributes: item.variant.attributeValues.map((av) => ({
-      name: av.attribute.name,
-      value: av.value,
-    })),
-    quantity: item.quantity,
-    price: item.finalPrice ?? item.price ?? 0,
-    orderId: order.id,
-    status: order.status,
-    createdAt: order.createdAt,
-    siteurl: item.inputValues?.find((iv) => iv.field.label === "Site URL")?.value || "",
-    keyword: item.inputValues?.find((iv) => iv.field.label === "Keyword")?.value || "",
-  }))
-);
+  // Generate backlinks
+  const backlinks: BacklinkItem[] = orders.flatMap((order) =>
+    order.items
+      .filter((item) => item.variant?.product?.slug === "backlink")
+      .map((item) => ({
+        id: item.id,
+        slug: item.variant.product.slug,
+        productTitle: item.variant.product.title,
+        attributes: item.variant.attributeValues.map((av) => ({
+          name: av.attribute.name,
+          value: av.value,
+        })),
+        quantity: item.quantity,
+        price: item.finalPrice ?? item.price ?? 0,
+        orderId: order.id,
+        status: order.status,
+        createdAt: order.createdAt,
+        siteurl:
+          item.inputValues?.find((iv) => iv.field.label === "Site URL")?.value || "",
+        keyword:
+          item.inputValues?.find((iv) => iv.field.label === "Keyword")?.value || "",
+      }))
+  );
+
+  // Generate security orders
+  const security: SecurityItem[] = orders.flatMap((order) =>
+    order.items
+      .filter((item) => item.variant?.product?.slug === "security")
+      .map((item) => ({
+        id: item.id,
+        slug: item.variant.product.slug,
+        productTitle: item.variant.product.title,
+        attributes: item.variant.attributeValues.map((av) => ({
+          name: av.attribute.name,
+          value: av.value,
+        })),
+        quantity: item.quantity,
+        price: item.finalPrice ?? item.price ?? 0,
+        orderId: order.id,
+        status: order.status,
+        createdAt: order.createdAt,
+        siteurl:
+          item.inputValues?.find((iv) => iv.field.label === "Site URL")?.value || "",
+        keyword:
+          item.inputValues?.find((iv) => iv.field.label === "Keyword")?.value || "",
+      }))
+  );
 
   const jobs: Jobs = {
     backlink: backlinks,
+    security: security,
     content: [],
-    security: [],
     cluster: [],
     seo: [],
     spam: [],
   };
 
   if (!isLoggedIn) {
-    return <p className="text-center py-10">Please log in to view your dashboard.</p>;
+    return <p className="text-center py-10">ابتدا باید وارد حساب کاربری خود شوید</p>;
   }
 
   if (loading) {
-    return <p className="text-center py-10">Loading your dashboard...</p>;
+    return <p className="text-center py-10">در حال بارگیری...</p>;
   }
 
   if (error) {
@@ -59,7 +117,7 @@ const backlinks: BacklinkItem[] = orders.flatMap((order) =>
             <HeaderPanel />
           </div>
           <div className="mt-6 relative rounded-2xl shadow-lg overflow-hidden glass-effect hover-scale animate-slideInRight z-0">
-            <DashboardContent jobs={jobs} backlinks={backlinks} />
+            <DashboardContent jobs={jobs} />
           </div>
         </div>
       </div>

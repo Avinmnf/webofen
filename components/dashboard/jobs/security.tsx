@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useOrderInput } from "@/hooks/useOrderInput";
 import HoverVideo from "@/components/videos/hovervideos";
 
-export interface BacklinkItem {
+export interface SecurityItem {
   id: string;
   slug: string; // <-- added slug
   productTitle: string;
@@ -18,11 +18,11 @@ export interface BacklinkItem {
   keyword: string;
 }
 
-interface BacklinkProps {
-  backlinks: BacklinkItem[];
+interface SecurityProps {
+  security: SecurityItem[];
 }
 
-const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
+const Security: React.FC<SecurityProps> = ({ security }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedOrderItemId, setSelectedOrderItemId] = useState<string | null>(
     null
@@ -45,13 +45,13 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
     }
   };
 
-  const pendingBacklink = backlinks.find((item) => item.status === "0");
-  const backlinkOrders = backlinks.filter((item) => item.slug === "backlink");
+  const pendingSecurity = security.find((item) => item.status === "0");
+  const backlinkOrders = security.filter((item) => item.slug === "security");
 
   return (
     <>
       <div className="grid grid-cols-3 gap-4 text-gray-700 bg-gray-50 p-4 rounded-lg shadow-sm">
-        {backlinks.map((item) => {
+        {security.map((item) => {
           // Generate a variant name from attributes
           const variantName = item.attributes
             .map((attr) => attr.value)
@@ -106,9 +106,9 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
         })}
       </div>
 
-      {pendingBacklink && (
+      {pendingSecurity && (
         <div className="flex justify-center w-full mt-6">
-          <button onClick={() => handleClick(pendingBacklink.id)}>
+          <button onClick={() => handleClick(pendingSecurity.id)}>
             <div className="animate-bounce w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
               ⚡
             </div>
@@ -127,42 +127,38 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
             </button>
 
             <div className="">
-              
-<div className="p-2 relative w-full aspect-[19/9] bg-[#001933] rounded-xl overflow-hidden flex items-start">
-  <HoverVideo
-    src="/guidance/Hailuo_Video_Create_a_smooth_looping_animat_420401581408546819.mp4"
-    className="h-full absolute left-0 w-auto object-cover"
-  />
-  <h2 className="text-xl font-semibold mb-4 text-white">
-    ثبت اطلاعات لینک
-  </h2>
-  <div className="absolute top-10 right-10 z-10 flex flex-col gap-2">
-    {fields.map((field) => (
-      <input
-        key={field.id}
-        type={field.fieldType === "number" ? "number" : "text"}
-        name={field.id}
-        placeholder={field.placeholder || field.label}
-        value={values[field.id] || ""}
-        onChange={(e) => handleChange(field.id, e.target.value)}
-        className="w-full mb-3 p-2 border border-gray-200 rounded-lg text-gray-600"
-        required={field.required}
-      />
-    ))}
-    <button
-      onClick={handleSubmit}
-      className="w-full bg-[#6fd6e5] text-white py-2 rounded hover:bg-green-700"
-    >
-      ثبت
-    </button>
-  </div>
-</div>
-
+              <div className="p-2 relative w-full aspect-[19/9] bg-[#001933] rounded-xl overflow-hidden flex items-start">
+                <HoverVideo
+                  src="/guidance/Hailuo_Video_Create_a_smooth_looping_animat_420401581408546819.mp4"
+                  className="h-full absolute left-0 w-auto object-cover"
+                />
+                <h2 className="text-xl font-semibold mb-4 text-white">
+                  ثبت اطلاعات لینک
+                </h2>
+                <div className="absolute top-10 right-10 z-10 flex flex-col gap-2">
+                  {fields.map((field) => (
+                    <input
+                      key={field.id}
+                      type={field.fieldType === "number" ? "number" : "text"}
+                      name={field.id}
+                      placeholder={field.placeholder || field.label}
+                      value={values[field.id] || ""}
+                      onChange={(e) => handleChange(field.id, e.target.value)}
+                      className="w-full mb-3 p-2 border border-gray-200 rounded-lg text-gray-600"
+                      required={field.required}
+                    />
+                  ))}
+                  <button
+                    onClick={handleSubmit}
+                    className="w-full bg-[#6fd6e5] text-white py-2 rounded hover:bg-green-700"
+                  >
+                    ثبت
+                  </button>
+                </div>
+              </div>
             </div>
             {loading && <p>در حال بارگذاری فیلدها...</p>}
             {error && <p className="text-red-500">{error}</p>}
-
-
           </div>
         </div>
       )}
@@ -170,4 +166,4 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
   );
 };
 
-export default Backlink;
+export default Security;
