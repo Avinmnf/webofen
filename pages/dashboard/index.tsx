@@ -17,6 +17,7 @@ export interface BacklinkItem {
   price: number;
   orderId: string;
   status: string;
+  adminStatus?: string;
   createdAt: string;
   siteurl?: string;
   keyword: string;
@@ -56,11 +57,14 @@ const Page: React.FC = () => {
         price: item.finalPrice ?? item.price ?? 0,
         orderId: order.id,
         status: order.status,
+        adminStatus: item.adminStatus,
         createdAt: order.createdAt,
         siteurl:
-          item.inputValues?.find((iv) => iv.field.label === "Site URL")?.value || "",
+          item.inputValues?.find((iv) => iv.field.label === "Site URL")
+            ?.value || "",
         keyword:
-          item.inputValues?.find((iv) => iv.field.label === "Keyword")?.value || "",
+          item.inputValues?.find((iv) => iv.field.label === "Keyword")?.value ||
+          "",
       }))
   );
 
@@ -82,9 +86,11 @@ const Page: React.FC = () => {
         status: order.status,
         createdAt: order.createdAt,
         siteurl:
-          item.inputValues?.find((iv) => iv.field.label === "Site URL")?.value || "",
+          item.inputValues?.find((iv) => iv.field.label === "Site URL")
+            ?.value || "",
         keyword:
-          item.inputValues?.find((iv) => iv.field.label === "Keyword")?.value || "",
+          item.inputValues?.find((iv) => iv.field.label === "Keyword")?.value ||
+          "",
       }))
   );
 
@@ -98,7 +104,9 @@ const Page: React.FC = () => {
   };
 
   if (!isLoggedIn) {
-    return <p className="text-center py-10">ابتدا باید وارد حساب کاربری خود شوید</p>;
+    return (
+      <p className="text-center py-10">ابتدا باید وارد حساب کاربری خود شوید</p>
+    );
   }
 
   if (loading) {

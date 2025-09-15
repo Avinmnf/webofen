@@ -31,9 +31,13 @@ export interface OrderItem {
   price: number;
   originalPrice?: number;
   finalPrice?: number;
+  status: string;
+  adminStatus?: string;
+  delayed?: string;
   variant: Variant;
   inputValues?: OrderItemInputValue[];
 }
+
 
 export interface Order {
   id: string;
@@ -43,7 +47,6 @@ export interface Order {
   createdAt: string;
   items: OrderItem[];
 }
-
 interface UseUserOrdersResult {
   orders: Order[];
   loading: boolean;

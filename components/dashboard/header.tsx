@@ -93,7 +93,7 @@ const HeaderPanel: React.FC = () => {
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="w-8 h-8 p-1 rounded-full bg-gradient-to-r from-blue-600 to-blue-400 text-white shadow-sm"
+          className="w-8 h-8 p-1 rounded-full bg-[#1d546b] text-white shadow-sm"
         >
           <path
             strokeLinecap="round"

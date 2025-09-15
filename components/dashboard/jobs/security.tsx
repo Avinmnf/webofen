@@ -115,53 +115,54 @@ const Security: React.FC<SecurityProps> = ({ security }) => {
           </button>
         </div>
       )}
+{showModal && (
+  <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
+    <div className="bg-white w-[50%] relative rounded-xl overflow-hidden">
+      <div className="p-2 relative w-full aspect-[19/9] bg-[#001933] rounded-xl overflow-hidden flex items-start">
+        <HoverVideo
+          src="/guidance/Hailuo_Video_Create_a_smooth_looping_animat_420401581408546819.mp4"
+          className="h-full absolute left-0 w-auto object-cover"
+        />
 
-      {showModal && (
-        <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
-          <div className="bg-white w-[50%]">
-            <button
-              onClick={() => setShowModal(false)}
-              className="absolute top-3 right-3 text-gray-800 hover:text-red-500 text-2xl"
-            >
-              &times;
-            </button>
+        {/* Close button inside the container */}
+        <button
+          onClick={() => setShowModal(false)}
+          className="absolute top-3 right-3 text-white text-2xl hover:text-red-500 z-20"
+        >
+          &times;
+        </button>
 
-            <div className="">
-              <div className="p-2 relative w-full aspect-[19/9] bg-[#001933] rounded-xl overflow-hidden flex items-start">
-                <HoverVideo
-                  src="/guidance/Hailuo_Video_Create_a_smooth_looping_animat_420401581408546819.mp4"
-                  className="h-full absolute left-0 w-auto object-cover"
-                />
-                <h2 className="text-xl font-semibold mb-4 text-white">
-                  ثبت اطلاعات لینک
-                </h2>
-                <div className="absolute top-10 right-10 z-10 flex flex-col gap-2">
-                  {fields.map((field) => (
-                    <input
-                      key={field.id}
-                      type={field.fieldType === "number" ? "number" : "text"}
-                      name={field.id}
-                      placeholder={field.placeholder || field.label}
-                      value={values[field.id] || ""}
-                      onChange={(e) => handleChange(field.id, e.target.value)}
-                      className="w-full mb-3 p-2 border border-gray-200 rounded-lg text-gray-600"
-                      required={field.required}
-                    />
-                  ))}
-                  <button
-                    onClick={handleSubmit}
-                    className="w-full bg-[#6fd6e5] text-white py-2 rounded hover:bg-green-700"
-                  >
-                    ثبت
-                  </button>
-                </div>
-              </div>
-            </div>
-            {loading && <p>در حال بارگذاری فیلدها...</p>}
-            {error && <p className="text-red-500">{error}</p>}
-          </div>
+        <div className="absolute top-[25%] right-[15%] z-10 flex flex-col gap-2">
+          <h2 className="text-xl font-semibold mb-4 text-white">
+            ثبت اطلاعات
+          </h2>
+          {fields.map((field) => (
+            <input
+              key={field.id}
+              type={field.fieldType === "number" ? "number" : "text"}
+              name={field.id}
+              placeholder={field.placeholder || field.label}
+              value={values[field.id] || ""}
+              onChange={(e) => handleChange(field.id, e.target.value)}
+              className="w-full mb-3 p-2 border border-gray-200 rounded-lg text-white"
+              required={field.required}
+            />
+          ))}
+          <button
+            onClick={handleSubmit}
+            className="w-full bg-[#6fd6e5] text-white py-2 rounded hover:bg-green-700"
+          >
+            ثبت
+          </button>
         </div>
-      )}
+      </div>
+
+      {loading && <p>در حال بارگذاری فیلدها...</p>}
+      {error && <p className="text-red-500">{error}</p>}
+    </div>
+  </div>
+)}
+
     </>
   );
 };
