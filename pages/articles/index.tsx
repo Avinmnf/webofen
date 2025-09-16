@@ -25,7 +25,7 @@ function isRecommended(post: Post) {
   return post.tags.some((tag) => tag.name === "پیشنهاد ما");
 }
 export default function PostsPage() {
-  const NEXT_PUBLIC_CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
+  const imgcdn = process.env.NEXT_PUBLIC_CDN_URL;
   const [page, setPage] = useState(1);
   const limit = 10;
   const socialCards = [
@@ -84,7 +84,7 @@ export default function PostsPage() {
                         className="rounded-t-2xl"
                         width={700}
                         height={300}
-                        src={`${NEXT_PUBLIC_CDN_URL}${posts[0].imageUrl}`}
+                        src={`${imgcdn}${posts[0].imageUrl}`}
                         alt={posts[0].imageAlt || posts[0].title}
                       />
                     )}
