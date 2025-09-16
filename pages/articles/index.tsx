@@ -86,6 +86,7 @@ export default function PostsPage() {
                         height={300}
                         src={`${imgcdn}${posts[0].imageUrl}`}
                         alt={posts[0].imageAlt || posts[0].title}
+                        loader={({ src }) => src}
                       />
                     )}
                     <div className="w-full mt-6 p-6">
@@ -399,6 +400,7 @@ export default function PostsPage() {
                           height={200}
                           src={`${imgcdn}${(card as Post)
                             .imageUrl!}`}
+                            loader={({ src }) => src}
                           alt={(card as Post).imageAlt || (card as Post).title}
                           className="rounded-t-2xl w-full h-42 object-cover"
                         />

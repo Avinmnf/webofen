@@ -134,6 +134,7 @@ export default function PostPage() {
               <Image
                 src={`${imgcdn}${post.imageUrl}`}
                 alt={post.imageAlt || post.title}
+                loader={({ src }) => src}
                 fill
                 className="bg-gray-200 rounded-2xl"
               />
