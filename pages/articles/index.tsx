@@ -397,7 +397,7 @@ export default function PostsPage() {
                         <Image
                           width={500}
                           height={200}
-                          src={`https://cms.webofen.com${(card as Post)
+                          src={`${imgcdn}${(card as Post)
                             .imageUrl!}`}
                           alt={(card as Post).imageAlt || (card as Post).title}
                           className="rounded-t-2xl w-full h-42 object-cover"
