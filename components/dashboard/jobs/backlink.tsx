@@ -1,10 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
+import { useEffect } from "react";
 import { useOrderInput } from "@/hooks/useOrderInput";
 import HoverVideo from "@/components/videos/hovervideos";
 import ProgressCircle from "../progress";
 import SmallProgressCircle from "../smallprogress";
+import Image from "next/image";
+import BacklinkHistory from "../history/backlinkhistory";
 
 export interface BacklinkItem {
   id: string;
@@ -33,25 +36,39 @@ const statusProgressMap: Record<string, number> = {
   pending: 0,
   in_progress: 50,
   completed: 100,
+  out_of_time: 100,
 };
 
 const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
+  const [showHistory, setShowHistory] = useState(false);
+  const [historyOrders, setHistoryOrders] = useState<BacklinkItem[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedOrderItemId, setSelectedOrderItemId] = useState<string | null>(
     null
   );
+  const [showNotification, setShowNotification] = useState(false);
 
-  const { fields, values, loading, error, handleChange, submitValues } =
+const { fields, values, setValues, loading, error, handleChange, submitValues, fetchValues } =
     useOrderInput(selectedOrderItemId);
+  const selectedItem = backlinks.find(
+    (item) => item.id === selectedOrderItemId
+  );
+  const canEdit = selectedItem?.adminStatus === "pending";
+const handleClick = async (id: string) => {
+  setSelectedOrderItemId(id);
+  setShowModal(true);
 
-  const handleClick = (id: string) => {
-    setSelectedOrderItemId(id);
-    setShowModal(true);
-  };
+  // Fetch existing saved values and prefill them
+  const existingValues = await fetchValues(id);
+  if (existingValues) {
+    setValues(existingValues);
+  }
+};
 
   const handleSubmit = async () => {
     try {
       await submitValues();
+
       setShowModal(false);
     } catch (err) {
       console.error("Failed to submit input values", err);
@@ -74,6 +91,11 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
     return !isNaN(delayedDate.getTime()) && delayedDate < new Date();
   };
 
+  useEffect(() => {
+    if (delayedItems.length > 0) {
+      setShowNotification(true);
+    }
+  }, [backlinks]);
   // Separate items by status
   const inProgressItems = backlinks.filter(
     (item) => item.adminStatus === "in_progress"
@@ -90,11 +112,18 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
   const normalItems = backlinks.filter(
     (item) =>
       item.adminStatus !== "in_progress" &&
-      item.adminStatus !== "pending" &&
       item.adminStatus !== "out_of_time" &&
       item.adminStatus !== "canceled"
   );
+  
+  useEffect(() => {
+    if (delayedItems.length > 0) {
+      setShowNotification(true);
+    }
 
+    // ✅ Example: Filter backlinks that are completed to historyOrders
+    setHistoryOrders(backlinks.filter((item) => item.adminStatus === "completed"));
+  }, [backlinks]);
   // Pick the first in-progress as the "big" one
   const bigInProgressItem = inProgressItems[0];
   const otherInProgressItems = inProgressItems.slice(1);
@@ -108,41 +137,70 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
   return (
     <>
       <div className="flex flex-col items-center text-gray-700 bg-gray-50 p-4 rounded-lg shadow-sm space-y-8">
+        {showNotification && (
+          <div className="fixed top-0 left-0 right-0 bg-red-600 text-white p-4 text-center animate-slideDown z-50">
+            ⚠️ سفارش شما دیرکرد داشته است. ما از تأخیر پوزش می‌طلبیم.
+          </div>
+        )}
+
+        {/* History Toggle */}
+        {historyOrders.length > 0 && (
+          <div className="w-full flex justify-end mb-4">
+            <button
+              onClick={() => setShowHistory(!showHistory)}
+              className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded-lg transition"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className={`h-5 w-5 transform transition-transform ${
+                  showHistory ? "rotate-180" : "rotate-0"
+                }`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+              تاریخچه
+            </button>
+          </div>
+        )}
+
+        {/* History Orders */}
+        {showHistory && historyOrders.length > 0 && (
+          <BacklinkHistory
+            history={historyOrders}
+            onSelect={handleClick}
+            getProgress={getProgress}
+            isDelayed={isDelayed}
+          />
+        )}
+
         {/* Top in-progress pill */}
         {bigInProgressItem && (
-          <div className="flex flex-row items-center relative">
+          <div className="flex items-center relative flex-row-reverse">
             <ProgressCircle
               percentage={getProgress(bigInProgressItem)}
               delayed={isDelayed(bigInProgressItem)}
             />
             <button
               onClick={() => handleClick(bigInProgressItem.id)}
-              className="absolute right-[45px] w-16 h-16 flex items-center justify-center"
+              className="absolute left-11 w-20 h-16 flex items-center justify-center"
             >
-              {/* SVG */}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="150"
-                height="150"
-                viewBox="-46.08 -46.08 604.16 604.16"
-              >
-                <path
-                  fill="#DFDFE1"
-                  d="M479.587 188.925c43.218-43.221 43.218-113.29 0-156.512-43.221-43.218-113.292-43.218-156.513 0L32.413 323.075c-43.218 43.221-43.216 113.29.002 156.512 43.219 43.218 113.29 43.218 156.51 0z"
+              <div className="relative w-full h-32 flex justify-center items-center overflow-hidden">
+                <Image
+                  width={220}
+                  height={220}
+                  alt="Backlink"
+                  src={"/dashboard/backlink.png"}
+                  className="object-contain rotate-30"
                 />
-                <path
-                  fill="#CFCDD2"
-                  d="M479.587 32.414 32.414 479.587c43.219 43.218 113.29 43.218 156.51 0l290.663-290.662c43.218-43.221 43.218-113.29 0-156.511"
-                />
-                <path
-                  fill="#6FD6E5"
-                  d="m177.743 177.745-145.33 145.33c-43.218 43.221-43.216 113.29.002 156.512 43.219 43.218 113.29 43.218 156.51 0l145.331-145.331z"
-                />
-                <path
-                  fill="#64c3d1"
-                  d="M255.999 256 32.414 479.587c43.219 43.218 113.29 43.218 156.51 0l145.331-145.331z"
-                />
-              </svg>
+              </div>
             </button>
             <div className="text-center mt-2 text-sm">
               <div>
@@ -165,7 +223,7 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
           </div>
         )}
 
-        {/* Small pills: other in-progress, delayed, and normal items */}
+        {/* Small pills: other in-progress, delayed, canceled, and normal items */}
         <div className="flex flex-wrap justify-center gap-6 w-full">
           {[
             ...otherInProgressItems,
@@ -191,37 +249,16 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
                   onClick={() => handleClick(item.id)}
                   className="absolute top-4 w-12 h-12 flex items-center justify-center"
                 >
-                  {/* Pill SVG */}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="50"
-                    height="50"
-                    viewBox="-46.08 -46.08 604.16 604.16"
-                  >
-                    <path
-                      fill="#DFDFE1"
-                      d="M479.587 188.925c43.218-43.221 43.218-113.29 0-156.512-43.221-43.218-113.292-43.218-156.513 0L32.413 323.075c-43.218 43.221-43.216 113.29.002 156.512 43.219 43.218 113.29 43.218 156.51 0z"
+                  <div className="relative w-full h-64 flex justify-center items-center overflow-hidden">
+                    <Image
+                      width={220}
+                      height={220}
+                      alt="Backlink"
+                      src={"/dashboard/backlink.png"}
+                      className="object-contain rotate-30"
                     />
-                    <path
-                      fill="#CFCDD2"
-                      d="M479.587 32.414 32.414 479.587c43.219 43.218 113.29 43.218 156.51 0l290.663-290.662c43.218-43.221 43.218-113.29 0-156.511"
-                    />
-                    <path
-                      fill="#6FD6E5"
-                      d="m177.743 177.745-145.33 145.33c-43.218 43.221-43.216 113.29.002 156.512 43.219 43.218 113.29 43.218 156.51 0l145.331-145.331z"
-                    />
-                    <path
-                      fill="#64c3d1"
-                      d="M255.999 256 32.414 479.587c43.219 43.218 113.29 43.218 156.51 0l145.331-145.331z"
-                    />
-                  </svg>
-
-                  {/* Red line if delayed */}
-                  {delayed && (
-                    <div className="mt-1 w-full h-1 bg-red-500 rounded" />
-                  )}
+                  </div>
                 </button>
-
                 <div className="text-center mt-2 text-sm">
                   <div>
                     <p className="text-gray-600">خرید:</p>
@@ -240,6 +277,7 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
         </div>
       </div>
 
+      {/* Pending Backlink */}
       {pendingBacklink && (
         <div className="flex justify-center w-full mt-6">
           <button onClick={() => handleClick(pendingBacklink.id)}>
@@ -250,48 +288,88 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
         </div>
       )}
 
+      {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
-          <div className="bg-white w-[40%] relative rounded-xl overflow-hidden">
-            <div className="p-2 relative w-full aspect-[19/9] bg-[#001933] rounded-xl overflow-hidden flex items-start">
-              <HoverVideo
-                src="/guidance/Hailuo_Video_Create_a_smooth_looping_animat_420401581408546819.mp4"
-                className="h-full absolute left-0 w-auto object-cover"
-              />
-              <button
-                onClick={() => setShowModal(false)}
-                className="absolute top-3 right-3 text-white text-2xl hover:text-red-500 z-20"
-              >
-                &times;
-              </button>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 animate-fadeIn">
+          <div className="bg-gradient-to-br from-[#0B1120]/90 to-[#1C2233]/90 w-[90%] max-w-lg relative rounded-3xl shadow-2xl overflow-hidden border border-cyan-500/20 animate-scaleUp">
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute top-4 right-4 text-white text-3xl hover:text-red-500 transition-colors z-20"
+            >
+              &times;
+            </button>
 
-              <div className="absolute top-[25%] right-[15%] z-10 flex flex-col gap-2">
-                <h2 className="text-xl font-semibold mb-4 text-white">
-                  ثبت اطلاعات
+            <div className="relative w-full h-64 flex justify-center items-center overflow-hidden">
+              <Image
+                width={220}
+                height={220}
+                alt="Backlink"
+                src={"/dashboard/backlink.png"}
+                className="object-contain animate-float blur-[1px]"
+              />
+              <div className="absolute inset-0 flex items-end p-4">
+                <h2 className="text-2xl font-bold text-white text-center w-full drop-shadow-lg">
+                  ثبت اطلاعات سفارش بک لینک
                 </h2>
-                {fields.map((field) => (
+              </div>
+            </div>
+
+            <div className="p-6 space-y-5">
+              {fields?.map((field) => (
+                <div key={field.id} className="flex flex-col">
+                  <label className="text-sm text-gray-300 mb-1">
+                    {field.label}
+                  </label>
                   <input
-                    key={field.id}
                     type={field.fieldType === "number" ? "number" : "text"}
                     name={field.id}
                     placeholder={field.placeholder || field.label}
                     value={values[field.id] || ""}
                     onChange={(e) => handleChange(field.id, e.target.value)}
-                    className="w-full mb-3 p-2 border border-gray-200 rounded-lg text-white"
+                    className={`w-full px-4 py-2 rounded-xl border border-cyan-500/30 bg-[#1C2233] text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-500 outline-none transition-all duration-300 ${
+                      !canEdit
+                        ? "opacity-60 cursor-not-allowed"
+                        : "hover:ring-cyan-300"
+                    }`}
                     required={field.required}
+                    disabled={!canEdit}
                   />
-                ))}
-                <button
-                  onClick={handleSubmit}
-                  className="w-full bg-[#6fd6e5] text-white py-2 rounded hover:bg-green-700"
-                >
-                  ثبت
-                </button>
-              </div>
-            </div>
+                </div>
+              ))}
 
-            {loading && <p>در حال بارگذاری فیلدها...</p>}
-            {error && <p className="text-red-500">{error}</p>}
+              <button
+                onClick={handleSubmit}
+                className={`w-full py-3 rounded-xl text-lg font-semibold text-white transition-all duration-300 ${
+                  !canEdit
+                    ? "bg-gray-600 cursor-not-allowed"
+                    : "bg-cyan-500 hover:bg-cyan-600 active:scale-95 shadow-lg"
+                }`}
+                disabled={!canEdit}
+              >
+                {!canEdit ? "ثبت شده" : "ثبت اطلاعات"}
+              </button>
+
+              {!canEdit ? (
+                <p className="text-sm text-gray-400 text-center">
+                  این سفارش قبلاً ثبت شده و دیگر قابل تغییر نیست.
+                </p>
+              ) : (
+                <ul className="text-sm text-gray-300 list-disc pl-5 space-y-1">
+                  <li>اطلاعات وارد شده پس از ثبت قابل ویرایش نیست.</li>
+                  <li>از صحت اطلاعات قبل از ارسال مطمئن شوید.</li>
+                  <li>پس از ثبت، وضعیت سفارش شما برای بررسی ارسال می‌شود.</li>
+                </ul>
+              )}
+
+              {loading && (
+                <p className="text-cyan-400 text-sm animate-pulse">
+                  در حال بارگذاری...
+                </p>
+              )}
+              {error && (
+                <p className="text-red-400 text-sm animate-shake">{error}</p>
+              )}
+            </div>
           </div>
         </div>
       )}

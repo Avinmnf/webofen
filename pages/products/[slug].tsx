@@ -79,9 +79,10 @@ export default function ProductDetailPage() {
     );
 
     for (const order of sortedOrders) {
-      const matchingItem = order.items.find(
-        (item) => item.variant.product.id === product.id
-      );
+const matchingItem = order.items.find(
+  (item) => item.variant?.product?.id === product.id
+);
+
       if (matchingItem) {
         setOrderItemId(matchingItem.id);
         return; // Stop after first match

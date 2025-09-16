@@ -60,11 +60,10 @@ const Page: React.FC = () => {
         adminStatus: item.adminStatus,
         createdAt: order.createdAt,
         siteurl:
-          item.inputValues?.find((iv) => iv.field.label === "Site URL")
-            ?.value || "",
+item.inputValues?.find((iv) => iv.field?.label === "Site URL")?.value || "",
         keyword:
-          item.inputValues?.find((iv) => iv.field.label === "Keyword")?.value ||
-          "",
+  item.inputValues?.find((iv) => iv.field?.label === "Keyword")?.value || "",
+
       }))
   );
 
@@ -86,11 +85,10 @@ const Page: React.FC = () => {
         status: order.status,
         createdAt: order.createdAt,
         siteurl:
-          item.inputValues?.find((iv) => iv.field.label === "Site URL")
-            ?.value || "",
+item.inputValues?.find((iv) => iv.field?.label === "Site URL")?.value || "",
         keyword:
-          item.inputValues?.find((iv) => iv.field.label === "Keyword")?.value ||
-          "",
+  item.inputValues?.find((iv) => iv.field?.label === "Keyword")?.value || "",
+
       }))
   );
 
@@ -119,12 +117,12 @@ const Page: React.FC = () => {
 
   return (
     <DashboardLayout>
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 relative">
+      <div className=" bg-gradient-to-br from-indigo-50 via-white to-purple-50 relative">
         <div className="md:w-7/12 mx-auto px-4 py-6 max-w-7xl">
           <div className="animate-fadeIn z-40">
             <HeaderPanel />
           </div>
-          <div className="mt-6 relative rounded-2xl shadow-lg overflow-hidden glass-effect hover-scale animate-slideInRight z-0">
+          <div className="mt-6 relative rounded-2xl h-screen shadow-lg overflow-hidden glass-effect hover-scale animate-slideInRight z-0">
             <DashboardContent jobs={jobs} />
           </div>
         </div>
