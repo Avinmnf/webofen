@@ -25,7 +25,6 @@ function isRecommended(post: Post) {
   return post.tags.some((tag) => tag.name === "پیشنهاد ما");
 }
 export default function PostsPage() {
-  const imgcdn = process.env.NEXT_PUBLIC_CDN_URL || "http://cdn-api.webofen.com";
   const [page, setPage] = useState(1);
   const limit = 10;
   const socialCards = [
@@ -84,7 +83,7 @@ export default function PostsPage() {
                         className="rounded-t-2xl"
                         width={700}
                         height={300}
-                        src={`${imgcdn}${posts[0].imageUrl}`}
+                        src={`${posts[0].imageUrl}`}
                         alt={posts[0].imageAlt || posts[0].title}
                         loader={({ src }) => src}
                       />
@@ -398,7 +397,7 @@ export default function PostsPage() {
                         <Image
                           width={500}
                           height={200}
-                          src={`${imgcdn}${(card as Post)
+                          src={`${(card as Post)
                             .imageUrl!}`}
                             loader={({ src }) => src}
                           alt={(card as Post).imageAlt || (card as Post).title}

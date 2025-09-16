@@ -9,9 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { usePageView } from "@/hooks/usePageView";
 import { useGuestToken } from "@/contexts/GuestTokenContext";
 export default function PostPage() {
-  const imgcdn = process.env.NEXT_PUBLIC_CDN_URL || "http://cdn-api.webofen.com";
   const { user } = useAuth();
-
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
   const router = useRouter();
@@ -132,7 +130,7 @@ export default function PostPage() {
           {post.imageUrl && (
             <div className="relative w-full h-[500px]">
               <Image
-                src={`${imgcdn}${post.imageUrl}`}
+                src={`${post.imageUrl}`}
                 alt={post.imageAlt || post.title}
                 loader={({ src }) => src}
                 fill
