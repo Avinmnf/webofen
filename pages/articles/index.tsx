@@ -25,7 +25,7 @@ function isRecommended(post: Post) {
   return post.tags.some((tag) => tag.name === "پیشنهاد ما");
 }
 export default function PostsPage() {
-  const imgcdn = process.env.NEXT_PUBLIC_CDN_URL;
+  const imgcdn = process.env.NEXT_PUBLIC_CDN_URL || "http://cdn-api.webofen.com";
   const [page, setPage] = useState(1);
   const limit = 10;
   const socialCards = [

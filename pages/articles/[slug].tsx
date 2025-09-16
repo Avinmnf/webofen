@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { usePageView } from "@/hooks/usePageView";
 import { useGuestToken } from "@/contexts/GuestTokenContext";
 export default function PostPage() {
-  const imgcdn = process.env.NEXT_PUBLIC_CDN_URL;
+  const imgcdn = process.env.NEXT_PUBLIC_CDN_URL || "http://cdn-api.webofen.com";
   const { user } = useAuth();
 
   const [likes, setLikes] = useState(0);
