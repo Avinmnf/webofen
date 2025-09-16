@@ -81,7 +81,7 @@ export default function PostsPage() {
                     {posts[0].imageUrl && (
                       <Image
                         className="rounded-t-2xl"
-                        width={700}
+                        width={1000}
                         height={300}
                         src={`${posts[0].imageUrl}`}
                         alt={posts[0].imageAlt || posts[0].title}
