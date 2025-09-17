@@ -402,9 +402,9 @@ export default function Home() {
             </div>
           </div>
         </div>
-
       </section>
-      <div className="bg-[#f7f8fc] w-full">
+
+      <section className="bg-[#f7f8fc] w-full">
         <div className="max-w-[1250] m-auto px-8 md:px-0 flex flex-col md:flex-row items-center md:items-start gap-10">
           {/* Left Section: Centered Text */}
           <div className="w-full md:w-[40%] flex justify-center items-center text-center md:text-right mt-30">
@@ -426,12 +426,12 @@ export default function Home() {
             <Commentsabtus />
           </div>
         </div>
-      </div>
-      <div className="max-w-[1440px] m-auto">
+      </section>
+      <section className="max-w-[1250px] m-auto">
         <div className=" relative py-10">
           <Reservetime />
         </div>
-      </div>
+      </section>
     </main>
   );
 }

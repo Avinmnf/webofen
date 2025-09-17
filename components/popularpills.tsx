@@ -9,19 +9,19 @@ export default function Popularpills() {
       <div className="grid md:grid-cols-3 grid-cols-1 gap-4 text-gray-600">
         {[
           {
-            src: "/guidance/Hailuo_Video_A_futuristic_glowing_pill_with_420392168333352962_2.mp4",
+            src: "/guidance/backlink.mp4",
             title: "قرص بک لینک سازی",
             desc: "سئو خارجی سایت",
             link: "https://example.com/video-2"
           },
           {
-            src: "/guidance/Hailuo_Video_A_futuristic_glowing_pill_with_420392168333352962_1.mp4",
+            src: "/guidance/optimization.mp4",
             title: "قرص  بهینه سازی",
             desc: "سئو داخلی سایت",
             link: "https://example.com/video-1"
           },
           {
-            src: "/guidance/Hailuo_Video_Create_a_smooth_looping_animat_422500566735044610_1.mp4",
+            src: "/guidance/screamingfrog.mp4",
             title: "قرص اسکریمینگ فراگ",
             desc: "سئو داخلی سایت",
             link: "https://example.com/video-3"
