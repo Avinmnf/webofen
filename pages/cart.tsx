@@ -39,7 +39,8 @@ export default function CartPage() {
     const minTotalOk = !appliedCoupon.minTotal || subtotal >= Number(appliedCoupon.minTotal);
     if (minTotalOk) {
       let rawDiscount = Math.floor(subtotal * (appliedCoupon.discountPercentage / 100));
-      if (appliedCoupon.maxDiscount) rawDiscount = Math.min(rawDiscount, Number(appliedCoupon.maxDiscount));
+      if (appliedCoupon.maxDiscount)
+        rawDiscount = Math.min(rawDiscount, Number(appliedCoupon.maxDiscount));
       discountTotal = rawDiscount;
       totalPrice = subtotal - discountTotal;
 
@@ -57,26 +58,25 @@ export default function CartPage() {
         line.couponApplied = perUnitReduction > 0;
       });
     } else {
-      // Coupon not eligible
       discountTotal = 0;
       totalPrice = subtotal;
     }
   }
 
   const handleApplyCoupon = async () => {
-    if (!couponCode) return setCouponMessage("❌ لطفا کد تخفیف را وارد کنید");
+    if (!couponCode) return setCouponMessage('❌ لطفا کد تخفیف را وارد کنید');
 
     try {
-      const res = await fetch(`api/proxy/validate`,{
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch(`api/proxy/validate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: couponCode, cartTotal: subtotal }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setCouponMessage("❌ " + (data.error || "خطا در اعمال کوپن"));
+        setCouponMessage('❌ ' + (data.error || 'خطا در اعمال کوپن'));
         setAppliedCoupon(null);
       } else {
         setAppliedCoupon(data.coupon);
@@ -84,23 +84,32 @@ export default function CartPage() {
       }
     } catch (err) {
       console.error(err);
-      setCouponMessage("❌ خطا در ارتباط با سرور");
+      setCouponMessage('❌ خطا در ارتباط با سرور');
       setAppliedCoupon(null);
     }
   };
 
   const handlePlaceOrder = async () => {
-    const itemsForOrder = lines.map((line) => ({
-      variantId: line.variantId,
-      quantity: line.quantity,
-      originalPrice: line.price || 0,
-      finalPrice: line.finalUnit,
-      appliedCouponId: line.couponApplied ? appliedCoupon?.id || null : null,
-    }));
+    // ✅ Expand each quantity into separate items
+    const itemsForOrder = lines.flatMap((line) =>
+      Array.from({ length: line.quantity }).map(() => ({
+        variantId: line.variantId,
+        quantity: 1, // always 1 per order line
+        originalPrice: line.price || 0,
+        finalPrice: line.finalUnit,
+        appliedCouponId: line.couponApplied ? appliedCoupon?.id || null : null,
+      }))
+    );
 
     const res = await placeOrder(
       { customerName, customerPhone, address, couponCode: appliedCoupon?.id || undefined },
-      { items: itemsForOrder, subtotal, totalPrice, discountTotal, couponId: appliedCoupon?.id || null }
+      {
+        items: itemsForOrder,
+        subtotal,
+        totalPrice,
+        discountTotal,
+        couponId: appliedCoupon?.id || null,
+      }
     );
 
     if (res.success) {
