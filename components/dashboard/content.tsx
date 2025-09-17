@@ -12,6 +12,9 @@ export type Jobs = {
   cluster: any[];
   seo: any[];
   spam?: any[];
+  reportage?: any[];
+  optimization?: any[];
+  rankdomain?: any[];
 };
 
 interface DashboardContentProps {
@@ -36,10 +39,12 @@ const DashboardContent: React.FC<DashboardContentProps> = ({ jobs }) => {
   const services = [
     { id: "backlink" as const, label: "بک لینک", icon: "/dashboard/backlink.png" },
     { id: "content" as const, label: "محتوا", icon: "/dashboard/content.png" },
+    { id: "optimization" as const, label: "بهینه سازی", icon: "/dashboard/optimize.png" },
     { id: "security" as const, label: "امنیت", icon: "/dashboard/security.png" },
     { id: "cluster" as const, label: "کلاستر", icon: "/dashboard/cluster.png" },
-    { id: "seo" as const, label: "سئو", icon: "/dashboard/rankup.png" },
-    { id: "spam" as const, label: "اسپم", icon: "/dashboard/spamscore.png" },
+    { id: "rankdomain" as const, label: "افزایش رنک", icon: "/dashboard/rankup.png" },
+    { id: "reportage" as const, label: "رپورتاژ", icon: "/dashboard/newspaper.png" },
+    { id: "spam" as const, label: "اسپم اسکور", icon: "/dashboard/spamscore.png" },
   ];
 
   return (
