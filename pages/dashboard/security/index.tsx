@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
-import { useEffect } from "react";
-import { useOrderInput } from "@/hooks/useOrderInput";
-import ProgressCircle from "../progress";
-import SmallProgressCircle from "../smallprogress";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import BacklinkHistory from "../history/backlinkhistory";
+import { useOrderInput } from "@/hooks/useOrderInput";
+import { useUserOrders } from "@/hooks/useUserOrders";
+import { useAuth } from "@/contexts/AuthContext";
+import BacklinkHistory from "@/components/dashboard/history/backlinkhistory";
+import ProgressCircle from "@/components/dashboard/progress";
+import SmallProgressCircle from "@/components/dashboard/smallprogress";
 
-export interface BacklinkItem {
+export interface SecurityItem {
   id: string;
   slug: string;
   productTitle: string;
@@ -26,11 +27,6 @@ export interface BacklinkItem {
   keyword: string;
   submittedValues?: { id: string; label: string; value: string }[];
 }
-
-interface BacklinkProps {
-  backlinks: BacklinkItem[];
-}
-
 const statusProgressMap: Record<string, number> = {
   pending: 0,
   in_progress: 50,
@@ -38,33 +34,85 @@ const statusProgressMap: Record<string, number> = {
   out_of_time: 100,
 };
 
-const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
-  const [backlinksState, setBacklinksState] =
-    useState<BacklinkItem[]>(backlinks);
-  const [showHistory, setShowHistory] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+const SecurityPage: React.FC = () => {
+  const { isLoggedIn } = useAuth();
+  const { orders, loading, error } = useUserOrders();
+
+  // Map orders to backlinks
+  useEffect(() => {
+    if (!orders || orders.length === 0) return;
+
+    const mappedSecurity: SecurityItem[] = orders.flatMap((order) =>
+      order.items
+        .filter((item) => item.variant?.product?.slug === "security")
+        .map((item) => ({
+          id: item.id,
+          slug: item.variant.product.slug,
+          productTitle: item.variant.product.title,
+          attributes: item.variant.attributeValues.map((av) => ({
+            name: av.attribute.name,
+            value: av.value,
+          })),
+          quantity: item.quantity,
+          price: item.finalPrice ?? item.price ?? 0,
+          orderId: order.id,
+          status: order.status,
+          adminStatus: item.adminStatus,
+          createdAt: order.createdAt,
+          siteurl:
+            item.inputValues?.find((iv) => iv.field?.label === "Site URL")
+              ?.value || "",
+          keyword:
+            item.inputValues?.find((iv) => iv.field?.label === "Keyword")
+              ?.value || "",
+        }))
+    );
+
+    setSecuritysState(mappedSecurity);
+  }, [orders]);
+
+  const [SecurityState, setSecuritysState] = useState<SecurityItem[]>([]);
+  const [inputValuesMap, setInputValuesMap] = useState<Record<string, any[]>>(
+    {}
+  );
   const [selectedOrderItemId, setSelectedOrderItemId] = useState<string | null>(
     null
   );
+  const [showModal, setShowModal] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
 
   const {
     fields,
     values,
     setValues,
-    loading,
-    error,
+    loading: inputLoading,
+    error: inputError,
     handleChange,
     submitValues,
     fetchValues,
   } = useOrderInput(selectedOrderItemId);
 
-  // Use backlinksState instead of backlinks
-  const selectedItem = backlinksState.find(
+  const selectedItem = SecurityState.find(
     (item) => item.id === selectedOrderItemId
   );
   const canEdit = selectedItem?.adminStatus === "pending";
+  useEffect(() => {
+    const fetchAllValues = async () => {
+      const map: Record<string, any[]> = {};
+      for (const order of orders) {
+        for (const item of order.items) {
+          if (item.variant?.product?.slug === "backlink") {
+            const savedValues = await fetchValues(item.id);
+            map[item.id] = savedValues || [];
+          }
+        }
+      }
+      setInputValuesMap(map);
+    };
 
+    fetchAllValues();
+  }, [orders]);
   const handleClick = async (id: string) => {
     setSelectedOrderItemId(id);
     setShowModal(true);
@@ -78,8 +126,7 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
   const handleSubmit = async () => {
     try {
       await submitValues();
-
-      setBacklinksState((prev) =>
+      setSecuritysState((prev) =>
         prev.map((item) =>
           item.id === selectedOrderItemId
             ? {
@@ -94,17 +141,16 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
             : item
         )
       );
-
       setShowModal(false);
     } catch (err) {
       console.error("Failed to submit input values", err);
     }
   };
 
-  const getProgress = (item: BacklinkItem) =>
+  const getProgress = (item: SecurityItem) =>
     statusProgressMap[item.adminStatus ?? "pending"] ?? 0;
 
-  const isDelayed = (item: BacklinkItem) => {
+  const isDelayed = (item: SecurityItem) => {
     if (item.adminStatus === "out_of_time") return true;
     if (!item.delayed) return false;
 
@@ -117,28 +163,25 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
   };
 
   useEffect(() => {
-    const delayedItems = backlinksState.filter(
+    const delayedItems = SecurityState.filter(
       (item) => item.adminStatus === "out_of_time"
     );
     if (delayedItems.length > 0) {
       setShowNotification(true);
     }
-  }, [backlinksState]);
+  }, [SecurityState]);
 
-  // Use backlinksState for all filtering
-  const inProgressItems = backlinksState.filter(
+  // Filtering for different states
+  const inProgressItems = SecurityState.filter(
     (item) => item.adminStatus === "in_progress"
   );
-
-  const delayedItems = backlinksState.filter(
+  const delayedItems = SecurityState.filter(
     (item) => item.adminStatus === "out_of_time"
   );
-
-  const canceledItems = backlinksState.filter(
+  const canceledItems = SecurityState.filter(
     (item) => item.adminStatus === "canceled"
   );
-
-  const normalItems = backlinksState.filter(
+  const normalItems = SecurityState.filter(
     (item) =>
       item.adminStatus !== "in_progress" &&
       item.adminStatus !== "out_of_time" &&
@@ -147,20 +190,23 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
 
   const oneMonthAgo = new Date();
   oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-
-  const recentBacklinks = backlinksState.filter(
+  const recentBacklinks = SecurityState.filter(
     (item) => new Date(item.createdAt) >= oneMonthAgo
   );
-
   const bigInProgressItem = inProgressItems[0];
   const otherInProgressItems = inProgressItems.slice(1);
-
-  const pendingBacklink = backlinksState.find((item) => item.status === "0");
-
-  const historyOrders = backlinksState.filter(
+  const pendingBacklink = SecurityState.find((item) => item.status === "0");
+  const historyOrders = SecurityState.filter(
     (item) =>
       item.adminStatus === "completed" || new Date(item.createdAt) < oneMonthAgo
   );
+
+  if (!isLoggedIn)
+    return (
+      <p className="text-center py-10">ابتدا باید وارد حساب کاربری خود شوید</p>
+    );
+  if (loading) return <p className="text-center py-10">در حال بارگیری...</p>;
+  if (error) return <p className="text-center text-red-500 py-10">{error}</p>;
 
   return (
     <>
@@ -181,68 +227,70 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
 
               {/* Top in-progress pill */}
               {bigInProgressItem && (
-                <div className="flex items-center relative flex-row-reverse w-full justify-between p-4">
-                  <ProgressCircle
-                    percentage={getProgress(bigInProgressItem)}
-                    delayed={isDelayed(bigInProgressItem)}
-                  />
-                  <button
-                    onClick={() => handleClick(bigInProgressItem.id)}
-                    className="absolute left-14 w-20 h-16 flex items-center justify-center"
-                  >
-                    <div className="relative w-full h-32 flex justify-center items-center overflow-hidden">
-                      <Image
-                        width={220}
-                        height={220}
-                        alt="Backlink"
-                        src={"/dashboard/backlink.png"}
-                        className="object-contain rotate-30"
-                      />
-                    </div>
-                  </button>
-                  <div className=" mt-2 text-sm w-1/3">
-                    <div className="flex gap-2 items-center">
-                      <p className="text-gray-600 font-semibold">
-                        تاریخ خرید:{" "}
-                      </p>
-                      <p className="text-gray-600">
-                        {new Date(
-                          bigInProgressItem.createdAt
-                        ).toLocaleDateString("fa-IR")}
-                      </p>
-                    </div>
-                    <div className="flex gap-2 items-center">
-                      <p className="text-gray-600 font-semibold">تعداد:</p>
-                      <p className="text-gray-700">
-                        {bigInProgressItem.attributes
-                          .map((attr) => attr.value)
-                          .join(" / ")}
-                      </p>
-                    </div>
-
-                    <div className="flex gap-2 items-center mt-1">
-                      {bigInProgressItem?.submittedValues?.length ? (
-                        <div className="mt-1 text-sm">
-                          {bigInProgressItem.submittedValues.map((input) => (
-                            <div
-                              key={input.id}
-                              className="flex gap-1 items-center"
-                            >
-                              <span className="font-semibold text-gray-600">
-                                {input.label}:
-                              </span>
-                              <span className="text-gray-700">
-                                {input.value || "—"}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : null}
+                <>
+                  <div className="flex items-center relative flex-row-reverse w-full justify-between p-4">
+                    <ProgressCircle
+                      percentage={getProgress(bigInProgressItem)}
+                      delayed={isDelayed(bigInProgressItem)}
+                    />
+                    <button
+                      onClick={() => handleClick(bigInProgressItem.id)}
+                      className="absolute left-14 w-20 h-16 flex items-center justify-center"
+                    >
+                      <div className="relative w-full h-32 flex justify-center items-center overflow-hidden">
+                        <Image
+                          width={220}
+                          height={220}
+                          alt="Backlink"
+                          src={"/dashboard/backlink.png"}
+                          className="object-contain rotate-30"
+                        />
+                      </div>
+                    </button>
+                    <div className="mt-2 text-sm w-1/3">
+                      <div className="flex gap-2 items-center">
+                        <p className="text-gray-600 font-semibold">
+                          تاریخ خرید:
+                        </p>
+                        <p className="text-gray-600">
+                          {new Date(
+                            bigInProgressItem.createdAt
+                          ).toLocaleDateString("fa-IR")}
+                        </p>
+                      </div>
+                      <div className="flex gap-2 items-center">
+                        <p className="text-gray-600 font-semibold">تعداد:</p>
+                        <p className="text-gray-700">
+                          {bigInProgressItem.attributes
+                            .map((attr) => attr.value)
+                            .join(" / ")}
+                        </p>
+                      </div>
+                      <div className="flex gap-2 items-center mt-1">
+                        {bigInProgressItem?.submittedValues?.length ? (
+                          <div className="mt-1 text-sm">
+                            {bigInProgressItem.submittedValues.map((input) => (
+                              <div
+                                key={input.id}
+                                className="flex gap-1 items-center"
+                              >
+                                <span className="font-semibold text-gray-600">
+                                  {input.label}:
+                                </span>
+                                <span className="text-gray-700">
+                                  {input.value || "—"}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
-                </div>
+                  <div className="h-1 w-full bg-gray-200 rounded-2xl "></div>
+                </>
               )}
-              <div className="h-1 w-full bg-[#1d546b]"></div>
+
               {/* Small pills: other in-progress, delayed, canceled, and normal items */}
               <div className="flex flex-wrap justify-center gap-6 w-full">
                 {[
@@ -454,4 +502,4 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
   );
 };
 
-export default Backlink;
+export default SecurityPage;

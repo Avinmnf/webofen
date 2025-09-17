@@ -1,105 +1,12 @@
 "use client";
 
 import React from "react";
-import DashboardLayout from "@/components/dashboard/layout";
-import DashboardContent, { Jobs } from "@/components/dashboard/content";
-import HeaderPanel from "@/components/dashboard/header";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserOrders } from "@/hooks/useUserOrders";
 
-
-export interface BacklinkItem {
-  id: string;
-  slug: string;
-  productTitle: string;
-  attributes: { name: string; value: string }[];
-  quantity: number;
-  price: number;
-  orderId: string;
-  status: string;
-  adminStatus?: string;
-  createdAt: string;
-  siteurl?: string;
-  keyword: string;
-}
-
-export interface SecurityItem {
-  id: string;
-  slug: string;
-  productTitle: string;
-  attributes: { name: string; value: string }[];
-  quantity: number;
-  price: number;
-  orderId: string;
-  status: string;
-  createdAt: string;
-  siteurl?: string;
-  keyword: string;
-}
-
-const Page: React.FC = () => {
-  const { isLoggedIn } = useAuth();
-  const { orders, loading, error } = useUserOrders();
-
-  // Generate backlinks
-  const backlinks: BacklinkItem[] = orders.flatMap((order) =>
-    order.items
-      .filter((item) => item.variant?.product?.slug === "backlink")
-      .map((item) => ({
-        id: item.id,
-        slug: item.variant.product.slug,
-        productTitle: item.variant.product.title,
-        attributes: item.variant.attributeValues.map((av) => ({
-          name: av.attribute.name,
-          value: av.value,
-        })),
-        quantity: item.quantity,
-        price: item.finalPrice ?? item.price ?? 0,
-        orderId: order.id,
-        status: order.status,
-        adminStatus: item.adminStatus,
-        createdAt: order.createdAt,
-        siteurl:
-item.inputValues?.find((iv) => iv.field?.label === "Site URL")?.value || "",
-        keyword:
-  item.inputValues?.find((iv) => iv.field?.label === "Keyword")?.value || "",
-
-      }))
-  );
-
-  // Generate security orders
-  const security: SecurityItem[] = orders.flatMap((order) =>
-    order.items
-      .filter((item) => item.variant?.product?.slug === "security")
-      .map((item) => ({
-        id: item.id,
-        slug: item.variant.product.slug,
-        productTitle: item.variant.product.title,
-        attributes: item.variant.attributeValues.map((av) => ({
-          name: av.attribute.name,
-          value: av.value,
-        })),
-        quantity: item.quantity,
-        price: item.finalPrice ?? item.price ?? 0,
-        orderId: order.id,
-        status: order.status,
-        createdAt: order.createdAt,
-        siteurl:
-item.inputValues?.find((iv) => iv.field?.label === "Site URL")?.value || "",
-        keyword:
-  item.inputValues?.find((iv) => iv.field?.label === "Keyword")?.value || "",
-
-      }))
-  );
-
-  const jobs: Jobs = {
-    backlink: backlinks,
-    security: security,
-    content: [],
-    cluster: [],
-    seo: [],
-    spam: [],
-  };
+const DashboardHome: React.FC = () => {
+  const { isLoggedIn, user } = useAuth();
+  const { orders, loading: ordersLoading } = useUserOrders();
 
   if (!isLoggedIn) {
     return (
@@ -107,28 +14,82 @@ item.inputValues?.find((iv) => iv.field?.label === "Site URL")?.value || "",
     );
   }
 
-  if (loading) {
-    return <p className="text-center py-10">در حال بارگیری...</p>;
+  if (ordersLoading) {
+    return (
+      <p className="text-center py-10 text-gray-500">
+        در حال بارگذاری اطلاعات...
+      </p>
+    );
   }
 
-  if (error) {
-    return <p className="text-center text-red-500 py-10">{error}</p>;
-  }
+  // ✅ Count completed orders
+  const completedOrdersCount = orders.filter(
+    (order) =>
+      order.status === "completed" ||
+      order.items.some((item) => item.adminStatus === "completed")
+  ).length;
 
   return (
-    <DashboardLayout>
-      <div className=" bg-gradient-to-br from-indigo-50 via-white to-purple-50 relative">
-        <div className="md:w-7/12 mx-auto px-4 py-6 max-w-7xl">
-          <div className="animate-fadeIn z-40">
-            <HeaderPanel />
-          </div>
-          <div className="mt-6 relative rounded-2xl h-screen shadow-lg overflow-hidden glass-effect hover-scale animate-slideInRight z-0">
-            <DashboardContent jobs={jobs} />
-          </div>
+    <div className="flex flex-col gap-6">
+      {/* Greeting */}
+      <div className="bg-gray-50 p-6 rounded-2xl text-center">
+        <h2 className="text-2xl font-semibold text-gray-700 mb-2">
+          سلام {user?.name || "کاربر"}
+        </h2>
+        <p className="text-gray-500">
+          به پنل خودت خوش اومدی! لطفا یکی از بخش‌های نوار کناری را انتخاب کن
+        </p>
+      </div>
+
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* Total Orders */}
+        <div className="bg-blue-50 p-4 rounded-xl text-center border-dashed border border-gray-300">
+          <p className="text-2xl font-bold text-blue-600">{orders.length}</p>
+          <p className="text-gray-500 text-sm">سفارش‌ها</p>
+        </div>
+
+        {/* Completed Orders */}
+        <div className=" p-4 rounded-xl text-center border-dashed border border-gray-300 bg-green-50">
+          <p className="text-2xl font-bold text-green-600">
+            {completedOrdersCount}
+          </p>
+          <p className="text-gray-500 text-sm">سفارش‌های تکمیل‌شده</p>
         </div>
       </div>
-    </DashboardLayout>
+
+      {/* Recent Activity */}
+      <div className="bg-gray-50 p-4 rounded-2xl">
+        <h3 className="text-lg font-semibold mb-2 text-gray-600">
+          سفارشات اخیر
+        </h3>
+        <ul className="divide-y divide-gray-200">
+          {orders.slice(0, 5).map((order) => (
+            <li
+              key={order.id}
+              className="py-2 flex justify-between flex-col sm:flex-row sm:items-center"
+            >
+              <div className="w-full">
+                {order.items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex justify-between items-center rounded-lg p-2"
+                  >
+                    <p className="text-gray-600">
+                      {item.variant.product?.title} ({item.quantity} عدد)
+                    </p>
+                    <span className="text-sm text-gray-500">
+                      {item.adminStatus}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 };
 
-export default Page;
+export default DashboardHome;
