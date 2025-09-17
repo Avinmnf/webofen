@@ -16,7 +16,6 @@ import { useCheckPurchase } from "@/hooks/useCheckPurchase"; // ✅ add this imp
 import { useUserOrders } from "@/hooks/useUserOrders";
 
 export default function ProductDetailPage() {
-  const NEXT_PUBLIC_CMS_URL = process.env.NEXT_PUBLIC_CMS_URL;
   const { addItem } = useCart();
   const router = useRouter();
   const { slug } = router.query;
@@ -195,7 +194,15 @@ export default function ProductDetailPage() {
             <div className="space-y-4 border rounded-2xl border-gray-200 w-2/3">
               {/* Main Product Image */}
               <div className="relative group w-full h-72">
-         
+                <div className="relative w-full h-[500px]">
+                  <Image
+                    src={`${product.imageUrl}`}
+                    alt={product.title}
+                    loader={({ src }) => src}
+                    fill
+                    className="bg-gray-200 rounded-2xl"
+                  />
+                </div>
               </div>
               {/* Gallery Images */}
               {product.galleryUrls && product.galleryUrls.length > 0 && (
@@ -268,11 +275,10 @@ export default function ProductDetailPage() {
                               [attrName]: value,
                             }))
                           }
-                          className={`px-4 py-2 rounded border ${
-                            selectedAttributes[attrName] === value
+                          className={`px-4 py-2 rounded border ${selectedAttributes[attrName] === value
                               ? "bg-indigo-600 text-white border-indigo-600"
                               : "bg-white border-gray-300"
-                          }`}
+                            }`}
                         >
                           {value}
                         </button>
@@ -296,7 +302,7 @@ export default function ProductDetailPage() {
               </div>
             ) : (
               Object.keys(selectedAttributes).length ===
-                Object.keys(attributeMap).length && (
+              Object.keys(attributeMap).length && (
                 <p className="text-red-600 mb-6">
                   واریانت مناسب با این ترکیب پیدا نشد.
                 </p>

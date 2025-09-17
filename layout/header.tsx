@@ -46,8 +46,8 @@ export default function Header() {
   };
 
   return (
-    <header dir="rtl" className="w-full text-black bg-white pt-5">
-      <div className="flex justify-center  max-w-[1440px] m-auto">
+    <header dir="rtl" className="w-full text-black bg-[#f7f8fc] p-5">
+      <div className="flex justify-center  max-w-[1250px] m-auto">
         <div className="w-full flex flex-col lg:flex-row items-center justify-between rounded-2xl bg-white p-4 shadow-sm">
 
           {/* Logo & Toggle Button */}
