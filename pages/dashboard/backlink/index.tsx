@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
-import { useEffect } from "react";
-import { useOrderInput } from "@/hooks/useOrderInput";
-import ProgressCircle from "../progress";
-import SmallProgressCircle from "../smallprogress";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import BacklinkHistory from "../history/backlinkhistory";
+import { useOrderInput } from "@/hooks/useOrderInput";
+import { useUserOrders } from "@/hooks/useUserOrders";
+import { useAuth } from "@/contexts/AuthContext";
+import BacklinkHistory from "@/components/dashboard/history/backlinkhistory";
+import ProgressCircle from "@/components/dashboard/progress";
+import SmallProgressCircle from "@/components/dashboard/smallprogress";
 
 export interface BacklinkItem {
   id: string;
@@ -27,10 +28,6 @@ export interface BacklinkItem {
   submittedValues?: { id: string; label: string; value: string }[];
 }
 
-interface BacklinkProps {
-  backlinks: BacklinkItem[];
-}
-
 const statusProgressMap: Record<string, number> = {
   pending: 0,
   in_progress: 50,
@@ -38,33 +35,74 @@ const statusProgressMap: Record<string, number> = {
   out_of_time: 100,
 };
 
-const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
-  const [backlinksState, setBacklinksState] =
-    useState<BacklinkItem[]>(backlinks);
-  const [showHistory, setShowHistory] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedOrderItemId, setSelectedOrderItemId] = useState<string | null>(
-    null
+const BacklinkPage: React.FC = () => {
+  const { isLoggedIn } = useAuth();
+  const { orders, loading, error } = useUserOrders();
+
+  // Map orders to backlinks
+useEffect(() => {
+  const mappedBacklinks: BacklinkItem[] = orders.flatMap(order =>
+    order.items
+      .filter(item => item.variant?.product?.slug === "backlink")
+      .map(item => ({
+        id: item.id,
+        slug: item.variant.product.slug,
+        productTitle: item.variant.product.title,
+        attributes: item.variant.attributeValues.map(av => ({
+          name: av.attribute.name,
+          value: av.value,
+        })),
+        quantity: item.quantity,
+        price: item.finalPrice ?? item.price ?? 0,
+        orderId: order.id,
+        status: order.status,
+        adminStatus: item.adminStatus,
+        createdAt: order.createdAt,
+        siteurl: item.inputValues?.find(iv => iv.field?.label === "Site URL")?.value || "",
+        keyword: item.inputValues?.find(iv => iv.field?.label === "Keyword")?.value || "",
+      }))
   );
+
+  setBacklinksState(mappedBacklinks);
+}, [orders]);
+
+
+const [backlinksState, setBacklinksState] = useState<BacklinkItem[]>([]);
+const [inputValuesMap, setInputValuesMap] = useState<Record<string, any[]>>({});
+  const [selectedOrderItemId, setSelectedOrderItemId] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
 
   const {
     fields,
     values,
     setValues,
-    loading,
-    error,
+    loading: inputLoading,
+    error: inputError,
     handleChange,
     submitValues,
     fetchValues,
   } = useOrderInput(selectedOrderItemId);
 
-  // Use backlinksState instead of backlinks
-  const selectedItem = backlinksState.find(
-    (item) => item.id === selectedOrderItemId
-  );
+  const selectedItem = backlinksState.find(item => item.id === selectedOrderItemId);
   const canEdit = selectedItem?.adminStatus === "pending";
+useEffect(() => {
+  const fetchAllValues = async () => {
+    const map: Record<string, any[]> = {};
+    for (const order of orders) {
+      for (const item of order.items) {
+        if (item.variant?.product?.slug === "backlink") {
+          const savedValues = await fetchValues(item.id);
+          map[item.id] = savedValues || [];
+        }
+      }
+    }
+    setInputValuesMap(map);
+  };
 
+  fetchAllValues();
+}, [orders]);
   const handleClick = async (id: string) => {
     setSelectedOrderItemId(id);
     setShowModal(true);
@@ -78,23 +116,20 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
   const handleSubmit = async () => {
     try {
       await submitValues();
-
-      setBacklinksState((prev) =>
-        prev.map((item) =>
+      setBacklinksState(prev =>
+        prev.map(item =>
           item.id === selectedOrderItemId
             ? {
                 ...item,
-                submittedValues:
-                  fields?.map((field) => ({
-                    id: field.id,
-                    label: field.label,
-                    value: values[field.id] || "",
-                  })) ?? [],
+                submittedValues: fields?.map(field => ({
+                  id: field.id,
+                  label: field.label,
+                  value: values[field.id] || "",
+                })) ?? [],
               }
             : item
         )
       );
-
       setShowModal(false);
     } catch (err) {
       console.error("Failed to submit input values", err);
@@ -118,49 +153,35 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
 
   useEffect(() => {
     const delayedItems = backlinksState.filter(
-      (item) => item.adminStatus === "out_of_time"
+      item => item.adminStatus === "out_of_time"
     );
     if (delayedItems.length > 0) {
       setShowNotification(true);
     }
   }, [backlinksState]);
 
-  // Use backlinksState for all filtering
-  const inProgressItems = backlinksState.filter(
-    (item) => item.adminStatus === "in_progress"
-  );
-
-  const delayedItems = backlinksState.filter(
-    (item) => item.adminStatus === "out_of_time"
-  );
-
-  const canceledItems = backlinksState.filter(
-    (item) => item.adminStatus === "canceled"
-  );
-
+  // Filtering for different states
+  const inProgressItems = backlinksState.filter(item => item.adminStatus === "in_progress");
+  const delayedItems = backlinksState.filter(item => item.adminStatus === "out_of_time");
+  const canceledItems = backlinksState.filter(item => item.adminStatus === "canceled");
   const normalItems = backlinksState.filter(
-    (item) =>
-      item.adminStatus !== "in_progress" &&
-      item.adminStatus !== "out_of_time" &&
-      item.adminStatus !== "canceled"
+    item => item.adminStatus !== "in_progress" && item.adminStatus !== "out_of_time" && item.adminStatus !== "canceled"
   );
 
   const oneMonthAgo = new Date();
   oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-
-  const recentBacklinks = backlinksState.filter(
-    (item) => new Date(item.createdAt) >= oneMonthAgo
-  );
-
+  const recentBacklinks = backlinksState.filter(item => new Date(item.createdAt) >= oneMonthAgo);
   const bigInProgressItem = inProgressItems[0];
   const otherInProgressItems = inProgressItems.slice(1);
-
-  const pendingBacklink = backlinksState.find((item) => item.status === "0");
-
+  const pendingBacklink = backlinksState.find(item => item.status === "0");
   const historyOrders = backlinksState.filter(
-    (item) =>
-      item.adminStatus === "completed" || new Date(item.createdAt) < oneMonthAgo
+    item => item.adminStatus === "completed" || new Date(item.createdAt) < oneMonthAgo
   );
+
+  if (!isLoggedIn) return <p className="text-center py-10">ابتدا باید وارد حساب کاربری خود شوید</p>;
+  if (loading) return <p className="text-center py-10">در حال بارگیری...</p>;
+  if (error) return <p className="text-center text-red-500 py-10">{error}</p>;
+
 
   return (
     <>
@@ -454,4 +475,4 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
   );
 };
 
-export default Backlink;
+export default BacklinkPage;
