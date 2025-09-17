@@ -25,7 +25,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ isMobile }) => {
 
   return (
     <div
-      className={`bg-white ${
+      className={`bg-[#f7f8fc] rounded-r-md ${
         isMobile
           ? "fixed bottom-0 left-0 right-0 z-50 flex flex-row overflow-x-auto whitespace-nowrap border-t border-gray-200"
           : "block md:w-44 overflow-y-auto"

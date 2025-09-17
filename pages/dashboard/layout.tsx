@@ -24,14 +24,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      <div className="md:w-7/12 mx-auto px-4 py-6 max-w-7xl">
+      <div className="md:w-8/12 mx-auto px-4 py-6 max-w-7xl ">
         {/* Header */}
         <HeaderPanel />
         {/* Sidebar */}
-        <div className="flex mt-6">
+        <div className="flex mt-6 bg-whitex shadow-sm rounded-lg">
           <DashboardSidebar isMobile={isMobile} />
           {/* Main content */}
-          <div className="w-full bg-white rounded-md p-4">{children}</div>
+          <div className="w-full bg-white rounded-md p-8">{children}</div>
         </div>
       </div>
     </div>
