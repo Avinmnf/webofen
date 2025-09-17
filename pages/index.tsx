@@ -14,7 +14,7 @@ export default function Home() {
             {/* Main Image */}
             <div className="relative w-[90%] mx-auto md:w-[62%] aspect-[16/9] rounded-lg overflow-hidden">
               <Image
-                src="/homepage/slider2.png"
+                src="/homepage/slider.webp"
                 alt="Main slide"
                 fill
                 className="object-contain"
@@ -24,7 +24,7 @@ export default function Home() {
                 className="absolute w-[25.3%] md:w-[27%] text-[2.8vw] md:text-[1.2vw] right-0 md:rounded-[1.2rem] rounded-lg"
                 style={{
                   bottom: "0",
-                  height: "18%",
+                  height: "16%",
                   backgroundColor: "#6FD6E5",
                   color: "#fff",
                   boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
@@ -37,7 +37,7 @@ export default function Home() {
             {/* Side Image - Desktop Version */}
             <div className="relative w-full hidden md:flex lg:w-[38%] aspect-auto rounded-lg">
               <Image
-                src="/homepage/sideslide2.png"
+                src="/homepage/sideslide.webp"
                 alt="Side slide"
                 fill
                 className="object-contain"
@@ -152,11 +152,11 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="max-w-[1250px] m-auto mt-20 px-4">
+      <section className="max-w-[1250px] m-auto mt-10 md:mt-20 px-4">
         <div className="flex flex-col lg:flex-row gap-8 justify-center mx-auto items-centerY">
           {/* Left Image */}
           <div className="w-full lg:w-5/12">
-            <div className="relative h-[100%]">
+            <div className="relative aspect-[16/12] md:aspect-[1]">
               <Image
                 src="/homepage/peopleAsset 7.png"
                 alt="Main slide"
@@ -206,8 +206,8 @@ export default function Home() {
             <p className="pt-6 flex text-[#1d546b] text-lg md:text-lg font-semibold">
               <svg width="40px" height="40px" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#1d546b"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="8"></g><g id="SVGRepo_iconCarrier"> <path d="M142 125.853C155.049 97.8883 180.62 82.7645 200.381 78.4757C227.189 72.6575 249.859 84.0511 257.624 112.528C260.302 122.352 259.217 138.128 253.081 148.517C247.426 158.092 239.904 165.942 227.555 176.481C225.251 178.447 217.389 185.018 216.649 185.643C199.849 199.818 191.567 209.152 186.81 220.972C182.053 232.792 182.305 269.489 216.649 266.35" stroke="#1d546b" stroke-opacity="0.9" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M198.744 315.68C198.744 317.274 198.744 319.614 198.744 322.7" stroke="#1d546b" stroke-opacity="0.9" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>  چرا وبوفن را انتخاب کنیم؟
             </p>
-            <div className="flex w-full">
-              <div className="w-1/2">
+            <div className="grid md:flex w-full">
+              <div className="w-full md:w-1/2">
                 <p className="pt-3 flex text-sm md:text-sm text-gray-600 leading-relaxed text-justify">
                   <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4.91988 12.257C4.2856 12.257 3.65131 12.5199 3.19988 13.0342C2.79417 13.4913 2.59417 14.0799 2.63417 14.6913C2.67417 15.3027 2.94846 15.857 3.4056 16.2627L7.51417 19.8684C7.93131 20.2342 8.46846 20.4399 9.02274 20.4399C9.0856 20.4399 9.14846 20.4399 9.21131 20.4342C9.82846 20.3827 10.4056 20.0799 10.7942 19.5999L20.857 7.27986C21.657 6.30272 21.5085 4.85701 20.5313 4.05701C20.057 3.67415 19.4627 3.49129 18.857 3.55415C18.2513 3.61701 17.7027 3.90844 17.3142 4.38272L8.74846 14.8627L6.42274 12.8227C5.99417 12.4456 5.45131 12.257 4.91988 12.257Z" fill="url(#paint0_linear)"></path> <path d="M9.02279 20.0284C8.56565 20.0284 8.12565 19.8627 7.78279 19.5598L3.67422 15.9541C2.89708 15.2684 2.81708 14.0798 3.50279 13.3027C4.18851 12.5255 5.37708 12.4455 6.15422 13.1313L8.79994 15.4513L17.6285 4.63983C18.2856 3.83412 19.4685 3.71983 20.2742 4.37126C21.0799 5.0284 21.1942 6.21126 20.5428 7.01697L10.4742 19.337C10.1542 19.7313 9.67993 19.977 9.17708 20.0227C9.12565 20.0227 9.07422 20.0284 9.02279 20.0284Z" fill="url(#paint1_linear)"></path> <path opacity="0.75" d="M9.02279 20.0284C8.56565 20.0284 8.12565 19.8627 7.78279 19.5598L3.67422 15.9541C2.89708 15.2684 2.81708 14.0798 3.50279 13.3027C4.18851 12.5255 5.37708 12.4455 6.15422 13.1313L8.79994 15.4513L17.6285 4.63983C18.2856 3.83412 19.4685 3.71983 20.2742 4.37126C21.0799 5.0284 21.1942 6.21126 20.5428 7.01697L10.4742 19.337C10.1542 19.7313 9.67993 19.977 9.17708 20.0227C9.12565 20.0227 9.07422 20.0284 9.02279 20.0284Z" fill="url(#paint2_radial)"></path> <path opacity="0.5" d="M9.02279 20.0284C8.56565 20.0284 8.12565 19.8627 7.78279 19.5598L3.67422 15.9541C2.89708 15.2684 2.81708 14.0798 3.50279 13.3027C4.18851 12.5255 5.37708 12.4455 6.15422 13.1313L8.79994 15.4513L17.6285 4.63983C18.2856 3.83412 19.4685 3.71983 20.2742 4.37126C21.0799 5.0284 21.1942 6.21126 20.5428 7.01697L10.4742 19.337C10.1542 19.7313 9.67993 19.977 9.17708 20.0227C9.12565 20.0227 9.07422 20.0284 9.02279 20.0284Z" fill="url(#paint3_radial)"></path> <defs> <linearGradient id="paint0_linear" x1="15.825" y1="-13.9667" x2="9.82533" y2="23.9171" gradientUnits="userSpaceOnUse"> <stop stop-color="#00CC00"></stop> <stop offset="0.1878" stop-color="#06C102"></stop> <stop offset="0.5185" stop-color="#17A306"></stop> <stop offset="0.9507" stop-color="#33740C"></stop> <stop offset="1" stop-color="#366E0D"></stop> </linearGradient> <linearGradient id="paint1_linear" x1="15.2501" y1="0.625426" x2="7.43443" y2="23.6215" gradientUnits="userSpaceOnUse"> <stop offset="0.2544" stop-color="#90D856"></stop> <stop offset="0.736" stop-color="#00CC00"></stop> <stop offset="0.7716" stop-color="#0BCD07"></stop> <stop offset="0.8342" stop-color="#29CF18"></stop> <stop offset="0.9166" stop-color="#59D335"></stop> <stop offset="1" stop-color="#90D856"></stop> </linearGradient> <radialGradient id="paint2_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(15.452 8.95803) rotate(116.129) scale(8.35776 4.28316)"> <stop stop-color="#FBE07A" stop-opacity="0.75"></stop> <stop offset="0.0803394" stop-color="#FBE387" stop-opacity="0.6897"></stop> <stop offset="0.5173" stop-color="#FDF2C7" stop-opacity="0.362"></stop> <stop offset="0.8357" stop-color="#FFFBF0" stop-opacity="0.1233"></stop> <stop offset="1" stop-color="white" stop-opacity="0"></stop> </radialGradient> <radialGradient id="paint3_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(11.6442 17.0245) rotate(155.316) scale(9.80163 4.14906)"> <stop stop-color="#440063" stop-opacity="0.25"></stop> <stop offset="1" stop-color="#420061" stop-opacity="0"></stop> </radialGradient> </defs> </g></svg> مطابق با مشکلات دقیق وبسایتتان هزینه خواهید کرد.
                 </p>
@@ -218,7 +218,7 @@ export default function Home() {
                   <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4.91988 12.257C4.2856 12.257 3.65131 12.5199 3.19988 13.0342C2.79417 13.4913 2.59417 14.0799 2.63417 14.6913C2.67417 15.3027 2.94846 15.857 3.4056 16.2627L7.51417 19.8684C7.93131 20.2342 8.46846 20.4399 9.02274 20.4399C9.0856 20.4399 9.14846 20.4399 9.21131 20.4342C9.82846 20.3827 10.4056 20.0799 10.7942 19.5999L20.857 7.27986C21.657 6.30272 21.5085 4.85701 20.5313 4.05701C20.057 3.67415 19.4627 3.49129 18.857 3.55415C18.2513 3.61701 17.7027 3.90844 17.3142 4.38272L8.74846 14.8627L6.42274 12.8227C5.99417 12.4456 5.45131 12.257 4.91988 12.257Z" fill="url(#paint0_linear)"></path> <path d="M9.02279 20.0284C8.56565 20.0284 8.12565 19.8627 7.78279 19.5598L3.67422 15.9541C2.89708 15.2684 2.81708 14.0798 3.50279 13.3027C4.18851 12.5255 5.37708 12.4455 6.15422 13.1313L8.79994 15.4513L17.6285 4.63983C18.2856 3.83412 19.4685 3.71983 20.2742 4.37126C21.0799 5.0284 21.1942 6.21126 20.5428 7.01697L10.4742 19.337C10.1542 19.7313 9.67993 19.977 9.17708 20.0227C9.12565 20.0227 9.07422 20.0284 9.02279 20.0284Z" fill="url(#paint1_linear)"></path> <path opacity="0.75" d="M9.02279 20.0284C8.56565 20.0284 8.12565 19.8627 7.78279 19.5598L3.67422 15.9541C2.89708 15.2684 2.81708 14.0798 3.50279 13.3027C4.18851 12.5255 5.37708 12.4455 6.15422 13.1313L8.79994 15.4513L17.6285 4.63983C18.2856 3.83412 19.4685 3.71983 20.2742 4.37126C21.0799 5.0284 21.1942 6.21126 20.5428 7.01697L10.4742 19.337C10.1542 19.7313 9.67993 19.977 9.17708 20.0227C9.12565 20.0227 9.07422 20.0284 9.02279 20.0284Z" fill="url(#paint2_radial)"></path> <path opacity="0.5" d="M9.02279 20.0284C8.56565 20.0284 8.12565 19.8627 7.78279 19.5598L3.67422 15.9541C2.89708 15.2684 2.81708 14.0798 3.50279 13.3027C4.18851 12.5255 5.37708 12.4455 6.15422 13.1313L8.79994 15.4513L17.6285 4.63983C18.2856 3.83412 19.4685 3.71983 20.2742 4.37126C21.0799 5.0284 21.1942 6.21126 20.5428 7.01697L10.4742 19.337C10.1542 19.7313 9.67993 19.977 9.17708 20.0227C9.12565 20.0227 9.07422 20.0284 9.02279 20.0284Z" fill="url(#paint3_radial)"></path> <defs> <linearGradient id="paint0_linear" x1="15.825" y1="-13.9667" x2="9.82533" y2="23.9171" gradientUnits="userSpaceOnUse"> <stop stop-color="#00CC00"></stop> <stop offset="0.1878" stop-color="#06C102"></stop> <stop offset="0.5185" stop-color="#17A306"></stop> <stop offset="0.9507" stop-color="#33740C"></stop> <stop offset="1" stop-color="#366E0D"></stop> </linearGradient> <linearGradient id="paint1_linear" x1="15.2501" y1="0.625426" x2="7.43443" y2="23.6215" gradientUnits="userSpaceOnUse"> <stop offset="0.2544" stop-color="#90D856"></stop> <stop offset="0.736" stop-color="#00CC00"></stop> <stop offset="0.7716" stop-color="#0BCD07"></stop> <stop offset="0.8342" stop-color="#29CF18"></stop> <stop offset="0.9166" stop-color="#59D335"></stop> <stop offset="1" stop-color="#90D856"></stop> </linearGradient> <radialGradient id="paint2_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(15.452 8.95803) rotate(116.129) scale(8.35776 4.28316)"> <stop stop-color="#FBE07A" stop-opacity="0.75"></stop> <stop offset="0.0803394" stop-color="#FBE387" stop-opacity="0.6897"></stop> <stop offset="0.5173" stop-color="#FDF2C7" stop-opacity="0.362"></stop> <stop offset="0.8357" stop-color="#FFFBF0" stop-opacity="0.1233"></stop> <stop offset="1" stop-color="white" stop-opacity="0"></stop> </radialGradient> <radialGradient id="paint3_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(11.6442 17.0245) rotate(155.316) scale(9.80163 4.14906)"> <stop stop-color="#440063" stop-opacity="0.25"></stop> <stop offset="1" stop-color="#420061" stop-opacity="0"></stop> </radialGradient> </defs> </g></svg> گزارشات لحظه ای از هر اقدام را در اختیار دارید.
                 </p>
               </div>
-              <div className="w-1/2">
+              <div className="w-full md:w-1/2">
                 <p className="pt-3 flex text-sm md:text-sm text-gray-600 leading-relaxed text-justify">
                   <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4.91988 12.257C4.2856 12.257 3.65131 12.5199 3.19988 13.0342C2.79417 13.4913 2.59417 14.0799 2.63417 14.6913C2.67417 15.3027 2.94846 15.857 3.4056 16.2627L7.51417 19.8684C7.93131 20.2342 8.46846 20.4399 9.02274 20.4399C9.0856 20.4399 9.14846 20.4399 9.21131 20.4342C9.82846 20.3827 10.4056 20.0799 10.7942 19.5999L20.857 7.27986C21.657 6.30272 21.5085 4.85701 20.5313 4.05701C20.057 3.67415 19.4627 3.49129 18.857 3.55415C18.2513 3.61701 17.7027 3.90844 17.3142 4.38272L8.74846 14.8627L6.42274 12.8227C5.99417 12.4456 5.45131 12.257 4.91988 12.257Z" fill="url(#paint0_linear)"></path> <path d="M9.02279 20.0284C8.56565 20.0284 8.12565 19.8627 7.78279 19.5598L3.67422 15.9541C2.89708 15.2684 2.81708 14.0798 3.50279 13.3027C4.18851 12.5255 5.37708 12.4455 6.15422 13.1313L8.79994 15.4513L17.6285 4.63983C18.2856 3.83412 19.4685 3.71983 20.2742 4.37126C21.0799 5.0284 21.1942 6.21126 20.5428 7.01697L10.4742 19.337C10.1542 19.7313 9.67993 19.977 9.17708 20.0227C9.12565 20.0227 9.07422 20.0284 9.02279 20.0284Z" fill="url(#paint1_linear)"></path> <path opacity="0.75" d="M9.02279 20.0284C8.56565 20.0284 8.12565 19.8627 7.78279 19.5598L3.67422 15.9541C2.89708 15.2684 2.81708 14.0798 3.50279 13.3027C4.18851 12.5255 5.37708 12.4455 6.15422 13.1313L8.79994 15.4513L17.6285 4.63983C18.2856 3.83412 19.4685 3.71983 20.2742 4.37126C21.0799 5.0284 21.1942 6.21126 20.5428 7.01697L10.4742 19.337C10.1542 19.7313 9.67993 19.977 9.17708 20.0227C9.12565 20.0227 9.07422 20.0284 9.02279 20.0284Z" fill="url(#paint2_radial)"></path> <path opacity="0.5" d="M9.02279 20.0284C8.56565 20.0284 8.12565 19.8627 7.78279 19.5598L3.67422 15.9541C2.89708 15.2684 2.81708 14.0798 3.50279 13.3027C4.18851 12.5255 5.37708 12.4455 6.15422 13.1313L8.79994 15.4513L17.6285 4.63983C18.2856 3.83412 19.4685 3.71983 20.2742 4.37126C21.0799 5.0284 21.1942 6.21126 20.5428 7.01697L10.4742 19.337C10.1542 19.7313 9.67993 19.977 9.17708 20.0227C9.12565 20.0227 9.07422 20.0284 9.02279 20.0284Z" fill="url(#paint3_radial)"></path> <defs> <linearGradient id="paint0_linear" x1="15.825" y1="-13.9667" x2="9.82533" y2="23.9171" gradientUnits="userSpaceOnUse"> <stop stop-color="#00CC00"></stop> <stop offset="0.1878" stop-color="#06C102"></stop> <stop offset="0.5185" stop-color="#17A306"></stop> <stop offset="0.9507" stop-color="#33740C"></stop> <stop offset="1" stop-color="#366E0D"></stop> </linearGradient> <linearGradient id="paint1_linear" x1="15.2501" y1="0.625426" x2="7.43443" y2="23.6215" gradientUnits="userSpaceOnUse"> <stop offset="0.2544" stop-color="#90D856"></stop> <stop offset="0.736" stop-color="#00CC00"></stop> <stop offset="0.7716" stop-color="#0BCD07"></stop> <stop offset="0.8342" stop-color="#29CF18"></stop> <stop offset="0.9166" stop-color="#59D335"></stop> <stop offset="1" stop-color="#90D856"></stop> </linearGradient> <radialGradient id="paint2_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(15.452 8.95803) rotate(116.129) scale(8.35776 4.28316)"> <stop stop-color="#FBE07A" stop-opacity="0.75"></stop> <stop offset="0.0803394" stop-color="#FBE387" stop-opacity="0.6897"></stop> <stop offset="0.5173" stop-color="#FDF2C7" stop-opacity="0.362"></stop> <stop offset="0.8357" stop-color="#FFFBF0" stop-opacity="0.1233"></stop> <stop offset="1" stop-color="white" stop-opacity="0"></stop> </radialGradient> <radialGradient id="paint3_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(11.6442 17.0245) rotate(155.316) scale(9.80163 4.14906)"> <stop stop-color="#440063" stop-opacity="0.25"></stop> <stop offset="1" stop-color="#420061" stop-opacity="0"></stop> </radialGradient> </defs> </g></svg> امکان مدیریت و زمان بندی فرآیند ها وجود دارد.
                 </p>
@@ -256,106 +256,116 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="relative mt-20" style={{background: "linear-gradient(180deg,rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 25%, rgba(247, 248, 252, 1) 25%, rgba(247, 248, 252, 1) 100%);"}}>
+      <section className="relative mt-8 md:mt-20" style={{ background: "linear-gradient(180deg,rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 25%, rgba(247, 248, 252, 1) 25%, rgba(247, 248, 252, 1) 100%);" }}>
         {/* Image container (no background color) */}
-        <div className="max-w-[1250px] m-auto relative z-10">
-          <div className=" m-auto">
-            <div className="relative w-full h-[340px] rounded-lg overflow-hidden">
-              <Image
-                src="/homepage/bigslide.png"
-                alt="Main slide"
-                fill
-                className="object-cover"
-              />
-              <div className="absolute top-4 right-4 flex items-start z-10 p-4 rounded-xl max-w-[90%]">
-                <svg
-                  className="w-8"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 54.59 52.11"
-                  fill="#1d546b"
-                  stroke="#1d546b"
-                  strokeMiterlimit={10}
-                >
-                  <g>
-                    <path d="M43.46,24.24h2.77v2.31c0,.26.21.46.46.46s.46-.21.46-.46v-2.31h2.77c2.29,0,4.16-1.87,4.16-4.16v-7.86c0-4.08-3.32-7.39-7.39-7.39s-7.39,3.32-7.39,7.39v7.86c0,2.29,1.87,4.16,4.16,4.16ZM40.23,12.23c0-3.57,2.9-6.47,6.47-6.47s6.47,2.9,6.47,6.47v7.86c0,1.78-1.45,3.23-3.23,3.23h-6.47c-1.78,0-3.23-1.45-3.23-3.23v-7.86ZM46.23,20.08v-2.77c0-.26.21-.46.46-.46s.46.21.46.46v2.77c0,.26-.21.46-.46.46s-.46-.21-.46-.46Z" />
-                    <path d="M45.59,23.77v10.96c0,8.38-6.82,15.2-15.2,15.2s-15.2-6.82-15.2-15.2v-2.21c7.28-.56,13.03-6.65,13.03-14.07V5.43c0-2.99-2.43-5.43-5.43-5.43h-5.43v2.17h5.43c1.8,0,3.26,1.46,3.26,3.26v13.03c0,6.59-5.36,11.94-11.94,11.94S2.17,25.04,2.17,18.45V5.43c0-1.8,1.46-3.26,3.26-3.26h5.43V0h-5.43C2.43,0,0,2.44,0,5.43v13.03c0,7.42,5.75,13.52,13.03,14.07v2.21c0,9.58,7.79,17.37,17.37,17.37s17.37-7.79,17.37-17.37v-10.96" />
-                  </g>
-                </svg>
-                <div className="mr-4">
-                  <p className="text-[#1d546b] text-xl font-semibold">
-                    حوزه تخصصی و درمان
-                  </p>
-                  <div className="flex flex-wrap items-center mt-1">
-                    <p className="text-gray-800 text-2xl font-semibold">
-                      خدمات تخصصی کلینیک
+        <div className="max-w-[1250px] m-auto relative p-4 md:p-0">
+          <div className="grid md:flex w-full md:h-[344] mb-0 md:mb-10 rounded-3xl bg-[#29b0cb] md:bg-white md:bg-[url(/homepage/bg1.webp)]">
+            <div id="first" className="order-2 md:order-1 w-full md:w-2/3">
+              <div className="w-full">
+                <div className="flex mr-4 h-26 mb-1 items-center">
+                  <div className="ml-3">
+                    <svg
+                      className="w-8"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 54.59 52.11"
+                      fill="#1d546b"
+                      stroke="#1d546b"
+                      strokeMiterlimit={10}
+                    >
+                      <g>
+                        <path d="M43.46,24.24h2.77v2.31c0,.26.21.46.46.46s.46-.21.46-.46v-2.31h2.77c2.29,0,4.16-1.87,4.16-4.16v-7.86c0-4.08-3.32-7.39-7.39-7.39s-7.39,3.32-7.39,7.39v7.86c0,2.29,1.87,4.16,4.16,4.16ZM40.23,12.23c0-3.57,2.9-6.47,6.47-6.47s6.47,2.9,6.47,6.47v7.86c0,1.78-1.45,3.23-3.23,3.23h-6.47c-1.78,0-3.23-1.45-3.23-3.23v-7.86ZM46.23,20.08v-2.77c0-.26.21-.46.46-.46s.46.21.46.46v2.77c0,.26-.21.46-.46.46s-.46-.21-.46-.46Z" />
+                        <path d="M45.59,23.77v10.96c0,8.38-6.82,15.2-15.2,15.2s-15.2-6.82-15.2-15.2v-2.21c7.28-.56,13.03-6.65,13.03-14.07V5.43c0-2.99-2.43-5.43-5.43-5.43h-5.43v2.17h5.43c1.8,0,3.26,1.46,3.26,3.26v13.03c0,6.59-5.36,11.94-11.94,11.94S2.17,25.04,2.17,18.45V5.43c0-1.8,1.46-3.26,3.26-3.26h5.43V0h-5.43C2.43,0,0,2.44,0,5.43v13.03c0,7.42,5.75,13.52,13.03,14.07v2.21c0,9.58,7.79,17.37,17.37,17.37s17.37-7.79,17.37-17.37v-10.96" />
+                      </g>
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-[#1d546b] text-xl font-semibold">
+                      حوزه تخصصی و درمان
                     </p>
-                    <p className="text-[#6FD6E5] text-2xl pr-2 font-semibold">
-                      وبوفن
-                    </p>
+                    <div className="flex flex-wrap items-center mt-1">
+                      <p className="text-gray-800 text-2xl font-semibold">
+                        خدمات تخصصی کلینیک
+                      </p>
+                      <p className="text-[#6FD6E5] text-2xl pr-2 font-semibold">
+                        وبوفن
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-
-              <div className="absolute right-[5%] bottom-[5%] flex flex-col sm:flex-row gap-6 z-20 w-7/12 px-4">
-                <div className="bg-[#1d546b] flex items-center text-white rounded-4xl p-7 w-1/2 h-full sm:w-auto text-center text-sm sm:text-base">
-                  <svg
-                    className="w-40 h-40"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 106.53 102.09"
-                  >
-                    <path
-                      fill="#f7f8fc"
-                      d="M86.55,0H19.97C8.96,0,0,8.96,0,19.97v57.7c0,11.01,8.96,19.97,19.97,19.97h31.07c1.23,0,2.22-.99,2.22-2.22s-.99-2.22-2.22-2.22h-31.07c-8.57,0-15.54-6.97-15.54-15.54v-42.17h97.65v19.97c0,1.23.99,2.22,2.22,2.22s2.22-.99,2.22-2.22V19.97c0-11.01-8.96-19.97-19.97-19.97ZM4.44,31.07v-11.1c0-8.57,6.97-15.54,15.54-15.54h66.58c8.57,0,15.54,6.97,15.54,15.54v11.1H4.44ZM22.19,17.75c0,2.45-1.99,4.44-4.44,4.44s-4.44-1.99-4.44-4.44,1.99-4.44,4.44-4.44,4.44,1.99,4.44,4.44ZM35.51,17.75c0,2.45-1.99,4.44-4.44,4.44s-4.44-1.99-4.44-4.44,1.99-4.44,4.44-4.44,4.44,1.99,4.44,4.44ZM48.82,17.75c0,2.45-1.99,4.44-4.44,4.44s-4.44-1.99-4.44-4.44,1.99-4.44,4.44-4.44,4.44,1.99,4.44,4.44ZM92.63,85.06c3.13-3.83,5.02-8.72,5.02-14.04,0-12.24-9.96-22.19-22.19-22.19s-22.19,9.96-22.19,22.19,9.96,22.19,22.19,22.19c5.32,0,10.21-1.88,14.04-5.02l13.24,13.24c.43.43,1,.65,1.57.65s1.14-.22,1.57-.65c.87-.87.87-2.27,0-3.14l-13.24-13.24h0ZM75.46,88.77c-9.79,0-17.75-7.96-17.75-17.75s7.96-17.75,17.75-17.75,17.75,7.96,17.75,17.75-7.96,17.75-17.75,17.75Z"
-                    />
-                  </svg>
-                  <div className="text-start pr-5">
-                    <h4 className="pb-1">خدمات درمانی سئو</h4>
-                    <p>
-                      لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ
-                    </p>
+              <div className="block md:flex w-full h-100 md:h-58 items-center">
+                <div className="w-full px-6 py-2 md:p-6 md:w-1/2">
+                  <div className="w-full border border-white hover:bg-[#1d546b] hover:border-[#1d546b] flex items-center text-white rounded-4xl p-4 h-full sm:w-auto text-center text-sm sm:text-base">
+                    <svg
+                      className="w-35 h-35 p-2"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 106.53 102.09"
+                    >
+                      <path
+                        fill="#f7f8fc"
+                        d="M86.55,0H19.97C8.96,0,0,8.96,0,19.97v57.7c0,11.01,8.96,19.97,19.97,19.97h31.07c1.23,0,2.22-.99,2.22-2.22s-.99-2.22-2.22-2.22h-31.07c-8.57,0-15.54-6.97-15.54-15.54v-42.17h97.65v19.97c0,1.23.99,2.22,2.22,2.22s2.22-.99,2.22-2.22V19.97c0-11.01-8.96-19.97-19.97-19.97ZM4.44,31.07v-11.1c0-8.57,6.97-15.54,15.54-15.54h66.58c8.57,0,15.54,6.97,15.54,15.54v11.1H4.44ZM22.19,17.75c0,2.45-1.99,4.44-4.44,4.44s-4.44-1.99-4.44-4.44,1.99-4.44,4.44-4.44,4.44,1.99,4.44,4.44ZM35.51,17.75c0,2.45-1.99,4.44-4.44,4.44s-4.44-1.99-4.44-4.44,1.99-4.44,4.44-4.44,4.44,1.99,4.44,4.44ZM48.82,17.75c0,2.45-1.99,4.44-4.44,4.44s-4.44-1.99-4.44-4.44,1.99-4.44,4.44-4.44,4.44,1.99,4.44,4.44ZM92.63,85.06c3.13-3.83,5.02-8.72,5.02-14.04,0-12.24-9.96-22.19-22.19-22.19s-22.19,9.96-22.19,22.19,9.96,22.19,22.19,22.19c5.32,0,10.21-1.88,14.04-5.02l13.24,13.24c.43.43,1,.65,1.57.65s1.14-.22,1.57-.65c.87-.87.87-2.27,0-3.14l-13.24-13.24h0ZM75.46,88.77c-9.79,0-17.75-7.96-17.75-17.75s7.96-17.75,17.75-17.75,17.75,7.96,17.75,17.75-7.96,17.75-17.75,17.75Z"
+                      />
+                    </svg>
+                    <div className="text-start pr-5">
+                      <h2 className="pb-1 text-xl">خدمات سئو</h2>
+                      <p className="text-sm">
+                        لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ
+                      </p>
+                    </div>
                   </div>
                 </div>
-
-                <div className="text-white flex items-center border border-white rounded-4xl p-6 w-1/2 sm:w-auto text-center text-sm sm:text-base">
-                  <svg
-                    className="w-40 h-40"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 107.48 103"
-                  >
-                    <path
-                      fill="#ffff"
-                      d="M87.33,0H20.15C9.04,0,0,9.04,0,20.15v58.22c0,11.11,9.04,20.15,20.15,20.15h8.96c1.24,0,2.24-1,2.24-2.24s-1-2.24-2.24-2.24h-8.96c-8.64,0-15.67-7.03-15.67-15.67v-42.54h98.52v42.54c0,8.64-7.03,15.67-15.67,15.67h-8.96c-1.24,0-2.24,1-2.24,2.24s1,2.24,2.24,2.24h8.96c11.11,0,20.15-9.04,20.15-20.15V20.15c0-11.11-9.04-20.15-20.15-20.15ZM4.48,31.35v-11.2c0-8.64,7.03-15.67,15.67-15.67h67.17c8.64,0,15.67,7.03,15.67,15.67v11.2H4.48ZM22.39,17.91c0,2.47-2.01,4.48-4.48,4.48s-4.48-2.01-4.48-4.48,2.01-4.48,4.48-4.48,4.48,2.01,4.48,4.48ZM35.83,17.91c0,2.47-2.01,4.48-4.48,4.48s-4.48-2.01-4.48-4.48,2.01-4.48,4.48-4.48,4.48,2.01,4.48,4.48ZM49.26,17.91c0,2.47-2.01,4.48-4.48,4.48s-4.48-2.01-4.48-4.48,2.01-4.48,4.48-4.48,4.48,2.01,4.48,4.48ZM80.61,64.93c0,8.48-3.89,16.28-10.66,21.4-1.76,1.34-2.78,3.3-2.78,5.4v9.02c0,1.24-1,2.24-2.24,2.24s-2.24-1-2.24-2.24v-9.02c0-3.51,1.66-6.78,4.55-8.97,5.65-4.27,8.88-10.77,8.88-17.83,0-5.61-2.09-10.97-5.88-15.11-.78-.85-1.72-.58-1.99-.47-.33.13-1.08.54-1.08,1.59v6.62c0,7.17-5.3,13.33-12.06,14-3.8.4-7.58-.86-10.39-3.4-2.81-2.54-4.42-6.18-4.42-9.96v-7.26c0-1.06-.76-1.47-1.08-1.59-.27-.1-1.2-.38-1.99.47-3.79,4.14-5.88,9.5-5.88,15.11,0,7.06,3.24,13.56,8.88,17.83,2.89,2.19,4.55,5.46,4.55,8.97v9.02c0,1.24-1,2.24-2.24,2.24s-2.24-1-2.24-2.24v-9.02c0-2.1-1.01-4.06-2.78-5.4-6.77-5.13-10.66-12.93-10.66-21.4,0-6.73,2.51-13.17,7.06-18.13,1.77-1.93,4.48-2.57,6.91-1.62,2.39.93,3.94,3.19,3.94,5.77v7.26c0,2.53,1.07,4.94,2.95,6.64,1.9,1.72,4.37,2.53,6.94,2.27,4.5-.46,8.03-4.65,8.03-9.55v-6.62c0-2.57,1.55-4.84,3.94-5.77,2.43-.95,5.14-.31,6.91,1.62,4.55,4.96,7.06,11.4,7.06,18.13Z"
-                    />
-                  </svg>
-                  <div className="text-start pr-5">
-                    <h4 className="pb-1">خدمات طراحی سایت</h4>
-                    <p>
-                      لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ
-                    </p>
+                <div className="w-full px-6 py-2 md:p-6 md:w-1/2">
+                  <div className="w-full text-white flex items-center border border-white hover:bg-[#1d546b] hover:border-[#1d546b] rounded-4xl p-4 sm:w-auto text-center text-sm sm:text-base">
+                    <svg
+                      className="w-38 h-38 p-2"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 107.48 103"
+                    >
+                      <path
+                        fill="#ffff"
+                        d="M87.33,0H20.15C9.04,0,0,9.04,0,20.15v58.22c0,11.11,9.04,20.15,20.15,20.15h8.96c1.24,0,2.24-1,2.24-2.24s-1-2.24-2.24-2.24h-8.96c-8.64,0-15.67-7.03-15.67-15.67v-42.54h98.52v42.54c0,8.64-7.03,15.67-15.67,15.67h-8.96c-1.24,0-2.24,1-2.24,2.24s1,2.24,2.24,2.24h8.96c11.11,0,20.15-9.04,20.15-20.15V20.15c0-11.11-9.04-20.15-20.15-20.15ZM4.48,31.35v-11.2c0-8.64,7.03-15.67,15.67-15.67h67.17c8.64,0,15.67,7.03,15.67,15.67v11.2H4.48ZM22.39,17.91c0,2.47-2.01,4.48-4.48,4.48s-4.48-2.01-4.48-4.48,2.01-4.48,4.48-4.48,4.48,2.01,4.48,4.48ZM35.83,17.91c0,2.47-2.01,4.48-4.48,4.48s-4.48-2.01-4.48-4.48,2.01-4.48,4.48-4.48,4.48,2.01,4.48,4.48ZM49.26,17.91c0,2.47-2.01,4.48-4.48,4.48s-4.48-2.01-4.48-4.48,2.01-4.48,4.48-4.48,4.48,2.01,4.48,4.48ZM80.61,64.93c0,8.48-3.89,16.28-10.66,21.4-1.76,1.34-2.78,3.3-2.78,5.4v9.02c0,1.24-1,2.24-2.24,2.24s-2.24-1-2.24-2.24v-9.02c0-3.51,1.66-6.78,4.55-8.97,5.65-4.27,8.88-10.77,8.88-17.83,0-5.61-2.09-10.97-5.88-15.11-.78-.85-1.72-.58-1.99-.47-.33.13-1.08.54-1.08,1.59v6.62c0,7.17-5.3,13.33-12.06,14-3.8.4-7.58-.86-10.39-3.4-2.81-2.54-4.42-6.18-4.42-9.96v-7.26c0-1.06-.76-1.47-1.08-1.59-.27-.1-1.2-.38-1.99.47-3.79,4.14-5.88,9.5-5.88,15.11,0,7.06,3.24,13.56,8.88,17.83,2.89,2.19,4.55,5.46,4.55,8.97v9.02c0,1.24-1,2.24-2.24,2.24s-2.24-1-2.24-2.24v-9.02c0-2.1-1.01-4.06-2.78-5.4-6.77-5.13-10.66-12.93-10.66-21.4,0-6.73,2.51-13.17,7.06-18.13,1.77-1.93,4.48-2.57,6.91-1.62,2.39.93,3.94,3.19,3.94,5.77v7.26c0,2.53,1.07,4.94,2.95,6.64,1.9,1.72,4.37,2.53,6.94,2.27,4.5-.46,8.03-4.65,8.03-9.55v-6.62c0-2.57,1.55-4.84,3.94-5.77,2.43-.95,5.14-.31,6.91,1.62,4.55,4.96,7.06,11.4,7.06,18.13Z"
+                      />
+                    </svg>
+                    <div className="text-start pr-5">
+                      <h2 className="pb-1 text-xl">خدمات طراحی سایت</h2>
+                      <p className="text-sm">
+                        لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ
+                      </p>
+                    </div>
                   </div>
                 </div>
+              </div>
+            </div>
+            <div id="Second" className="order-1 md:order-2 w-full pt-2 md:w-1/3">
+              <div className="relative w-full md:w-2/4 mx-auto h-[220px] md:h-[100%]  rounded-lg">
+                <Image
+                  src="/homepage/hero2.webp"
+                  alt="Main slide"
+                  fill
+                  className="object-contain"
+                />
               </div>
             </div>
           </div>
         </div>
 
         {/* Background section starts from mid-image */}
-        <div className="w-full  relative z-0">
-          <div className="max-w-[1440px] m-auto">
-            <div className="mt-10">
-              <div className="flex items-center md:pr-18 justify-center md:justify-start">
+        <div className="w-full  relative ">
+          <div className="max-w-[1250px] p-8 md:p-0 mx-auto">
+            
+              <div className="flex items-center justify-center md:justify-start">
                 <h3 className="text-gray-800 font-semibold">
                   قرص های پر بازدید کیلینیک
                 </h3>
-                <h3 className="text-[#6FD6E5] pr-2">وب و فن</h3>
+                <h3 className="text-[#6FD6E5] pr-2">وبوفن</h3>
               </div>
               <Popularpills />
             </div>
-          </div>
+          
         </div>
       </section>
 
-      <section className="max-w-[1440px] m-auto ">
+      <section className="max-w-[1250px] m-auto ">
         <Pathsection />
         <div className="w-full">
           <div className="relative py-10 md:py-20">
@@ -395,11 +405,11 @@ export default function Home() {
 
       </section>
       <div className="bg-[#f7f8fc] w-full">
-        <div className="max-w-[1440px] m-auto px-4 md:px-20 flex flex-col md:flex-row items-center md:items-start gap-10">
+        <div className="max-w-[1250] m-auto px-8 md:px-0 flex flex-col md:flex-row items-center md:items-start gap-10">
           {/* Left Section: Centered Text */}
           <div className="w-full md:w-[40%] flex justify-center items-center text-center md:text-right mt-30">
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">
                 مشتریان ، درباره <span className="text-[#3db4c6]">وبوفن</span> چه
                 می‌گویند ؟
               </h2>

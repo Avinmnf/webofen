@@ -1,7 +1,7 @@
 export default function Pathsection() {
     const DottedLine = ({ vertical = false }) => (
         <svg
-            width={vertical ? "20" : "180"}
+            width={vertical ? "10" : "120"}
             height={vertical ? "140" : "20"}
             xmlns="http://www.w3.org/2000/svg"
             className="shrink-0"
@@ -39,8 +39,8 @@ export default function Pathsection() {
     );
 
     return (
-        <div className="w-full mt-8 md:mt-16 lg:mt-22 ">
-            <div className="">
+        <div className="w-full mt-8 md:mt-16 lg:mt-22 md:flex hidden">
+            <div className="mx-auto">
                 <div className="text-right mb-6 md:mb-10">
                     <p className="text-[#1d546b] text-sm md:text-base">مراحل درمان</p>
                     <div className="flex items-center flex-wrap ">
@@ -50,7 +50,7 @@ export default function Pathsection() {
                 </div>
 
                 {/* Steps - Horizontal for larger screens */}
-                <div className="hidden lg:flex items-center justify-between mt-6 md:mt-10 gap-2 md:gap-4 px-4">
+                <div className="hidden lg:flex items-center justify-between mt-6 md:mt-10 gap-2 md:gap-4 px-14">
                     {/* Step 1 */}
                     <StepIcon>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 84 84.01" fill="#fff">
@@ -195,12 +195,12 @@ export default function Pathsection() {
                 {/* Steps labels - Horizontal for larger screens */}
                 <div className="hidden lg:block w-full mt-6 md:mt-10">
                     <div className="w-full mx-auto">
-                        <div className="flex items-center justify-between rounded-full bg-[#f7f8fc] p-4 px-8">
-                            <p className="text-sm text-gray-600">شروع درمان سایت</p>
+                        <div className="flex items-center justify-between rounded-full bg-[#f7f8fc] p-4 px-14">
+                            <p className="text-sm text-gray-600">شروع درمان </p>
                             <span className="inline-block w-3 h-3 bg-[#6FD6E5] rounded-full mx-4" aria-hidden="true" />
                             <p className="text-sm text-gray-600">جمع آوری اطلاعات</p>
                             <span className="inline-block w-3 h-3 bg-[#6FD6E5] rounded-full mx-4" aria-hidden="true" />
-                            <p className="text-sm text-gray-600">آنالیز داده ها</p>
+                            <p className="text-sm text-gray-600">آنالیز داده</p>
                             <span className="inline-block w-3 h-3 bg-[#6FD6E5] rounded-full mx-4" aria-hidden="true" />
                             <p className="text-sm text-gray-600">برنامه طول درمان</p>
                             <span className="inline-block w-3 h-3 bg-[#6FD6E5] rounded-full mx-4" aria-hidden="true" />
