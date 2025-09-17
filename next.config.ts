@@ -10,6 +10,11 @@ const nextConfig: NextConfig = {
         hostname: "cms.webofen.com",
         pathname: "/uploads/**",
       },
+      {
+        protocol: "https",
+        hostname: "cdn-api.webofen.com",
+        pathname: "/uploads/**",
+      },
     ],
   },
 };

@@ -9,9 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { usePageView } from "@/hooks/usePageView";
 import { useGuestToken } from "@/contexts/GuestTokenContext";
 export default function PostPage() {
-  const NEXT_PUBLIC_CMS_URL = process.env.NEXT_PUBLIC_CMS_URL;
   const { user } = useAuth();
-
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
   const router = useRouter();
@@ -132,8 +130,9 @@ export default function PostPage() {
           {post.imageUrl && (
             <div className="relative w-full h-[500px]">
               <Image
-                src={`${NEXT_PUBLIC_CMS_URL}${post.imageUrl}`}
+                src={`${post.imageUrl}`}
                 alt={post.imageAlt || post.title}
+                loader={({ src }) => src}
                 fill
                 className="bg-gray-200 rounded-2xl"
               />
