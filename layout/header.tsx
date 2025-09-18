@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useAuth } from '@/contexts/AuthContext';
-import { useCart } from '@/contexts/CartContext';
+import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
 
 export default function Header() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -18,16 +18,19 @@ export default function Header() {
   // Close profile dropdown if clicked outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setProfileDropdownOpen(false);
       }
     }
     if (profileDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     } else {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [profileDropdownOpen]);
 
   const menuItems = [
@@ -36,7 +39,7 @@ export default function Header() {
     { label: "خدمات درمانی", href: "/products" },
     { label: "وبلاگ", href: "/articles" },
     { label: "درباره ما", href: "/" },
-    { label: "بیمه وب و فن", href: "/" }
+    { label: "بیمه وب و فن", href: "/" },
   ];
 
   // Logout called from modal, no redirect
@@ -49,7 +52,6 @@ export default function Header() {
     <header dir="rtl" className="w-full text-black bg-[#f7f8fc] p-5">
       <div className="flex justify-center  max-w-[1250px] m-auto">
         <div className="w-full flex flex-col lg:flex-row items-center justify-between rounded-2xl bg-white p-4 shadow-sm">
-
           {/* Logo & Toggle Button */}
           <div className="w-full flex items-center justify-between lg:w-auto">
             <Link href="/">
@@ -67,19 +69,45 @@ export default function Header() {
               aria-label="Toggle menu"
             >
               {menuOpen ? (
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-6 h-6 text-gray-700"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-6 h-6 text-gray-700"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 </svg>
               )}
             </button>
           </div>
 
           {/* Navigation Menu */}
-          <nav className={`w-full lg:w-auto transition-all duration-300 ${menuOpen ? 'block mt-4' : 'hidden lg:flex'}`}>
+          <nav
+            className={`w-full lg:w-auto transition-all duration-300 ${
+              menuOpen ? "block mt-4" : "hidden lg:flex"
+            }`}
+          >
             <ul className="flex flex-col lg:flex-row items-center gap-4 lg:gap-10">
               {menuItems.map((item, index) => (
                 <li
@@ -88,21 +116,28 @@ export default function Header() {
                     setActiveIndex(index);
                     setMenuOpen(false);
                   }}
-                  className={`cursor-pointer select-none ${activeIndex === index ? 'text-[#6fd6e5] font-bold' : 'text-gray-700'}`}
+                  className={`cursor-pointer select-none ${
+                    activeIndex === index
+                      ? "text-[#6fd6e5] font-bold"
+                      : "text-gray-700"
+                  }`}
                 >
-                  <Link href={item.href}>
-                    {item.label}
-                  </Link>
+                  <Link href={item.href}>{item.label}</Link>
                 </li>
               ))}
             </ul>
           </nav>
 
           {/* CTA Button or Username with dropdown */}
-          <div className={`relative mt-4 lg:mt-0 ${menuOpen ? 'block' : 'hidden lg:block'}`} ref={dropdownRef}>
+          <div
+            className={`relative mt-4 lg:mt-0 ${
+              menuOpen ? "block" : "hidden lg:block"
+            }`}
+            ref={dropdownRef}
+          >
             {isLoggedIn && user ? (
               <>
-                <div className='flex items-center cursor-pointer'>
+                <div className="flex items-center cursor-pointer">
                   <div
                     className="flex items-center select-none border rounded-lg px-4 py-1 border-gray-200 ml-5"
                     onClick={() => setProfileDropdownOpen((open) => !open)}
@@ -116,7 +151,11 @@ export default function Header() {
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-                      <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+                      <g
+                        id="SVGRepo_tracerCarrier"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      ></g>
                       <g id="SVGRepo_iconCarrier">
                         <path
                           opacity="0.4"
@@ -137,11 +176,14 @@ export default function Header() {
                       {user.name}
                     </div>
                   </div>
-                  <div className='border-r border-gray-300 pr-4 relative'>
-                    <Link href={'/cart'}>
-                      <svg viewBox="0 0 24 24"
-                        className='w-6 h-6'
-                        fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <div className="border-r border-gray-300 pr-4 relative">
+                    <Link href={"/cart"}>
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="w-6 h-6"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
                         <g strokeWidth="0" />
                         <g strokeLinecap="round" strokeLinejoin="round" />
                         <g>
@@ -192,47 +234,33 @@ export default function Header() {
                     aria-orientation="vertical"
                     aria-labelledby="user-menu"
                   >
+                    {/* Go to Dashboard */}
+                    <Link
+                      href="/dashboard"
+                      className="block border-b border-gray-200 w-full text-right px-4 py-3 text-sm text-gray-700 cursor-pointer hover:bg-gray-100"
+                      onClick={() => setProfileDropdownOpen(false)}
+                    >
+                      داشبورد
+                    </Link>
+
+                    {/* Logout */}
                     <button
                       onClick={() => {
                         setShowLogoutModal(true);
                         setProfileDropdownOpen(false);
                       }}
-                      className="block border-b border-gray-200 w-full text-right px-4 py-3 text-sm text-gray-700 cursor-pointer"
+                      className="block w-full text-right px-4 py-3 text-sm text-gray-700 cursor-pointer hover:bg-gray-100"
                       role="menuitem"
                       type="button"
                     >
                       خروج
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowLogoutModal(true);
-                        setProfileDropdownOpen(false);
-                      }}
-                      className="block border-b border-gray-200 w-full text-right px-4 py-3 text-sm text-gray-700 cursor-pointer"
-                      role="menuitem"
-                      type="button"
-                    >
-                      سفارش ها
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowLogoutModal(true);
-                        setProfileDropdownOpen(false);
-                      }}
-                      className="block border-b border-gray-200 w-full text-right px-4 py-3 text-sm text-gray-700 cursor-pointer"
-                      role="menuitem"
-                      type="button"
-                    >
-                      داشبورد
                     </button>
                   </div>
                 )}
               </>
             ) : (
               <button className="bg-[#6FD6E5] hover:bg-[#1d546b] w-24 h-10 rounded-lg text-white hover:scale-102 transition-all cursor-pointer">
-                <Link href={'/login'}>
-                  ورود
-                </Link>
+                <Link href={"/login"}>ورود</Link>
               </button>
             )}
 
@@ -240,7 +268,9 @@ export default function Header() {
             {showLogoutModal && (
               <div className="fixed inset-0 flex items-center justify-center bg-black/70 bg-opacity-50 z-50">
                 <div className="bg-white rounded-lg p-5 w-92 text-right">
-                  <p className="mb-4">آیا مطمئن هستید که می‌خواهید خارج شوید؟</p>
+                  <p className="mb-4">
+                    آیا مطمئن هستید که می‌خواهید خارج شوید؟
+                  </p>
                   <div className="flex justify-between mt-5">
                     <button
                       onClick={() => setShowLogoutModal(false)}

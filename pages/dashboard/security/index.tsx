@@ -242,7 +242,7 @@ const SecurityPage: React.FC = () => {
                           width={220}
                           height={220}
                           alt="Backlink"
-                          src={"/dashboard/backlink.png"}
+                          src={"/dashboard/security.png"}
                           className="object-contain rotate-30"
                         />
                       </div>
@@ -324,7 +324,7 @@ const SecurityPage: React.FC = () => {
                             width={220}
                             height={220}
                             alt="Backlink"
-                            src={"/dashboard/backlink.png"}
+                            src={"/dashboard/security.png"}
                             className="object-contain rotate-30"
                           />
                         </div>
@@ -415,89 +415,95 @@ const SecurityPage: React.FC = () => {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 animate-fadeIn">
-          <div className="bg-gradient-to-br from-[#0B1120]/90 to-[#1C2233]/90 w-[90%] max-w-lg relative rounded-3xl shadow-2xl overflow-hidden border border-cyan-500/20 animate-scaleUp">
-            <button
-              onClick={() => setShowModal(false)}
-              className="absolute top-4 right-4 text-white text-3xl hover:text-red-500 transition-colors z-20"
-            >
-              &times;
-            </button>
+  <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 animate-fadeIn">
+    <div className="bg-white flex flex-col lg:flex-row w-[90%] max-w-5xl p-4 relative rounded-3xl shadow-2xl overflow-hidden border border-cyan-500/20 animate-scaleUp">
+      
+      {/* Close Button */}
+      <button
+        onClick={() => setShowModal(false)}
+        className="absolute top-4 right-4 text-black text-3xl hover:text-red-500 transition-colors z-20"
+      >
+        &times;
+      </button>
 
-            <div className="relative w-full h-64 flex justify-center items-center overflow-hidden">
-              <Image
-                width={220}
-                height={220}
-                alt="Backlink"
-                src={"/dashboard/backlink.png"}
-                className="object-contain animate-float blur-[1px]"
-              />
-              <div className="absolute inset-0 flex items-end p-4">
-                <h2 className="text-2xl font-bold text-white text-center w-full drop-shadow-lg">
-                  ثبت اطلاعات سفارش بک لینک
-                </h2>
-              </div>
-            </div>
-
-            <div className="p-6 space-y-5">
-              {fields?.map((field) => (
-                <div key={field.id} className="flex flex-col">
-                  <label className="text-sm text-gray-300 mb-1">
-                    {field.label}
-                  </label>
-                  <input
-                    type={field.fieldType === "number" ? "number" : "text"}
-                    name={field.id}
-                    placeholder={field.placeholder || field.label}
-                    value={values[field.id] || ""}
-                    onChange={(e) => handleChange(field.id, e.target.value)}
-                    className={`w-full px-4 py-2 rounded-xl border border-cyan-500/30 bg-[#1C2233] text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-500 outline-none transition-all duration-300 ${
-                      !canEdit
-                        ? "opacity-60 cursor-not-allowed"
-                        : "hover:ring-cyan-300"
-                    }`}
-                    required={field.required}
-                    disabled={!canEdit}
-                  />
-                </div>
-              ))}
-
-              <button
-                onClick={handleSubmit}
-                className={`w-full py-3 rounded-xl text-lg font-semibold text-white transition-all duration-300 ${
-                  !canEdit
-                    ? "bg-gray-600 cursor-not-allowed"
-                    : "bg-cyan-500 hover:bg-cyan-600 active:scale-95 shadow-lg"
-                }`}
-                disabled={!canEdit}
-              >
-                {!canEdit ? "ثبت شده" : "ثبت اطلاعات"}
-              </button>
-
-              {!canEdit ? (
-                <p className="text-sm text-gray-400 text-center">
-                  این سفارش قبلاً ثبت شده و دیگر قابل تغییر نیست.
-                </p>
-              ) : (
-                <ul className="text-sm text-gray-300 list-disc pl-5 space-y-1">
-                  <li>اطلاعات وارد شده پس از تایید، قابل ویرایش نیست.</li>
-                  <li>از صحت اطلاعات قبل از ارسال مطمئن شوید.</li>
-                  <li>پس از ثبت، وضعیت سفارش شما برای بررسی ارسال می‌شود.</li>
-                </ul>
-              )}
-
-              {loading && (
-                <p className="text-cyan-400 text-sm animate-pulse">
-                  در حال بارگذاری...
-                </p>
-              )}
-              {error && (
-                <p className="text-red-400 text-sm animate-shake">{error}</p>
-              )}
-            </div>
-          </div>
+      {/* Form Section */}
+      <div className="p-4 sm:p-6 space-y-5 w-full lg:w-3/5">
+        <div className="flex items-center justify-center sm:justify-start">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-600 text-center w-full drop-shadow-lg">
+            ثبت اطلاعات سفارش بک لینک
+          </h2>
         </div>
-      )}
+
+        {fields?.map((field) => (
+          <div key={field.id} className="flex flex-col">
+            <label className="text-xs sm:text-sm text-gray-500 mb-1">
+              {field.label}
+            </label>
+            <input
+              type={field.fieldType === "number" ? "number" : "text"}
+              name={field.id}
+              placeholder={field.placeholder || field.label}
+              value={values[field.id] || ""}
+              onChange={(e) => handleChange(field.id, e.target.value)}
+              className={`w-full px-3 sm:px-4 py-2 rounded-xl border border-cyan-500/30 bg-[#1C2233] text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-500 outline-none transition-all duration-300 ${
+                !canEdit
+                  ? "opacity-60 cursor-not-allowed"
+                  : "hover:ring-cyan-300"
+              }`}
+              required={field.required}
+              disabled={!canEdit}
+            />
+          </div>
+        ))}
+
+        <button
+          onClick={handleSubmit}
+          className={`w-full py-2 sm:py-3 rounded-xl text-base sm:text-lg font-semibold text-white transition-all duration-300 ${
+            !canEdit
+              ? "bg-gray-600 cursor-not-allowed"
+              : "bg-cyan-500 hover:bg-cyan-600 active:scale-95 shadow-lg"
+          }`}
+          disabled={!canEdit}
+        >
+          {!canEdit ? "ثبت شده" : "ثبت اطلاعات"}
+        </button>
+
+        {!canEdit ? (
+          <p className="text-xs sm:text-sm text-gray-400 text-center">
+            این سفارش قبلاً ثبت شده و دیگر قابل تغییر نیست.
+          </p>
+        ) : (
+          <ul className="text-xs sm:text-sm text-gray-300 list-disc pl-4 sm:pl-5 space-y-1">
+            <li>اطلاعات وارد شده پس از تایید، قابل ویرایش نیست.</li>
+            <li>از صحت اطلاعات قبل از ارسال مطمئن شوید.</li>
+            <li>پس از ثبت، وضعیت سفارش شما برای بررسی ارسال می‌شود.</li>
+          </ul>
+        )}
+
+        {loading && (
+          <p className="text-cyan-400 text-xs sm:text-sm animate-pulse">
+            در حال بارگذاری...
+          </p>
+        )}
+        {error && (
+          <p className="text-red-400 text-xs sm:text-sm animate-shake">{error}</p>
+        )}
+      </div>
+
+      {/* Image Section */}
+      <div className="relative flex justify-center items-center w-full lg:w-2/5 mt-4 lg:mt-0">
+        <Image
+          width={220}
+          height={220}
+          alt="Backlink"
+          src="/dashboard/security.png"
+          className="object-contain max-w-[70%] sm:max-w-[60%] lg:max-w-full"
+        />
+      </div>
+    </div>
+  </div>
+)}
+
     </>
   );
 };

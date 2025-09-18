@@ -24,7 +24,7 @@ const HeaderPanel: React.FC = () => {
   return (
     <div className="relative w-full flex flex-col lg:flex-row items-center justify-between rounded-2xl bg-white p-4 shadow-sm">
       {/* Left Section */}
-      <div className="relative">
+      <div className="relative w-4/12">
         <button
           onClick={toggleMenu}
           className="flex items-center justify-center p-2 rounded-md hover:bg-gray-100"
@@ -83,14 +83,17 @@ const HeaderPanel: React.FC = () => {
       </div>
 
       {/* Middle Section: Logo */}
-      <div className="flex-1 w-10/12 flex justify-center">
+      <div className="flex-1 w-4/12 flex justify-center">
         <Image src="/homepage/logo.png" alt="Logo" width={160} height={50} />
       </div>
 
       {/* Right Section: Profile */}
-      <div className="w-1/12 flex gap-2 justify-end items-center">
+      <div className="w-4/12 flex gap-2 justify-end items-center">
+      <div className="border border-gray-200 px-2 rounded-lg">
+        <span className="text-gray-600">اعتبار: 500000 ریال</span>
+      </div>
         <svg
-          className="w-8 h-9"
+          className="w-7 h-7"
           viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -123,7 +126,7 @@ const HeaderPanel: React.FC = () => {
           className="rounded-2xl transition-colors duration-300 ease-in-out hover:bg-[#f7f8fc]"
         >
           <svg
-            className="w-8 h-8"
+            className="w-7 h-7"
             viewBox="0 0 64 64"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"

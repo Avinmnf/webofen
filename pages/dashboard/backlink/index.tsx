@@ -263,7 +263,7 @@ useEffect(() => {
                   </div>
                 </div>
               )}
-              <div className="h-1 w-full bg-[#1d546b]"></div>
+              <div className="h-1 w-full bg-gray-200 rounded-2xl"></div>
               {/* Small pills: other in-progress, delayed, canceled, and normal items */}
               <div className="flex flex-wrap justify-center gap-6 w-full">
                 {[
