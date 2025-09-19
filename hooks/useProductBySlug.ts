@@ -15,6 +15,13 @@ type Variant = {
   ratingsValues: number[];
 };
 
+type TOCItem = {
+  id: string;
+  text: string;
+  tag: string;
+  level: number;
+};
+
 type Product = {
   id: string;
   title: string;
@@ -26,6 +33,8 @@ type Product = {
   createdAt: string;
   category: { id: string; title: string };
   variants: Variant[];
+  modifiedContent?: string;
+  toc?: TOCItem[]; // اضافه کردن TOC به نوع Product
 };
 
 export default function useProductBySlug(slug?: string) {
@@ -52,7 +61,13 @@ export default function useProductBySlug(slug?: string) {
           ratingsValues: v.ratingsValues ?? [],
         }));
 
-        setProduct({ ...data.product, variants });
+        // اضافه کردن TOC و modifiedContent اگر وجود دارند
+        setProduct({ 
+          ...data.product, 
+          variants,
+          toc: data.product.toc || [],
+          modifiedContent: data.product.modifiedContent || data.product.content
+        });
       })
       .catch((err) => setError(err.message || 'Failed to fetch'))
       .finally(() => setLoading(false));

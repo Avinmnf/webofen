@@ -29,7 +29,7 @@ export default function Popularpills() {
         ].map((item, idx) => (
           <div
             key={idx}
-            className="relative w-full aspect-[16/8] bg-[#001933] rounded-4xl overflow-hidden flex items-start"
+            className="relative w-full aspect-[16/8] bg-[#00172f] rounded-4xl overflow-hidden flex items-start"
             onMouseEnter={(e) => {
               const video = e.currentTarget.querySelector("video");
               video?.play();

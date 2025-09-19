@@ -66,10 +66,10 @@ export default function guidance() {
   };
   return (
     <main>
-      <div className="max-w-[1250px] m-auto ">
+      <div className="max-w-[1250px] m-auto p-4">
         <div className="relative w-full aspect-[3/1] md:aspect-[12/2] mt-10 md:rounded-lg overflow-hidden flex items-start">
           <Image
-            src="/guidance/container.png"
+            src="/guidance/pharmacy-banner-main.webp"
             alt="Main slide"
             fill
             className="object-contain md:block hidden"
@@ -79,11 +79,11 @@ export default function guidance() {
             src="/guidance/pharmacy-banner.webp"
             alt="Main slide"
             fill
-            className="object-contain md:hidden block rounded-3xl "
+            className="object-contain md:hidden block rounded-3xl"
             priority
           />
         </div>
-        <section className="mt-14 max-w-[1440px]">
+        <section className="mt-14 max-w-[1250px]">
           <div className="flex flex-col lg:flex-row gap-8 justify-center mx-auto items-center">
             {/* Left Image */}
             <div className="w-full lg:w-5/12">
@@ -555,17 +555,17 @@ export default function guidance() {
                   است.)
                 </p>
               </div>
-            
+
             </div>
           </div>
         </section>
-        <Pills/>
-        
-          <section>
+        <Pills />
+
+        <section>
           {/*FAQ*/}
-          <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center bg-[#f5f4f2] p-8 rounded-4xl justify-between mt-14">
+          <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center bg-[#f5f4f2]  rounded-4xl justify-between mt-14">
             {/* FAQ Section */}
-            <div className="w-full lg:w-3/5">
+            <div className="w-full lg:w-3/5 p-4">
               {faqs.map((faq, index) => (
                 <div
                   key={index}
