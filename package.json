@@ -9,7 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "cookies-next": "^6.1.0",
     "framer-motion": "^12.23.3",
+    "jsonwebtoken": "^9.0.2",
     "next": "15.3.5",
     "nookies": "^2.5.2",
     "react": "^18.2.0",
@@ -20,6 +22,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
