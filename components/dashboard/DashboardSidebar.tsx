@@ -40,7 +40,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ isMobile }) => {
             className={`flex flex-col gap-1 justify-center items-center flex-[0_0_auto] 
               ${isMobile ? "min-w-[90px] h-[80px] px-2" : "w-full space-x-3 space-x-reverse p-3 mb-2 rounded-r-xl"} 
               transition-all duration-300 
-              ${isActive ? "bg-[#1d546b] text-white shadow-md" : "hover:bg-gray-300 text-black"}
+              ${isActive ? "bg-white text-gray-700 shadow-sm" : "hover:bg-gray-300 text-black"}
             `}
           >
             <div className={`flex-shrink-0 p-2 rounded-lg ${isActive ? "bg-white bg-opacity-20" : "bg-gray-200"}`}>
