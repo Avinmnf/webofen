@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { GetServerSideProps } from 'next';
 import { Product } from '@/lib/models/products';
-import { parseCookies, setCookie } from "nookies";
 import useRelatedProducts from "@/hooks/useRelatedProducts";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -444,30 +443,17 @@ export default function ProductDetailPage({ product }: Props) {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { slug } = ctx.params as { slug: string };
 
-  const cookies = parseCookies(ctx);
-  let guestToken = cookies.guestToken || "AAAAA";
-
-  // اگه توکن وجود نداشت، سرور خودش بگیره
-  if (!guestToken) {
-    try {
-      const res = await fetch(`/api/proxy/guesttoken`);
-      const data = await res.json();
-      guestToken = data.token;
-      setCookie(ctx, "guestToken", guestToken, { path: "/", maxAge: 2 * 24 * 60 * 60 });
-    } catch (err) {
-      console.error("Failed to get guest token:", err);
-    }
-  }
+  
 
   let product: Product | null = null;
 
   try {
-    const res = await fetch(`http://localhost:3000/api/proxy/productbyslug/${slug}`, {
+    const res = await fetch(`http://localhost:3002/api/proxy/productbyslug/${slug}`, {
       headers: {
         "Content-Type": "application/json",
-        "x-guest-token": guestToken || "",
       },
     });
+
     if (!res.ok) throw new Error("Failed to fetch product");
     const data = await res.json();
     product = data.product;

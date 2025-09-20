@@ -5,7 +5,6 @@ import Layout from "@/layout/layout";
 import DashboardLayout from "./dashboard/layout";
 import { CartProvider } from '@/contexts/CartContext';
 import { AuthProvider } from "@/contexts/AuthContext";
-import { GuestTokenProvider } from "@/contexts/GuestTokenContext";
 import SEO from "@/components/seo";
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -15,7 +14,6 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
     <SEO />
-    <GuestTokenProvider>
       <AuthProvider>
         <CartProvider>
           <LayoutComponent>
@@ -23,7 +21,6 @@ export default function App({ Component, pageProps }: AppProps) {
           </LayoutComponent>
         </CartProvider>
       </AuthProvider>
-    </GuestTokenProvider>
     </>
   );
 }
