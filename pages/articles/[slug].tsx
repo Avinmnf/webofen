@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { GetServerSideProps } from 'next';
-import { parseCookies, setCookie } from "nookies";
 import { Post } from "@/lib/models/post"
 import CommentForm from "@/components/comments/comments";
 import CommentsList from "@/components/comments/CommentsList";
@@ -9,7 +8,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePageView } from "@/hooks/usePageView";
-import { useGuestToken } from "@/contexts/GuestTokenContext";
 import SEO from '@/components/seo'
 type Props = { post: Post };
 export default function PostPage({ post }: Props) {
@@ -22,7 +20,6 @@ export default function PostPage({ post }: Props) {
 
   const [mounted, setMounted] = useState(false);
 
-  const { token, loading: tokenLoading } = useGuestToken();
 
   useEffect(() => {
     if (post) {
@@ -33,12 +30,12 @@ export default function PostPage({ post }: Props) {
 
   usePageView({ slug: post?.slug || "", title: post?.title || "" });
   const handleLike = async () => {
-    if (tokenLoading || !token) return; // wait for token
+    // if (tokenLoading || !token) return; // wait for token
     const res = await fetch("/api/graphql", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        // Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         query: `
@@ -61,12 +58,12 @@ export default function PostPage({ post }: Props) {
   };
 
   const handleDislike = async () => {
-    if (tokenLoading || !token) return;
+    // if (tokenLoading || !token) return;
     const res = await fetch("/api/graphql", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        // Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         query: `
@@ -358,27 +355,14 @@ export default function PostPage({ post }: Props) {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { slug } = ctx.params as { slug: string };
-  const cookies = parseCookies(ctx);
-  let guestToken = cookies.guestToken || "AAAAA";
-  console.log(guestToken);
+
   const safeSlug = encodeURIComponent(slug);
-  // اگه توکن وجود نداشت، سرور خودش بگیره
-  if (!guestToken) {
-    try {
-      const res = await fetch(`/api/proxy/guesttoken`);
-      const data = await res.json();
-      guestToken = data.token;
-      setCookie(ctx, "guestToken", guestToken, { path: "/", maxAge: 2 * 24 * 60 * 60 });
-    } catch (err) {
-      console.error("Failed to get guest token:", err);
-    }
-  }
+ 
   let post: Post | null = null;
   try {
     const res = await fetch(`http://localhost:3000/api/proxy/postbyslug/${safeSlug}`, {
       headers: {
-        "Content-Type": "application/json",
-        "x-guest-token": guestToken || "",
+        "Content-Type": "application/json"
       },
     });
     if (!res.ok) throw new Error("Failed to fetch product");
