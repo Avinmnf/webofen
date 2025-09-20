@@ -1,103 +1,79 @@
-'use client';
-
-import Link from 'next/link';
-import React, { useState, FormEvent } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/router';
 
-export default function LoginPage() {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+const LoginPage = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  
+  const { login } = useAuth();
+  const router = useRouter();
 
-  // use the context so header updates when user changes
-  const { login, user } = useAuth();
-
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
     setLoading(true);
+    setError('');
 
-    try {
-      const ok = await login(email, password);
-      if (!ok) throw new Error('Login failed');
-      // at this point AuthContext.user is set, header re-renders automatically
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
-    } finally {
-      setLoading(false);
+    const success = await login(email, password);
+    
+    if (success) {
+      router.push('/dashboard');
+    } else {
+      setError('Invalid email or password');
     }
-  }
-
-  if (user) {
-    return (
-      <div className="max-w-md mx-auto p-8 pt-20 bg-white rounded-xl shadow-lg text-center">
-        <h2 className="text-2xl font-semibold mb-4 text-blue-900">
-          خوش آمدید، {user.name} !
-        </h2>
-        <p className="text-gray-600">ایمیل شما: {user.email}</p>
-      </div>
-    );
-  }
+    
+    setLoading(false);
+  };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="max-w-md mx-auto pt-20 bg-white p-8 rounded-xl shadow-md"
-    >
-      <h2 className="text-3xl font-bold mb-6 text-center text-gray-900">ورود</h2>
-
+    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+      
       {error && (
-        <p className="mb-4 text-red-600 font-medium bg-red-100 p-3 rounded">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
-        </p>
+        </div>
       )}
-
-      <div className="mb-5">
-        <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-700">
-          ایمیل
-        </label>
-        <input
-          id="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          autoComplete="username"
-          className="text-gray-600 w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-          placeholder="example@example.com"
-        />
-      </div>
-
-      <div className="mb-6">
-        <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-700">
-          رمز عبور
-        </label>
-        <input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          autoComplete="current-password"
-          className="text-gray-600 w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-          placeholder="********"
-        />
-      </div>
-
-      <Link className="text-blue-950 text-sm" href="/signup">
-        ایجاد حساب کاربری
-      </Link>
-
-      <button
-        type="submit"
-        disabled={loading}
-        className={`w-full py-3 rounded-md text-white font-semibold transition mt-5 ${
-          loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-        }`}
-      >
-        {loading ? 'در حال ورود...' : 'ورود'}
-      </button>
-    </form>
+      
+      <form onSubmit={handleSubmit}>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Email
+          </label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        </div>
+        
+        <div className="mb-6">
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Password
+          </label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        </div>
+        
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+        >
+          {loading ? 'Logging in...' : 'Login'}
+        </button>
+      </form>
+    </div>
   );
-}
+};
+
+export default LoginPage
