@@ -92,7 +92,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Logout function
 const logout = async () => {
   try {
-    await fetch(`/api/proxy/auth/logout`, {
+    await fetch(`/api/logout`, {
       method: 'POST',
       credentials: 'include', // send cookie
     });
