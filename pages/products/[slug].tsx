@@ -189,13 +189,37 @@ export default function ProductDetailPage({ product }: Props) {
             <div className="flex w-2/3">
               <div className="flex ml-2 p-2 rounded-3xl  border-2 border-[#f7f8fc] bg-[#f7f8fc]">
                 <div className="w-1/2 p-6">
-                  <div className="relative ">
+                  <div className="flex items-center">
                     <VideoPlayer product={product.imageUrl} />
                   </div>
                 </div>
                 <div className="w-1/2 p-6">
                   <h1 className="font-bold pb-4">خرید قرص {product.title}</h1>
                   <p className="text-justify text-sm">{product.description}</p>
+                  <div className="flex items-center text-sm mt-4">
+                    <span className="bg-blue-300 p-2 m-1 ml-2 rounded-xl hover:scale-110">
+                      <Image src="/productsvg/link.svg" width={20} alt="as" height={20} />
+                    </span>
+                   لینک سازی ترکیبی
+                  </div>
+                  <div className="flex items-center text-sm"> 
+                    <span className="bg-blue-300 p-2 m-1 ml-2 rounded-xl hover:scale-110">
+                      <Image src="/productsvg/boo.svg" width={20} alt="as" height={20} />
+                    </span>
+                   افزایش رتبه سریع تر در گوگل
+                  </div>
+                  <div className="flex items-center text-sm">
+                    <span className="bg-blue-300 p-2 m-1 ml-2 rounded-xl hover:scale-110">
+                      <Image src="/productsvg/chart.svg" width={20} alt="as" height={20} />
+                    </span>
+                    انتشار در رسانه های معتبر
+                  </div>
+                  <div className="flex items-center text-sm">
+                    <span className="bg-blue-300 p-2 m-1 ml-2 rounded-xl hover:scale-110">
+                      <Image src="/productsvg/web.svg" width={20} alt="as" height={20} />
+                    </span>
+                    سایت های معتبر با DA و DR بالا
+                  </div>
                 </div>
               </div>
             </div>
