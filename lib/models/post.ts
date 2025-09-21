@@ -11,4 +11,7 @@ export type Post = {
     tags?: { name: string }[];
     ratings?: { value: number }[];
     _ratingsMeta?: { count: number };
+    modifiedContent?: string;
+    toc?: TOCItem[];
 };
+type TOCItem = { id: string; text: string; tag: string; level: number };

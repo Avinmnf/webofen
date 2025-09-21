@@ -31,7 +31,7 @@ body {
 .content h3{font-size: 1.5rem;padding: 10px 0;}
 .content h4{font-size: 1.3rem;padding: 10px 0;}
 .content ul{padding: 15px; background-color: #f8f8f8;border-radius: 10px;margin:5px}
-.content ul li{margin-right:20px;list-style-type: disc;}
+.content ul li{list-style-type: disc;}
 .toc-level-1{margin-right: 1px;}
 .toc-level-2{margin-right: 5px;}
 .toc-level-3{margin-right: 10px;}
