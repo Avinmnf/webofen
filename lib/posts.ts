@@ -1,6 +1,6 @@
 import { Post, UsePostsOptions } from '@/lib/models/postlist';
 import { calculateReadTime } from './readTime';
-
+const website = process.env.NEXT_PUBLIC_WEBOFEN || 'https://webofen.com'
 export async function fetchPosts(options: UsePostsOptions = {}) {
     try {
         const params = new URLSearchParams();
@@ -15,7 +15,7 @@ export async function fetchPosts(options: UsePostsOptions = {}) {
         if (options.sort) params.append("sort", options.sort);
         if (options.order) params.append("order", options.order);
 
-        const res = await fetch(`http://localhost:3000/api/proxy/posts?${params.toString()}`);
+        const res = await fetch(`${website}/api/proxy/posts?${params.toString()}`);
 
         if (!res.ok) {
             throw new Error(`Failed to fetch posts: ${res.status}`);
@@ -28,7 +28,7 @@ export async function fetchPosts(options: UsePostsOptions = {}) {
                 let content = "";
                 const safeSlug = encodeURIComponent(post.slug);
                 try {
-                    const postRes = await fetch(`http://localhost:3000/api/proxy/postbyslug/${safeSlug}`);
+                    const postRes = await fetch(`${website}/api/proxy/postbyslug/${safeSlug}`);
                     if (postRes.ok) {
                         const postData = await postRes.json();
                         content = postData.post.content || "";
@@ -38,7 +38,7 @@ export async function fetchPosts(options: UsePostsOptions = {}) {
                 }
                 let counts = 0
                 try {
-                    const res = await fetch(`http://localhost:3000/api/proxy/getviewbyslug/${safeSlug}`);
+                    const res = await fetch(`${website}/api/proxy/getviewbyslug/${safeSlug}`);
                     
                     if (!res.ok) {
                         throw new Error(`Failed to fetch page views: ${res.status}`);
