@@ -4,6 +4,7 @@ import Image from "next/image";
 import { GetServerSideProps } from "next";
 import { fetchPosts } from "@/lib/posts";
 import { Post, PostWithViews } from "@/lib/models/postlist";
+import { useRouter } from "next/router";
 
 type PostsPageProps = {
   initialPosts: Post[];
@@ -15,11 +16,14 @@ function isRecommended(post: Post) {
   return post.tags.some((tag) => tag.name === "پیشنهاد ما");
 }
 
-export default function PostsPage({ 
-  initialPosts, 
-  total, 
-  initialPage = 1 
+export default function PostsPage({
+  initialPosts,
+  total,
+  initialPage = 1
 }: PostsPageProps) {
+  const router = useRouter();
+  const [posts, setPosts] = useState<Post[]>(initialPosts);
+  const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(initialPage);
   const limit = 10;
 
@@ -40,7 +44,7 @@ export default function PostsPage({
     },
   ];
 
-  const postsWithViews: PostWithViews[] = initialPosts.map((post) => ({
+  const postsWithViews: PostWithViews[] = posts.map((post) => ({
     ...post,
     views: post.countview || 0,
   }));
@@ -51,7 +55,26 @@ export default function PostsPage({
   if (cards.length > 5) cards.splice(5, 0, socialCards[1]);
 
   const totalPages = Math.ceil(total / limit);
-
+  const handlePageChange = async (newPage: number) => {
+    setLoading(true);
+    try {
+      const postsData = await fetchPosts({
+        page: newPage,
+        limit: 10,
+        status: "published",
+        sort: "createdAt",
+        order: "desc",
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setPosts(postsData.posts);
+      setPage(newPage);
+    } catch (error) {
+      console.error("خطا در گرفتن پست‌ها:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   return (
     <main className="bg-[#f7f8fc] pb-10">
       <div className="w-full pt-20">
@@ -60,16 +83,16 @@ export default function PostsPage({
             {/* ✅ Left (Main Content) */}
             <div className=" md:p-0 p-4 w-full md:w-[70%] rounded-2xl h-full">
               {/* Featured First Post */}
-              {initialPosts.length > 0 && (
-                <Link href={`/articles/${initialPosts[0].slug}`} passHref>
+              {posts.length > 0 && (
+                <Link href={`/articles/${posts[0].slug}`} passHref>
                   <div className="rounded-2xl bg-white mb-8 shadow hover:shadow-lg transition cursor-pointer">
-                    {initialPosts[0].imageUrl && (
+                    {posts[0].imageUrl && (
                       <Image
                         className="rounded-t-2xl"
                         width={1000}
                         height={300}
-                        src={`${initialPosts[0].imageUrl}`}
-                        alt={initialPosts[0].imageAlt || initialPosts[0].title}
+                        src={`${posts[0].imageUrl}`}
+                        alt={posts[0].imageAlt || posts[0].title}
                         loader={({ src }) => src}
                       />
                     )}
@@ -99,7 +122,7 @@ export default function PostsPage({
                         )}
 
                         <div className="relative group inline-block">
-                          {isRecommended(initialPosts[0]) && (
+                          {isRecommended(posts[0]) && (
                             <>
                               <svg
                                 className="w-5 h-5 ml-2 text-yellow-400 cursor-pointer"
@@ -122,14 +145,14 @@ export default function PostsPage({
                           )}
                         </div>
                         <p className="text-sm text-gray-500">
-                          {initialPosts[0].category?.title}
+                          {posts[0].category?.title}
                         </p>
                       </div>
                       <p className="text-gray-700 mt-1 text-xl font-semibold">
-                        {initialPosts[0].title}
+                        {posts[0].title}
                       </p>
                       <p className="text-gray-500 mt-3 text-md">
-                        {initialPosts[0].description}
+                        {posts[0].description}
                       </p>
 
                       <div className="text-xs text-gray-400 mt-2 flex justify-between items-center">
@@ -145,11 +168,11 @@ export default function PostsPage({
                               fill="#e16f23"
                             />
                           </svg>
-                          <span className="mt-2 mr-1 text-sm">{initialPosts[0].countview}</span>
+                          <span className="mt-2 mr-1 text-sm">{posts[0].countview}</span>
 
                         </div>
                         <p className="text-gray-400 text-sm">
-                          زمان مطالعه : {initialPosts[0].readtime} دقیقه
+                          زمان مطالعه : {posts[0].readtime} دقیقه
                         </p>
                       </div>
                     </div>
@@ -276,7 +299,6 @@ export default function PostsPage({
                                 </p>
                               </div>
                             </div>
-
                             <div>
                               <Link
                                 href="https://t.me/yourchannel"
@@ -339,7 +361,6 @@ export default function PostsPage({
                                 </p>
                               </div>
                             </div>
-
                             <div>
                               <Link
                                 href="https://t.me/yourchannel"
@@ -469,14 +490,14 @@ export default function PostsPage({
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
               <button
                 key={num}
-                onClick={() => setPage(num)}
+                onClick={() => handlePageChange(num)}
                 className={`
-        px-3 py-1 rounded
-        ${page === num
-                    ? "bg-[#ff5084] text-white"
-                    : "bg-gray-200 hover:bg-gray-300"
-                  }
-      `}
+                  px-3 py-1 rounded cursor-pointer
+                  ${page === num
+                              ? "bg-[#ff5084] text-white"
+                              : "bg-gray-200 hover:bg-gray-300"
+                            }
+                `}
               >
                 {num}
               </button>
