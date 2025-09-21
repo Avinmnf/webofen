@@ -444,7 +444,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { slug } = ctx.params as { slug: string };
   let product: Product | null = null;
   try {
-    const res = await fetch(`http://localhost:3002/api/proxy/productbyslug/${slug}`, {
+    const res = await fetch(`http://localhost:3000/api/proxy/productbyslug/${slug}`, {
       headers: {
         "Content-Type": "application/json",
       },
