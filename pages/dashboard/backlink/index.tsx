@@ -115,7 +115,17 @@ const BacklinkPage: React.FC = () => {
 
     fetchAllValues();
   }, [orders]);
+
+  // for opening modal
   const handleClick = async (id: string) => {
+    const item = backlinksState.find((i) => i.id === id);
+    if (!item) return;
+
+    if (item.adminStatus === "completed") {
+      setCompletedOrderId(id);
+      return;
+    }
+
     setSelectedOrderItemId(id);
     setShowModal(true);
 
@@ -412,13 +422,13 @@ const BacklinkPage: React.FC = () => {
                     {backlinksState.filter(
                       (item) => item.adminStatus === "completed"
                     ).length > 0 && (
-                      <div className="flex flex-col md:flex-row gap-4 mt-6">
+                      <div className="flex flex-col md:flex-row w-full md:w-1/2 gap-4 mt-6">
                         {backlinksState
                           .filter((item) => item.adminStatus === "completed")
                           .map((item) => (
                             <div
                               key={item.id}
-                              className="flex flex-row items-center bg-white w-full md:w-1/2 rounded-2xl p-4 shadow-md transition hover:scale-105"
+                              className="flex flex-row items-center bg-white  rounded-2xl p-4 transition hover:scale-102"
                             >
                               <div className="flex items-center gap-3">
                                 {/* Pill preview */}
@@ -426,7 +436,7 @@ const BacklinkPage: React.FC = () => {
                                   onClick={() => handleClick(item.id)}
                                   className="relative w-14 h-14 flex justify-center items-center group"
                                 >
-                                  <div className="absolute w-10 h-10 flex justify-center items-center bg-green-200 rounded-full shadow-md animate-bounce">
+                                  <div className="absolute w-10 h-10 flex justify-center items-center  rounded-full  animate-bounce">
                                     <SmallProgressCircle
                                       percentage={100}
                                       delayed={false}
@@ -543,6 +553,74 @@ const BacklinkPage: React.FC = () => {
           </button>
         </div>
       )}
+      {completedOrderId && selectedCompletedOrder && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center z-50 animate-fadeIn ">
+          <div className="bg-white w-[90%] max-w-lg rounded-3xl shadow-2xl p-6 relative">
+            <button
+              onClick={() => setCompletedOrderId(null)}
+              className="absolute top-4 right-4 text-2xl font-bold hover:text-red-500"
+            >
+              &times;
+            </button>
+
+            <h2 className="text-xl font-bold mb-4 text-gray-800 text-center">
+              سفارش تکمیل‌شده
+            </h2>
+
+            <div className="mb-4">
+              <p className="text-gray-700">
+                <span className="font-semibold">محصول:</span>{" "}
+                {selectedCompletedOrder.productTitle}
+              </p>
+              <p className="text-gray-700">
+                <span className="font-semibold">تاریخ خرید:</span>{" "}
+                {new Date(selectedCompletedOrder.createdAt).toLocaleDateString(
+                  "fa-IR"
+                )}
+              </p>
+              <p className="text-gray-700">
+                <span className="font-semibold">تاریخ تکمیل:</span>{" "}
+                {selectedCompletedOrder.completionTime
+                  ? new Date(
+                      selectedCompletedOrder.completionTime
+                    ).toLocaleDateString("fa-IR")
+                  : "—"}
+              </p>
+
+              <p className="text-gray-700">
+                <span className="font-semibold">تعداد:</span>{" "}
+                {selectedCompletedOrder.attributes
+                  .map((a) => a.value)
+                  .join(" / ")}
+              </p>
+            </div>
+
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h3 className="font-semibold text-gray-800 mb-2">گزارش تکمیل</h3>
+              {selectedCompletedOrder.completionReport
+                ?.split("\n")
+                .map((line, idx) =>
+                  line.startsWith("http") ? (
+                    <div key={idx}>
+                      <a
+                        href={line}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline break-all"
+                      >
+                        {line}
+                      </a>
+                    </div>
+                  ) : (
+                    <p key={idx} className="text-gray-700">
+                      {line}
+                    </p>
+                  )
+                )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal */}
       {showModal && (
@@ -626,30 +704,6 @@ const BacklinkPage: React.FC = () => {
                 <p className="text-red-400 text-sm animate-shake">{error}</p>
               )}
             </div>
-            {selectedItem?.adminStatus === "completed" &&
-              selectedItem.completionReport && (
-                <div className="mt-4 p-3 rounded-xl text-gray-700 whitespace-pre-line">
-                  <h3 className="font-semibold text-green-700 mb-1">
-                    گزارش تکمیل
-                  </h3>
-                  {selectedItem.completionReport.split("\n").map((line, idx) =>
-                    line.startsWith("http") ? (
-                      <div key={idx}>
-                        <a
-                          href={line}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 underline break-all"
-                        >
-                          {line}
-                        </a>
-                      </div>
-                    ) : (
-                      <p key={idx}>{line}</p>
-                    )
-                  )}
-                </div>
-              )}
           </div>
         </div>
       )}
