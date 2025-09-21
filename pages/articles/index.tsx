@@ -1,32 +1,28 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePosts } from "@/hooks/useposts";
-import usePageViews from "@/hooks/usePageViews";
+import { GetServerSideProps } from "next";
+import { fetchPosts } from "@/lib/posts";
+import { Post, PostWithViews } from "@/lib/models/postlist";
 
-type Post = {
-  id: string;
-  title: string;
-  slug: string;
-  description: string;
-  imageUrl?: string;
-  imageAlt?: string;
-  category?: { id: string; title: string };
-  createdAt: string;
-  readtime: number;
-  desc: string;
-  likes: number;
-  tags: { id: string; name: string }[];
+type PostsPageProps = {
+  initialPosts: Post[];
+  total: number;
+  initialPage?: number;
 };
-type PostWithViews = Post & {
-  views: number;
-};
+
 function isRecommended(post: Post) {
   return post.tags.some((tag) => tag.name === "پیشنهاد ما");
 }
-export default function PostsPage() {
-  const [page, setPage] = useState(1);
+
+export default function PostsPage({ 
+  initialPosts, 
+  total, 
+  initialPage = 1 
+}: PostsPageProps) {
+  const [page, setPage] = useState(initialPage);
   const limit = 10;
+
   const socialCards = [
     {
       id: "telegram",
@@ -44,28 +40,17 @@ export default function PostsPage() {
     },
   ];
 
-  const { posts, total, loading } = usePosts({
-    page,
-    limit,
-    status: "published",
-    sort: "createdAt",
-    order: "desc",
-  });
-
-  const totalPages = Math.ceil(total / limit);
-  const { data, loading: viewsLoading } = usePageViews();
-  const pageViewCounts = data?.counts || {};
-  const postsWithViews: PostWithViews[] = posts.map((post) => ({
+  const postsWithViews: PostWithViews[] = initialPosts.map((post) => ({
     ...post,
-    views: pageViewCounts[`/articles/${post.slug}`] || 0,
+    views: post.countview || 0,
   }));
+
   // Create cards array with fixed positions for social cards
-  const cards: (
-    | (typeof postsWithViews)[number]
-    | { id: string; title: string; type: string }
-  )[] = [...postsWithViews.slice(1)];
+  const cards: (PostWithViews | typeof socialCards[0])[] = [...postsWithViews.slice(1)];
   if (cards.length > 1) cards.splice(1, 0, socialCards[0]);
   if (cards.length > 5) cards.splice(5, 0, socialCards[1]);
+
+  const totalPages = Math.ceil(total / limit);
 
   return (
     <main className="bg-[#f7f8fc] pb-10">
@@ -75,16 +60,16 @@ export default function PostsPage() {
             {/* ✅ Left (Main Content) */}
             <div className=" md:p-0 p-4 w-full md:w-[70%] rounded-2xl h-full">
               {/* Featured First Post */}
-              {posts.length > 0 && (
-                <Link href={`/articles/${posts[0].slug}`} passHref>
+              {initialPosts.length > 0 && (
+                <Link href={`/articles/${initialPosts[0].slug}`} passHref>
                   <div className="rounded-2xl bg-white mb-8 shadow hover:shadow-lg transition cursor-pointer">
-                    {posts[0].imageUrl && (
+                    {initialPosts[0].imageUrl && (
                       <Image
                         className="rounded-t-2xl"
                         width={1000}
                         height={300}
-                        src={`${posts[0].imageUrl}`}
-                        alt={posts[0].imageAlt || posts[0].title}
+                        src={`${initialPosts[0].imageUrl}`}
+                        alt={initialPosts[0].imageAlt || initialPosts[0].title}
                         loader={({ src }) => src}
                       />
                     )}
@@ -114,7 +99,7 @@ export default function PostsPage() {
                         )}
 
                         <div className="relative group inline-block">
-                          {isRecommended(posts[0]) && (
+                          {isRecommended(initialPosts[0]) && (
                             <>
                               <svg
                                 className="w-5 h-5 ml-2 text-yellow-400 cursor-pointer"
@@ -137,14 +122,14 @@ export default function PostsPage() {
                           )}
                         </div>
                         <p className="text-sm text-gray-500">
-                          {posts[0].category?.title}
+                          {initialPosts[0].category?.title}
                         </p>
                       </div>
                       <p className="text-gray-700 mt-1 text-xl font-semibold">
-                        {posts[0].title}
+                        {initialPosts[0].title}
                       </p>
                       <p className="text-gray-500 mt-3 text-md">
-                        {posts[0].description}
+                        {initialPosts[0].description}
                       </p>
 
                       <div className="text-xs text-gray-400 mt-2 flex justify-between items-center">
@@ -160,19 +145,11 @@ export default function PostsPage() {
                               fill="#e16f23"
                             />
                           </svg>
+                          <span className="mt-2 mr-1 text-sm">{initialPosts[0].countview}</span>
 
-                          <p className="mt-2 mr-1 text-sm">
-                            {viewsLoading
-                              ? "در حال بارگذاری..."
-                              : postsWithViews[0].views}
-                          </p>
                         </div>
                         <p className="text-gray-400 text-sm">
-                          زمان مطالعه:{" "}
-                          {new Date(posts[0].createdAt).toLocaleDateString(
-                            "fa-IR"
-                          )}{" "}
-                          دقیقه
+                          زمان مطالعه : {initialPosts[0].readtime} دقیقه
                         </p>
                       </div>
                     </div>
@@ -180,7 +157,6 @@ export default function PostsPage() {
                 </Link>
               )}
             </div>
-
             {/* ✅ Right Sidebar */}
             <div className="md:w-[35%] md:mr-4 md:p-0 p-4">
               <div className="flex flex-col items-center justify-between h-full pb-3">
@@ -221,7 +197,6 @@ export default function PostsPage() {
                     />
                   </div>
                 </div>
-
                 <div className="flex bg-[#ffdab0] py-2 px-5 mb-5 w-full rounded-2xl border-3 border-white">
                   <div className="w-1/2 flex justify-center items-center">
                     <div>
@@ -399,14 +374,14 @@ export default function PostsPage() {
                           height={200}
                           src={`${(card as Post)
                             .imageUrl!}`}
-                            loader={({ src }) => src}
+                          loader={({ src }) => src}
                           alt={(card as Post).imageAlt || (card as Post).title}
                           className="rounded-t-2xl w-full h-42 object-cover"
                         />
                       )}
                       <div className="flex flex-col justify-between p-8">
                         <div className="flex items-center">
-                          {(card as PostWithViews).views > 10 && (
+                          {(card as PostWithViews).countview > 10 && (
                             <svg
                               className="w-5 h-5 ml-2"
                               viewBox="0 0 24 24"
@@ -442,12 +417,8 @@ export default function PostsPage() {
                               </>
                             )}
                           </div>
-
                           <p className="text-sm text-gray-500">
-                            {posts[0].category?.title}
-                            <p className="text-sm text-gray-500">
-                              {(card as Post).category?.title}
-                            </p>
+                            {initialPosts[0].category?.title}
                           </p>
                         </div>
                         <p className="text-base font-semibold text-gray-700  hover:text-[#1d546b]">
@@ -501,11 +472,10 @@ export default function PostsPage() {
                 onClick={() => setPage(num)}
                 className={`
         px-3 py-1 rounded
-        ${
-          page === num
-            ? "bg-[#ff5084] text-white"
-            : "bg-gray-200 hover:bg-gray-300"
-        }
+        ${page === num
+                    ? "bg-[#ff5084] text-white"
+                    : "bg-gray-200 hover:bg-gray-300"
+                  }
       `}
               >
                 {num}
@@ -517,3 +487,37 @@ export default function PostsPage() {
     </main>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  try {
+    const page = parseInt(context.query.page as string) || 1;
+    const limit = 10;
+
+    // دریافت پست‌ها
+    const postsData = await fetchPosts({
+      page,
+      limit,
+      status: "published",
+      sort: "createdAt",
+      order: "desc",
+    });
+    // دریافت آمار بازدیدها
+    return {
+      props: {
+        initialPosts: postsData.posts,
+        total: postsData.total,
+        initialPage: page,
+      },
+    };
+  } catch (error) {
+    console.error("Error in getServerSideProps:", error);
+    return {
+      props: {
+        initialPosts: [],
+        total: 0,
+        pageViewCounts: {},
+        initialPage: 1,
+      },
+    };
+  }
+};
