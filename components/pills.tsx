@@ -93,7 +93,7 @@ export default function Pills() {
         }
     ]
     return (
-        <section className="mt-10 flex flex-col p-4 gap-4">
+        <section className="mt-10 flex flex-col gap-2">
             <div className="md:flex items-center border-3 border-gray-200 bg-gray-100 rounded-2xl md:rounded-full p-2">
                 <div className="flex items-center ml-4 md:w-1/4">
                     <div className="bg-[#6fd6e5] w-16 h-16 rounded-full flex items-center justify-center">
@@ -159,7 +159,7 @@ export default function Pills() {
                         {data.map((item, idx) => (
                             <div
                                 key={idx}
-                                className="relative w-full aspect-[16/8] bg-[#001933] rounded-4xl overflow-hidden flex items-start"
+                                className="relative w-full aspect-[16/8] bg-[#00172f] rounded-4xl overflow-hidden flex items-start"
                                 onMouseEnter={(e) => {
                                     const video = e.currentTarget.querySelector("video");
                                     video?.play();

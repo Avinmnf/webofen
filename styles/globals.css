@@ -26,13 +26,35 @@ body {
   font-style: normal;
 }
 @layer base {
-h1{font-size: 1.8rem;}
-h2{font-size: 1.7rem;}
-h3{font-size: 1.5rem;}
-h4{font-size: 1.3rem;}
+.content h1{font-size: 1.8rem; padding: 10px 0;}
+.content h2{font-size: 1.7rem;padding: 10px 0;}
+.content h3{font-size: 1.5rem;padding: 10px 0;}
+.content h4{font-size: 1.3rem;padding: 10px 0;}
+.content ul{padding: 15px; background-color: #f8f8f8;border-radius: 10px;margin:5px}
+.content ul li{list-style-type: disc;}
+.toc-level-1{margin-right: 1px;}
+.toc-level-2{margin-right: 5px;}
+.toc-level-3{margin-right: 10px;}
+}
+.toc-sidebar {
+  position: sticky;
+  top: 20px; /* فاصله از بالای صفحه */
+  align-self: flex-start; /* برای flex container */
+  height: fit-content;
+  max-height: 80vh; /* حداکثر ارتفاع */
+  overflow-y: auto; /* اسکرول داخلی اگر محتوا بلند شد */
+}
+
+/* برای responsive design */
+@media (max-width: 768px) {
+  .toc-sidebar {
+    position: relative;
+    top: 0;
+    margin-bottom: 20px;
+  }
 }
 p{
-  line-height: 2rem;
+  line-height: 1.7rem;
 }
 
 

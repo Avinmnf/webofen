@@ -22,7 +22,6 @@ export default function ProductList() {
   return (
     <div className="p-6 max-w-[1440px] mx-auto">
       <h2 className="text-3xl font-bold text-gray-800 mb-6"> لیست محصولات</h2>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {products.map((product) => (
           <Link
@@ -33,7 +32,7 @@ export default function ProductList() {
             <div className="relative group w-[450px] h-[200px]">
               {product.imageUrl ? (
                 <Image
-                  src={`${NEXT_PUBLIC_CMS_URL}${product.imageUrl}`}
+                  src={`${product.imageUrl}`}
                   alt={product.title}
                   fill
                   className="bg-gray-200 rounded-2xl"

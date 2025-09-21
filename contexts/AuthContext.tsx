@@ -1,130 +1,111 @@
-"use client";
+import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 
-import { createContext, useContext, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-
-type User = {
-  name: string;
+export interface Role {
   id: string;
-  email: string;
-  role: string;
-};
+  name: string;
+}
 
-type AuthContextType = {
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: Role;
+}
+
+export interface AuthResponse {
+  token: string;
+  user: User;
+}
+
+interface AuthContextType {
   user: User | null;
+  loading: boolean;
+  isLoggedIn: boolean; // اضافه کردن این property
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
-  isLoggedIn: boolean;
-  refreshUser: () => Promise<void>;
-};
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
-  const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
-  // Fetch current user from backend
-  const fetchUser = async () => {
+  // اضافه کردن isLoggedIn بر اساس وجود user
+  const isLoggedIn = !!user;
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
     try {
-      const res = await fetch(
-        `/api/proxy/me`, {
-        credentials: "include",
-      });
-
-      if (!res.ok) throw new Error("Not authenticated");
-
-      const data = await res.json();
-      setUser(data.user);
-    } catch (err) {
-      setUser(null);
+      const response = await fetch('/api/auth/me');
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Automatically fetch user on mount
-  useEffect(() => {
-    fetchUser();
-
-    // Listen to global login/logout events
-    const handleLogin = () => fetchUser();
-    const handleLogout = () => setUser(null);
-
-    window.addEventListener("user-logged-in", handleLogin);
-    window.addEventListener("user-logged-out", handleLogout);
-
-    return () => {
-      window.removeEventListener("user-logged-in", handleLogin);
-      window.removeEventListener("user-logged-out", handleLogout);
-    };
-  }, []);
-
-  // Manual refresh if needed
-  const refreshUser = async () => await fetchUser();
-
-  // Login function
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const res = await fetch(
-          `/api/proxy/auth/login`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ email, password }),
-        }
-      );
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-      if (!res.ok) throw new Error("Invalid login");
-
-      const data = await res.json();
-      setUser(data.user);
-
-      // Notify other components
-      window.dispatchEvent(new Event("user-logged-in"));
-
-      return true;
-    } catch (err) {
-      console.error("Login error:", err);
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Login failed:', error);
       return false;
     }
   };
 
-  // Logout function
-const logout = async () => {
-  try {
-    await fetch(`/api/logout`, {
-      method: 'POST',
-      credentials: 'include', // send cookie
-    });
-  } catch (err) {
-    console.error("Logout error:", err);
-  }
+  const logout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      setUser(null);
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
-  setUser(null);
-  localStorage.removeItem('cartBackup');
-  localStorage.removeItem('customerInfo');
-  window.dispatchEvent(new Event("user-logged-out"));
-  router.push("/login");
-};
-
+  const value: AuthContextType = {
+    user,
+    loading,
+    isLoggedIn, // اضافه کردن isLoggedIn به context value
+    login,
+    logout,
+  };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        login,
-        logout,
-        isLoggedIn: !!user,
-        refreshUser,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within AuthProvider");
-  return context;
-}
+};
