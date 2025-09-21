@@ -89,9 +89,6 @@ const HeaderPanel: React.FC = () => {
 
       {/* Right Section: Profile */}
       <div className="w-4/12 flex gap-2 justify-end items-center">
-      <div className="border border-gray-200 px-2 py-1 rounded-lg">
-        <span className="text-gray-600">اعتبار: 500000 ریال</span>
-      </div>
         <svg
           className="w-7 h-7"
           viewBox="0 0 24 24"

@@ -26,6 +26,7 @@ export interface BacklinkItem {
   siteurl?: string;
   keyword: string;
   submittedValues?: { id: string; label: string; value: string }[];
+  completionReport?: string;
 }
 
 const statusProgressMap: Record<string, number> = {
@@ -64,11 +65,13 @@ const BacklinkPage: React.FC = () => {
           keyword:
             item.inputValues?.find((iv) => iv.field?.label === "Keyword")
               ?.value || "",
+          completionReport: item.completionReport || "",
         }))
     );
 
     setBacklinksState(mappedBacklinks);
   }, [orders]);
+  const [completedOrderId, setCompletedOrderId] = useState<string | null>(null);
 
   const [backlinksState, setBacklinksState] = useState<BacklinkItem[]>([]);
   const [inputValuesMap, setInputValuesMap] = useState<Record<string, any[]>>(
@@ -122,6 +125,9 @@ const BacklinkPage: React.FC = () => {
     }
   };
 
+  const selectedCompletedOrder = backlinksState.find(
+    (item) => item.id === completedOrderId
+  );
   const handleSubmit = async () => {
     try {
       await submitValues();
@@ -406,34 +412,48 @@ const BacklinkPage: React.FC = () => {
                     {backlinksState.filter(
                       (item) => item.adminStatus === "completed"
                     ).length > 0 && (
-                      <div className="flex flex-row items-center bg-white w-1/2 rounded-2xl p-4 shadow-md transition">
-                        <div className="flex items-center gap-3">
-                          {/* Pill preview */}
-                          <div className="relative w-14 h-14 flex justify-center items-center">
-                            <div className="absolute w-10 h-10 flex justify-center items-center bg-green-200 rounded-full shadow-md animate-bounce">
-                              <SmallProgressCircle
-                                percentage={100}
-                                delayed={false}
-                              />
-                              <Image
-                                width={40}
-                                height={40}
-                                alt="Backlink"
-                                src={"/dashboard/backlink.png"}
-                                className="object-contain rotate-12"
-                              />
+                      <div className="flex flex-col md:flex-row gap-4 mt-6">
+                        {backlinksState
+                          .filter((item) => item.adminStatus === "completed")
+                          .map((item) => (
+                            <div
+                              key={item.id}
+                              className="flex flex-row items-center bg-white w-full md:w-1/2 rounded-2xl p-4 shadow-md transition hover:scale-105"
+                            >
+                              <div className="flex items-center gap-3">
+                                {/* Pill preview */}
+                                <button
+                                  onClick={() => handleClick(item.id)}
+                                  className="relative w-14 h-14 flex justify-center items-center group"
+                                >
+                                  <div className="absolute w-10 h-10 flex justify-center items-center bg-green-200 rounded-full shadow-md animate-bounce">
+                                    <SmallProgressCircle
+                                      percentage={100}
+                                      delayed={false}
+                                    />
+                                    <Image
+                                      width={40}
+                                      height={40}
+                                      alt="Backlink"
+                                      src={"/dashboard/backlink.png"}
+                                      className="object-contain rotate-12"
+                                    />
+                                  </div>
+                                </button>
+                              </div>
+                              <div className="ml-4">
+                                <h3 className="text-gray-500 text-lg font-semibold mb-1">
+                                  سفارش تکمیل‌شده
+                                </h3>
+                                <p className="text-gray-600 text-sm">
+                                  تاریخ خرید:{" "}
+                                  {new Date(item.createdAt).toLocaleDateString(
+                                    "fa-IR"
+                                  )}
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                          {/* Counter */}
-                        </div>
-                        <h3 className="text-gray-500 text-lg font-semibold mb-3">
-                          {
-                            backlinksState.filter(
-                              (item) => item.adminStatus === "completed"
-                            ).length
-                          }
-                          سفارش تکمیل‌شده
-                        </h3>
+                          ))}
                       </div>
                     )}
 
@@ -606,6 +626,30 @@ const BacklinkPage: React.FC = () => {
                 <p className="text-red-400 text-sm animate-shake">{error}</p>
               )}
             </div>
+            {selectedItem?.adminStatus === "completed" &&
+              selectedItem.completionReport && (
+                <div className="mt-4 p-3 rounded-xl text-gray-700 whitespace-pre-line">
+                  <h3 className="font-semibold text-green-700 mb-1">
+                    گزارش تکمیل
+                  </h3>
+                  {selectedItem.completionReport.split("\n").map((line, idx) =>
+                    line.startsWith("http") ? (
+                      <div key={idx}>
+                        <a
+                          href={line}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 underline break-all"
+                        >
+                          {line}
+                        </a>
+                      </div>
+                    ) : (
+                      <p key={idx}>{line}</p>
+                    )
+                  )}
+                </div>
+              )}
           </div>
         </div>
       )}

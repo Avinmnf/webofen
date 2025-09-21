@@ -36,8 +36,8 @@ export interface OrderItem {
   delayed?: string;
   variant: Variant;
   inputValues?: OrderItemInputValue[];
+  completionReport?: string;
 }
-
 
 export interface Order {
   id: string;
