@@ -42,7 +42,7 @@ export function useTickets() {
     description: string;
     priority: "low" | "medium" | "high";
   }) => {
-    const res = await fetch("/api/tickets", {
+    const res = await fetch("/api/proxy/tickets", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(ticketData),
