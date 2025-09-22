@@ -381,10 +381,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { slug } = ctx.params as { slug: string };
 
   const safeSlug = encodeURIComponent(slug);
+  const website = process.env.NEXT_PUBLIC_WEBOFEN || 'https://webofen.com'
 
   let post: Post | null = null;
   try {
-    const res = await fetch(`http://localhost:3000/api/proxy/postbyslug/${safeSlug}`, {
+    const res = await fetch(`${website}/api/proxy/postbyslug/${safeSlug}`, {
       headers: {
         "Content-Type": "application/json"
       },
