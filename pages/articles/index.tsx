@@ -1,32 +1,33 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePosts } from "@/hooks/useposts";
-import usePageViews from "@/hooks/usePageViews";
+import { GetServerSideProps } from "next";
+import { fetchPosts } from "@/lib/posts";
+import { Post, PostWithViews } from "@/lib/models/postlist";
+import { useRouter } from "next/router";
 
-type Post = {
-  id: string;
-  title: string;
-  slug: string;
-  description: string;
-  imageUrl?: string;
-  imageAlt?: string;
-  category?: { id: string; title: string };
-  createdAt: string;
-  readtime: number;
-  desc: string;
-  likes: number;
-  tags: { id: string; name: string }[];
+type PostsPageProps = {
+  initialPosts: Post[];
+  total: number;
+  initialPage?: number;
 };
-type PostWithViews = Post & {
-  views: number;
-};
+
 function isRecommended(post: Post) {
   return post.tags.some((tag) => tag.name === "پیشنهاد ما");
 }
-export default function PostsPage() {
-  const [page, setPage] = useState(1);
+
+export default function PostsPage({
+  initialPosts,
+  total,
+  initialPage = 1
+}: PostsPageProps) {
+  const router = useRouter();
+  const [posts, setPosts] = useState<Post[]>(initialPosts);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(initialPage);
+  const [hasMore, setHasMore] = useState(initialPosts.length < total);
   const limit = 10;
+
   const socialCards = [
     {
       id: "telegram",
@@ -44,36 +45,54 @@ export default function PostsPage() {
     },
   ];
 
-  const { posts, total, loading } = usePosts({
-    page,
-    limit,
-    status: "published",
-    sort: "createdAt",
-    order: "desc",
-  });
-
-  const totalPages = Math.ceil(total / limit);
-  const { data, loading: viewsLoading } = usePageViews();
-  const pageViewCounts = data?.counts || {};
   const postsWithViews: PostWithViews[] = posts.map((post) => ({
     ...post,
-    views: pageViewCounts[`/articles/${post.slug}`] || 0,
+    views: post.countview || 0,
   }));
+
   // Create cards array with fixed positions for social cards
-  const cards: (
-    | (typeof postsWithViews)[number]
-    | { id: string; title: string; type: string }
-  )[] = [...postsWithViews.slice(1)];
+  const cards: (PostWithViews | typeof socialCards[0])[] = [...postsWithViews.slice(1)];
   if (cards.length > 1) cards.splice(1, 0, socialCards[0]);
   if (cards.length > 5) cards.splice(5, 0, socialCards[1]);
 
+  const totalPages = Math.ceil(total / limit);
+
+  const handleLoadMore = async () => {
+    if (loading || !hasMore) return;
+    
+    setLoading(true);
+    const nextPage = page + 1;
+    
+    try {
+      const postsData = await fetchPosts({
+        page: nextPage,
+        limit: 10,
+        status: "published",
+        sort: "createdAt",
+        order: "desc",
+      });
+      
+      if (postsData.posts.length > 0) {
+        setPosts(prevPosts => [...prevPosts, ...postsData.posts]);
+        setPage(nextPage);
+        setHasMore(postsData.posts.length === limit);
+      } else {
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error("خطا در بارگذاری پست‌های بیشتر:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="bg-[#f7f8fc] pb-10">
-      <div className="w-full pt-20">
-        <div className="md:w-[70%] mx-auto">
+      <div className="w-full pt-10">
+        <div className="w-[1250px] mx-auto">
           <div className="md:flex justify-between">
             {/* ✅ Left (Main Content) */}
-            <div className=" md:p-0 p-4 w-full md:w-[70%] rounded-2xl h-full">
+            <div className="md:p-0 p-4 w-full md:w-[70%] rounded-2xl h-full">
               {/* Featured First Post */}
               {posts.length > 0 && (
                 <Link href={`/articles/${posts[0].slug}`} passHref>
@@ -122,7 +141,7 @@ export default function PostsPage() {
                                 viewBox="0 0 20 20"
                                 xmlns="http://www.w3.org/2000/svg"
                               >
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.954a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.953c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.539-1.118l1.286-3.953a1 1 0 00-.364-1.118L2.073 9.38c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.954z" />
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.954a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.953c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.539-1.118l1.286-3.953a1 1 0 00-.364-1.118L2.073 9.38c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.950-.69l1.286-3.954z" />
                               </svg>
 
                               {/* Tooltip */}
@@ -160,19 +179,10 @@ export default function PostsPage() {
                               fill="#e16f23"
                             />
                           </svg>
-
-                          <p className="mt-2 mr-1 text-sm">
-                            {viewsLoading
-                              ? "در حال بارگذاری..."
-                              : postsWithViews[0].views}
-                          </p>
+                          <span className="mt-2 mr-1 text-sm">{posts[0].countview}</span>
                         </div>
                         <p className="text-gray-400 text-sm">
-                          زمان مطالعه:{" "}
-                          {new Date(posts[0].createdAt).toLocaleDateString(
-                            "fa-IR"
-                          )}{" "}
-                          دقیقه
+                          زمان مطالعه : {posts[0].readtime} دقیقه
                         </p>
                       </div>
                     </div>
@@ -180,7 +190,6 @@ export default function PostsPage() {
                 </Link>
               )}
             </div>
-
             {/* ✅ Right Sidebar */}
             <div className="md:w-[35%] md:mr-4 md:p-0 p-4">
               <div className="flex flex-col items-center justify-between h-full pb-3">
@@ -221,7 +230,6 @@ export default function PostsPage() {
                     />
                   </div>
                 </div>
-
                 <div className="flex bg-[#ffdab0] py-2 px-5 mb-5 w-full rounded-2xl border-3 border-white">
                   <div className="w-1/2 flex justify-center items-center">
                     <div>
@@ -301,7 +309,6 @@ export default function PostsPage() {
                                 </p>
                               </div>
                             </div>
-
                             <div>
                               <Link
                                 href="https://t.me/yourchannel"
@@ -364,7 +371,6 @@ export default function PostsPage() {
                                 </p>
                               </div>
                             </div>
-
                             <div>
                               <Link
                                 href="https://t.me/yourchannel"
@@ -399,14 +405,14 @@ export default function PostsPage() {
                           height={200}
                           src={`${(card as Post)
                             .imageUrl!}`}
-                            loader={({ src }) => src}
+                          loader={({ src }) => src}
                           alt={(card as Post).imageAlt || (card as Post).title}
                           className="rounded-t-2xl w-full h-42 object-cover"
                         />
                       )}
                       <div className="flex flex-col justify-between p-8">
                         <div className="flex items-center">
-                          {(card as PostWithViews).views > 10 && (
+                          {(card as PostWithViews).countview > 10 && (
                             <svg
                               className="w-5 h-5 ml-2"
                               viewBox="0 0 24 24"
@@ -442,12 +448,8 @@ export default function PostsPage() {
                               </>
                             )}
                           </div>
-
                           <p className="text-sm text-gray-500">
-                            {posts[0].category?.title}
-                            <p className="text-sm text-gray-500">
-                              {(card as Post).category?.title}
-                            </p>
+                            {initialPosts[0].category?.title}
                           </p>
                         </div>
                         <p className="text-base font-semibold text-gray-700  hover:text-[#1d546b]">
@@ -492,28 +494,65 @@ export default function PostsPage() {
               </div>
             ))}
           </div>
-
-          {/* ✅ Pagination */}
-          <div className="mt-12 flex justify-center items-center gap-2">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
+          {hasMore && (
+            <div className="mt-12 flex justify-center">
               <button
-                key={num}
-                onClick={() => setPage(num)}
-                className={`
-        px-3 py-1 rounded
-        ${
-          page === num
-            ? "bg-[#ff5084] text-white"
-            : "bg-gray-200 hover:bg-gray-300"
-        }
-      `}
+                onClick={handleLoadMore}
+                disabled={loading}
+                className="px-6 py-3 bg-[#ff5084] text-white rounded-lg hover:bg-[#e04475] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {num}
+                {loading ? (
+                  <div className="flex items-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    در حال بارگذاری...
+                  </div>
+                ) : (
+                  "بارگذاری پست‌های بیشتر"
+                )}
               </button>
-            ))}
-          </div>
+            </div>
+          )}
+          {/* ✅ Pagination */}
+        
         </div>
       </div>
     </main>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  try {
+    const page = parseInt(context.query.page as string) || 1;
+    const limit = 10;
+
+    // دریافت پست‌ها
+    const postsData = await fetchPosts({
+      page,
+      limit,
+      status: "published",
+      sort: "createdAt",
+      order: "desc",
+    });
+    // دریافت آمار بازدیدها
+    return {
+      props: {
+        initialPosts: postsData.posts,
+        total: postsData.total,
+        initialPage: page,
+      },
+    };
+  } catch (error) {
+    console.error("Error in getServerSideProps:", error);
+    return {
+      props: {
+        initialPosts: [],
+        total: 0,
+        pageViewCounts: {},
+        initialPage: 1,
+      },
+    };
+  }
+};

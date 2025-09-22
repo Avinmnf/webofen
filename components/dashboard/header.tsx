@@ -63,7 +63,7 @@ const HeaderPanel: React.FC = () => {
             <ul className="flex flex-col text-right text-gray-700">
               <li className="px-5 py-3 border-b border-gray-100 hover:bg-blue-50 transition-colors duration-200">
                 <Link
-                  href="/dashboard/support"
+                  href="/dashboard/tickets"
                   className="flex items-center gap-2"
                 >
                   پشتیبانی

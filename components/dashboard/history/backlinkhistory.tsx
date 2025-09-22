@@ -3,8 +3,7 @@
 import React from "react";
 import SmallProgressCircle from "../smallprogress";
 import Image from "next/image";
-import { BacklinkItem } from "../jobs/backlink";
-
+import { BacklinkItem } from "@/pages/dashboard/backlink";
 interface BacklinkHistoryProps {
   history: BacklinkItem[];
   onSelect: (id: string) => void;

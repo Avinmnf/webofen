@@ -281,10 +281,10 @@ export default function PostPage({ post }: Props) {
                       <span>{dislikes}</span>
                     </button>
                   </div>
-                  <div className="w-full flex gap-6 justify-center items-center">
+                  <div className="w-full flex gap-6 p-2 mt-3 justify-center items-center">
                     <Link href={"/instagram"}>
                       <svg
-                        className="w-5 h-5 mt-5 text-gray-400 hover:text-amber-700"
+                        className="w-6 h-6 text-gray-400 hover:text-amber-700"
                         viewBox="0 0 24 24"
                         id="meteor-icon-kit__solid-instagram"
                         fill="currentColor"
@@ -301,7 +301,7 @@ export default function PostPage({ post }: Props) {
                     </Link>{" "}
                     <Link href={"/twitter"} className="pt-2">
                       {" "}
-                      <svg className="w-5 h-5 mt-6 text-gray-400 hover:text-blue-300" viewBox="0 0 24 24" fill="none">
+                      <svg className="w-6 h-6 text-gray-400 hover:text-blue-300" viewBox="0 0 24 24" fill="none">
                         {" "}
                         <path
                           d="M23 3a10.9 10.9 0 01-3.14 1.53A4.48 4.48 0 0022.4 1.6a9.04 9.04 0 01-2.88 1.1A4.52 4.52 0 0016 0c-2.48 0-4.5 2.02-4.5 4.5 0 .35.04.7.11 1.03A12.86 12.86 0 013 2.1s-4 9 5 13a13 13 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"
@@ -312,7 +312,7 @@ export default function PostPage({ post }: Props) {
                     <Link href="/linkedin">
                       {" "}
                       <svg
-                        className="w-5 h-5 mt-5 text-gray-400 hover:text-blue-800"
+                        className="w-6 h-6 text-gray-400 hover:text-blue-800"
                         viewBox="0 0 24 24"
                         fill="currentColor"
                         xmlns="http://www.w3.org/2000/svg"
@@ -324,7 +324,7 @@ export default function PostPage({ post }: Props) {
                     <Link href="/telegram">
                       {" "}
                       <svg
-                        className="w-5 h-5 mt-6 text-gray-400 hover:text-blue-500"
+                        className="w-6 h-6 text-gray-400 hover:text-blue-500"
                         viewBox="0 0 48 48"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
@@ -338,7 +338,7 @@ export default function PostPage({ post }: Props) {
                     </Link>
                     <Link href="/facebook">
                       <svg
-                        className="w-5 h-5 mt-5 text-gray-400 hover:text-blue-900"
+                        className="w-6 h-6 text-gray-400 hover:text-blue-900"
                         viewBox="0 0 290 290"
                         fill="currentColor"
                         xmlns="http://www.w3.org/2000/svg"
@@ -381,17 +381,17 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { slug } = ctx.params as { slug: string };
 
   const safeSlug = encodeURIComponent(slug);
+  const website = process.env.NEXT_PUBLIC_WEBOFEN || 'https://webofen.com'
 
   let post: Post | null = null;
   try {
-    const res = await fetch(`http://localhost:3000/api/proxy/postbyslug/${safeSlug}`, {
+    const res = await fetch(`${website}/api/proxy/postbyslug/${safeSlug}`, {
       headers: {
         "Content-Type": "application/json"
       },
     });
     if (!res.ok) throw new Error("Failed to fetch product");
     const data = await res.json();
-    console.log(data)
     post = data.post;
   } catch (err) {
     console.error(err);

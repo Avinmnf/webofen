@@ -443,8 +443,10 @@ export default function ProductDetailPage({ product }: Props) {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { slug } = ctx.params as { slug: string };
   let product: Product | null = null;
+  const website = process.env.NEXT_PUBLIC_WEBOFEN || 'https://webofen.com'
+
   try {
-    const res = await fetch(`http://localhost:3002/api/proxy/productbyslug/${slug}`, {
+    const res = await fetch(`${website}/api/proxy/productbyslug/${slug}`, {
       headers: {
         "Content-Type": "application/json",
       },
