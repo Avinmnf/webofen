@@ -8,6 +8,19 @@ import { useAuth } from "@/contexts/AuthContext";
 import BacklinkHistory from "@/components/dashboard/history/backlinkhistory";
 import ProgressCircle from "@/components/dashboard/progress";
 import SmallProgressCircle from "@/components/dashboard/smallprogress";
+import AnimatedProgress from "@/components/dashboard/AnimatedProgress";
+interface Variant {
+  product: {
+    id: string;
+    slug: string;
+    title: string;
+  };
+  attributeValues: {
+    attribute: { name: string };
+    value: string;
+  }[];
+}
+
 
 export interface BacklinkItem {
   id: string;
@@ -27,6 +40,7 @@ export interface BacklinkItem {
   keyword: string;
   submittedValues?: { id: string; label: string; value: string }[];
   completionReport?: string;
+  variant: Variant;
 }
 
 const statusProgressMap: Record<string, number> = {
@@ -66,6 +80,8 @@ const BacklinkPage: React.FC = () => {
             item.inputValues?.find((iv) => iv.field?.label === "Keyword")
               ?.value || "",
           completionReport: item.completionReport || "",
+            variant: item.variant, // ← add this
+
         }))
     );
 
@@ -243,10 +259,13 @@ const BacklinkPage: React.FC = () => {
               {/* Top in-progress pill */}
               {bigInProgressItem && (
                 <div className="flex items-center relative flex-row-reverse w-full justify-between p-4">
-                  <ProgressCircle
-                    percentage={getProgress(bigInProgressItem)}
-                    delayed={isDelayed(bigInProgressItem)}
-                  />
+<AnimatedProgress
+  key={bigInProgressItem.id}
+  item={{ ...bigInProgressItem, delayed: isDelayed(bigInProgressItem) }} // ensure boolean
+  canceled={bigInProgressItem.adminStatus === "cancelled"}
+  delayed={isDelayed(bigInProgressItem)}
+/>
+
                   <button
                     onClick={() => handleClick(bigInProgressItem.id)}
                     className="absolute left-14 w-20 h-16 flex items-center justify-center"
