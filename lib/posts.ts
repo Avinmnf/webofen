@@ -28,25 +28,18 @@ export async function fetchPosts(options: UsePostsOptions = {}) {
                 let content = "";
                 const safeSlug = encodeURIComponent(post.slug);
                 try {
-                    const postRes = await fetch(`${website}/api/proxy/postbyslug/${safeSlug}`);
-                    if (postRes.ok) {
-                        const postData = await postRes.json();
-                        content = postData.post.content || "";
-                    }
+                    content = post.content || "";
                 } catch (err) {
                     console.error("Failed to fetch post content for readtime", err);
                 }
                 let counts = 0
                 try {
                     const res = await fetch(`${website}/api/proxy/getviewbyslug/${safeSlug}`);
-                    
                     if (!res.ok) {
                         throw new Error(`Failed to fetch page views: ${res.status}`);
                     }
-
                     const data = await res.json();
                     counts = data.count;
-                    
                 } catch (err) {
                     console.error("Failed to fetch post content for readtime", err);
                 }

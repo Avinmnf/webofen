@@ -25,6 +25,7 @@ export default function PostsPage({
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(initialPage);
+  const [hasMore, setHasMore] = useState(initialPosts.length < total);
   const limit = 10;
 
   const socialCards = [
@@ -55,33 +56,43 @@ export default function PostsPage({
   if (cards.length > 5) cards.splice(5, 0, socialCards[1]);
 
   const totalPages = Math.ceil(total / limit);
-  const handlePageChange = async (newPage: number) => {
+
+  const handleLoadMore = async () => {
+    if (loading || !hasMore) return;
+    
     setLoading(true);
+    const nextPage = page + 1;
+    
     try {
       const postsData = await fetchPosts({
-        page: newPage,
+        page: nextPage,
         limit: 10,
         status: "published",
         sort: "createdAt",
         order: "desc",
       });
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      setPosts(postsData.posts);
-      setPage(newPage);
+      
+      if (postsData.posts.length > 0) {
+        setPosts(prevPosts => [...prevPosts, ...postsData.posts]);
+        setPage(nextPage);
+        setHasMore(postsData.posts.length === limit);
+      } else {
+        setHasMore(false);
+      }
     } catch (error) {
-      console.error("خطا در گرفتن پست‌ها:", error);
+      console.error("خطا در بارگذاری پست‌های بیشتر:", error);
     } finally {
       setLoading(false);
     }
   };
-  
+
   return (
     <main className="bg-[#f7f8fc] pb-10">
-      <div className="w-full pt-20">
-        <div className="md:w-[70%] mx-auto">
+      <div className="w-full pt-10">
+        <div className="w-[1250px] mx-auto">
           <div className="md:flex justify-between">
             {/* ✅ Left (Main Content) */}
-            <div className=" md:p-0 p-4 w-full md:w-[70%] rounded-2xl h-full">
+            <div className="md:p-0 p-4 w-full md:w-[70%] rounded-2xl h-full">
               {/* Featured First Post */}
               {posts.length > 0 && (
                 <Link href={`/articles/${posts[0].slug}`} passHref>
@@ -130,7 +141,7 @@ export default function PostsPage({
                                 viewBox="0 0 20 20"
                                 xmlns="http://www.w3.org/2000/svg"
                               >
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.954a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.953c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.539-1.118l1.286-3.953a1 1 0 00-.364-1.118L2.073 9.38c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.954z" />
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.954a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.953c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.539-1.118l1.286-3.953a1 1 0 00-.364-1.118L2.073 9.38c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.950-.69l1.286-3.954z" />
                               </svg>
 
                               {/* Tooltip */}
@@ -169,7 +180,6 @@ export default function PostsPage({
                             />
                           </svg>
                           <span className="mt-2 mr-1 text-sm">{posts[0].countview}</span>
-
                         </div>
                         <p className="text-gray-400 text-sm">
                           زمان مطالعه : {posts[0].readtime} دقیقه
@@ -484,25 +494,29 @@ export default function PostsPage({
               </div>
             ))}
           </div>
-
-          {/* ✅ Pagination */}
-          <div className="mt-12 flex justify-center items-center gap-2">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
+          {hasMore && (
+            <div className="mt-12 flex justify-center">
               <button
-                key={num}
-                onClick={() => handlePageChange(num)}
-                className={`
-                  px-3 py-1 rounded cursor-pointer
-                  ${page === num
-                              ? "bg-[#ff5084] text-white"
-                              : "bg-gray-200 hover:bg-gray-300"
-                            }
-                `}
+                onClick={handleLoadMore}
+                disabled={loading}
+                className="px-6 py-3 bg-[#ff5084] text-white rounded-lg hover:bg-[#e04475] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {num}
+                {loading ? (
+                  <div className="flex items-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    در حال بارگذاری...
+                  </div>
+                ) : (
+                  "بارگذاری پست‌های بیشتر"
+                )}
               </button>
-            ))}
-          </div>
+            </div>
+          )}
+          {/* ✅ Pagination */}
+        
         </div>
       </div>
     </main>
