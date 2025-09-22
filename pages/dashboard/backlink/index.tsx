@@ -8,7 +8,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import BacklinkHistory from "@/components/dashboard/history/backlinkhistory";
 import ProgressCircle from "@/components/dashboard/progress";
 import SmallProgressCircle from "@/components/dashboard/smallprogress";
-import AnimatedProgress from "@/components/dashboard/AnimatedProgress";
+import SimpleProgress from "@/components/dashboard/AnimatedProgress";
+import CircularProgressWithTimesmall from "@/components/dashboard/AnimatedProgresssmall";
 interface Variant {
   product: {
     id: string;
@@ -20,7 +21,6 @@ interface Variant {
     value: string;
   }[];
 }
-
 
 export interface BacklinkItem {
   id: string;
@@ -36,6 +36,7 @@ export interface BacklinkItem {
   completionTime?: string;
   deadline?: string;
   createdAt: string;
+  startTime: string;
   siteurl?: string;
   keyword: string;
   submittedValues?: { id: string; label: string; value: string }[];
@@ -80,8 +81,9 @@ const BacklinkPage: React.FC = () => {
             item.inputValues?.find((iv) => iv.field?.label === "Keyword")
               ?.value || "",
           completionReport: item.completionReport || "",
-            variant: item.variant, // ← add this
-
+          variant: item.variant, // ← add this
+          startTime: item.startTime,
+          deadline: item.deadline,
         }))
     );
 
@@ -231,7 +233,9 @@ const BacklinkPage: React.FC = () => {
     (item) =>
       item.adminStatus === "completed" || new Date(item.createdAt) < oneMonthAgo
   );
-
+  console.log("Item to render progress:", bigInProgressItem);
+  console.log("StartTime:", bigInProgressItem?.startTime);
+  console.log("Deadline:", bigInProgressItem?.deadline);
   if (!isLoggedIn)
     return (
       <p className="text-center py-10">ابتدا باید وارد حساب کاربری خود شوید</p>
@@ -241,7 +245,7 @@ const BacklinkPage: React.FC = () => {
 
   return (
     <>
-      <div className="relative w-full ">
+      <div className="relative w-full">
         <div
           className={`transition-transform duration-700 [transform-style:preserve-3d] ${
             showHistory ? "[transform:rotateY(180deg)]" : ""
@@ -257,14 +261,17 @@ const BacklinkPage: React.FC = () => {
               )}
 
               {/* Top in-progress pill */}
+
               {bigInProgressItem && (
                 <div className="flex items-center relative flex-row-reverse w-full justify-between p-4">
-<AnimatedProgress
-  key={bigInProgressItem.id}
-  item={{ ...bigInProgressItem, delayed: isDelayed(bigInProgressItem) }} // ensure boolean
-  canceled={bigInProgressItem.adminStatus === "cancelled"}
-  delayed={isDelayed(bigInProgressItem)}
-/>
+                  {bigInProgressItem && (
+                    <SimpleProgress
+                      startTime={bigInProgressItem.startTime}
+                      deadline={bigInProgressItem.deadline || ""}
+                      completionTime={bigInProgressItem.completionTime}
+                      canceled={bigInProgressItem.adminStatus === "cancelled"}
+                    />
+                  )}
 
                   <button
                     onClick={() => handleClick(bigInProgressItem.id)}
@@ -344,7 +351,7 @@ const BacklinkPage: React.FC = () => {
                     <h3 className="text-gray-700 text-lg font-semibold mb-4">
                       قرص های مصرف نشده
                     </h3>
-                    <div className="flex flex-wrap justify-center gap-6 w-full">
+                    <div className="flex flex-wrap justify-start bg-gray-200 rounded-xl p-6 gap-6 w-full">
                       {[
                         ...otherInProgressItems,
                         ...delayedItems,
@@ -372,8 +379,10 @@ const BacklinkPage: React.FC = () => {
                               key={item.id}
                               className="flex flex-col items-center relative scale-90"
                             >
-                              <SmallProgressCircle
-                                percentage={getProgress(item)}
+                              <CircularProgressWithTimesmall
+                                startTime={item.startTime} // use item
+                                deadline={item.deadline || undefined} // use item
+                                completionTime={item.completionTime} // use item
                                 delayed={delayed}
                                 canceled={canceled}
                               />
@@ -436,12 +445,12 @@ const BacklinkPage: React.FC = () => {
                   backlinksState.filter(
                     (item) => item.adminStatus === "canceled"
                   ).length > 0) && (
-                  <div className="flex flex-col md:flex-row gap-8 mt-6">
+                  <div className="flex flex-col md:flex-row gap-8 md:w-1/2 mt-6">
                     {/* Completed Summary */}
                     {backlinksState.filter(
                       (item) => item.adminStatus === "completed"
                     ).length > 0 && (
-                      <div className="flex flex-col md:flex-row w-full md:w-1/2 gap-4 mt-6">
+                      <div className="flex flex-col md:flex-row w-full gap-4 mt-6">
                         {backlinksState
                           .filter((item) => item.adminStatus === "completed")
                           .map((item) => (

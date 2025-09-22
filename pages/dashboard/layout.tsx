@@ -23,18 +23,19 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const isMobile = useIsMobile();
 
   return (
-    <div className="min-h-screen bg-[#f7f8fc]">
-      <div className="md:w-8/12 mx-auto px-4 py-6 max-w-7xl ">
-        {/* Header */}
-        <HeaderPanel />
-        {/* Sidebar */}
-        <div className="flex mt-6 bg-whitex shadow-sm rounded-lg">
-          <DashboardSidebar isMobile={isMobile} />
-          {/* Main content */}
-          <div className="w-full bg-white rounded-l-md p-8">{children}</div>
-        </div>
-      </div>
+<div className="min-h-screen bg-[#f7f8fc]">
+  <div className="md:w-8/12 mx-auto px-4 py-6 max-w-7xl">
+    {/* Header */}
+    <HeaderPanel />
+    {/* Sidebar */}
+    <div className="flex mt-6 bg-white shadow-sm rounded-lg h-screen">
+      <DashboardSidebar isMobile={isMobile} />
+      {/* Main content */}
+      <div className="w-full bg-white rounded-l-md p-8">{children}</div>
     </div>
+  </div>
+</div>
+
   );
 };
 
