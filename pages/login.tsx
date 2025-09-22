@@ -27,6 +27,10 @@ const LoginPage = () => {
     setLoading(false);
   };
 
+  const handlePhoneLogin = () => {
+    router.push('/login-phone'); // هدایت به صفحه ورود با شماره
+  };
+
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md text-black">
       <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
@@ -72,8 +76,18 @@ const LoginPage = () => {
           {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
+
+      {/* دکمه ورود با شماره تلفن */}
+      <div className="mt-4 text-center">
+        <button
+          onClick={handlePhoneLogin}
+          className="text-blue-500 underline hover:text-blue-700"
+        >
+          ورود با شماره تلفن 
+        </button>
+      </div>
     </div>
   );
 };
 
-export default LoginPage
+export default LoginPage;

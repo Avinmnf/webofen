@@ -58,6 +58,7 @@ async function processToken(token: string, req: NextApiRequest, res: NextApiResp
               id
               name
               email
+              phone
               role {
                 id
                 name
