@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 
 export default function SignupPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [form, setForm] = useState({ name: '', email: '', password: '' , phone:""});
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -43,9 +43,10 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6  rounded-md shadow-sm  bg-white">
+    <div className="max-w-md mx-auto p-6 rounded-md shadow-sm bg-white">
       <h1 className="text-2xl font-bold mb-4 text-center text-gray-700">ثبت‌ نام</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* نام */}
         <div>
           <label className="block mb-1 font-medium text-gray-700">نام</label>
           <input
@@ -57,6 +58,8 @@ export default function SignupPage() {
             required
           />
         </div>
+
+        {/* ایمیل */}
         <div>
           <label className="block mb-1 font-medium text-gray-700">ایمیل</label>
           <input
@@ -65,9 +68,24 @@ export default function SignupPage() {
             className="w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300 text-gray-600"
             value={form.email}
             onChange={handleChange}
-            required
+            placeholder="you@example.com"
           />
         </div>
+
+        {/* شماره تلفن */}
+        <div>
+          <label className="block mb-1 font-medium text-gray-700">شماره تلفن</label>
+          <input
+            name="phone"
+            type="tel"
+            className="w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300 text-gray-600"
+            value={form.phone}
+            onChange={handleChange}
+            placeholder="مثال: 09121234567"
+          />
+        </div>
+
+        {/* رمز عبور */}
         <div>
           <label className="block mb-1 font-medium text-gray-700">رمز عبور</label>
           <input
@@ -81,20 +99,29 @@ export default function SignupPage() {
           />
         </div>
 
+        {/* خطا */}
         {error && (
-          <p className="text-red-500 text-sm bg-red-100 p-2 rounded ">{error}</p>
+          <p className="text-red-500 text-sm bg-red-100 p-2 rounded">{error}</p>
         )}
 
+        {/* دکمه ثبت */}
         <button
           type="submit"
           disabled={loading}
           className={`w-full py-2 px-4 rounded text-white font-semibold transition ${
-            loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+            loading
+              ? "bg-blue-300 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
           }`}
         >
-          {loading ? 'در حال ثبت‌نام...' : 'ثبت‌نام'}
+          {loading ? "در حال ثبت‌نام..." : "ثبت‌نام"}
         </button>
       </form>
+
+      {/* لینک ورود */}
+      <p className="mt-4 text-center text-blue-600 underline cursor-pointer" onClick={() => router.push("/login")}>
+        وارد صفحه لاگین شوید
+      </p>
     </div>
   );
 }
