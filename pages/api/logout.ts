@@ -1,13 +1,16 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { deleteCookie } from 'cookies-next';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    res.setHeader(
-      'Set-Cookie',
-      `token=; HttpOnly; Path=/; Max-Age=0; SameSite=Strict; ${
-        process.env.NODE_ENV === 'production' ? 'Secure' : ''
-      }`
-    );
+    deleteCookie('token', {
+      req,
+      res,
+      path: '/',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+    });
 
     return res.status(200).json({ message: 'Logged out successfully' });
   }
