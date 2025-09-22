@@ -12,7 +12,7 @@ interface CircularProgressWithTimeProps {
   canceled?: boolean;
 }
 
-const CircularProgressWithTime: React.FC<CircularProgressWithTimeProps> = ({
+const CircularProgressWithTimesmall: React.FC<CircularProgressWithTimeProps> = ({
   startTime,
   deadline,
   completionTime,
@@ -21,11 +21,17 @@ const CircularProgressWithTime: React.FC<CircularProgressWithTimeProps> = ({
 }) => {
   const [percentage, setPercentage] = useState(0);
 
-  const calculateProgress = () => {
-    // If task is completed, always 100%
-    if (completionTime) return 100;
-    if (!startTime || !deadline) return 0;
+  // If startTime or deadline are missing, don't show the progress
+  if (!startTime || !deadline) {
+    return (
+      <div className="w-20 h-20 flex items-center justify-center bg-gray-100 rounded-full">
+        {/* Optional: small placeholder or icon */}
+      </div>
+    );
+  }
 
+  const calculateProgress = () => {
+    if (completionTime) return 100;
     const start = new Date(startTime).getTime();
     const end = new Date(deadline).getTime();
     const now = Date.now();
@@ -50,18 +56,16 @@ const CircularProgressWithTime: React.FC<CircularProgressWithTimeProps> = ({
   if (canceled) pathColor = "#9ca3af"; // canceled
 
   return (
-    <div className="w-40 h-40">
+    <div className="w-20 h-20">
       <CircularProgressbarWithChildren
         value={percentage}
         styles={buildStyles({
           pathColor,
           trailColor: "#eeeeee",
         })}
-      >
-
-      </CircularProgressbarWithChildren>
+      />
     </div>
   );
 };
 
-export default CircularProgressWithTime;
+export default CircularProgressWithTimesmall;

@@ -35,8 +35,10 @@ export interface OrderItem {
   adminStatus?: string;
   delayed?: string;
   variant: Variant;
+  deadline?: string;
   inputValues?: OrderItemInputValue[];
   completionReport?: string;
+  startTime: string;
 }
 
 export interface Order {
