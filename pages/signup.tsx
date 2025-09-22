@@ -120,7 +120,7 @@ export default function SignupPage() {
 
       {/* لینک ورود */}
       <p className="mt-4 text-center text-blue-600 underline cursor-pointer" onClick={() => router.push("/login")}>
-        وارد صفحه لاگین شوید
+        وارد   شوید
       </p>
     </div>
   );

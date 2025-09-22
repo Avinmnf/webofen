@@ -31,6 +31,10 @@ const LoginPage = () => {
     router.push('/login-phone'); // هدایت به صفحه ورود با شماره
   };
 
+  const handleSignup = () => {
+    router.push('/signup'); // هدایت به صفحه ثبت‌نام
+  };
+
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md text-black">
       <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
@@ -83,7 +87,17 @@ const LoginPage = () => {
           onClick={handlePhoneLogin}
           className="text-blue-500 underline hover:text-blue-700"
         >
-          ورود با شماره تلفن 
+          ورود با شماره تلفن
+        </button>
+      </div>
+
+      {/* دکمه ثبت نام */}
+      <div className="mt-2 text-center">
+        <button
+          onClick={handleSignup}
+          className="text-blue-500 underline hover:text-blue-700"
+        >
+          حساب کاربری ندارید؟ ثبت‌نام کنید
         </button>
       </div>
     </div>
