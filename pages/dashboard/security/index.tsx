@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useOrderInput } from "@/hooks/useOrderInput";
 import { useUserOrders } from "@/hooks/useUserOrders";
 import { useAuth } from "@/contexts/AuthContext";
-import BacklinkHistory from "@/components/dashboard/history/backlinkhistory";
 import ProgressCircle from "@/components/dashboard/progress";
 import SmallProgressCircle from "@/components/dashboard/smallprogress";
 
@@ -373,18 +372,7 @@ const SecurityPage: React.FC = () => {
           {/* BACK SIDE – History */}
           <div className="absolute inset-0 [transform:rotateY(180deg)] backface-hidden">
             <div className="flex flex-col items-center text-gray-700 bg-gray-50 p-4 rounded-lg shadow-sm space-y-8">
-              {historyOrders.length > 0 ? (
-                <BacklinkHistory
-                  history={historyOrders}
-                  onSelect={handleClick}
-                  getProgress={getProgress}
-                  isDelayed={isDelayed}
-                />
-              ) : (
-                <p className="text-gray-500 text-center mt-10">
-                  هیچ سابقه‌ای برای این محصول وجود ندارد.
-                </p>
-              )}
+            
             </div>
           </div>
         </div>
