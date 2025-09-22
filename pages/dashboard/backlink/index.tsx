@@ -5,11 +5,10 @@ import Image from "next/image";
 import { useOrderInput } from "@/hooks/useOrderInput";
 import { useUserOrders } from "@/hooks/useUserOrders";
 import { useAuth } from "@/contexts/AuthContext";
-import BacklinkHistory from "@/components/dashboard/history/backlinkhistory";
-import ProgressCircle from "@/components/dashboard/progress";
-import SmallProgressCircle from "@/components/dashboard/smallprogress";
 import SimpleProgress from "@/components/dashboard/AnimatedProgress";
 import CircularProgressWithTimesmall from "@/components/dashboard/AnimatedProgresssmall";
+
+
 interface Variant {
   product: {
     id: string;
@@ -101,6 +100,8 @@ const BacklinkPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
+const [completedOpen, setCompletedOpen] = useState(false);
+const [cancelledOpen, setCancelledOpen] = useState(false);
 
   const {
     fields,
@@ -377,7 +378,7 @@ const BacklinkPage: React.FC = () => {
                           return (
                             <div
                               key={item.id}
-                              className="flex flex-col items-center relative scale-90"
+                              className="flex flex-col items-center relative scale-90 "
                             >
                               <CircularProgressWithTimesmall
                                 startTime={item.startTime} // use item
@@ -388,7 +389,7 @@ const BacklinkPage: React.FC = () => {
                               />
                               <button
                                 onClick={() => handleClick(item.id)}
-                                className="absolute top-4 w-12 h-12 flex items-center justify-center"
+                                className="absolute top-4 w-12 h-12 flex items-center justify-center cursor-pointer"
                               >
                                 <div className="relative w-full h-16 flex justify-center items-center overflow-hidden">
                                   <Image
@@ -437,104 +438,127 @@ const BacklinkPage: React.FC = () => {
                     </div>
                   </div>
                 )}
+{/* Completed & Canceled Summary */}
+{(backlinksState.some((item) => item.adminStatus === "completed") ||
+  backlinksState.some((item) => item.adminStatus === "cancelled")) && (
+  <div className="flex flex-col gap-6 mt-6">
+    {/* Completed Section */}
+    {backlinksState.some((item) => item.adminStatus === "completed") && (
+      <div className="bg-white rounded-2xl shadow-md">
+        {/* Section Header */}
+        <button
+          onClick={() => setCompletedOpen((prev) => !prev)}
+          className="w-full flex justify-between items-center p-4 text-green-700 font-bold text-lg"
+        >
+          <span>
+            سفارش‌های تکمیل‌شده (
+            {backlinksState.filter((i) => i.adminStatus === "completed").length})
+          </span>
+          {completedOpen}
+        </button>
 
-                {/* Completed & Canceled Summary */}
-                {(backlinksState.filter(
-                  (item) => item.adminStatus === "completed"
-                ).length > 0 ||
-                  backlinksState.filter(
-                    (item) => item.adminStatus === "canceled"
-                  ).length > 0) && (
-                  <div className="flex flex-col md:flex-row gap-8 md:w-1/2 mt-6">
-                    {/* Completed Summary */}
-                    {backlinksState.filter(
-                      (item) => item.adminStatus === "completed"
-                    ).length > 0 && (
-                      <div className="flex flex-col md:flex-row w-full gap-4 mt-6">
-                        {backlinksState
-                          .filter((item) => item.adminStatus === "completed")
-                          .map((item) => (
-                            <div
-                              key={item.id}
-                              className="flex flex-row items-center bg-white  rounded-2xl p-4 transition hover:scale-102"
-                            >
-                              <div className="flex items-center gap-3">
-                                {/* Pill preview */}
-                                <button
-                                  onClick={() => handleClick(item.id)}
-                                  className="relative w-14 h-14 flex justify-center items-center group"
-                                >
-                                  <div className="absolute w-10 h-10 flex justify-center items-center  rounded-full  animate-bounce">
-                                    <SmallProgressCircle
-                                      percentage={100}
-                                      delayed={false}
-                                    />
-                                    <Image
-                                      width={40}
-                                      height={40}
-                                      alt="Backlink"
-                                      src={"/dashboard/backlink.png"}
-                                      className="object-contain rotate-12"
-                                    />
-                                  </div>
-                                </button>
-                              </div>
-                              <div className="ml-4">
-                                <h3 className="text-gray-500 text-lg font-semibold mb-1">
-                                  سفارش تکمیل‌شده
-                                </h3>
-                                <p className="text-gray-600 text-sm">
-                                  تاریخ خرید:{" "}
-                                  {new Date(item.createdAt).toLocaleDateString(
-                                    "fa-IR"
-                                  )}
-                                </p>
-                              </div>
-                            </div>
-                          ))}
-                      </div>
-                    )}
+        {/* Collapsible Content */}
+        {completedOpen && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4 border-t">
+            {backlinksState
+              .filter((item) => item.adminStatus === "completed")
+              .map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center bg-gray-50 rounded-xl p-4 shadow-sm hover:shadow-lg transition"
+                >
+                  {/* Pill preview */}
+                  <button
+                    onClick={() => handleClick(item.id)}
+                    className="relative w-14 h-14 flex justify-center items-center"
+                  >
+                    <div className="absolute w-12 h-12 flex justify-center items-center rounded-full border-2 border-green-300 animate-bounce">
+                      <Image
+                        width={32}
+                        height={32}
+                        alt="Backlink"
+                        src={"/dashboard/backlink.png"}
+                        className="object-contain rotate-12"
+                      />
+                    </div>
+                  </button>
 
-                    {/* Canceled Summary */}
-                    {backlinksState.filter(
-                      (item) => item.adminStatus === "canceled"
-                    ).length > 0 && (
-                      <div className="flex flex-col items-center w-1/2 bg-white/80 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-red-400 transition hover:scale-105">
-                        <h3 className="text-red-600 text-lg font-semibold mb-3">
-                          لغوشده
-                        </h3>
-                        <div className="flex items-center gap-3">
-                          {/* Pill preview */}
-                          <div className="relative w-14 h-14 flex justify-center items-center">
-                            <SmallProgressCircle
-                              percentage={0}
-                              delayed={false}
-                              canceled
-                            />
-                            <div className="absolute w-10 h-10 flex justify-center items-center bg-red-500 rounded-full shadow-md filter grayscale opacity-80">
-                              <Image
-                                width={40}
-                                height={40}
-                                alt="Backlink"
-                                src={"/dashboard/backlink.png"}
-                                className="object-contain rotate-12"
-                              />
-                            </div>
-                          </div>
-                          {/* Counter */}
-                          <span className="text-red-600 font-bold text-xl animate-pulse">
-                            ×{" "}
-                            {
-                              backlinksState.filter(
-                                (item) => item.adminStatus === "canceled"
-                              ).length
-                            }
-                          </span>
-                        </div>
-                      </div>
-                    )}
+                  {/* Info */}
+                  <div className="ml-4 flex-1">
+                    <p className="text-gray-700 text-sm font-bold">
+                      تاریخ خرید:{" "}
+                      {new Date(item.createdAt).toLocaleDateString("fa-IR")}
+                    </p>
+                    <p className="text-gray-500 text-sm">
+                      پرداخت شده: {item.price}
+                    </p>
                   </div>
-                )}
+                </div>
+              ))}
+          </div>
+        )}
+      </div>
+    )}
+
+    {/* Cancelled Section */}
+    {backlinksState.some((item) => item.adminStatus === "cancelled") && (
+      <div className="bg-white rounded-2xl shadow-md">
+        {/* Section Header */}
+        <button
+          onClick={() => setCancelledOpen((prev) => !prev)}
+          className="w-full flex justify-between items-center p-4 text-red-700 font-bold text-lg"
+        >
+          <span>
+            سفارش‌های لغو‌شده (
+            {backlinksState.filter((i) => i.adminStatus === "cancelled").length})
+          </span>
+          {cancelledOpen}
+        </button>
+
+        {/* Collapsible Content */}
+        {cancelledOpen && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4 border-t">
+            {backlinksState
+              .filter((item) => item.adminStatus === "cancelled")
+              .map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center bg-gray-50 rounded-xl p-4 shadow-sm hover:shadow-lg transition"
+                >
+                  <button
+                    onClick={() => handleClick(item.id)}
+                    className="relative w-14 h-14 flex justify-center items-center"
+                  >
+                    <div className="absolute w-12 h-12 flex justify-center items-center rounded-full border-2 border-red-300">
+                      <Image
+                        width={32}
+                        height={32}
+                        alt="Backlink"
+                        src={"/dashboard/backlink.png"}
+                        className="object-contain rotate-12"
+                      />
+                    </div>
+                  </button>
+
+                  <div className="ml-4 flex-1">
+                    <p className="text-gray-700 text-sm font-bold">
+                      تاریخ خرید:{" "}
+                      {new Date(item.createdAt).toLocaleDateString("fa-IR")}
+                    </p>
+                  </div>
+
+                  <span className="ml-3 px-3 py-1 text-xs font-semibold text-red-700 bg-red-100 rounded-full">
+                    لغو شده
+                  </span>
+                </div>
+              ))}
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+)}
+
               </div>
             </div>
           </div>
@@ -542,18 +566,8 @@ const BacklinkPage: React.FC = () => {
           {/* BACK SIDE – History */}
           <div className="absolute inset-0 [transform:rotateY(180deg)] backface-hidden">
             <div className="flex flex-col items-center text-gray-700 bg-gray-50 p-4 rounded-lg shadow-sm space-y-8">
-              {historyOrders.length > 0 ? (
-                <BacklinkHistory
-                  history={historyOrders}
-                  onSelect={handleClick}
-                  getProgress={getProgress}
-                  isDelayed={isDelayed}
-                />
-              ) : (
-                <p className="text-gray-500 text-center mt-10">
-                  هیچ سابقه‌ای برای این محصول وجود ندارد.
-                </p>
-              )}
+            
+               
             </div>
           </div>
         </div>

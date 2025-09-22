@@ -325,18 +325,7 @@ const Backlink: React.FC<BacklinkProps> = ({ backlinks }) => {
           {/* BACK SIDE – History */}
           <div className="absolute inset-0 [transform:rotateY(180deg)] backface-hidden">
             <div className="flex flex-col items-center text-gray-700 bg-gray-50 p-4 rounded-lg shadow-sm space-y-8">
-              {historyOrders.length > 0 ? (
-                <BacklinkHistory
-                  history={historyOrders}
-                  onSelect={handleClick}
-                  getProgress={getProgress}
-                  isDelayed={isDelayed}
-                />
-              ) : (
-                <p className="text-gray-500 text-center mt-10">
-                  هیچ سابقه‌ای برای این محصول وجود ندارد.
-                </p>
-              )}
+
             </div>
           </div>
         </div>
