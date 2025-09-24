@@ -17,7 +17,7 @@ const services = [
   { id: "cluster", label: "کلاستر", icon: "/dashboard/cluster.png", href: "/dashboard/cluster" },
   { id: "rankdomain", label: "افزایش رنک", icon: "/dashboard/rankup.png", href: "/dashboard/rankdomain" },
   { id: "reportage", label: "رپورتاژ", icon: "/dashboard/newspaper.png", href: "/dashboard/reportage" },
-  { id: "spam", label: "اسپم اسکور", icon: "/dashboard/spamscore.png", href: "/dashboard/spam" },
+  { id: "spam-score", label: "اسپم اسکور", icon: "/dashboard/spamscore.png", href: "/dashboard/spam" },
 ];
 
 const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ isMobile }) => {
