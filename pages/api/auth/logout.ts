@@ -7,8 +7,12 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // حذف کوکی
-  deleteCookie('token', { req, res, path: '/' });
+  deleteCookie('token', {
+    req,
+    res,
+    path: '/',                 // باید مثل login باشه
+    domain: process.env.NODE_ENV === 'production' ? '.webofen.com' : undefined,
+  });
 
   return res.status(200).json({ message: 'Logged out successfully' });
 }
