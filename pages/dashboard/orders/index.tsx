@@ -53,7 +53,7 @@ export default function OrdersPage() {
                     <h2 className="text-lg font-semibold text-gray-700">
                       سفارش #{order.id}
                     </h2>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500">           
                       تاریخ: {new Date(order.createdAt).toLocaleDateString('fa-IR')}
                     </p>
                   </div>

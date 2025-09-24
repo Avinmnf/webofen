@@ -1,3 +1,4 @@
+'use client';
 import { GetServerSideProps } from "next";
 
 const GRAPHQL_URL = process.env.NEXT_PUBLIC_GRAPHQL_URL || "http://localhost:3000/api/graphql";
@@ -39,6 +40,45 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
 
   let urls: { slug: string; lastmod: string }[] = [];
 
+  // اضافه کردن صفحات ثابت
+  urls.push({
+    slug: "articles",
+    lastmod: new Date().toISOString(),
+  });
+
+  // اضافه کردن همه پست‌های داخل /articles
+  try {
+    const postsResult = await fetch(GRAPHQL_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        query: `
+          query {
+            posts {
+              slug
+              updatedAt
+              includeInSitemap
+              isIndexed
+            }
+          }
+        `
+      }),
+    }).then(r => r.json());
+
+    const posts = postsResult.data?.posts || [];
+    posts.forEach((post: any) => {
+      if (post.includeInSitemap && post.isIndexed) {
+        urls.push({
+          slug: `articles/${post.slug}`,
+          lastmod: post.updatedAt || new Date().toISOString(),
+        });
+      }
+    });
+  } catch (err) {
+    console.error("Error fetching posts for /articles:", err);
+  }
+
+  // حلقه روی بقیه کلیدها
   for (const key of ALL_KEYS) {
     const listKey = mapKeyToList(key);
     if (!listKey) continue;
@@ -74,15 +114,14 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
       }).then(r => r.json());
 
       let items = result.data?.[listKey] || [];
-      // فقط آیتم‌هایی که includeInSitemap و isIndexed درست هستند
       items = items.filter((i:any) => i.includeInSitemap && i.isIndexed);
 
-    urls.push(
-  ...items.map((item: any) => ({
-    slug: item.slug || item.name || item.title || item.id, // <-- اینجا name اضافه شد
-    lastmod: item.updatedAt || item.createdAt || new Date().toISOString(),
-  }))
-);
+      urls.push(
+        ...items.map((item: any) => ({
+          slug: item.slug || item.name || item.title || item.id,
+          lastmod: item.updatedAt || item.createdAt || new Date().toISOString(),
+        }))
+      );
 
     } catch (err) {
       console.error(`Error fetching ${key}:`, err);
