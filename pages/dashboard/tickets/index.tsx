@@ -59,23 +59,11 @@ const TicketsPage = () => {
     }
   };
 
-  const getPriorityBadgeClass = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return "bg-red-100 text-red-800";
-      case "medium":
-        return "bg-amber-100 text-amber-800";
-      case "low":
-        return "bg-emerald-100 text-emerald-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
       case "open":
-        return "bg-blue-100 text-blue-800";
+        return "bg-yellow-50 text-black";
       case "in_progress":
         return "bg-purple-100 text-purple-800";
       case "closed":
@@ -95,11 +83,10 @@ const TicketsPage = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">پشتیبانی</h1>
-          <p className="text-gray-500 mt-1">مدیریت درخواست‌های پشتیبانی</p>
         </div>
         <button
           onClick={() => setIsCreateModalOpen(true)}
-          className="bg-blue-600 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 shadow-md hover:bg-blue-700 hover:shadow-lg transition"
+          className="bg-[#1d546b] text-white text-sm px-4 py-2 rounded-md flex items-center gap-2  cursor-pointer"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
@@ -109,60 +96,11 @@ const TicketsPage = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between">
-            <h3 className="text-gray-500 text-sm">کل تیکت‌ها</h3>
-            <div className="p-2 bg-blue-50 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-          </div>
-          <p className="text-2xl font-bold mt-2">{tickets.length}</p>
-        </div>
-
-        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between">
-            <h3 className="text-gray-500 text-sm">باز</h3>
-            <div className="p-2 bg-amber-50 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-          </div>
-          <p className="text-2xl font-bold mt-2">{tickets.filter(t => t.status === 'open').length}</p>
-        </div>
-
-        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between">
-            <h3 className="text-gray-500 text-sm">در حال بررسی</h3>
-            <div className="p-2 bg-purple-50 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
-              </svg>
-            </div>
-          </div>
-          <p className="text-2xl font-bold mt-2">{tickets.filter(t => t.status === 'in_progress').length}</p>
-        </div>
-
-        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between">
-            <h3 className="text-gray-500 text-sm">حل شده</h3>
-            <div className="p-2 bg-emerald-50 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Tickets Table */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow overflow-hidden">
         <div className="p-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-800">تیکت‌های پشتیبانی</h2>
+          <h2 className="font-semibold text-gray-800">تیکت‌های شما</h2>
         </div>
 
         <div className="overflow-x-auto">
@@ -226,7 +164,7 @@ const TicketsPage = () => {
                     </div>
                   </td>
                   <td className="py-4 px-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityBadgeClass(ticket.priority)}`}>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium `}>
                       {priorityMap[ticket.priority] || ticket.priority}
                     </span>
                   </td>
@@ -332,7 +270,7 @@ const TicketsPage = () => {
       {/* Ticket Details Modal */}
       {selectedTicket && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <div className="bg-white w-full max-w-4xl rounded-2xl p-6 relative shadow-xl border border-gray-200 overflow-y-auto max-h-[90vh] animate-scaleIn">
+          <div className="bg-white w-full max-w-4xl rounded-2xl p-10 relative shadow-xl border border-gray-200 overflow-y-auto max-h-[90vh] animate-scaleIn">
             <button
               onClick={() => setSelectedTicket(null)}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
@@ -346,7 +284,7 @@ const TicketsPage = () => {
               <div>
                 <h2 className="text-xl font-bold text-gray-900">{selectedTicket.title}</h2>
                 <div className="flex items-center gap-3 mt-2">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityBadgeClass(selectedTicket.priority)}`}>
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium`}>
                     {priorityMap[selectedTicket.priority] || selectedTicket.priority}
                   </span>
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(selectedTicket.status)}`}>
