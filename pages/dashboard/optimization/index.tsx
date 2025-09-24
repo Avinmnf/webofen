@@ -20,7 +20,7 @@ interface Variant {
   }[];
 }
 
-export interface SecurityItem {
+export interface OptimizationItem {
   id: string;
   slug: string;
   productTitle: string;
@@ -49,17 +49,17 @@ const statusProgressMap: Record<string, number> = {
   out_of_time: 100,
 };
 
-const SecurityPage: React.FC = () => {
+const OptimizationPage: React.FC = () => {
   const { isLoggedIn } = useAuth();
   const { orders, loading, error } = useUserOrders();
   const [inputValuesMap, setInputValuesMap] = useState<Record<string, any[]>>(
     {}
   );
-  // Map orders to Security
+  // Map orders to Optimization
   useEffect(() => {
-    const mappedSecurity: SecurityItem[] = orders.flatMap((order) =>
+    const mappedOptimization: OptimizationItem[] = orders.flatMap((order) =>
       order.items
-        .filter((item) => item.variant?.product?.slug === "security")
+        .filter((item) => item.variant?.product?.slug === "optimization")
         .map((item) => {
           const savedValues = inputValuesMap[item.id] || [];
           return {
@@ -95,12 +95,12 @@ const SecurityPage: React.FC = () => {
         })
     );
 
-    setSecuritysState(mappedSecurity);
+    setOptimizationsState(mappedOptimization);
   }, [orders, inputValuesMap]);
 
   const [completedOrderId, setCompletedOrderId] = useState<string | null>(null);
 
-  const [SecuritysState, setSecuritysState] = useState<SecurityItem[]>([]);
+  const [OptimizationsState, setOptimizationsState] = useState<OptimizationItem[]>([]);
 
   const [selectedOrderItemId, setSelectedOrderItemId] = useState<string | null>(
     null
@@ -127,7 +127,7 @@ const SecurityPage: React.FC = () => {
     fetchValues,
   } = useOrderInput(selectedOrderItemId);
 
-  const selectedItem = SecuritysState.find(
+  const selectedItem = OptimizationsState.find(
     (item) => item.id === selectedOrderItemId
   );
   const canEdit = selectedItem?.adminStatus === "pending";
@@ -136,7 +136,7 @@ const SecurityPage: React.FC = () => {
       const map: Record<string, any[]> = {};
       for (const order of orders) {
         for (const item of order.items) {
-          if (item.variant?.product?.slug === "security") {
+          if (item.variant?.product?.slug === "optimization") {
             const savedValues = await fetchValues(item.id);
             map[item.id] = savedValues || [];
           }
@@ -150,7 +150,7 @@ const SecurityPage: React.FC = () => {
 
   // for opening modal
   const handleClick = async (id: string) => {
-    const item = SecuritysState.find((i) => i.id === id);
+    const item = OptimizationsState.find((i) => i.id === id);
     if (!item) return;
 
     if (item.adminStatus === "completed") {
@@ -167,13 +167,13 @@ const SecurityPage: React.FC = () => {
     }
   };
 
-  const selectedCompletedOrder = SecuritysState.find(
+  const selectedCompletedOrder = OptimizationsState.find(
     (item) => item.id === completedOrderId
   );
   const handleSubmit = async () => {
     try {
       await submitValues();
-      setSecuritysState((prev) =>
+      setOptimizationsState((prev) =>
         prev.map((item) =>
           item.id === selectedOrderItemId
             ? {
@@ -194,10 +194,10 @@ const SecurityPage: React.FC = () => {
     }
   };
 
-  const getProgress = (item: SecurityItem) =>
+  const getProgress = (item: OptimizationItem) =>
     statusProgressMap[item.adminStatus ?? "pending"] ?? 0;
 
-  const isDelayed = (item: SecurityItem) => {
+  const isDelayed = (item: OptimizationItem) => {
     if (item.adminStatus === "out_of_time") return true;
     if (!item.delayed) return false;
 
@@ -210,25 +210,25 @@ const SecurityPage: React.FC = () => {
   };
 
   useEffect(() => {
-    const delayedItems = SecuritysState.filter(
+    const delayedItems = OptimizationsState.filter(
       (item) => item.adminStatus === "out_of_time"
     );
     if (delayedItems.length > 0) {
       setShowNotification(true);
     }
-  }, [SecuritysState]);
+  }, [OptimizationsState]);
 
   // Filtering for different states
-  const inProgressItems = SecuritysState.filter(
+  const inProgressItems = OptimizationsState.filter(
     (item) => item.adminStatus === "in_progress"
   );
-  const delayedItems = SecuritysState.filter(
+  const delayedItems = OptimizationsState.filter(
     (item) => item.adminStatus === "out_of_time"
   );
-  const canceledItems = SecuritysState.filter(
+  const canceledItems = OptimizationsState.filter(
     (item) => item.adminStatus === "cancelled"
   );
-  const normalItems = SecuritysState.filter(
+  const normalItems = OptimizationsState.filter(
     (item) =>
       item.adminStatus !== "in_progress" &&
       item.adminStatus !== "out_of_time" &&
@@ -237,18 +237,18 @@ const SecurityPage: React.FC = () => {
 
   const oneMonthAgo = new Date();
   oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-  const recentSecuritys = SecuritysState.filter(
+  const recentOptimizations = OptimizationsState.filter(
     (item) => new Date(item.createdAt) >= oneMonthAgo
   );
   const bigInProgressItem = inProgressItems[0];
   const otherInProgressItems = inProgressItems.slice(1);
-  const pendingSecuritys = SecuritysState.find((item) => item.status === "0");
-  const historyOrders = SecuritysState.filter(
+  const pendingOptimizations = OptimizationsState.find((item) => item.status === "0");
+  const historyOrders = OptimizationsState.filter(
     (item) =>
       item.adminStatus === "completed" || new Date(item.createdAt) < oneMonthAgo
   );
   useEffect(() => {
-    setSecuritysState((prev) =>
+    setOptimizationsState((prev) =>
       prev.map((item) => ({
         ...item,
         submittedValues: inputValuesMap[item.id] || [],
@@ -625,7 +625,7 @@ const SecurityPage: React.FC = () => {
 
             {/* Orders Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {SecuritysState
+              {OptimizationsState
                 .filter((item) =>
                   historyFilter === "all"
                     ? true
@@ -773,4 +773,4 @@ const SecurityPage: React.FC = () => {
   );
 };
 
-export default SecurityPage;
+export default OptimizationPage;

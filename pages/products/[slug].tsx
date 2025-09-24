@@ -290,24 +290,6 @@ export default function ProductDetailPage({ product }: Props) {
                     <strong>موجودی:</strong>  {matchedVariant ? matchedVariant.stock : "تعداد را مشخص کنید"}
                   </p>
                 </div>
-                <div className=" mb-6">
-                  <label
-                    htmlFor="quantity"
-                    className="block mb-1 font-semibold text-gray-700"
-                  >
-                    تعداد بسته قرص
-                  </label>
-                  <input
-                    id="quantity"
-                    type="number"
-                    min={1}
-                    max={matchedVariant?.stock || 1}
-                    value={quantity}
-                    onChange={handleQuantityChange}
-                    className="w-full border border-gray-300 rounded p-2"
-                    disabled={!matchedVariant}
-                  />
-                </div>
 
                 <button
                   className="flex bg-green-700 p-2 rounded-3xl text-white cursor-pointer items-center w-full justify-center"
@@ -335,6 +317,24 @@ export default function ProductDetailPage({ product }: Props) {
           <section className="flex content">
             <div className="text-gray-700 mt-6 w-4/5 p-2">
               <div dangerouslySetInnerHTML={{ __html: product.modifiedContent || "" }} />
+                {!checkingBought ? (
+            hasBought ? (
+              <CommentForm
+                contentType="product"
+                pageSlug={typeof slug === "string" ? slug : ""}
+                productId={product?.id}
+                orderItemId={orderItemId}
+              />
+            ) : (
+              <p className="max-w-3xl mx-auto mt-10 text-center text-red-600 font-semibold">
+                برای ارسال نظر، ابتدا باید این محصول را خریداری کنید.
+              </p>
+            )
+          ) : (
+            <p className="max-w-3xl mx-auto mt-10 text-center text-gray-500 animate-pulse">
+              در حال بررسی وضعیت خرید شما...
+            </p>
+          )}
             </div>
             <div className="w-1/5 mt-6">
               {product.toc && product.toc.length > 0 && (
@@ -359,79 +359,19 @@ export default function ProductDetailPage({ product }: Props) {
             </div>
           </section>
 
-          <div className="w-11/12 text-gray-700 m-auto">
-            {!loadingRelated && related.length > 0 && (
-              <div className="mt-10">
-                <h2 className="text-xl font-bold mb-4">محصولات مرتبط</h2>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {related.map((item) => (
-                    <li
-                      key={item.id}
-                      className="border p-4 rounded shadow-sm bg-white"
-                    >
-                      <a
-                        href={`/products/${item.slug}`}
-                        className="font-semibold text-blue-700"
-                      >
-                        {item.title}
-                      </a>
-                      {item.imageUrl && (
-                        <img
-                          src={item.imageUrl}
-                          alt={item.title}
-                          className="w-full h-40 object-cover mt-2 rounded"
-                        />
-                      )}
-                      {item.description && (
-                        <p className="text-sm mt-2">{item.description}</p>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  onClick={() => setSkip((prev) => prev + take)}
-                  className="mt-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
-                >
-                  بارگذاری بیشتر
-                </button>
-              </div>
-            )}
-          </div>
           <AverageRating productId={product?.id} />
           <RatingForm
             contentType="product"
             contentId={product?.id ?? ""}
             orderItemId={orderItemId}
           />
-          {!checkingBought ? (
-            hasBought ? (
-              <CommentForm
-                contentType="product"
-                pageSlug={typeof slug === "string" ? slug : ""}
-                productId={product?.id}
-                orderItemId={orderItemId}
-              />
-            ) : (
-              <p className="max-w-3xl mx-auto mt-10 text-center text-red-600 font-semibold">
-                برای ارسال نظر، ابتدا باید این محصول را خریداری کنید.
-              </p>
-            )
-          ) : (
-            <p className="max-w-3xl mx-auto mt-10 text-center text-gray-500 animate-pulse">
-              در حال بررسی وضعیت خرید شما...
-            </p>
-          )}
-
-          {/* Comments list is always shown */}
-          <CommentsList
-            contentType="product"
-            pageSlug={typeof slug === "string" ? slug : ""}
-          />
 
           {/* Toast Notification */}
           {showToast && (
-            <div className="fixed bottom-6 left-[15%] transform -translate-x-1/2 bg-blue-900 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all">
-              محصول با موفقیت به سبد خرید افزوده شد
+            <div className="fixed bottom-6 left-[15%] transform -translate-x-1/2  py-2 px-4 bg-[#6fd6e5] text-gray-700 rounded-lg shadow-lg z-50 transition-all">
+              <p className="text-sm ">
+              محصول {product.title} با موفقیت به سبد خرید افزوده شد
+              </p>
             </div>
           )}
         </div>

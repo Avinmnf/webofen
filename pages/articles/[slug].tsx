@@ -1,26 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps } from "next";
 import CommentForm from "@/components/comments/comments";
 import CommentsList from "@/components/comments/CommentsList";
-import { Post } from '@/lib/models/post';
+import { Post } from "@/lib/models/post";
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePageView } from "@/hooks/usePageView";
-import SEO from '@/components/seo'
+import SEO from "@/components/seo";
 type Props = { post: Post };
 export default function PostPage({ post }: Props) {
-  console.log(post)
+  console.log(post);
   const { user } = useAuth();
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
   const router = useRouter();
   const { slug } = router.query;
 
-
   const [mounted, setMounted] = useState(false);
-
 
   useEffect(() => {
     if (post) {
@@ -94,20 +92,21 @@ export default function PostPage({ post }: Props) {
 
   const publishedDate = post.createdAt
     ? new Date(post.createdAt).toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
     : null;
 
   return (
     <>
-
       <SEO
         title={post.title}
-        keywords={post?.tags
-          ? post.tags.map((tag: { name: string }) => tag.name).join(', ')
-          : ''}
+        keywords={
+          post?.tags
+            ? post.tags.map((tag: { name: string }) => tag.name).join(", ")
+            : ""
+        }
         description={post.description}
         canonical={`https://example.com/article/${post.slug}`}
       />
@@ -185,10 +184,10 @@ export default function PostPage({ post }: Props) {
                     <span>
                       {post.createdAt
                         ? new Date(post.createdAt).toLocaleDateString("fa-IR", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })
                         : "تاریخ نامشخص"}
                     </span>
                   </div>
@@ -199,8 +198,16 @@ export default function PostPage({ post }: Props) {
 
           <div className="flex w-full m-auto justify-between content">
             <div className="text-gray-700 mt-6 w-4/5">
-              <div dangerouslySetInnerHTML={{ __html: post.modifiedContent || "" }} />
+              <div
+                dangerouslySetInnerHTML={{ __html: post.modifiedContent || "" }}
+              />
+              <div className="bg-gray-100 mt-6 w-full h-1"></div>
+              <CommentForm
+                contentType="post"
+                pageSlug={typeof slug === "string" ? slug : ""}
+              />
             </div>
+
             {/* Sidebar */}
             <aside className="w-1/5">
               <div className="sticky top-2 space-y-6  justify-center">
@@ -211,13 +218,16 @@ export default function PostPage({ post }: Props) {
                       <nav className="toc-nav text-sm">
                         <ul>
                           {[...post.toc].reverse().map((item) => (
-                            <li className={`toc-item toc-level-${item.level} mb-2 text-[#545454] hover:text-[#000]`}><a
-                              key={item.id}
-                              href={`#${item.id}`}
-                              className='block'
+                            <li
+                              className={`toc-item toc-level-${item.level} mb-2 text-[#545454] hover:text-[#000]`}
                             >
-                              {item.text}
-                            </a>
+                              <a
+                                key={item.id}
+                                href={`#${item.id}`}
+                                className="block"
+                              >
+                                {item.text}
+                              </a>
                             </li>
                           ))}
                         </ul>
@@ -229,7 +239,7 @@ export default function PostPage({ post }: Props) {
                   <div className="w-full flex gap-6 justify-center items-center">
                     <button
                       onClick={handleLike}
-                      className="flex items-center gap-2 text-blue-400 hover:text-green-400 cursor-pointer" 
+                      className="flex items-center gap-2 text-blue-400 hover:text-green-400 cursor-pointer"
                     >
                       <svg
                         className="w-6 h-7 hover:text-green-400"
@@ -301,7 +311,11 @@ export default function PostPage({ post }: Props) {
                     </Link>{" "}
                     <Link href={"/twitter"} className="pt-2">
                       {" "}
-                      <svg className="w-6 h-6 text-gray-400 hover:text-blue-300" viewBox="0 0 24 24" fill="none">
+                      <svg
+                        className="w-6 h-6 text-gray-400 hover:text-blue-300"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
                         {" "}
                         <path
                           d="M23 3a10.9 10.9 0 01-3.14 1.53A4.48 4.48 0 0022.4 1.6a9.04 9.04 0 01-2.88 1.1A4.52 4.52 0 0016 0c-2.48 0-4.5 2.02-4.5 4.5 0 .35.04.7.11 1.03A12.86 12.86 0 013 2.1s-4 9 5 13a13 13 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"
@@ -355,16 +369,9 @@ export default function PostPage({ post }: Props) {
         {/* Comments Section */}
         <div className="max-w-4xl mx-auto mt-12 space-y-8 px-4">
           <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">
-              Leave a Comment
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+              Comments
             </h2>
-            <CommentForm
-              contentType="post"
-              pageSlug={typeof slug === "string" ? slug : ""}
-            />
-          </div>
-          <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Comments</h2>
             <CommentsList
               contentType="post"
               pageSlug={typeof slug === "string" ? slug : ""}
@@ -376,18 +383,17 @@ export default function PostPage({ post }: Props) {
   );
 }
 
-
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { slug } = ctx.params as { slug: string };
 
   const safeSlug = encodeURIComponent(slug);
-  const website = process.env.NEXT_PUBLIC_WEBOFEN || 'https://webofen.com'
+  const website = process.env.NEXT_PUBLIC_WEBOFEN || "https://webofen.com";
 
   let post: Post | null = null;
   try {
     const res = await fetch(`${website}/api/proxy/postbyslug/${safeSlug}`, {
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
     });
     if (!res.ok) throw new Error("Failed to fetch product");

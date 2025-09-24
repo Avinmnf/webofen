@@ -8,7 +8,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import SimpleProgress from "@/components/dashboard/AnimatedProgress";
 import CircularProgressWithTimesmall from "@/components/dashboard/AnimatedProgresssmall";
 
-
 interface Variant {
   product: {
     id: string;
@@ -53,55 +52,69 @@ const statusProgressMap: Record<string, number> = {
 const BacklinkPage: React.FC = () => {
   const { isLoggedIn } = useAuth();
   const { orders, loading, error } = useUserOrders();
-
+  const [inputValuesMap, setInputValuesMap] = useState<Record<string, any[]>>(
+    {}
+  );
   // Map orders to backlinks
   useEffect(() => {
     const mappedBacklinks: BacklinkItem[] = orders.flatMap((order) =>
       order.items
         .filter((item) => item.variant?.product?.slug === "backlink")
-        .map((item) => ({
-          id: item.id,
-          slug: item.variant.product.slug,
-          productTitle: item.variant.product.title,
-          attributes: item.variant.attributeValues.map((av) => ({
-            name: av.attribute.name,
-            value: av.value,
-          })),
-          quantity: item.quantity,
-          price: item.finalPrice ?? item.price ?? 0,
-          orderId: order.id,
-          status: order.status,
-          adminStatus: item.adminStatus,
-          createdAt: order.createdAt,
-          siteurl:
-            item.inputValues?.find((iv) => iv.field?.label === "Site URL")
-              ?.value || "",
-          keyword:
-            item.inputValues?.find((iv) => iv.field?.label === "Keyword")
-              ?.value || "",
-          completionReport: item.completionReport || "",
-          variant: item.variant, // ← add this
-          startTime: item.startTime,
-          deadline: item.deadline,
-        }))
+        .map((item) => {
+          const savedValues = inputValuesMap[item.id] || [];
+          return {
+            id: item.id,
+            slug: item.variant.product.slug,
+            productTitle: item.variant.product.title,
+            attributes: item.variant.attributeValues.map((av) => ({
+              name: av.attribute.name,
+              value: av.value,
+            })),
+            quantity: item.quantity,
+            price: item.finalPrice ?? item.price ?? 0,
+            orderId: order.id,
+            status: order.status,
+            adminStatus: item.adminStatus,
+            createdAt: order.createdAt,
+            siteurl:
+              item.inputValues?.find((iv) => iv.field?.label === "Site URL")
+                ?.value || "",
+            keyword:
+              item.inputValues?.find((iv) => iv.field?.label === "Keyword")
+                ?.value || "",
+            completionReport: item.completionReport || "",
+            variant: item.variant,
+            startTime: item.startTime,
+            deadline: item.deadline,
+            submittedValues: savedValues.map((sv: any) => ({
+              id: sv.id,
+              label: sv.label,
+              value: sv.value,
+            })),
+          };
+        })
     );
 
     setBacklinksState(mappedBacklinks);
-  }, [orders]);
+  }, [orders, inputValuesMap]);
+
   const [completedOrderId, setCompletedOrderId] = useState<string | null>(null);
 
   const [backlinksState, setBacklinksState] = useState<BacklinkItem[]>([]);
-  const [inputValuesMap, setInputValuesMap] = useState<Record<string, any[]>>(
-    {}
-  );
+
   const [selectedOrderItemId, setSelectedOrderItemId] = useState<string | null>(
     null
   );
   const [showModal, setShowModal] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [historyFilter, setHistoryFilter] = useState<
+    "all" | "completed" | "cancelled"
+  >("all");
   const [showNotification, setShowNotification] = useState(false);
-const [completedOpen, setCompletedOpen] = useState(false);
-const [cancelledOpen, setCancelledOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<"completed" | "cancelled" | null>(
+    null
+  );
 
   const {
     fields,
@@ -234,9 +247,19 @@ const [cancelledOpen, setCancelledOpen] = useState(false);
     (item) =>
       item.adminStatus === "completed" || new Date(item.createdAt) < oneMonthAgo
   );
-  console.log("Item to render progress:", bigInProgressItem);
+  useEffect(() => {
+    setBacklinksState((prev) =>
+      prev.map((item) => ({
+        ...item,
+        submittedValues: inputValuesMap[item.id] || [],
+      }))
+    );
+  }, [inputValuesMap]);
+
+  console.log(bigInProgressItem);
   console.log("StartTime:", bigInProgressItem?.startTime);
   console.log("Deadline:", bigInProgressItem?.deadline);
+  console.log("bigitem:", bigInProgressItem?.submittedValues);
   if (!isLoggedIn)
     return (
       <p className="text-center py-10">ابتدا باید وارد حساب کاربری خود شوید</p>
@@ -247,356 +270,199 @@ const [cancelledOpen, setCancelledOpen] = useState(false);
   return (
     <>
       <div className="relative w-full">
-        <div
-          className={`transition-transform duration-700 [transform-style:preserve-3d] ${
-            showHistory ? "[transform:rotateY(180deg)]" : ""
-          }`}
-        >
-          {/* FRONT SIDE – Recent Orders */}
-          <div className="absolute inset-0 backface-hidden">
-            <div className="flex flex-col items-center text-gray-700 bg-[#f7f8fc] p-4 rounded-lg shadow-sm space-y-8">
-              {showNotification && (
-                <div className="fixed top-0 left-0 right-0 bg-red-600 text-white p-4 text-center animate-slideDown z-50">
-                  ⚠️ سفارش شما دیرکرد داشته است. ما از تأخیر پوزش می‌طلبیم.
-                </div>
-              )}
-
-              {/* Top in-progress pill */}
-
-              {bigInProgressItem && (
-                <div className="flex items-center relative flex-row-reverse w-full justify-between p-4">
-                  {bigInProgressItem && (
-                    <SimpleProgress
-                      startTime={bigInProgressItem.startTime}
-                      deadline={bigInProgressItem.deadline || ""}
-                      completionTime={bigInProgressItem.completionTime}
-                      canceled={bigInProgressItem.adminStatus === "cancelled"}
-                    />
-                  )}
-
-                  <button
-                    onClick={() => handleClick(bigInProgressItem.id)}
-                    className="absolute left-14 w-20 h-16 flex items-center justify-center"
-                  >
-                    <div className="relative w-full h-32 flex justify-center items-center overflow-hidden">
-                      <Image
-                        width={220}
-                        height={220}
-                        alt="Backlink"
-                        src={"/dashboard/backlink.png"}
-                        className="object-contain rotate-30"
-                      />
-                    </div>
-                  </button>
-                  <div className=" mt-2 text-sm w-1/3">
-                    <div className="flex gap-2 items-center">
-                      <p className="text-gray-600 font-semibold">
-                        تاریخ خرید:{" "}
-                      </p>
-                      <p className="text-gray-600">
-                        {new Date(
-                          bigInProgressItem.createdAt
-                        ).toLocaleDateString("fa-IR")}
-                      </p>
-                    </div>
-                    <div className="flex gap-2 items-center">
-                      <p className="text-gray-600 font-semibold">تعداد:</p>
-                      <p className="text-gray-700">
-                        {bigInProgressItem.attributes
-                          .map((attr) => attr.value)
-                          .join(" / ")}
-                      </p>
-                    </div>
-
-                    <div className="flex gap-2 items-center mt-1">
-                      {bigInProgressItem?.submittedValues?.length ? (
-                        <div className="mt-1 text-sm">
-                          {bigInProgressItem.submittedValues.map((input) => (
-                            <div
-                              key={input.id}
-                              className="flex gap-1 items-center"
-                            >
-                              <span className="font-semibold text-gray-600">
-                                {input.label}:
-                              </span>
-                              <span className="text-gray-700">
-                                {input.value || "—"}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : null}
-                    </div>
-                  </div>
-                </div>
-              )}
-              <div className="h-1 w-full bg-gray-200 rounded-2xl"></div>
-              {/* Small pills: group by status */}
-              <div className="flex flex-col w-full gap-8">
-                {/* Active/Ongoing Pills */}
-                {[
-                  ...otherInProgressItems,
-                  ...delayedItems,
-                  ...canceledItems,
-                  ...normalItems,
-                ].filter(
-                  (item) =>
-                    (!item.submittedValues ||
-                      item.submittedValues.length === 0) &&
-                    item.adminStatus !== "completed" &&
-                    item.adminStatus !== "canceled" &&
-                    item.adminStatus !== "in_progress" &&
-                    item.adminStatus !== "out_of_time"
-                ).length > 0 && (
-                  <div>
-                    <h3 className="text-gray-700 text-lg font-semibold mb-4">
-                      قرص های مصرف نشده
-                    </h3>
-                    <div className="flex flex-wrap justify-start bg-gray-200 rounded-xl p-6 gap-6 w-full">
-                      {[
-                        ...otherInProgressItems,
-                        ...delayedItems,
-                        ...canceledItems,
-                        ...normalItems,
-                      ]
-                        .filter(
-                          (item) =>
-                            (!item.submittedValues ||
-                              item.submittedValues.length === 0) &&
-                            item.adminStatus !== "completed" &&
-                            item.adminStatus !== "cancelled" &&
-                            item.adminStatus !== "in_progress" &&
-                            item.adminStatus !== "out_of_time"
-                        )
-                        .map((item) => {
-                          const variantName = item.attributes
-                            .map((a) => a.value)
-                            .join(" / ");
-                          const delayed = isDelayed(item);
-                          const canceled = item.adminStatus === "cancelled";
-
-                          return (
-                            <div
-                              key={item.id}
-                              className="flex flex-col items-center relative scale-90 "
-                            >
-                              <CircularProgressWithTimesmall
-                                startTime={item.startTime} // use item
-                                deadline={item.deadline || undefined} // use item
-                                completionTime={item.completionTime} // use item
-                                delayed={delayed}
-                                canceled={canceled}
-                              />
-                              <button
-                                onClick={() => handleClick(item.id)}
-                                className="absolute top-4 w-12 h-12 flex items-center justify-center cursor-pointer"
-                              >
-                                <div className="relative w-full h-16 flex justify-center items-center overflow-hidden">
-                                  <Image
-                                    width={220}
-                                    height={220}
-                                    alt="Backlink"
-                                    src={"/dashboard/backlink.png"}
-                                    className="object-contain rotate-30"
-                                  />
-                                </div>
-                              </button>
-                              <div className="text-center mt-2 text-sm">
-                                <p className="text-gray-600">خرید:</p>
-                                <p className="text-gray-600">
-                                  {new Date(item.createdAt).toLocaleDateString(
-                                    "fa-IR"
-                                  )}
-                                </p>
-                                <p className="text-gray-600 mt-1">تعداد:</p>
-                                <p className="text-gray-700 font-semibold">
-                                  {variantName}
-                                </p>
-
-                                {/* Show submitted values for active pills */}
-                                {item?.submittedValues?.length ? (
-                                  <div className="mt-1 text-xs">
-                                    {item.submittedValues.map((input) => (
-                                      <div
-                                        key={input.id}
-                                        className="flex gap-1 items-center"
-                                      >
-                                        <span className="font-semibold text-gray-600">
-                                          {input.label}:
-                                        </span>
-                                        <span className="text-gray-700">
-                                          {input.value || "—"}
-                                        </span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                ) : null}
-                              </div>
-                            </div>
-                          );
-                        })}
-                    </div>
-                  </div>
-                )}
-{/* Completed & Canceled Summary */}
-{(backlinksState.some((item) => item.adminStatus === "completed") ||
-  backlinksState.some((item) => item.adminStatus === "cancelled")) && (
-  <div className="flex flex-col gap-6 mt-6">
-    {/* Completed Section */}
-    {backlinksState.some((item) => item.adminStatus === "completed") && (
-      <div className="bg-white rounded-2xl shadow-md">
-        {/* Section Header */}
-        <button
-          onClick={() => setCompletedOpen((prev) => !prev)}
-          className="w-full flex justify-between items-center p-4 text-green-700 font-bold text-lg"
-        >
-          <span>
-            سفارش‌های تکمیل‌شده (
-            {backlinksState.filter((i) => i.adminStatus === "completed").length})
-          </span>
-          {completedOpen}
-        </button>
-
-        {/* Collapsible Content */}
-        {completedOpen && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4 border-t">
-            {backlinksState
-              .filter((item) => item.adminStatus === "completed")
-              .map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center bg-gray-50 rounded-xl p-4 shadow-sm hover:shadow-lg transition"
-                >
-                  {/* Pill preview */}
-                  <button
-                    onClick={() => handleClick(item.id)}
-                    className="relative w-14 h-14 flex justify-center items-center"
-                  >
-                    <div className="absolute w-12 h-12 flex justify-center items-center rounded-full border-2 border-green-300 animate-bounce">
-                      <Image
-                        width={32}
-                        height={32}
-                        alt="Backlink"
-                        src={"/dashboard/backlink.png"}
-                        className="object-contain rotate-12"
-                      />
-                    </div>
-                  </button>
-
-                  {/* Info */}
-                  <div className="ml-4 flex-1">
-                    <p className="text-gray-700 text-sm font-bold">
-                      تاریخ خرید:{" "}
-                      {new Date(item.createdAt).toLocaleDateString("fa-IR")}
-                    </p>
-                    <p className="text-gray-500 text-sm">
-                      پرداخت شده: {item.price}
-                    </p>
-                  </div>
-                </div>
-              ))}
-          </div>
-        )}
-      </div>
-    )}
-
-    {/* Cancelled Section */}
-    {backlinksState.some((item) => item.adminStatus === "cancelled") && (
-      <div className="bg-white rounded-2xl shadow-md">
-        {/* Section Header */}
-        <button
-          onClick={() => setCancelledOpen((prev) => !prev)}
-          className="w-full flex justify-between items-center p-4 text-red-700 font-bold text-lg"
-        >
-          <span>
-            سفارش‌های لغو‌شده (
-            {backlinksState.filter((i) => i.adminStatus === "cancelled").length})
-          </span>
-          {cancelledOpen}
-        </button>
-
-        {/* Collapsible Content */}
-        {cancelledOpen && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4 border-t">
-            {backlinksState
-              .filter((item) => item.adminStatus === "cancelled")
-              .map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center bg-gray-50 rounded-xl p-4 shadow-sm hover:shadow-lg transition"
-                >
-                  <button
-                    onClick={() => handleClick(item.id)}
-                    className="relative w-14 h-14 flex justify-center items-center"
-                  >
-                    <div className="absolute w-12 h-12 flex justify-center items-center rounded-full border-2 border-red-300">
-                      <Image
-                        width={32}
-                        height={32}
-                        alt="Backlink"
-                        src={"/dashboard/backlink.png"}
-                        className="object-contain rotate-12"
-                      />
-                    </div>
-                  </button>
-
-                  <div className="ml-4 flex-1">
-                    <p className="text-gray-700 text-sm font-bold">
-                      تاریخ خرید:{" "}
-                      {new Date(item.createdAt).toLocaleDateString("fa-IR")}
-                    </p>
-                  </div>
-
-                  <span className="ml-3 px-3 py-1 text-xs font-semibold text-red-700 bg-red-100 rounded-full">
-                    لغو شده
-                  </span>
-                </div>
-              ))}
-          </div>
-        )}
-      </div>
-    )}
-  </div>
-)}
-
-              </div>
-            </div>
-          </div>
-
-          {/* BACK SIDE – History */}
-          <div className="absolute inset-0 [transform:rotateY(180deg)] backface-hidden">
-            <div className="flex flex-col items-center text-gray-700 bg-gray-50 p-4 rounded-lg shadow-sm space-y-8">
-            
-               
-            </div>
-          </div>
-        </div>
-
-        {/* Flip Button */}
-        {historyOrders.length > 0 && (
-          <div className="flex justify-end mt-4">
-            <button
-              onClick={() => setShowHistory(!showHistory)}
-              className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded-lg transition"
-            >
-              {showHistory ? "بازگشت" : "تاریخچه"}
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Pending Backlink */}
-      {pendingBacklink && (
-        <div className="flex justify-center w-full mt-6">
-          <button onClick={() => handleClick(pendingBacklink.id)}>
-            <div className="animate-bounce w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
-              ⚡
-            </div>
+        <div className="w-full flex justify-end">
+          <button
+            onClick={() => setHistoryModalOpen(true)}
+            className="bg-[#f7f8fc] text-gray-700 font-semibold p-2 py-4 text-sm rounded-t-xl w-1/3 cursor-pointer"
+          >
+            تاریخچه
           </button>
         </div>
-      )}
+        <div className="flex relative flex-col items-center text-gray-700 bg-[#f7f8fc] p-4 rounded-b-xl rounded-tr-xl space-y-8">
+          {/* big pill */}
+          {bigInProgressItem && (
+            <>
+            <div className="flex items-center relative flex-row-reverse w-full justify-between p-4">
+              {bigInProgressItem && (
+                <SimpleProgress
+                  startTime={bigInProgressItem.startTime}
+                  deadline={bigInProgressItem.deadline || ""}
+                  completionTime={bigInProgressItem.completionTime}
+                  canceled={bigInProgressItem.adminStatus === "cancelled"}
+                />
+              )}
+
+              <button
+                onClick={() => handleClick(bigInProgressItem.id)}
+                className="absolute left-14 w-20 h-16 flex items-center justify-center"
+              >
+                <div className="relative w-full h-32 flex justify-center items-center overflow-hidden">
+                  <Image
+                    width={220}
+                    height={220}
+                    alt="Backlink"
+                    src={"/dashboard/backlink.png"}
+                    className="object-contain rotate-30"
+                  />
+                </div>
+              </button>
+              <div className=" mt-2 text-sm w-1/3">
+                <div className="flex gap-2 items-center">
+                  <p className="text-gray-600 font-semibold">تاریخ خرید: </p>
+                  <p className="text-gray-600">
+                    {new Date(bigInProgressItem.createdAt).toLocaleDateString(
+                      "fa-IR"
+                    )}
+                  </p>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <p className="text-gray-600 font-semibold">تعداد:</p>
+                  <p className="text-gray-700">
+                    {bigInProgressItem.attributes
+                      .map((attr) => attr.value)
+                      .join(" / ")}
+                  </p>
+                </div>
+                <div className="flex gap-2 items-center mt-1">
+                  <div className="mt-1 text-sm">
+                    {bigInProgressItem.submittedValues?.length ? (
+                      <div className="mt-2 text-sm">
+                        {bigInProgressItem.submittedValues.map((bigitem) => (
+                          <div
+                            key={bigitem.id}
+                            className="flex gap-1 items-center"
+                          >
+                            <span className="font-semibold text-gray-600">
+                              {bigitem.label}:
+                            </span>
+                            <span className="text-gray-700">
+                              {bigitem.value || "—"}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-400 mt-2">اطلاعات وارد نشده</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          <div className="h-1 w-full bg-gray-200 rounded-2xl"></div>
+          </>
+          )}
+          {/* Small pills */}
+          <div className="flex flex-col w-full gap-8">
+            {/* Active/Ongoing Pills */}
+            {[
+              ...otherInProgressItems,
+              ...delayedItems,
+              ...canceledItems,
+              ...normalItems,
+            ].filter(
+              (item) =>
+                (!item.submittedValues || item.submittedValues.length === 0) &&
+                item.adminStatus !== "completed" &&
+                item.adminStatus !== "canceled" &&
+                item.adminStatus !== "in_progress" &&
+                item.adminStatus !== "out_of_time"
+            ).length > 0 && (
+              <div>
+                <h3 className="text-gray-700 text-lg font-semibold mb-4">
+                  قرص های مصرف نشده
+                </h3>
+                <div className="flex flex-wrap justify-start bg-gray-200 rounded-xl p-6 gap-6 w-full">
+                  {[
+                    ...otherInProgressItems,
+                    ...delayedItems,
+                    ...canceledItems,
+                    ...normalItems,
+                  ]
+                    .filter(
+                      (item) =>
+                        (!item.submittedValues ||
+                          item.submittedValues.length === 0) &&
+                        item.adminStatus !== "completed" &&
+                        item.adminStatus !== "cancelled" &&
+                        item.adminStatus !== "in_progress" &&
+                        item.adminStatus !== "out_of_time"
+                    )
+                    .map((item) => {
+                      const variantName = item.attributes
+                        .map((a) => a.value)
+                        .join(" / ");
+                      const delayed = isDelayed(item);
+                      const canceled = item.adminStatus === "cancelled";
+
+                      return (
+                        <div
+                          key={item.id}
+                          className="flex flex-col items-center relative scale-90 "
+                        >
+                          <CircularProgressWithTimesmall
+                            startTime={item.startTime}
+                            deadline={item.deadline || undefined}
+                            completionTime={item.completionTime}
+                            delayed={delayed}
+                            canceled={canceled}
+                          />
+                          <button
+                            onClick={() => handleClick(item.id)}
+                            className="absolute top-4 w-12 h-12 flex items-center justify-center cursor-pointer"
+                          >
+                            <div className="relative w-full h-16 flex justify-center items-center overflow-hidden">
+                              <Image
+                                width={220}
+                                height={220}
+                                alt="Backlink"
+                                src={"/dashboard/backlink.png"}
+                                className="object-contain rotate-30"
+                              />
+                            </div>
+                          </button>
+                          <div className="text-center mt-2 text-sm">
+                            <p className="text-gray-600">خرید:</p>
+                            <p className="text-gray-600">
+                              {new Date(item.createdAt).toLocaleDateString(
+                                "fa-IR"
+                              )}
+                            </p>
+                            <p className="text-gray-600 mt-1">تعداد:</p>
+                            <p className="text-gray-700 font-semibold">
+                              {variantName}
+                            </p>
+
+                            {/* Show submitted values for active pills */}
+                            {item?.submittedValues?.length ? (
+                              <div className="mt-1 text-xs">
+                                {item.submittedValues.map((input) => (
+                                  <div
+                                    key={input.id}
+                                    className="flex gap-1 items-center"
+                                  >
+                                    <span className="font-semibold text-gray-600">
+                                      {input.label}:
+                                    </span>
+                                    <span className="text-gray-700">
+                                      {input.value || "—"}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : null}
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       {completedOrderId && selectedCompletedOrder && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center z-50 animate-fadeIn ">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center z-99 animate-fadeIn ">
           <div className="bg-white w-[90%] max-w-lg rounded-3xl shadow-2xl p-6 relative">
             <button
               onClick={() => setCompletedOrderId(null)}
@@ -663,7 +529,161 @@ const [cancelledOpen, setCancelledOpen] = useState(false);
           </div>
         </div>
       )}
+      {historyModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-[#00172f] rounded-3xl w-full md:w-[60%] my-10 p-10 relative overflow-y-auto max-h-[120vh]">
+            {/* Close button */}
+            <button
+              onClick={() => setHistoryModalOpen(false)}
+              className="absolute top-4 right-4 text-2xl font-bold hover:text-red-200"
+            >
+              &times;
+            </button>
+            <div className="flex gap-2 flex-col md:flex-row justify-between items-center border border-gray-100 rounded-xl md:rounded-full p-4 mb-4">
+              <div className="flex items-center w-full md:w-1/3">
+                <div className="p-4 rounded-full bg-[#6fd6e5] ml-2">
+                  <svg
+                    className="w-5 h-5"
+                    viewBox="0 0 48 48"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                    <g
+                      id="SVGRepo_tracerCarrier"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    ></g>
+                    <g id="SVGRepo_iconCarrier">
+                      {" "}
+                      <rect
+                        width="48"
+                        height="48"
+                        fill="white"
+                        fill-opacity="0.01"
+                      ></rect>{" "}
+                      <path
+                        d="M5.81824 6.72729V14H13.091"
+                        stroke="#4f4f4f"
+                        stroke-width="4"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      ></path>{" "}
+                      <path
+                        d="M4 24C4 35.0457 12.9543 44 24 44V44C35.0457 44 44 35.0457 44 24C44 12.9543 35.0457 4 24 4C16.598 4 10.1351 8.02111 6.67677 13.9981"
+                        stroke="#4f4f4f"
+                        stroke-width="4"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      ></path>{" "}
+                      <path
+                        d="M24.005 12L24.0038 24.0088L32.4832 32.4882"
+                        stroke="#4f4f4f"
+                        stroke-width="4"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      ></path>{" "}
+                    </g>
+                  </svg>
+                </div>
 
+                <h2 className="text-md text-gray-100 ">تاریخچه سفارش‌ها</h2>
+              </div>
+              {/* Filter buttons */}
+              <div className="relative flex justify-center gap-4 bg-gray-300 rounded-full h-12 w-full ">
+                {/* active background */}
+                <div
+                  className="absolute top-0 left-0 h-full bg-[#6FD6E5] rounded-full transition-all duration-300"
+                  style={{
+                    width: `${100 / 3}%`,
+                    transform:
+                      historyFilter === "all"
+                        ? "translateX(200%)"
+                        : historyFilter === "completed"
+                        ? "translateX(100%)"
+                        : " translateX(0%)",
+                  }}
+                ></div>
+
+                {/* Buttons */}
+                {["all", "completed", "cancelled"].map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setHistoryFilter(f as any)}
+                    className="flex-1 z-10 text-sm md:text-md h-12 rounded-full cursor-pointer relative flex items-center justify-center transition-colors duration-200
+        hover:text-gray-200 text-gray-700"
+                  >
+                    {f === "all"
+                      ? "همه"
+                      : f === "completed"
+                      ? "تکمیل شده"
+                      : "لغو شده"}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Orders Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {backlinksState
+                .filter((item) =>
+                  historyFilter === "all"
+                    ? true
+                    : item.adminStatus === historyFilter
+                )
+                .map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center bg-gray-50 rounded-xl p-4 shadow-sm hover:shadow-lg transition"
+                  >
+                    <button
+                      onClick={() => handleClick(item.id)}
+                      className="relative w-14 h-14 flex justify-center items-center"
+                    >
+                      <div
+                        className={`absolute w-12 h-12 flex justify-center items-center rounded-full border-2 ${
+                          item.adminStatus === "completed"
+                            ? "border-green-700 animate-bounce"
+                            : item.adminStatus === "cancelled"
+                            ? "border-red-800"
+                            : item.adminStatus === "in_progress"
+                            ? "border-orange-500" 
+                            : "border-gray-200"
+                        }`}
+                      >
+                        <Image
+                          width={32}
+                          height={32}
+                          alt="Backlink"
+                          src={"/dashboard/backlink.png"}
+                          className="object-contain rotate-12"
+                        />
+                      </div>
+                    </button>
+
+                    <div className="ml-4 flex-1">
+                      <p className="text-gray-700 text-sm font-bold">
+                        تاریخ خرید:{" "}
+                        {new Date(item.createdAt).toLocaleDateString("fa-IR")}
+                      </p>
+                      <p className="text-gray-700 text-sm font-semibold">
+                        محصول: {item.productTitle}
+                      </p>
+                      <p className="text-gray-500 text-sm">
+                        وضعیت:{" "}
+                        {item.adminStatus === "completed"
+                          ? "تکمیل شده"
+                          : item.adminStatus === "cancelled"
+                          ? "لغو شده"
+                          : "در حال انجام"}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      )}
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 animate-fadeIn">
