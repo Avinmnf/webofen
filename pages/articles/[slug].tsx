@@ -366,18 +366,7 @@ export default function PostPage({ post }: Props) {
             </aside>
           </div>
         </div>
-        {/* Comments Section */}
-        <div className="max-w-4xl mx-auto mt-12 space-y-8 px-4">
-          <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              Comments
-            </h2>
-            <CommentsList
-              contentType="post"
-              pageSlug={typeof slug === "string" ? slug : ""}
-            />
-          </div>
-        </div>
+
       </main>
     </>
   );

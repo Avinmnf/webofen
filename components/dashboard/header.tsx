@@ -22,7 +22,7 @@ const HeaderPanel: React.FC = () => {
   }, []);
 
   return (
-    <div className="relative w-full flex flex-col lg:flex-row items-center justify-between rounded-2xl bg-white p-4 shadow-sm">
+    <div className="relative w-full flex lg:flex-row items-center justify-between rounded-2xl bg-white p-4 shadow-sm">
       {/* Left Section */}
       <div className="relative w-4/12">
         <button

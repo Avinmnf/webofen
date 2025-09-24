@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { CircularProgressbarWithChildren, buildStyles } from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
 
 interface CircularProgressWithTimeProps {
   startTime?: string;

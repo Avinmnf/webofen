@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React, { useMemo, useState } from 'react';
-import { useCreateComment } from '@/hooks/useCreateComment';
+import React, { useMemo, useState } from "react";
+import { useCreateComment } from "@/hooks/useCreateComment";
 
 interface CommentFormProps {
-  contentType: 'post' | 'product';
+  contentType: "post" | "product";
   pageSlug: string;
   parentId?: string;
   orderItemId?: string;
@@ -18,14 +18,17 @@ export default function CommentForm({
   productId,
   orderItemId,
 }: CommentFormProps) {
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [subject, setSubject] = useState('');
-  const [body, setBody] = useState('');
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [body, setBody] = useState("");
 
   const bodyLimit = 1200;
   const bodyCount = body.length;
-  const remaining = useMemo(() => Math.max(0, bodyLimit - bodyCount), [bodyCount]);
+  const remaining = useMemo(
+    () => Math.max(0, bodyLimit - bodyCount),
+    [bodyCount]
+  );
 
   const { createComment, loading, error, comment } = useCreateComment();
   const [success, setSuccess] = useState<string | null>(null);
@@ -34,9 +37,9 @@ export default function CommentForm({
     e.preventDefault();
     setSuccess(null);
 
-    if (contentType === 'product' && !productId) {
+    if (contentType === "product" && !productId) {
       setSuccess(null);
-      return alert('شناسه محصول یافت نشد. لطفاً صفحه را مجدد بارگذاری کنید.');
+      return alert("شناسه محصول یافت نشد. لطفاً صفحه را مجدد بارگذاری کنید.");
     }
 
     const payload = {
@@ -53,38 +56,32 @@ export default function CommentForm({
 
     const created = await createComment(payload);
     if (created) {
-      setSuccess('✅ نظر شما ارسال شد و پس از بررسی نمایش داده خواهد شد.');
-      setFullName('');
-      setEmail('');
-      setSubject('');
-      setBody('');
+      setSuccess("✅ نظر شما ارسال شد و پس از بررسی نمایش داده خواهد شد.");
+      setFullName("");
+      setEmail("");
+      setSubject("");
+      setBody("");
     }
   };
 
-  const submitDisabled = loading || (contentType === 'product' && !productId) || bodyCount > bodyLimit;
+  const submitDisabled =
+    loading ||
+    (contentType === "product" && !productId) ||
+    bodyCount > bodyLimit;
 
   return (
-    <div className="w-10/12 mt-10 mx-auto">
-      <div
-        className={[
-          'rounded-3xl border border-gray-200 ',
-          'bg-gray-200 backdrop-blur',
-          'shadow-[0_8px_30px_rgb(0,0,0,0.06)]',
-          'p-6 md:p-8',
-        ].join(' ')}
-      >
+    <div className="w-full mt-2 mx-auto">
+      <div>
         <div className="flex items-start justify-between gap-4 text-gray-600">
           <div>
             <h2 className="text-2xl font-extrabold text-gray-700  flex items-center gap-2">
-              <span className="inline-flex w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 via-blue-500 to-cyan-500 text-white items-center justify-center shadow-sm">✍️</span>
-              {parentId ? 'ارسال پاسخ' : 'ارسال نظر'}
+
+              {parentId ? "ارسال پاسخ" : "ارسال نظر"}
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-              لطفاً نظر خود را با رعایت احترام ارسال کنید.
-            </p>
+
           </div>
 
-          {contentType === 'product' && !productId && (
+          {contentType === "product" && !productId && (
             <span className="text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">
               شناسه محصول موجود نیست
             </span>
@@ -102,10 +99,15 @@ export default function CommentForm({
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4 text-gray-700 dark:text-gray-200">
+        <form
+          onSubmit={handleSubmit}
+          className="mt-2 space-y-4 text-gray-700 dark:text-gray-200"
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="group">
-              <label className="block text-sm font-medium mb-1 text-gray-700">نام و نام خانوادگی</label>
+              <label className="block text-sm font-medium mb-1 text-gray-700">
+                نام و نام خانوادگی
+              </label>
               <input
                 type="text"
                 placeholder="مثلاً: علی رضایی"
@@ -117,7 +119,9 @@ export default function CommentForm({
             </div>
 
             <div className="group">
-              <label className="block text-sm font-medium mb-1 text-gray-700">ایمیل</label>
+              <label className="block text-sm font-medium mb-1 text-gray-700">
+                ایمیل
+              </label>
               <input
                 type="email"
                 placeholder="you@example.com"
@@ -130,7 +134,9 @@ export default function CommentForm({
           </div>
 
           <div className="group">
-            <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">موضوع (اختیاری)</label>
+            <label className="block text-sm font-medium mb-1 text-gray-700">
+              موضوع (اختیاری)
+            </label>
             <input
               type="text"
               placeholder="مثلاً: تجربه خرید"
@@ -142,24 +148,18 @@ export default function CommentForm({
 
           <div className="group">
             <div className="flex items-center justify-between">
-              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">متن نظر</label>
-              <span
-                className={[
-                  'text-xs px-2 py-1 rounded-full',
-                  bodyCount > bodyLimit
-                    ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
-                    : 'bg-gray-100 text-gray-600 dark:bg-gray-800/60 dark:text-gray-300',
-                ].join(' ')}
-              >
-                {remaining} / {bodyLimit}
-              </span>
+              <label className="block text-sm font-medium mb-1 text-gray-700">
+                متن نظر
+              </label>
             </div>
             <textarea
               placeholder="نظر خود را اینجا بنویسید..."
               className={[
-                'w-full px-4 py-3 rounded-2xl border border-gray-300 text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400/70 focus:border-indigo-300 transition-all shadow-sm group-hover:shadow',
-                bodyCount > bodyLimit ? 'ring-2 ring-red-300 border-red-300' : '',
-              ].join(' ')}
+                "w-full px-4 py-3 rounded-2xl border border-gray-300 text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400/70 focus:border-indigo-300 transition-all shadow-sm group-hover:shadow",
+                bodyCount > bodyLimit
+                  ? "ring-2 ring-red-300 border-red-300"
+                  : "",
+              ].join(" ")}
               value={body}
               onChange={(e) => setBody(e.target.value)}
               required
@@ -172,13 +172,17 @@ export default function CommentForm({
               type="submit"
               disabled={submitDisabled}
               className={[
-                'cursor-pointer px-6 md:px-8 py-3 rounded-2xl font-semibold',
-                'bg-blue-100 text-blue-900',
-                'shadow-md hover:shadow-lg hover:scale-[1.015] active:scale-[0.995]',
-                'transition-all disabled:opacity-50 disabled:hover:scale-100',
-              ].join(' ')}
+                "cursor-pointer px-6 md:px-8 py-3 rounded-lg",
+                "bg-[#1d546b] text-white",
+                "shadow-md hover:shadow-lg hover:scale-[1.015] active:scale-[0.995]",
+                "transition-all disabled:opacity-50 disabled:hover:scale-100",
+              ].join(" ")}
             >
-              {loading ? ' در حال ارسال...' : parentId ? ' ارسال پاسخ' : ' ارسال نظر'}
+              {loading
+                ? " در حال ارسال..."
+                : parentId
+                ? " ارسال پاسخ"
+                : " ارسال نظر"}
             </button>
           </div>
         </form>
