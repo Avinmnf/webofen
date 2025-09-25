@@ -111,7 +111,7 @@ export default function PostPage({ post }: Props) {
         canonical={`https://example.com/article/${post.slug}`}
       />
 
-      <main className="w-[1250px] mx-auto p-4 relative">
+      <main className="w-[1250px] mx-auto p-4 relative articles">
         {/*Background Section */}
         <div className="relative pt-20">
           <div className="w-full m-auto">

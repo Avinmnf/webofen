@@ -129,37 +129,54 @@ export default function CartPage() {
                   className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white p-4 border-b border-gray-300 transition"
                 >
                   <Link href={`/products/${item.productId}`}>
-<div className="flex space-y-1">
-  <Image
-    width={100}
-    height={90}
-    src={item.imageUrl || "/dashboard/backlink.png"}
-    loader={({ src }) => src}
-    alt={item.title}
-    className="rounded-t-2xl"
-  />
-  <div>
-    <p className="font-semibold text-lg mb-2">{item.title}</p>
-    <p className="text-sm text-gray-500">تعداد: {item.quantity}</p>
+                    <div className="flex space-y-1">
+                      <Image
+                        width={100}
+                        height={90}
+                        src={item.imageUrl || "/dashboard/backlink.png"}
+                        loader={({ src }) => src}
+                        alt={item.title}
+                        className="rounded-t-2xl"
+                      />
+                      <div>
+                        <p className="font-semibold text-lg mb-2">
+                          {item.title}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          تعداد: {item.quantity}
+                        </p>
+                        {item.variantAttributes && (
+                          <div className="text-sm text-gray-500 mt-1">
+                            {Object.entries(item.variantAttributes ?? {}).map(
+                              ([attr, value], i, arr) => (
+                                <span key={i}>
+                                  {attr}: {value}
+                                  {i < arr.length - 1 ? ", " : ""}
+                                </span>
+                              )
+                            )}
+                          </div>
+                        )}
 
-    {/* Original Price (with line-through if coupon applied) */}
-    <p
-      className={`text-sm text-gray-500 ${
-        item.couponApplied ? "line-through text-gray-400" : ""
-      }`}
-    >
-      قیمت: {item.price?.toLocaleString()} تومان
-    </p>
+                        {/* Original Price (with line-through if coupon applied) */}
+                        <p
+                          className={`text-sm text-gray-500 ${
+                            item.couponApplied
+                              ? "line-through text-gray-400"
+                              : ""
+                          }`}
+                        >
+                          قیمت: {item.price?.toLocaleString()} تومان
+                        </p>
 
-    {/* Show discounted price if coupon applied */}
-    {item.couponApplied && (
-      <p className="text-sm text-emerald-600 font-semibold">
-        بعد از کوپن: {item.finalUnit.toLocaleString()} تومان
-      </p>
-    )}
-  </div>
-</div>
-
+                        {/* Show discounted price if coupon applied */}
+                        {item.couponApplied && (
+                          <p className="text-sm text-emerald-600 font-semibold">
+                            بعد از کوپن: {item.finalUnit.toLocaleString()} تومان
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </Link>
                   <div className="flex gap-3 mt-3 sm:mt-0">
                     <button

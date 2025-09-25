@@ -10,6 +10,7 @@ export type CartItem = {
   quantity: number;
   price?: number;
   imageUrl?: string;
+  variantAttributes?: Record<string, string>;
 };
 
 type CustomerInfo = {
@@ -25,7 +26,6 @@ type OrderExtraInfo = {
   subtotal: number;
   totalPrice: number;
   discountTotal: number;
-  originalPrice: number;
   couponId?: string | null;
 };
 
