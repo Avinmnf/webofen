@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useCoupon } from "@/hooks/useCoupon"; // <-- import your custom hook
 import Image from "next/image";
+import Link from "next/link";
 
 export default function CartPage() {
   const { cart, removeItem, updateItemQuantity, placeOrder } = useCart();
@@ -106,9 +107,13 @@ export default function CartPage() {
 
   return (
     <div className="p-6 w-9/12 mx-auto space-y-8 text-gray-800">
-      <p className="border-b text-lg font-semibold text-gray-700 pb-4 border-gray-300 mb-6">
-        سبد خرید
-      </p>
+      <div className="border-b text-lg font-semibold text-gray-700 pb-4 border-gray-300 mb-6  items-center justify-between">
+        <p>سبد خرید شما</p>
+        <span className="text-sm font-normal text-gray-500">
+          {lines.length} آیتم
+        </span>
+      </div>
+
       <div className="flex justify-between">
         {cart.length === 0 ? (
           <div className="text-center text-gray-500 text-lg">
@@ -121,36 +126,45 @@ export default function CartPage() {
               {lines.map((item, index) => (
                 <div
                   key={index}
-                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white rounded-2xl shadow-sm p-4 border border-gray-200 hover:shadow-md transition"
+                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white p-4 border-b border-gray-300 transition"
                 >
-                  <div className="flex space-y-1">
-                    <Image
-                      width={500}
-                      height={200}
-                      src={item.imageUrl || "/placeholder.png"}
-                      loader={({ src }) => src}
-                      alt={item.title}
-                      className="rounded-t-2xl h-42 w-44"
-                    />
-                    <div>
-                      <p className="font-semibold text-lg mb-2">{item.title}</p>
-                      <p className="text-sm text-gray-500">
-                        تعداد: {item.quantity}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        قیمت واحد: {item.price?.toLocaleString()} تومان
-                      </p>
-                      {item.couponApplied && (
-                        <p className="text-sm text-emerald-600 font-medium">
-                          بعد از کوپن: {item.finalUnit.toLocaleString()} تومان
-                        </p>
-                      )}
-                    </div>
-                  </div>
+                  <Link href={`/products/${item.productId}`}>
+<div className="flex space-y-1">
+  <Image
+    width={100}
+    height={90}
+    src={item.imageUrl || "/dashboard/backlink.png"}
+    loader={({ src }) => src}
+    alt={item.title}
+    className="rounded-t-2xl"
+  />
+  <div>
+    <p className="font-semibold text-lg mb-2">{item.title}</p>
+    <p className="text-sm text-gray-500">تعداد: {item.quantity}</p>
+
+    {/* Original Price (with line-through if coupon applied) */}
+    <p
+      className={`text-sm text-gray-500 ${
+        item.couponApplied ? "line-through text-gray-400" : ""
+      }`}
+    >
+      قیمت: {item.price?.toLocaleString()} تومان
+    </p>
+
+    {/* Show discounted price if coupon applied */}
+    {item.couponApplied && (
+      <p className="text-sm text-emerald-600 font-semibold">
+        بعد از کوپن: {item.finalUnit.toLocaleString()} تومان
+      </p>
+    )}
+  </div>
+</div>
+
+                  </Link>
                   <div className="flex gap-3 mt-3 sm:mt-0">
                     <button
                       onClick={() => removeItem(item.productId, item.variantId)}
-                      className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100"
+                      className="p-2 rounded-lg  text-red-600 hover:bg-red-50"
                     >
                       <svg
                         className="w-5 h-5"
@@ -211,7 +225,10 @@ export default function CartPage() {
                     تخفیف: {discountTotal.toLocaleString()} تومان
                   </p>
                 )}
-                <p className="font-bold text-sm mt-1">
+                <p className=" text-sm mt-1">
+                  قیمت محصولات: {subtotal.toLocaleString()} تومان
+                </p>
+                <p className=" text-sm mt-1">
                   جمع سبد خرید: {totalPrice.toLocaleString()} تومان
                 </p>
               </div>
@@ -221,11 +238,11 @@ export default function CartPage() {
                   placeholder="کد تخفیف"
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value)}
-                  className="flex-1 border px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 border-b px-4 py-2 border-gray-400 text-sm"
                 />
                 <button
                   onClick={handleApplyCoupon}
-                  className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+                  className="px-2 py-2 text-sm rounded-md bg-[#1d546b] text-white"
                 >
                   اعمال
                 </button>

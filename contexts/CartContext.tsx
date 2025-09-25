@@ -25,6 +25,7 @@ type OrderExtraInfo = {
   subtotal: number;
   totalPrice: number;
   discountTotal: number;
+  originalPrice: number;
   couponId?: string | null;
 };
 

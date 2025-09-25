@@ -23,7 +23,7 @@ export function useCoupon() {
     }
 
     try {
-      const res = await fetch(`/api/proxy/validate`, {
+      const res = await fetch(`/api/proxy/validateCoupon`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: couponCode, cartTotal }),
