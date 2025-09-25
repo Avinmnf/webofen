@@ -243,64 +243,31 @@ export default function ProductDetailPage({ product }: Props) {
             <div className="w-1/3  p-2 rounded-3xl border-2 border-[#29b0cb] bg-[#fff]">
               <div className="space-y-6 p-6">
                 <h2 className="text-xl font-semibold mb-2">انتخاب ویژگی‌ها</h2>
-                {product.slug === "content" && product.variants.length > 0 ? (
-                  // Slider for "words"
-                  <div>
-                    <h4 className="font-medium mb-2">تعداد کلمات:</h4>
-                    <input
-                      type="range"
-                      min={100}
-                      max={2000}
-                      step={50}
-                      value={quantity}
-                      onChange={(e) => setQuantity(Number(e.target.value))}
-                      className="w-full"
-                    />
-                    <div className="flex justify-between text-sm text-gray-600 mt-1">
-                      <span>100 کلمه</span>
-                      <span>2000 کلمه</span>
+                {Object.entries(attributeMap).map(([attrName, values]) => (
+                  <div key={attrName}>
+                    <h4 className="text-sm mb-2">{attrName}:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {values.map((value) => (
+                        <button
+                          key={value}
+                          onClick={() =>
+                            setSelectedAttributes((prev) => ({
+                              ...prev,
+                              [attrName]: value,
+                            }))
+                          }
+                          className={`px-4 py-2 rounded-[100px] border ${
+                            selectedAttributes[attrName] === value
+                              ? "bg-green-600 text-white border-indigo-600"
+                              : "bg-white border-gray-300"
+                          }`}
+                        >
+                          {value}
+                        </button>
+                      ))}
                     </div>
-                    <p className="mt-2">
-                      تعداد انتخاب شده: <strong>{quantity}</strong> کلمه
-                    </p>
-                    <p className="mt-1">
-                      قیمت تقریبی:{" "}
-                      <strong>
-                        {(
-                          quantity * (product.variants[0]?.price ?? 0)
-                        ).toLocaleString()}{" "}
-                        تومان
-                      </strong>
-                    </p>
                   </div>
-                ) : (
-                  // Regular variant buttons for other products
-                  Object.entries(attributeMap).map(([attrName, values]) => (
-                    <div key={attrName}>
-                      <h4 className="text-sm mb-2">{attrName}:</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {values.map((value) => (
-                          <button
-                            key={value}
-                            onClick={() =>
-                              setSelectedAttributes((prev) => ({
-                                ...prev,
-                                [attrName]: value,
-                              }))
-                            }
-                            className={`px-4 py-2 rounded-[100px] border ${
-                              selectedAttributes[attrName] === value
-                                ? "bg-green-600 text-white border-indigo-600"
-                                : "bg-white border-gray-300"
-                            }`}
-                          >
-                            {value}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))
-                )}
+                ))}
                 <div className="p-4 border rounded bg-gray-50 mb-6">
                   <p className="text-sm">
                     <strong>قیمت:</strong>{" "}
@@ -358,7 +325,7 @@ export default function ProductDetailPage({ product }: Props) {
                   __html: product.modifiedContent || "",
                 }}
               />
-                            <div className="bg-gray-100 mt-6 w-full h-1"></div>
+              <div className="bg-gray-100 mt-6 w-full h-1"></div>
 
               {!checkingBought ? (
                 hasBought ? (
@@ -378,11 +345,11 @@ export default function ProductDetailPage({ product }: Props) {
                   در حال بررسی وضعیت خرید شما...
                 </p>
               )}
-                              <RatingForm
-                  contentType="product"
-                  contentId={product?.id ?? ""}
-                  orderItemId={orderItemId}
-                />
+              <RatingForm
+                contentType="product"
+                contentId={product?.id ?? ""}
+                orderItemId={orderItemId}
+              />
             </div>
             <div className="w-1/5 mt-6">
               {product.toc && product.toc.length > 0 && (
@@ -407,9 +374,7 @@ export default function ProductDetailPage({ product }: Props) {
                   </nav>
                 </div>
               )}
-              
             </div>
-            
           </section>
 
           {/* Toast Notification */}

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useAuth } from './AuthContext';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { useAuth } from "./AuthContext";
 
 export type CartItem = {
   title: string;
@@ -9,6 +9,7 @@ export type CartItem = {
   variantId?: string;
   quantity: number;
   price?: number;
+  imageUrl?: string;
 };
 
 type CustomerInfo = {
@@ -31,7 +32,11 @@ type CartContextType = {
   cart: CartItem[];
   addItem: (item: CartItem) => void;
   removeItem: (productId: string, variantId?: string) => void;
-  updateItemQuantity: (productId: string, variantId: string | undefined, quantity: number) => void;
+  updateItemQuantity: (
+    productId: string,
+    variantId: string | undefined,
+    quantity: number
+  ) => void;
   clearCart: () => void;
   placeOrder: (
     customerInfo: CustomerInfo,
@@ -43,7 +48,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const useCart = () => {
   const context = useContext(CartContext);
-  if (!context) throw new Error('useCart must be used within a CartProvider');
+  if (!context) throw new Error("useCart must be used within a CartProvider");
   return context;
 };
 
@@ -51,7 +56,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
   const [cart, setCart] = useState<CartItem[]>([]);
 
-  const storageKey = user ? `cart_${user.id}` : 'cart_guest';
+  const storageKey = user ? `cart_${user.id}` : "cart_guest";
 
   useEffect(() => {
     const storedCart = localStorage.getItem(storageKey);
@@ -64,10 +69,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   }, [cart, storageKey]);
 
   const addItem = (item: CartItem) => {
-    setCart(prev => {
-      const existing = prev.find(i => i.productId === item.productId && i.variantId === item.variantId);
+    setCart((prev) => {
+      const existing = prev.find(
+        (i) => i.productId === item.productId && i.variantId === item.variantId
+      );
       if (existing) {
-        return prev.map(i =>
+        return prev.map((i) =>
           i.productId === item.productId && i.variantId === item.variantId
             ? { ...i, quantity: i.quantity + item.quantity }
             : i
@@ -79,12 +86,18 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const removeItem = (productId: string, variantId?: string) => {
-    setCart(prev => prev.filter(i => i.productId !== productId || i.variantId !== variantId));
+    setCart((prev) =>
+      prev.filter((i) => i.productId !== productId || i.variantId !== variantId)
+    );
   };
 
-  const updateItemQuantity = (productId: string, variantId: string | undefined, quantity: number) => {
-    setCart(prev =>
-      prev.map(item =>
+  const updateItemQuantity = (
+    productId: string,
+    variantId: string | undefined,
+    quantity: number
+  ) => {
+    setCart((prev) =>
+      prev.map((item) =>
         item.productId === productId && item.variantId === variantId
           ? { ...item, quantity }
           : item
@@ -97,18 +110,20 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem(storageKey);
   };
 
-  const placeOrder = async (customerInfo: CustomerInfo, extra?: OrderExtraInfo) => {
+  const placeOrder = async (
+    customerInfo: CustomerInfo,
+    extra?: OrderExtraInfo
+  ) => {
     try {
       const payload = {
         ...customerInfo,
         ...extra, // merge extra order details
       };
 
-      const res = await fetch(
-        `api/proxy/orders`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+      const res = await fetch(`api/proxy/orders`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(payload),
       });
 
@@ -117,18 +132,29 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       if (res.ok) {
         setCart([]);
         localStorage.removeItem(storageKey);
-        return { success: true, message: 'سفارش با موفقیت ثبت شد.', orderId: data.id };
+        return {
+          success: true,
+          message: "سفارش با موفقیت ثبت شد.",
+          orderId: data.id,
+        };
       } else {
-        return { success: false, message: data.message || 'خطا در ثبت سفارش.' };
+        return { success: false, message: data.message || "خطا در ثبت سفارش." };
       }
     } catch (error) {
-      return { success: false, message: 'خطای شبکه یا سرور.' };
+      return { success: false, message: "خطای شبکه یا سرور." };
     }
   };
 
   return (
     <CartContext.Provider
-      value={{ cart, addItem, removeItem, updateItemQuantity, clearCart, placeOrder }}
+      value={{
+        cart,
+        addItem,
+        removeItem,
+        updateItemQuantity,
+        clearCart,
+        placeOrder,
+      }}
     >
       {children}
     </CartContext.Provider>
