@@ -15,9 +15,9 @@ const services = [
   { id: "optimization", label: "بهینه سازی", icon: "/dashboard/optimize.png", href: "/dashboard/optimization" },
   { id: "security", label: "امنیت", icon: "/dashboard/security.png", href: "/dashboard/security" },
   { id: "cluster", label: "کلاستر", icon: "/dashboard/cluster.png", href: "/dashboard/cluster" },
-  { id: "rankdomain", label: "افزایش رنک", icon: "/dashboard/rankup.png", href: "/dashboard/rankdomain" },
+  { id: "rank-domain", label: "افزایش رنک", icon: "/dashboard/rankup.png", href: "/dashboard/rank-domain" },
   { id: "reportage", label: "رپورتاژ", icon: "/dashboard/newspaper.png", href: "/dashboard/reportage" },
-  { id: "spam-score", label: "اسپم اسکور", icon: "/dashboard/spamscore.png", href: "/dashboard/spam" },
+  { id: "spam-score", label: "اسپم اسکور", icon: "/dashboard/spamscore.png", href: "/dashboard/spam-score" },
 ];
 
 const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ isMobile }) => {
