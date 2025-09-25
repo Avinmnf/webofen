@@ -56,7 +56,9 @@ body {
 p{
   line-height: 1.7rem;
 }
-
+.articles a{
+  color: #3db4c6;
+}
 
 
 

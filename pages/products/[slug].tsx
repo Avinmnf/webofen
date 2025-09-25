@@ -38,6 +38,8 @@ export default function ProductDetailPage({ product }: Props) {
   const [attributeMap, setAttributeMap] = useState<Record<string, string[]>>(
     {}
   );
+  const [showVariantTooltip, setShowVariantTooltip] = useState(false);
+
   const [showToast, setShowToast] = useState(false);
   const [orderItemId, setOrderItemId] = useState<string | undefined>();
   const [userOrderItems, setUserOrderItems] = useState<{ id: string }[]>([]);
@@ -122,7 +124,6 @@ export default function ProductDetailPage({ product }: Props) {
       ) && attrs.length === Object.keys(selectedAttributes).length
     );
   });
-
   function handleQuantityChange(e: React.ChangeEvent<HTMLInputElement>) {
     let val = parseInt(e.target.value);
     if (isNaN(val) || val < 1) val = 1;
@@ -130,9 +131,10 @@ export default function ProductDetailPage({ product }: Props) {
       val = matchedVariant.stock;
     setQuantity(val);
   }
+  const isAddToCartDisabled = !matchedVariant;
 
-  async function handleTestOrder() {
-    if (!product || !matchedVariant) {
+  function handleAddToCart() {
+    if (!matchedVariant) {
       setOrderMessage("لطفا ویژگی‌ها را کامل انتخاب کنید.");
       return;
     }
@@ -141,39 +143,25 @@ export default function ProductDetailPage({ product }: Props) {
       setOrderMessage("موجودی کافی نیست.");
       return;
     }
+    addItem({
+      title: product.title,
+      productId: product.id,
+      variantId: matchedVariant.id,
+      quantity,
+      price: matchedVariant.price,
+      imageUrl: product.imageUrl,
+      variantAttributes: matchedVariant.attributeValues.reduce(
+        (acc, av) => ({ ...acc, [av.attribute.name]: av.value }),
+        {}
+      ),
+    });
 
-    const orderData = {
-      customerName: "ساجده حسینی",
-      customerPhone: "09214892475",
-      address: "آدرس تستی",
-      items: [
-        {
-          variantId: matchedVariant.id,
-          quantity,
-          price: matchedVariant.price,
-        },
-      ],
-    };
-
-    try {
-      const res = await fetch(`/api/proxy/orders`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderData),
-      });
-
-      const json = await res.json();
-
-      if (res.ok) {
-        setOrderMessage(`سفارش ثبت شد! شناسه سفارش: ${json.orderId}`);
-      } else {
-        setOrderMessage(`خطا در ثبت سفارش: ${json.error || "نامشخص"}`);
-      }
-    } catch {
-      setOrderMessage("خطای شبکه، لطفا دوباره تلاش کنید.");
+    if (!user) {
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 10000);
+      return;
     }
   }
-
   return (
     <>
       <SEO
@@ -244,64 +232,33 @@ export default function ProductDetailPage({ product }: Props) {
             <div className="w-1/3  p-2 rounded-3xl border-2 border-[#29b0cb] bg-[#fff]">
               <div className="space-y-6 p-6">
                 <h2 className="text-xl font-semibold mb-2">انتخاب ویژگی‌ها</h2>
-                {product.slug === "content" && product.variants.length > 0 ? (
-                  // Slider for "words"
-                  <div>
-                    <h4 className="font-medium mb-2">تعداد کلمات:</h4>
-                    <input
-                      type="range"
-                      min={100}
-                      max={2000}
-                      step={50}
-                      value={quantity}
-                      onChange={(e) => setQuantity(Number(e.target.value))}
-                      className="w-full"
-                    />
-                    <div className="flex justify-between text-sm text-gray-600 mt-1">
-                      <span>100 کلمه</span>
-                      <span>2000 کلمه</span>
+                {/* Variant selection */}
+                {Object.entries(attributeMap).map(([attrName, values]) => (
+                  <div key={attrName}>
+                    <h4 className="text-sm mb-2">{attrName}:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {values.map((value) => (
+                        <button
+                          key={value}
+                          onClick={() =>
+                            setSelectedAttributes((prev) => ({
+                              ...prev,
+                              [attrName]: value,
+                            }))
+                          }
+                          className={`px-4 py-2 rounded-[100px] border ${
+                            selectedAttributes[attrName] === value
+                              ? "bg-green-600 text-white border-indigo-600"
+                              : "bg-white border-gray-300"
+                          }`}
+                        >
+                          {value}
+                        </button>
+                      ))}
                     </div>
-                    <p className="mt-2">
-                      تعداد انتخاب شده: <strong>{quantity}</strong> کلمه
-                    </p>
-                    <p className="mt-1">
-                      قیمت تقریبی:{" "}
-                      <strong>
-                        {(
-                          quantity * (product.variants[0]?.price ?? 0)
-                        ).toLocaleString()}{" "}
-                        تومان
-                      </strong>
-                    </p>
                   </div>
-                ) : (
-                  // Regular variant buttons for other products
-                  Object.entries(attributeMap).map(([attrName, values]) => (
-                    <div key={attrName}>
-                      <h4 className="text-sm mb-2">{attrName}:</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {values.map((value) => (
-                          <button
-                            key={value}
-                            onClick={() =>
-                              setSelectedAttributes((prev) => ({
-                                ...prev,
-                                [attrName]: value,
-                              }))
-                            }
-                            className={`px-4 py-2 rounded-[100px] border ${
-                              selectedAttributes[attrName] === value
-                                ? "bg-green-600 text-white border-indigo-600"
-                                : "bg-white border-gray-300"
-                            }`}
-                          >
-                            {value}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))
-                )}
+                ))}
+
                 <div className="p-4 border rounded bg-gray-50 mb-6">
                   <p className="text-sm">
                     <strong>قیمت:</strong>{" "}
@@ -316,49 +273,81 @@ export default function ProductDetailPage({ product }: Props) {
                       : "تعداد را مشخص کنید"}
                   </p>
                 </div>
+                <p>تعداد بسته قرص</p>
+                <div className="flex items-center gap-3 w-full justify-between  bg-gray-100 rounded-4xl px-4 py-4">
+                  <input
+                    type="number"
+                    className="flex-1 mr-4 border-0 bg-gray-100 rounded-lg font-medium text-gray-700 focus:outline-none"
+                    value={quantity}
+                    onChange={(e) => {
+                      let val = parseInt(e.target.value);
+                      if (isNaN(val) || val < 1) val = 1;
+                      if (matchedVariant && val > matchedVariant.stock)
+                        val = matchedVariant.stock;
+                      setQuantity(val);
+                    }}
+                  />
+                  <button
+                    className="w-5 h-5 flex items-center justify-center bg-white rounded hover:bg-gray-200 transition"
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  >
+                    <span className="text-lg font-semibold">-</span>
+                  </button>
+
+                  <button
+                    className="w-5 h-5 flex items-center justify-center bg-white rounded hover:bg-gray-200 transition"
+                    onClick={() =>
+                      setQuantity((q) =>
+                        matchedVariant
+                          ? Math.min(q + 1, matchedVariant.stock)
+                          : q + 1
+                      )
+                    }
+                  >
+                    <span className="text-lg font-semibold">+</span>
+                  </button>
+                </div>
 
                 <AverageRating productId={product?.id} />
-            <button
-            className="flex bg-green-700 p-2 rounded-3xl text-white cursor-pointer items-center w-full justify-center"
-            onClick={() => {
-              // همیشه محصول اضافه شود
-              addItem({
-                title: product.title,
-                productId: product.id,
-                variantId: matchedVariant?.id,
-                quantity,
-                price: matchedVariant?.price,
-              });
+                <div
+                  className="relative w-full"
+                  onMouseEnter={() => {
+                    if (isAddToCartDisabled) setShowVariantTooltip(true);
+                  }}
+                  onMouseLeave={() => setShowVariantTooltip(false)}
+                >
+                  {showVariantTooltip && (
+                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-3 py-1 rounded shadow-lg whitespace-nowrap z-50">
+                      لطفا یک ویژگی‌ انتخاب کنید
+                    </div>
+                  )}
 
-              // اگر کاربر لاگین نیست
-              if (!user) {
-                setShowToast(true);
-                setTimeout(() => setShowToast(false), 10000); // ۱۰ ثانیه نمایش
-                return; // جلوگیری از تماس با API و خطای Unauthorized
-              }
-
-              // در صورت ورود کاربر، می‌توان ادامه ثبت سفارش یا handleTestOrder را انجام داد
-              // handleTestOrder(); // اگر لازمه
-            }}
-          >
-            <span className="text-sm p-2">افزودن به سبد</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="size-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-              />
-            </svg>
-          </button>
-
-
+                  <button
+                    className={`flex p-2 rounded-3xl text-white items-center w-full justify-center ${
+                      isAddToCartDisabled
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-green-700 hover:bg-green-800"
+                    }`}
+                    disabled={isAddToCartDisabled}
+                    onClick={handleAddToCart}
+                  >
+                    <span className="text-sm p-2">افزودن به سبد</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="size-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                      />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -369,7 +358,7 @@ export default function ProductDetailPage({ product }: Props) {
                   __html: product.modifiedContent || "",
                 }}
               />
-                            <div className="bg-gray-100 mt-6 w-full h-1"></div>
+              <div className="bg-gray-100 mt-6 w-full h-1"></div>
 
               {!checkingBought ? (
                 hasBought ? (
@@ -389,11 +378,11 @@ export default function ProductDetailPage({ product }: Props) {
                   در حال بررسی وضعیت خرید شما...
                 </p>
               )}
-                              <RatingForm
-                  contentType="product"
-                  contentId={product?.id ?? ""}
-                  orderItemId={orderItemId}
-                />
+              <RatingForm
+                contentType="product"
+                contentId={product?.id ?? ""}
+                orderItemId={orderItemId}
+              />
             </div>
             <div className="w-1/5 mt-6">
               {product.toc && product.toc.length > 0 && (
@@ -418,9 +407,7 @@ export default function ProductDetailPage({ product }: Props) {
                   </nav>
                 </div>
               )}
-              
             </div>
-            
           </section>
 
           {/* Toast Notification */}
@@ -434,13 +421,12 @@ export default function ProductDetailPage({ product }: Props) {
                   </Link>
                 </p>
               ) : (
-                <p className="text-sm">محصول {product.title} با موفقیت اضافه شد</p>
+                <p className="text-sm">
+                  محصول {product.title} با موفقیت اضافه شد
+                </p>
               )}
             </div>
           )}
-
-
-
         </div>
       </main>
     </>
