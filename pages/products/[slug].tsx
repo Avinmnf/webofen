@@ -15,6 +15,7 @@ import { usePageView } from "@/hooks/usePageView";
 import { useCheckPurchase } from "@/hooks/useCheckPurchase"; // ✅ add this import
 import { useUserOrders } from "@/hooks/useUserOrders";
 import VideoPlayer from "@/components/video";
+import Link from "next/link";
 import SEO from "@/components/seo";
 type Props = { product: Product };
 
@@ -243,31 +244,64 @@ export default function ProductDetailPage({ product }: Props) {
             <div className="w-1/3  p-2 rounded-3xl border-2 border-[#29b0cb] bg-[#fff]">
               <div className="space-y-6 p-6">
                 <h2 className="text-xl font-semibold mb-2">انتخاب ویژگی‌ها</h2>
-                {Object.entries(attributeMap).map(([attrName, values]) => (
-                  <div key={attrName}>
-                    <h4 className="text-sm mb-2">{attrName}:</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {values.map((value) => (
-                        <button
-                          key={value}
-                          onClick={() =>
-                            setSelectedAttributes((prev) => ({
-                              ...prev,
-                              [attrName]: value,
-                            }))
-                          }
-                          className={`px-4 py-2 rounded-[100px] border ${
-                            selectedAttributes[attrName] === value
-                              ? "bg-green-600 text-white border-indigo-600"
-                              : "bg-white border-gray-300"
-                          }`}
-                        >
-                          {value}
-                        </button>
-                      ))}
+                {product.slug === "content" && product.variants.length > 0 ? (
+                  // Slider for "words"
+                  <div>
+                    <h4 className="font-medium mb-2">تعداد کلمات:</h4>
+                    <input
+                      type="range"
+                      min={100}
+                      max={2000}
+                      step={50}
+                      value={quantity}
+                      onChange={(e) => setQuantity(Number(e.target.value))}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-sm text-gray-600 mt-1">
+                      <span>100 کلمه</span>
+                      <span>2000 کلمه</span>
                     </div>
+                    <p className="mt-2">
+                      تعداد انتخاب شده: <strong>{quantity}</strong> کلمه
+                    </p>
+                    <p className="mt-1">
+                      قیمت تقریبی:{" "}
+                      <strong>
+                        {(
+                          quantity * (product.variants[0]?.price ?? 0)
+                        ).toLocaleString()}{" "}
+                        تومان
+                      </strong>
+                    </p>
                   </div>
-                ))}
+                ) : (
+                  // Regular variant buttons for other products
+                  Object.entries(attributeMap).map(([attrName, values]) => (
+                    <div key={attrName}>
+                      <h4 className="text-sm mb-2">{attrName}:</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {values.map((value) => (
+                          <button
+                            key={value}
+                            onClick={() =>
+                              setSelectedAttributes((prev) => ({
+                                ...prev,
+                                [attrName]: value,
+                              }))
+                            }
+                            className={`px-4 py-2 rounded-[100px] border ${
+                              selectedAttributes[attrName] === value
+                                ? "bg-green-600 text-white border-indigo-600"
+                                : "bg-white border-gray-300"
+                            }`}
+                          >
+                            {value}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))
+                )}
                 <div className="p-4 border rounded bg-gray-50 mb-6">
                   <p className="text-sm">
                     <strong>قیمت:</strong>{" "}
@@ -284,37 +318,47 @@ export default function ProductDetailPage({ product }: Props) {
                 </div>
 
                 <AverageRating productId={product?.id} />
+            <button
+            className="flex bg-green-700 p-2 rounded-3xl text-white cursor-pointer items-center w-full justify-center"
+            onClick={() => {
+              // همیشه محصول اضافه شود
+              addItem({
+                title: product.title,
+                productId: product.id,
+                variantId: matchedVariant?.id,
+                quantity,
+                price: matchedVariant?.price,
+              });
 
-                <button
-                  className="flex bg-green-700 p-2 rounded-3xl text-white cursor-pointer items-center w-full justify-center"
-                  onClick={() => {
-                    addItem({
-                      title: product.title,
-                      productId: product.id,
-                      variantId: matchedVariant?.id,
-                      quantity,
-                      price: matchedVariant?.price,
-                    });
-                    setShowToast(true);
-                    setTimeout(() => setShowToast(false), 3000);
-                  }}
-                >
-                  <span className="text-sm p-2">افزودن به سبد</span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    className="size-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                    />
-                  </svg>
-                </button>
+              // اگر کاربر لاگین نیست
+              if (!user) {
+                setShowToast(true);
+                setTimeout(() => setShowToast(false), 10000); // ۱۰ ثانیه نمایش
+                return; // جلوگیری از تماس با API و خطای Unauthorized
+              }
+
+              // در صورت ورود کاربر، می‌توان ادامه ثبت سفارش یا handleTestOrder را انجام داد
+              // handleTestOrder(); // اگر لازمه
+            }}
+          >
+            <span className="text-sm p-2">افزودن به سبد</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="size-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+              />
+            </svg>
+          </button>
+
+
               </div>
             </div>
           </div>
@@ -325,7 +369,7 @@ export default function ProductDetailPage({ product }: Props) {
                   __html: product.modifiedContent || "",
                 }}
               />
-              <div className="bg-gray-100 mt-6 w-full h-1"></div>
+                            <div className="bg-gray-100 mt-6 w-full h-1"></div>
 
               {!checkingBought ? (
                 hasBought ? (
@@ -345,11 +389,11 @@ export default function ProductDetailPage({ product }: Props) {
                   در حال بررسی وضعیت خرید شما...
                 </p>
               )}
-              <RatingForm
-                contentType="product"
-                contentId={product?.id ?? ""}
-                orderItemId={orderItemId}
-              />
+                              <RatingForm
+                  contentType="product"
+                  contentId={product?.id ?? ""}
+                  orderItemId={orderItemId}
+                />
             </div>
             <div className="w-1/5 mt-6">
               {product.toc && product.toc.length > 0 && (
@@ -374,17 +418,29 @@ export default function ProductDetailPage({ product }: Props) {
                   </nav>
                 </div>
               )}
+              
             </div>
+            
           </section>
 
           {/* Toast Notification */}
           {showToast && (
-            <div className="fixed bottom-6 left-[15%] transform -translate-x-1/2  py-2 px-4 bg-[#6fd6e5] text-gray-700 rounded-lg shadow-lg z-50 transition-all">
-              <p className="text-sm ">
-                محصول {product.title} با موفقیت به سبد خرید افزوده شد
-              </p>
+            <div className="fixed bottom-6 left-[50%] transform -translate-x-1/2 py-2 px-4 bg-[#6fd6e5] text-gray-700 rounded-lg shadow-lg z-50 transition-all">
+              {!user ? (
+                <p className="text-sm">
+                  محصول اضافه شد. برای مشاهده{" "}
+                  <Link href="/login" className="underline font-semibold">
+                    وارد شوید
+                  </Link>
+                </p>
+              ) : (
+                <p className="text-sm">محصول {product.title} با موفقیت اضافه شد</p>
+              )}
             </div>
           )}
+
+
+
         </div>
       </main>
     </>
