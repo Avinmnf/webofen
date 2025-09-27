@@ -156,11 +156,11 @@ export default function ProductDetailPage({ product }: Props) {
       ),
     });
 
-    if (!user) {
+  
       setShowToast(true);
       setTimeout(() => setShowToast(false), 10000);
       return;
-    }
+    
   }
   return (
     <>
@@ -235,8 +235,8 @@ export default function ProductDetailPage({ product }: Props) {
                 {/* Variant selection */}
                 {Object.entries(attributeMap).map(([attrName, values]) => (
                   <div key={attrName}>
-                    <h4 className="text-sm mb-2">{attrName}:</h4>
-                    <div className="flex flex-wrap gap-2">
+                    <h4 className="text-sm mb-2 ">{attrName}:</h4>
+                    <div className="flex flex-wrap gap-2 ">
                       {values.map((value) => (
                         <button
                           key={value}
@@ -295,7 +295,7 @@ export default function ProductDetailPage({ product }: Props) {
                   </button>
 
                   <button
-                    className="w-5 h-5 flex items-center justify-center bg-white rounded hover:bg-gray-200 transition"
+                    className="w-5 h-5 flex items-center justify-center  bg-white rounded hover:bg-gray-200 transition"
                     onClick={() =>
                       setQuantity((q) =>
                         matchedVariant
@@ -310,20 +310,20 @@ export default function ProductDetailPage({ product }: Props) {
 
                 <AverageRating productId={product?.id} />
                 <div
-                  className="relative w-full"
+                  className="relative w-full "
                   onMouseEnter={() => {
                     if (isAddToCartDisabled) setShowVariantTooltip(true);
                   }}
                   onMouseLeave={() => setShowVariantTooltip(false)}
                 >
                   {showVariantTooltip && (
-                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-3 py-1 rounded shadow-lg whitespace-nowrap z-50">
+                    <div className="absolute -top-8 left-1/2  transform -translate-x-1/2 bg-gray-800 text-white text-xs px-3 py-1 rounded shadow-lg whitespace-nowrap z-50">
                       لطفا یک ویژگی‌ انتخاب کنید
                     </div>
                   )}
 
                   <button
-                    className={`flex p-2 rounded-3xl text-white items-center w-full justify-center ${
+                    className={`flex p-2 rounded-3xl text-white items-center w-full cursor-pointer justify-center ${
                       isAddToCartDisabled
                         ? "bg-gray-400 cursor-not-allowed"
                         : "bg-green-700 hover:bg-green-800"
@@ -331,7 +331,7 @@ export default function ProductDetailPage({ product }: Props) {
                     disabled={isAddToCartDisabled}
                     onClick={handleAddToCart}
                   >
-                    <span className="text-sm p-2">افزودن به سبد</span>
+                    <span className="text-sm p-2 ">افزودن به سبد</span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"

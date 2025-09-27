@@ -20,7 +20,6 @@ type CustomerInfo = {
   couponCode?: string;
 };
 
-// Extra info we send to backend
 type OrderExtraInfo = {
   items: any[];
   subtotal: number;
@@ -59,12 +58,22 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   const storageKey = user ? `cart_${user.id}` : "cart_guest";
 
+  // Load cart from localStorage on mount and merge guest with user cart
   useEffect(() => {
-    const storedCart = localStorage.getItem(storageKey);
-    if (storedCart) setCart(JSON.parse(storedCart));
-    else setCart([]);
+    const guestCart = localStorage.getItem("cart_guest");
+    const userCart = localStorage.getItem(storageKey);
+
+    let initialCart: CartItem[] = [];
+
+    if (guestCart) initialCart = [...JSON.parse(guestCart)];
+    if (userCart) initialCart = [...initialCart, ...JSON.parse(userCart)];
+
+    if (initialCart.length > 0) setCart(initialCart);
+
+    if (user) localStorage.removeItem("cart_guest");
   }, [user?.id]);
 
+  // Save cart to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify(cart));
   }, [cart, storageKey]);
@@ -118,7 +127,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const payload = {
         ...customerInfo,
-        ...extra, // merge extra order details
+        ...extra,
       };
 
       const res = await fetch(`api/proxy/orders`, {

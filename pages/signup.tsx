@@ -115,7 +115,7 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3 rounded-full text-white font-semibold transition shadow-md ${
+            className={`w-full py-3 rounded-full text-white cursor-pointer font-semibold transition shadow-md ${
               loading ? "bg-[#6FD6E5]/50 cursor-not-allowed" : "bg-[#6FD6E5] hover:bg-[#5cb8c6]"
             }`}
           >

@@ -96,7 +96,7 @@ const LoginPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3 rounded-xl text-white font-semibold shadow-md transition ${
+            className={`w-full py-3 rounded-xl text-white cursor-pointer font-semibold shadow-md transition ${
               loading ? "bg-[#6FD6E5]/50 cursor-not-allowed" : "bg-[#6FD6E5] hover:bg-[#5cb8c6]"
             }`}
           >
