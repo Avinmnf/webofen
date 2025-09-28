@@ -3,23 +3,46 @@
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 const HeaderPanel: React.FC = () => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [isProfileMenuVisible, setIsProfileMenuVisible] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
   const menuRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  const { logout, user } = useAuth();
 
   const toggleMenu = () => setIsMenuVisible((prev) => !prev);
+  const toggleProfileMenu = () => setIsProfileMenuVisible((prev) => !prev);
 
-  // Close dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsMenuVisible(false);
       }
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setIsProfileMenuVisible(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleLogoutClick = async () => {
+    try {
+      await logout();
+      setShowLogoutModal(false);
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   return (
     <div className="relative w-full flex lg:flex-row items-center justify-between rounded-2xl bg-white p-4 shadow-sm">
@@ -31,7 +54,7 @@ const HeaderPanel: React.FC = () => {
         >
           {/* Settings Icon */}
           <svg
-            className="w-6 h-6" // slightly smaller looks better
+            className="w-6 h-6"
             viewBox="0 0 64 64"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -62,18 +85,12 @@ const HeaderPanel: React.FC = () => {
           >
             <ul className="flex flex-col text-right text-gray-700">
               <li className="px-5 py-3 border-b border-gray-100 hover:bg-blue-50 transition-colors duration-200">
-                <Link
-                  href="/dashboard/tickets"
-                  className="flex items-center gap-2"
-                >
+                <Link href="/dashboard/tickets" className="flex items-center gap-2">
                   پشتیبانی
                 </Link>
               </li>
               <li className="px-5 py-3 hover:bg-blue-50 transition-colors duration-200">
-                <Link
-                  href="/dashboard/accounting"
-                  className="flex items-center gap-2"
-                >
+                <Link href="/dashboard/accounting" className="flex items-center gap-2">
                   مالی
                 </Link>
               </li>
@@ -89,39 +106,52 @@ const HeaderPanel: React.FC = () => {
 
       {/* Right Section: Profile */}
       <div className="w-4/12 flex gap-2 justify-end items-center">
-        <svg
-          className="w-7 h-7"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-          <g
-            id="SVGRepo_tracerCarrier"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          ></g>
-          <g id="SVGRepo_iconCarrier">
-            {" "}
-            <path
-              opacity="0.4"
-              d="M12 22.01C17.5228 22.01 22 17.5329 22 12.01C22 6.48716 17.5228 2.01001 12 2.01001C6.47715 2.01001 2 6.48716 2 12.01C2 17.5329 6.47715 22.01 12 22.01Z"
-              fill="#292D32"
-            ></path>{" "}
-            <path
-              d="M12 6.93994C9.93 6.93994 8.25 8.61994 8.25 10.6899C8.25 12.7199 9.84 14.3699 11.95 14.4299C11.98 14.4299 12.02 14.4299 12.04 14.4299C12.06 14.4299 12.09 14.4299 12.11 14.4299C12.12 14.4299 12.13 14.4299 12.13 14.4299C14.15 14.3599 15.74 12.7199 15.75 10.6899C15.75 8.61994 14.07 6.93994 12 6.93994Z"
-              fill="#292D32"
-            ></path>{" "}
-            <path
-              d="M18.7807 19.36C17.0007 21 14.6207 22.01 12.0007 22.01C9.3807 22.01 7.0007 21 5.2207 19.36C5.4607 18.45 6.1107 17.62 7.0607 16.98C9.7907 15.16 14.2307 15.16 16.9407 16.98C17.9007 17.62 18.5407 18.45 18.7807 19.36Z"
-              fill="#292D32"
-            ></path>{" "}
-          </g>
-        </svg>
-        <Link
-          href="/dashboard"
-          className="rounded-2xl transition-colors duration-300 ease-in-out hover:bg-[#f7f8fc]"
-        >
+        <button onClick={toggleProfileMenu} className="p-2 rounded-md hover:bg-gray-100">
+          {/* Profile Icon */}
+          <svg
+            className="w-7 h-7"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+            <g id="SVGRepo_iconCarrier">
+              <path
+                opacity="0.4"
+                d="M12 22.01C17.5228 22.01 22 17.5329 22 12.01C22 6.48716 17.5228 2.01001 12 2.01001C6.47715 2.01001 2 6.48716 2 12.01C2 17.5329 6.47715 22.01 12 22.01Z"
+                fill="#292D32"
+              ></path>
+              <path
+                d="M12 6.93994C9.93 6.93994 8.25 8.61994 8.25 10.6899C8.25 12.7199 9.84 14.3699 11.95 14.4299C11.98 14.4299 12.02 14.4299 12.04 14.4299C12.06 14.4299 12.09 14.4299 12.11 14.4299C12.12 14.4299 12.13 14.4299 12.13 14.4299C14.15 14.3599 15.74 12.7199 15.75 10.6899C15.75 8.61994 14.07 6.93994 12 6.93994Z"
+                fill="#292D32"
+              ></path>
+              <path
+                d="M18.7807 19.36C17.0007 21 14.6207 22.01 12.0007 22.01C9.3807 22.01 7.0007 21 5.2207 19.36C5.4607 18.45 6.1107 17.62 7.0607 16.98C9.7907 15.16 14.2307 15.16 16.9407 16.98C17.9007 17.62 18.5407 18.45 18.7807 19.36Z"
+                fill="#292D32"
+              ></path>
+            </g>
+          </svg>
+        </button>
+
+        {isProfileMenuVisible && (
+          <div
+            ref={profileRef}
+            className="absolute top-full  bg-white shadow-xl rounded-xl w-40 py-2 z-50"
+          >
+            <ul className="flex flex-col  text-gray-700">
+              <li
+                onClick={() => setShowLogoutModal(true)}
+                className="px-5 py-3 hover:bg-blue-50 transition-colors duration-200 cursor-pointer"
+              >
+                خروج
+              </li>
+            </ul>
+          </div>
+        )}
+
+        <Link href="/dashboard" className="rounded-2xl transition-colors duration-300 ease-in-out hover:bg-[#f7f8fc]">
+          {/* Dashboard Icon */}
           <svg
             className="w-7 h-7"
             viewBox="0 0 64 64"
@@ -139,6 +169,29 @@ const HeaderPanel: React.FC = () => {
           </svg>
         </Link>
       </div>
+
+      {/* Logout Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
+          <div className="bg-white text-black rounded-lg p-5 w-[23rem] text-right">
+            <p className="mb-4">آیا مطمئن هستید که می‌خواهید خارج شوید؟</p>
+            <div className="flex justify-between mt-5">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                خیر
+              </button>
+              <button
+                onClick={handleLogoutClick}
+                className="px-4 py-2 bg-[#6FD6E5] text-white rounded hover:bg-[#1d546b]"
+              >
+                بله
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,4 +1,6 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import { deleteCookie } from 'cookies-next';
+import { useRouter } from 'next/navigation';
 
 export interface Role { id: string; name: string; }
 export interface User { id: string; name: string; email: string; phone?: string; role: Role; }
@@ -10,7 +12,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   loginWithPhone: (phone: string, code: string) => Promise<boolean>;
   logout: () => Promise<void>;
-  refreshUser: () => Promise<void>; // اضافه کردن refreshUser
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -27,6 +29,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const isLoggedIn = !!user;
+  const router = useRouter();
 
   const refreshUser = async () => {
     setLoading(true);
@@ -47,7 +50,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   useEffect(() => {
-    refreshUser(); // mount شدن و بررسی لاگین از کوکی
+    refreshUser();
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
@@ -58,7 +61,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         body: JSON.stringify({ email, password }),
       });
       if (res.ok) {
-        await refreshUser(); // بعد از لاگین، اطلاعات کاربر را از /me بگیر
+        await refreshUser();
         return true;
       }
       return false;
@@ -76,7 +79,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         body: JSON.stringify({ phone, code }),
       });
       if (res.ok) {
-        await refreshUser(); // بعد از OTP، user از کوکی /me گرفته شود
+        await refreshUser();
         return true;
       }
       return false;
@@ -88,8 +91,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const logout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      // پاک کردن کوکی سمت کلاینت
+      deleteCookie('token', { path: '/' });
+
+      // درخواست به بک‌اند
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+
+      // خالی کردن وضعیت کاربر
       setUser(null);
+
+      // ریدایرکت به لاگین
     } catch (err) {
       console.error('Logout failed:', err);
     }
