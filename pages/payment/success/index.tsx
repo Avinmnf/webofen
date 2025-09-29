@@ -106,7 +106,7 @@ export default function PaymentSuccessPage() {
             onClick={handleManualRedirect}
             className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition duration-200 font-medium"
           >
-            بازگشت به سبد خرید
+            ورود به داشبورد
           </button>
 
           <div className="mt-6 pt-6 border-t border-gray-200">
