@@ -177,7 +177,7 @@ export default function Header() {
                     </div>
                   </div>
                   <div className="border-r border-gray-300 pr-4 relative">
-                    <Link href={"/cart"}>
+                    <Link href={"/payment"}>
                       <svg
                         viewBox="0 0 24 24"
                         className="w-6 h-6"

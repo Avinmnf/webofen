@@ -57,19 +57,60 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
   const [cart, setCart] = useState<CartItem[]>([]);
 
-  const storageKey = user ? `cart_${user.id}` : "cart_guest";
+  // Always compute storageKey dynamically
+  const storageKey = user ? `cart_${user.id}` : null;
 
+  /**
+   * ✅ FIRST: Check URL for paymentSuccess on first mount.
+   * This runs BEFORE we try to hydrate cart from storageKey.
+   * Clears ALL cart keys (guest + user carts).
+   */
   useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentSuccess = urlParams.get("paymentSuccess");
+
+    if (paymentSuccess === "true") {
+      console.log("✅ Payment success detected — clearing all carts");
+
+      // Remove all keys starting with "cart_"
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith("cart_")) {
+          localStorage.removeItem(key);
+        }
+      });
+
+      setCart([]);
+
+      // Clean up URL so refresh won't keep clearing
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, []);
+
+  /**
+   * ✅ SECOND: Hydrate cart whenever storageKey changes.
+   * Will hydrate empty cart if the first effect already cleared storage.
+   */
+  useEffect(() => {
+    if (!storageKey) {
+      setCart([]); // reset cart for logged-out users
+      return;
+    }
+
     const storedCart = localStorage.getItem(storageKey);
-    if (storedCart) setCart(JSON.parse(storedCart));
-    else setCart([]);
-  }, [user?.id]);
+    setCart(storedCart ? JSON.parse(storedCart) : []);
+  }, [storageKey]);
 
+  /**
+   * ✅ THIRD: Persist to localStorage whenever cart changes.
+   */
   useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify(cart));
+    if (storageKey) {
+      localStorage.setItem(storageKey, JSON.stringify(cart));
+    }
   }, [cart, storageKey]);
 
   const addItem = (item: CartItem) => {
+    if (!storageKey) return;
     setCart((prev) => {
       const existing = prev.find(
         (i) => i.productId === item.productId && i.variantId === item.variantId
@@ -80,13 +121,13 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             ? { ...i, quantity: i.quantity + item.quantity }
             : i
         );
-      } else {
-        return [...prev, item];
       }
+      return [...prev, item];
     });
   };
 
   const removeItem = (productId: string, variantId?: string) => {
+    if (!storageKey) return;
     setCart((prev) =>
       prev.filter((i) => i.productId !== productId || i.variantId !== variantId)
     );
@@ -97,6 +138,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     variantId: string | undefined,
     quantity: number
   ) => {
+    if (!storageKey) return;
     setCart((prev) =>
       prev.map((item) =>
         item.productId === productId && item.variantId === variantId
@@ -108,20 +150,23 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   const clearCart = () => {
     setCart([]);
-    localStorage.removeItem(storageKey);
+    if (storageKey) localStorage.removeItem(storageKey);
   };
 
   const placeOrder = async (
     customerInfo: CustomerInfo,
     extra?: OrderExtraInfo
   ) => {
+    if (!user) return { success: false, message: "User not logged in." };
+
     try {
       const payload = {
         ...customerInfo,
-        ...extra, // merge extra order details
+        ...extra,
+        status: "not_payed",
       };
 
-      const res = await fetch(`api/proxy/orders`, {
+      const res = await fetch(`/api/proxy/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -131,17 +176,16 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       const data = await res.json();
 
       if (res.ok) {
-        setCart([]);
-        localStorage.removeItem(storageKey);
         return {
           success: true,
           message: "سفارش با موفقیت ثبت شد.",
-          orderId: data.id,
+          orderId: data.orderId,
         };
       } else {
         return { success: false, message: data.message || "خطا در ثبت سفارش." };
       }
     } catch (error) {
+      console.error("placeOrder error:", error);
       return { success: false, message: "خطای شبکه یا سرور." };
     }
   };
