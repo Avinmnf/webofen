@@ -89,21 +89,21 @@ export default function CartPage() {
       });
     }
   }
-useEffect(() => {
-  console.log("📍 CART PAGE - URL DETAILS:", {
-    fullURL: window.location.href,
-    pathname: window.location.pathname,
-    search: window.location.search,
-    queryParams: router.query,
-    hasPaymentSuccess: router.query.paymentSuccess === "true",
-    hasRefId: !!router.query.ref_id
-  });
-}, [router.query]);
+  useEffect(() => {
+    console.log("📍 CART PAGE - URL DETAILS:", {
+      fullURL: window.location.href,
+      pathname: window.location.pathname,
+      search: window.location.search,
+      queryParams: router.query,
+      hasPaymentSuccess: router.query.paymentSuccess === "true",
+      hasRefId: !!router.query.ref_id,
+    });
+  }, [router.query]);
 
-// Also add this to check if the effect is running
-useEffect(() => {
-  console.log("🔄 Cart page useEffect triggered");
-}, []);
+  // Also add this to check if the effect is running
+  useEffect(() => {
+    console.log("🔄 Cart page useEffect triggered");
+  }, []);
 
   const handleApplyCoupon = async () => {
     const coupon = await validateCoupon(couponCode, subtotal);
@@ -116,10 +116,16 @@ useEffect(() => {
       return;
     }
 
-    const itemsForOrder = lines.map((line) => ({
-      variantId: line.variantId!,
-      quantity: line.quantity,
-    }));
+    // Expand quantities into separate items
+    const itemsForOrder: { variantId: string; quantity: number }[] = [];
+    lines.forEach((line) => {
+      for (let i = 0; i < line.quantity; i++) {
+        itemsForOrder.push({
+          variantId: line.variantId!,
+          quantity: 1, // each order item has quantity 1
+        });
+      }
+    });
 
     await handleCheckout({
       customerName,

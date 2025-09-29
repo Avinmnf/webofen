@@ -8,7 +8,7 @@ export default function PaymentFailPage() {
   const router = useRouter();
 
   const handleRetry = () => {
-    router.push("/cart");
+    router.push("/payment");
   };
 
   return (
