@@ -20,6 +20,7 @@ type CustomerInfo = {
   couponCode?: string;
 };
 
+// Extra info we send to backend
 type OrderExtraInfo = {
   items: any[];
   subtotal: number;
