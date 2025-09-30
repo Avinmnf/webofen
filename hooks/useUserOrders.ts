@@ -36,12 +36,15 @@ export interface OrderItem {
   delayed?: string;
   variant: Variant;
   deadline?: string;
+  vipDeadline: string;
   inputValues?: OrderItemInputValue[];
   completionReport?: string;
   startTime: string;
 }
 
 export interface Order {
+  user: string;
+  role: string;
   id: string;
   customerName: string;
   status: string;
@@ -50,6 +53,7 @@ export interface Order {
   items: OrderItem[];
 }
 interface UseUserOrdersResult {
+  role: string | null;
   orders: Order[];
   loading: boolean;
   error: string | null;
@@ -59,6 +63,7 @@ export function useUserOrders(): UseUserOrdersResult {
   const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(!!user);
+  const [role, setRole] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -80,6 +85,7 @@ export function useUserOrders(): UseUserOrdersResult {
         }
         const data = await res.json();
         setOrders(data.orders || []);
+        setRole(data.role || null);
         setError(null);
       } catch (err: any) {
         console.error("Error fetching orders:", err);
@@ -93,5 +99,5 @@ export function useUserOrders(): UseUserOrdersResult {
     fetchOrders();
   }, [user]);
 
-  return { orders, loading, error };
+  return { orders, loading, error, role };
 }

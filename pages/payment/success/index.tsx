@@ -58,7 +58,7 @@ export default function PaymentSuccessPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-green-50 flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
           {/* Success Icon */}
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -94,13 +94,6 @@ export default function PaymentSuccessPage() {
             </div>
           )}
 
-          <div className="mb-6">
-            <p className="text-gray-600">
-              این صفحه به طور خودکار بعد از{" "}
-              <span className="font-bold text-green-600">{countdown}</span>{" "}
-              ثانیه به سبد خرید هدایت می‌شود...
-            </p>
-          </div>
 
           <button
             onClick={handleManualRedirect}
