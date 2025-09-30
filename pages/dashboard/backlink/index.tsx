@@ -790,219 +790,303 @@ const BacklinkPage: React.FC = () => {
 
             <div className="p-6 space-y-5">
               <div
-                className={`p-6 space-y-5 ${
-                  role === "vipclient" ? "bg-white rounded-2xl text-black" : "bg-transparent"
+                className={` space-y-5 relative ${
+                  role === "vipclient"
+                    ? "bg-white rounded-2xl text-black"
+                    : "bg-transparent"
                 }`}
               >
-                {" "}
-                {/* Render VIP timer if user is VIP */}
-                {role === "vipclient" && selectedItem && (
-                  <div>
-                    <button
-                      onClick={() =>
-                        setOpenCalendarId(
-                          openCalendarId === selectedItem.id
-                            ? null
-                            : selectedItem.id
-                        )
-                      }
-                      disabled={deadlineLoading}
-                      className={`px-4 py-2 rounded ${
-                        deadlineLoading
-                          ? "cursor-not-allowed"
-                          : "cursor-pointer"
-                      } text-white`}
-                    >
-                      <svg
-                        className="w-8 h-8"
-                        version="1.1"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 100 100"
-                        enable-background="new 0 0 100 100"
-                        fill="#00000"
-                      >
-                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                        <g
-                          id="SVGRepo_tracerCarrier"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        ></g>
-                        <g id="SVGRepo_iconCarrier">
-                          {" "}
-                          <g id="Download_x5F_25_x25_"> </g>{" "}
-                          <g id="Download_x5F_50_x25_"> </g>{" "}
-                          <g id="Download_x5F_75_x25_"> </g>{" "}
-                          <g id="Download_x5F_100_x25_"> </g>{" "}
-                          <g id="Upload"> </g> <g id="Next"> </g>{" "}
-                          <g id="Last"> </g> <g id="OK"> </g> <g id="Fail"> </g>{" "}
-                          <g id="Add"> </g> <g id="Spinner_x5F_0_x25_"> </g>{" "}
-                          <g id="Spinner_x5F_25_x25_"> </g>{" "}
-                          <g id="Spinner_x5F_50_x25_"> </g>{" "}
-                          <g id="Spinner_x5F_75_x25_"> </g>{" "}
-                          <g id="Brightest_x5F_25_x25_"> </g>{" "}
-                          <g id="Brightest_x5F_50_x25_"> </g>{" "}
-                          <g id="Brightest_x5F_75_x25_"> </g>{" "}
-                          <g id="Brightest_x5F_100_x25_"> </g>{" "}
-                          <g id="Reload"> </g> <g id="Forbidden"> </g>{" "}
-                          <g id="Clock"> </g> <g id="Compass"> </g>{" "}
-                          <g id="World"> </g> <g id="Speed"> </g>{" "}
-                          <g id="Microphone"> </g> <g id="Options"> </g>{" "}
-                          <g id="Chronometer">
-                            {" "}
-                            <circle cx="73.375" cy="30.812" r="2"></circle>{" "}
-                            <circle
-                              fill="none"
-                              stroke="#000000"
-                              stroke-width="4"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-miterlimit="10"
-                              cx="50.188"
-                              cy="50"
-                              r="23.188"
-                            ></circle>{" "}
-                            <path
-                              fill="none"
-                              stroke="#000000"
-                              stroke-width="4"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-miterlimit="10"
-                              d=" M41.45,21.292C44.215,20.452,47.149,20,50.188,20c3.018,0,5.931,0.446,8.678,1.274"
-                            ></path>{" "}
-                            <line
-                              fill="none"
-                              stroke="#000000"
-                              stroke-width="4"
-                              stroke-linecap="round"
-                              stroke-miterlimit="10"
-                              x1="48.644"
-                              y1="50.45"
-                              x2="58.544"
-                              y2="40.55"
-                            ></line>{" "}
-                          </g>{" "}
-                          <g id="Lock"> </g> <g id="User"> </g>{" "}
-                          <g id="Position"> </g> <g id="No_x5F_Signal"> </g>{" "}
-                          <g id="Low_x5F_Signal"> </g>{" "}
-                          <g id="Mid_x5F_Signal"> </g>{" "}
-                          <g id="High_x5F_Signal"> </g> <g id="Options_1_"> </g>{" "}
-                          <g id="Flash"> </g> <g id="No_x5F_Signal_x5F_02"> </g>{" "}
-                          <g id="Low_x5F_Signal_x5F_02"> </g>{" "}
-                          <g id="Mid_x5F_Signal_x5F_02"> </g>{" "}
-                          <g id="High_x5F_Signal_x5F_02"> </g>{" "}
-                          <g id="Favorite"> </g> <g id="Search"> </g>{" "}
-                          <g id="Stats_x5F_01"> </g> <g id="Stats_x5F_02"> </g>{" "}
-                          <g id="Turn_x5F_On_x5F_Off"> </g>{" "}
-                          <g id="Full_x5F_Height"> </g>{" "}
-                          <g id="Full_x5F_Width"> </g>{" "}
-                          <g id="Full_x5F_Screen"> </g>{" "}
-                          <g id="Compress_x5F_Screen"> </g> <g id="Chat"> </g>{" "}
-                          <g id="Bluetooth"> </g> <g id="Share_x5F_iOS"> </g>{" "}
-                          <g id="Share_x5F_Android"> </g>{" "}
-                          <g id="Love__x2F__Favorite"> </g>{" "}
-                          <g id="Hamburguer"> </g> <g id="Flying"> </g>{" "}
-                          <g id="Take_x5F_Off"> </g> <g id="Land"> </g>{" "}
-                          <g id="City"> </g> <g id="Nature"> </g>{" "}
-                          <g id="Pointer"> </g> <g id="Prize"> </g>{" "}
-                          <g id="Extract"> </g> <g id="Play"> </g>{" "}
-                          <g id="Pause"> </g> <g id="Stop"> </g>{" "}
-                          <g id="Forward"> </g> <g id="Reverse"> </g>{" "}
-                          <g id="Next_1_"> </g> <g id="Last_1_"> </g>{" "}
-                          <g id="Empty_x5F_Basket"> </g>{" "}
-                          <g id="Add_x5F_Basket"> </g>{" "}
-                          <g id="Delete_x5F_Basket"> </g>{" "}
-                          <g id="Error_x5F_Basket"> </g>{" "}
-                          <g id="OK_x5F_Basket"> </g>{" "}
-                        </g>
-                      </svg>
-                    </button>
-
-                    {deadlineError && (
-                      <div className="mt-2 text-red-400 text-sm text-center">
-                        {deadlineError}
-                        <button
-                          onClick={resetError}
-                          className="mr-2 text-red-200 hover:text-red-100"
+                {/* Crown for VIP users */}
+                {role === "vipclient" && (
+                  <svg
+                    className="w-8 h-8 absolute -top-3 rotate-35 -right-2 z-50"
+                    viewBox="0 -6 34 34"
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="#000000"
+                  >
+                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                    <g
+                      id="SVGRepo_tracerCarrier"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    ></g>
+                    <g id="SVGRepo_iconCarrier">
+                      {" "}
+                      <title>crown</title> <desc>Created with Sketch.</desc>{" "}
+                      <defs>
+                        {" "}
+                        <linearGradient
+                          x1="50%"
+                          y1="0%"
+                          x2="50%"
+                          y2="100%"
+                          id="linearGradient-1"
                         >
-                          ✕
-                        </button>
-                      </div>
-                    )}
-
-                    {openCalendarId === selectedItem.id && (
-                      <div
-                        ref={calendarRef}
-                        className="absolute bottom-0 left-1/2 -translate-x-1/2 z-50 bg-white border text-black rounded-md shadow-lg p-4"
-                        onMouseDown={(e) => e.stopPropagation()}
+                          {" "}
+                          <stop stop-color="#FFC923" offset="0%">
+                            {" "}
+                          </stop>{" "}
+                          <stop stop-color="#FFAD41" offset="100%">
+                            {" "}
+                          </stop>{" "}
+                        </linearGradient>{" "}
+                      </defs>{" "}
+                      <g
+                        id="icons"
+                        stroke="none"
+                        stroke-width="1"
+                        fill="none"
+                        fill-rule="evenodd"
                       >
-                        <Calendar
-                          calendar={persian}
-                          locale={persian_fa}
-                          value={
-                            selectedDate[selectedItem.id] ||
-                            (selectedItem.vipDeadline
-                              ? new Date(selectedItem.vipDeadline)
-                              : null)
-                          }
-                          onChange={(date) => {
-                            if (!date) return;
-                            setSelectedDate((prev) => ({
-                              ...prev,
-                              [selectedItem.id]: date.toDate(),
-                            }));
-                          }}
-                          plugins={[<TimePicker position="bottom" />]}
-                        />
-                        <div className="flex justify-between mt-2">
-                          <button
-                            className={`px-3 py-1 rounded text-white ${
-                              deadlineLoading
-                                ? "bg-gray-400 cursor-not-allowed"
-                                : "bg-green-500 hover:bg-green-600"
-                            }`}
-                            onClick={() => {
-                              const date = selectedDate[selectedItem.id];
-                              if (!date || deadlineLoading) return;
-                              handleUpdateVipDeadline(
-                                selectedItem.id,
-                                date.toISOString()
-                              );
-                              setOpenCalendarId(null);
-                            }}
-                            disabled={deadlineLoading}
+                        {" "}
+                        <g
+                          id="ui-gambling-website-lined-icnos-casinoshunter"
+                          transform="translate(-1513.000000, -2041.000000)"
+                          fill="url(#linearGradient-1)"
+                          fill-rule="nonzero"
+                        >
+                          {" "}
+                          <g
+                            id="4"
+                            transform="translate(50.000000, 1871.000000)"
                           >
-                            {deadlineLoading ? "..." : "تایید"}
-                          </button>
-                          <button
-                            className={`px-3 py-1 rounded text-white ${
-                              deadlineLoading
-                                ? "bg-gray-400 cursor-not-allowed"
-                                : "bg-red-500 hover:bg-red-600"
-                            }`}
-                            onClick={() => {
-                              if (deadlineLoading) return;
-                              handleUpdateVipDeadline(selectedItem.id, "");
-                              setSelectedDate((prev) => ({
-                                ...prev,
-                                [selectedItem.id]: null,
-                              }));
-                              setOpenCalendarId(null);
-                            }}
-                            disabled={deadlineLoading}
-                          >
-                            {deadlineLoading ? "..." : "حذف"}
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                            {" "}
+                            <path
+                              d="M1480.91651,170.219311 C1481.3389,170.433615 1481.67193,170.790192 1481.85257,171.227002 L1485.64818,180.405177 L1493.44429,170.905749 C1494.13844,170.059929 1495.39769,169.928221 1496.25688,170.61157 C1496.72686,170.98536 1497,171.548271 1497,172.143061 L1497,189.04671 C1497,190.677767 1495.65685,192 1494,192 L1466,192 C1464.34315,192 1463,190.677767 1463,189.04671 L1463,172.142612 C1463,171.055241 1463.89543,170.173752 1465,170.173752 C1465.60413,170.173752 1466.17588,170.442575 1466.55559,170.905145 L1474.35377,180.405143 L1478.1477,171.227264 C1478.54422,170.268054 1479.62151,169.783179 1480.60701,170.093228 L1480.75404,170.145737 L1480.91651,170.219311 Z"
+                              id="crown"
+                            >
+                              {" "}
+                            </path>{" "}
+                          </g>{" "}
+                        </g>{" "}
+                      </g>{" "}
+                    </g>
+                  </svg>
                 )}
+
                 {fields?.map((field) => (
                   <div key={field.id} className="flex flex-col">
-                    <label className="text-sm text-gray-300 mb-1">
-                      {field.label}
-                    </label>
+                    <div className="flex items-center justify-between pr-4">
+                      <label className="text-sm text-gray-600 mb-1">
+                        {field.label}
+                      </label>
+                      {/* Render VIP timer if user is VIP */}
+                      {role === "vipclient" && selectedItem && (
+                        <>
+                          <button
+                            onClick={() =>
+                              setOpenCalendarId(
+                                openCalendarId === selectedItem.id
+                                  ? null
+                                  : selectedItem.id
+                              )
+                            }
+                            disabled={deadlineLoading}
+                            className={`px-4 py-2 rounded animate-pulse ${
+                              deadlineLoading
+                                ? "cursor-not-allowed"
+                                : "cursor-pointer"
+                            } text-white`}
+                          >
+                            <svg
+                              className="w-8 h-8"
+                              version="1.1"
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 100 100"
+                              enable-background="new 0 0 100 100"
+                              fill="#00000"
+                            >
+                              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                              <g
+                                id="SVGRepo_tracerCarrier"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              ></g>
+                              <g id="SVGRepo_iconCarrier">
+                                {" "}
+                                <g id="Download_x5F_25_x25_"> </g>{" "}
+                                <g id="Download_x5F_50_x25_"> </g>{" "}
+                                <g id="Download_x5F_75_x25_"> </g>{" "}
+                                <g id="Download_x5F_100_x25_"> </g>{" "}
+                                <g id="Upload"> </g> <g id="Next"> </g>{" "}
+                                <g id="Last"> </g> <g id="OK"> </g>{" "}
+                                <g id="Fail"> </g> <g id="Add"> </g>{" "}
+                                <g id="Spinner_x5F_0_x25_"> </g>{" "}
+                                <g id="Spinner_x5F_25_x25_"> </g>{" "}
+                                <g id="Spinner_x5F_50_x25_"> </g>{" "}
+                                <g id="Spinner_x5F_75_x25_"> </g>{" "}
+                                <g id="Brightest_x5F_25_x25_"> </g>{" "}
+                                <g id="Brightest_x5F_50_x25_"> </g>{" "}
+                                <g id="Brightest_x5F_75_x25_"> </g>{" "}
+                                <g id="Brightest_x5F_100_x25_"> </g>{" "}
+                                <g id="Reload"> </g> <g id="Forbidden"> </g>{" "}
+                                <g id="Clock"> </g> <g id="Compass"> </g>{" "}
+                                <g id="World"> </g> <g id="Speed"> </g>{" "}
+                                <g id="Microphone"> </g> <g id="Options"> </g>{" "}
+                                <g id="Chronometer">
+                                  {" "}
+                                  <circle
+                                    cx="73.375"
+                                    cy="30.812"
+                                    r="2"
+                                  ></circle>{" "}
+                                  <circle
+                                    fill="none"
+                                    stroke="#000000"
+                                    stroke-width="4"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-miterlimit="10"
+                                    cx="50.188"
+                                    cy="50"
+                                    r="23.188"
+                                  ></circle>{" "}
+                                  <path
+                                    fill="none"
+                                    stroke="#000000"
+                                    stroke-width="4"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-miterlimit="10"
+                                    d=" M41.45,21.292C44.215,20.452,47.149,20,50.188,20c3.018,0,5.931,0.446,8.678,1.274"
+                                  ></path>{" "}
+                                  <line
+                                    fill="none"
+                                    stroke="#000000"
+                                    stroke-width="4"
+                                    stroke-linecap="round"
+                                    stroke-miterlimit="10"
+                                    x1="48.644"
+                                    y1="50.45"
+                                    x2="58.544"
+                                    y2="40.55"
+                                  ></line>{" "}
+                                </g>{" "}
+                                <g id="Lock"> </g> <g id="User"> </g>{" "}
+                                <g id="Position"> </g>{" "}
+                                <g id="No_x5F_Signal"> </g>{" "}
+                                <g id="Low_x5F_Signal"> </g>{" "}
+                                <g id="Mid_x5F_Signal"> </g>{" "}
+                                <g id="High_x5F_Signal"> </g>{" "}
+                                <g id="Options_1_"> </g> <g id="Flash"> </g>{" "}
+                                <g id="No_x5F_Signal_x5F_02"> </g>{" "}
+                                <g id="Low_x5F_Signal_x5F_02"> </g>{" "}
+                                <g id="Mid_x5F_Signal_x5F_02"> </g>{" "}
+                                <g id="High_x5F_Signal_x5F_02"> </g>{" "}
+                                <g id="Favorite"> </g> <g id="Search"> </g>{" "}
+                                <g id="Stats_x5F_01"> </g>{" "}
+                                <g id="Stats_x5F_02"> </g>{" "}
+                                <g id="Turn_x5F_On_x5F_Off"> </g>{" "}
+                                <g id="Full_x5F_Height"> </g>{" "}
+                                <g id="Full_x5F_Width"> </g>{" "}
+                                <g id="Full_x5F_Screen"> </g>{" "}
+                                <g id="Compress_x5F_Screen"> </g>{" "}
+                                <g id="Chat"> </g> <g id="Bluetooth"> </g>{" "}
+                                <g id="Share_x5F_iOS"> </g>{" "}
+                                <g id="Share_x5F_Android"> </g>{" "}
+                                <g id="Love__x2F__Favorite"> </g>{" "}
+                                <g id="Hamburguer"> </g> <g id="Flying"> </g>{" "}
+                                <g id="Take_x5F_Off"> </g> <g id="Land"> </g>{" "}
+                                <g id="City"> </g> <g id="Nature"> </g>{" "}
+                                <g id="Pointer"> </g> <g id="Prize"> </g>{" "}
+                                <g id="Extract"> </g> <g id="Play"> </g>{" "}
+                                <g id="Pause"> </g> <g id="Stop"> </g>{" "}
+                                <g id="Forward"> </g> <g id="Reverse"> </g>{" "}
+                                <g id="Next_1_"> </g> <g id="Last_1_"> </g>{" "}
+                                <g id="Empty_x5F_Basket"> </g>{" "}
+                                <g id="Add_x5F_Basket"> </g>{" "}
+                                <g id="Delete_x5F_Basket"> </g>{" "}
+                                <g id="Error_x5F_Basket"> </g>{" "}
+                                <g id="OK_x5F_Basket"> </g>{" "}
+                              </g>
+                            </svg>
+                          </button>
+
+                          {deadlineError && (
+                            <div className="mt-2 text-red-400 text-sm text-center">
+                              {deadlineError}
+                              <button
+                                onClick={resetError}
+                                className="mr-2 text-red-200 hover:text-red-100"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          )}
+
+                          {openCalendarId === selectedItem.id && (
+                            <div
+                              ref={calendarRef}
+                              className="absolute bottom-0 left-1/2 -translate-x-1/2 z-50 bg-white border text-black rounded-md shadow-lg p-4"
+                              onMouseDown={(e) => e.stopPropagation()}
+                            >
+                              <Calendar
+                                calendar={persian}
+                                locale={persian_fa}
+                                value={
+                                  selectedDate[selectedItem.id] ||
+                                  (selectedItem.vipDeadline
+                                    ? new Date(selectedItem.vipDeadline)
+                                    : null)
+                                }
+                                onChange={(date) => {
+                                  if (!date) return;
+                                  setSelectedDate((prev) => ({
+                                    ...prev,
+                                    [selectedItem.id]: date.toDate(),
+                                  }));
+                                }}
+                                plugins={[<TimePicker position="bottom" />]}
+                              />
+                              <div className="flex justify-between mt-2">
+                                <button
+                                  className={`px-3 py-1 rounded text-white ${
+                                    deadlineLoading
+                                      ? "bg-gray-400 cursor-not-allowed"
+                                      : "bg-green-500 hover:bg-green-600"
+                                  }`}
+                                  onClick={() => {
+                                    const date = selectedDate[selectedItem.id];
+                                    if (!date || deadlineLoading) return;
+                                    handleUpdateVipDeadline(
+                                      selectedItem.id,
+                                      date.toISOString()
+                                    );
+                                    setOpenCalendarId(null);
+                                  }}
+                                  disabled={deadlineLoading}
+                                >
+                                  {deadlineLoading ? "..." : "تایید"}
+                                </button>
+                                <button
+                                  className={`px-3 py-1 rounded text-white ${
+                                    deadlineLoading
+                                      ? "bg-gray-400 cursor-not-allowed"
+                                      : "bg-red-500 hover:bg-red-600"
+                                  }`}
+                                  onClick={() => {
+                                    if (deadlineLoading) return;
+                                    handleUpdateVipDeadline(
+                                      selectedItem.id,
+                                      ""
+                                    );
+                                    setSelectedDate((prev) => ({
+                                      ...prev,
+                                      [selectedItem.id]: null,
+                                    }));
+                                    setOpenCalendarId(null);
+                                  }}
+                                  disabled={deadlineLoading}
+                                >
+                                  {deadlineLoading ? "..." : "حذف"}
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
                     <input
                       type={field.fieldType === "number" ? "number" : "text"}
                       name={field.id}

@@ -26,7 +26,10 @@ const HeaderPanel: React.FC = () => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsMenuVisible(false);
       }
-      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target as Node)
+      ) {
         setIsProfileMenuVisible(false);
       }
     };
@@ -85,12 +88,18 @@ const HeaderPanel: React.FC = () => {
           >
             <ul className="flex flex-col text-right text-gray-700">
               <li className="px-5 py-3 border-b border-gray-100 hover:bg-blue-50 transition-colors duration-200">
-                <Link href="/dashboard/tickets" className="flex items-center gap-2">
+                <Link
+                  href="/dashboard/tickets"
+                  className="flex items-center gap-2"
+                >
                   پشتیبانی
                 </Link>
               </li>
               <li className="px-5 py-3 hover:bg-blue-50 transition-colors duration-200">
-                <Link href="/dashboard/accounting" className="flex items-center gap-2">
+                <Link
+                  href="/dashboard/accounting"
+                  className="flex items-center gap-2"
+                >
                   مالی
                 </Link>
               </li>
@@ -106,7 +115,10 @@ const HeaderPanel: React.FC = () => {
 
       {/* Right Section: Profile */}
       <div className="w-4/12 flex gap-2 justify-end items-center">
-        <button onClick={toggleProfileMenu} className="p-2 rounded-md hover:bg-gray-100">
+        <button
+          onClick={toggleProfileMenu}
+          className="p-2 rounded-md hover:bg-gray-100"
+        >
           {/* Profile Icon */}
           <svg
             className="w-7 h-7"
@@ -115,7 +127,11 @@ const HeaderPanel: React.FC = () => {
             xmlns="http://www.w3.org/2000/svg"
           >
             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+            <g
+              id="SVGRepo_tracerCarrier"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></g>
             <g id="SVGRepo_iconCarrier">
               <path
                 opacity="0.4"
@@ -137,9 +153,12 @@ const HeaderPanel: React.FC = () => {
         {isProfileMenuVisible && (
           <div
             ref={profileRef}
-            className="absolute top-full  bg-white shadow-xl rounded-xl w-40 py-2 z-50"
+            className="absolute top-full left-0 mt-2 bg-white shadow-xl rounded-xl w-40 py-2 z-50"
           >
-            <ul className="flex flex-col  text-gray-700">
+            <ul className="flex flex-col text-gray-700">
+              <li className="px-5 py-3 hover:bg-blue-50 transition-colors duration-200 cursor-pointer">
+                <Link href="/dashboard/profile">پروفایل</Link>
+              </li>
               <li
                 onClick={() => setShowLogoutModal(true)}
                 className="px-5 py-3 hover:bg-blue-50 transition-colors duration-200 cursor-pointer"
@@ -150,7 +169,10 @@ const HeaderPanel: React.FC = () => {
           </div>
         )}
 
-        <Link href="/dashboard" className="rounded-2xl transition-colors duration-300 ease-in-out hover:bg-[#f7f8fc]">
+        <Link
+          href="/dashboard"
+          className="rounded-2xl transition-colors duration-300 ease-in-out hover:bg-[#f7f8fc]"
+        >
           {/* Dashboard Icon */}
           <svg
             className="w-7 h-7"
