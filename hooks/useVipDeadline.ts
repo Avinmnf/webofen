@@ -35,7 +35,7 @@ interface UpdateDeadlineResponse {
 }
 
 interface UseVipDeadlineReturn {
-  updateVipDeadline: (itemId: string, deadlineDate: string) => Promise<void>;
+  updateVipDeadline: (itemId: string, deadlineDate: string) => Promise<UpdateDeadlineResponse>;
   loading: boolean;
   error: string | null;
   resetError: () => void;
@@ -45,15 +45,18 @@ export const useVipDeadline = (): UseVipDeadlineReturn => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const updateVipDeadlineInDB = async (itemId: string, deadlineDate: string): Promise<UpdateDeadlineResponse> => {
+  const updateVipDeadlineInDB = async (
+    itemId: string,
+    deadlineDate: string
+  ): Promise<UpdateDeadlineResponse> => {
     const response = await fetch('/api/proxy/vipdeadline', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 
-        orderItemId: itemId, 
-        deadlineDate: deadlineDate 
+      body: JSON.stringify({
+        orderItemId: itemId,
+        deadlineDate: deadlineDate,
       }),
     });
 
@@ -65,18 +68,21 @@ export const useVipDeadline = (): UseVipDeadlineReturn => {
     return await response.json();
   };
 
-  const updateVipDeadline = async (itemId: string, deadlineDate: string): Promise<void> => {
+  const updateVipDeadline = async (
+    itemId: string,
+    deadlineDate: string
+  ): Promise<UpdateDeadlineResponse> => {
     setLoading(true);
     setError(null);
 
     try {
       const result = await updateVipDeadlineInDB(itemId, deadlineDate);
-      console.log("VIP deadline updated successfully:", result.message);
-      return result;
+      console.log('VIP deadline updated successfully:', result.message);
+      return result; // ✅ now matches the Promise<UpdateDeadlineResponse> type
     } catch (err: any) {
-      const errorMessage = err.message || "خطا در به‌روزرسانی مهلت VIP";
+      const errorMessage = err.message || 'خطا در به‌روزرسانی مهلت VIP';
       setError(errorMessage);
-      console.error("Failed to update VIP deadline:", err);
+      console.error('Failed to update VIP deadline:', err);
       throw err;
     } finally {
       setLoading(false);
@@ -89,6 +95,6 @@ export const useVipDeadline = (): UseVipDeadlineReturn => {
     updateVipDeadline,
     loading,
     error,
-    resetError
+    resetError,
   };
 };

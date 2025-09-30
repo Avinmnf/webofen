@@ -214,7 +214,7 @@ export default function PostPage({ post }: Props) {
                 <div>
                   {post.toc && post.toc.length > 0 && (
                     <div className="toc-sidebar">
-                      <h3>فهرست مطالب</h3>
+                      <h3 className="text-gray-600">فهرست مطالب</h3>
                       <nav className="toc-nav text-sm">
                         <ul>
                           {[...post.toc].reverse().map((item) => (
