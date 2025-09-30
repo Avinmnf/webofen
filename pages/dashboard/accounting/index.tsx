@@ -6,9 +6,10 @@ import { useUserOrders, Order } from "@/hooks/useUserOrders";
 const AccountingPage: React.FC = () => {
   const statusMap: Record<string, string> = {
     Processing: "در حال بررسی",
-    Cancelled: "بسته",
-    Pending: "در انتظار",
-    Completed: "حل شده",
+    Cancelled: "لغو شده",
+    waiting: "در حال پردازش", // اضافه شد در صورت نیاز
+    pending: "در انتظار",
+    submitted:"تکمیل شده",
   };
 
   const { orders, loading, error } = useUserOrders();
@@ -21,9 +22,7 @@ const AccountingPage: React.FC = () => {
     try {
       const response = await fetch(`/api/invoices/${order.id}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(order),
       });
 
@@ -37,7 +36,7 @@ const AccountingPage: React.FC = () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `invoice-${order.id}.pdf`;
+      a.download = `فاکتور-${order.id}.pdf`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -83,8 +82,7 @@ const AccountingPage: React.FC = () => {
             </div>
 
             <div className="mb-4 text-gray-700">
-              <strong>مبلغ کل:</strong>{" "}
-              {order?.totalPrice.toLocaleString()} تومان
+              <strong>مبلغ کل:</strong> {order?.totalPrice.toLocaleString()} تومان
             </div>
 
             <table className="w-full border border-gray-300 border-collapse text-sm text-right">
@@ -100,10 +98,7 @@ const AccountingPage: React.FC = () => {
               </thead>
               <tbody>
                 {order.items.map((item, index) => (
-                  <tr
-                    key={item.id}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
+                  <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                     <td className="border p-3 text-gray-700 text-center">
                       {item.variant.product.title}
                     </td>
@@ -112,14 +107,12 @@ const AccountingPage: React.FC = () => {
                         ?.map((av) => `${av.attribute.name}: ${av.value}`)
                         .join(", ")}
                     </td>
-                    <td className="border p-3 text-gray-700 text-center">
-                      {item.quantity}
-                    </td>
+                    <td className="border p-3 text-gray-700 text-center">{item.quantity}</td>
                     <td className="border p-3 text-gray-700 text-center">
                       {item.price?.toLocaleString()} تومان
                     </td>
                     <td className="border p-3 text-gray-700 text-center">
-                      {item.status}
+                      {statusMap[item.status?.trim()] ?? item.status}
                     </td>
                     {index === 0 && (
                       <td
@@ -127,7 +120,7 @@ const AccountingPage: React.FC = () => {
                         rowSpan={order.items.length}
                       >
                         <button
-                          className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition"
+                          className="bg-blue-500 text-white px-3 cursor-pointer py-1 rounded hover:bg-blue-600 transition"
                           onClick={() => handleDownloadInvoice(order)}
                         >
                           دانلود

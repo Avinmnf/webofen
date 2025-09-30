@@ -9,46 +9,39 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const order = req.body;
 
-      const html = `
+    const statusMap: Record<string, string> = {
+      Processing: "در حال بررسی",
+      Cancelled: "لغو شده",
+      Pending: "در انتظار",
+      Completed: "تکمیل شده",
+      waiting: "در حال پردازش",
+      submitted:"تکمیل شده",
+    };
+
+    const html = `
       <html lang="fa" dir="rtl">
         <head>
           <meta charset="UTF-8" />
           <style>
             @font-face {
               font-family: 'YekanBakh';
-              src: url('http://localhost:3002/fonts/Vazir-Medium.ttf') format('woff2');
+              src: url('http://localhost:3002/fonts/YekanBakhFaNum-Regular.ttf') format('woff2');
               font-weight: normal;
               font-style: normal;
             }
-
-            body {
-              font-family: 'YekanBakh', Tahoma, sans-serif;
-              padding: 30px;
-              background: #fafafa;
-            }
-
-            .invoice-container { 
-              background: #fff; 
-              padding: 25px; 
-              border-radius: 10px; 
-              box-shadow: 0 0 10px rgba(0,0,0,0.1); 
-            }
-
+            body { font-family: 'YekanBakh', Tahoma, sans-serif; padding: 30px; background: #fafafa; }
+            .invoice-container { background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
             .logo { text-align: right; margin-bottom: 15px; }
             .logo img { max-width: 120px; height: auto; }
-
             h1 { color: #2c3e50; font-size: 16px; margin-bottom: 20px; text-align: center; }
             .info { margin-bottom: 20px; padding: 15px; border: 1px solid #eee; background: #fdfdfd; border-radius: 8px; }
             .info p { margin: 5px 0; font-size: 14px; color: #333; }
-
             table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
             th, td { border: 1px solid #ddd; padding: 10px; }
             th { background-color: #f4f6f8; text-align: center; color: #555; }
             td { text-align: center; color: #333; }
-
             tbody tr:nth-child(even) { background-color: #fafafa; }
             tbody tr:hover { background-color: #f1f7ff; }
-
             .total { margin-top: 20px; text-align: left; font-size: 14px; font-weight: bold; color: #2c3e50; }
           </style>
         </head>
@@ -84,8 +77,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         ?.map((av: any) => `${av.attribute.name}: ${av.value}`)
                         .join(", ")}</td>
                       <td>${item.quantity}</td>
-                      <td>${item.price?.toLocaleString()} تومان</td>
-                      <td>${item.status}</td>
+                      <td>${item.price?.toLocaleString("fa-IR")} تومان</td>
+                      <td>${statusMap[item.status?.trim()] ?? item.status}</td>
                     </tr>
                   `
                   )
@@ -94,19 +87,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             </table>
 
             <div class="total">
-              مبلغ کل: ${order.totalPrice.toLocaleString()} تومان
+              مبلغ کل: ${order.totalPrice.toLocaleString("fa-IR")} تومان
             </div>
           </div>
         </body>
       </html>
-      `;
+    `;
 
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: "networkidle0" });
 
     const pdfBuffer = await page.pdf({ format: "A4", printBackground: true });
-
     await browser.close();
 
     res.setHeader("Content-Type", "application/pdf");
@@ -117,4 +112,3 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(500).json({ error: "خطا در تولید PDF" });
   }
 }
-  
