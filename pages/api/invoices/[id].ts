@@ -9,15 +9,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const order = req.body;
 
-    const html = `
+      const html = `
       <html lang="fa" dir="rtl">
         <head>
           <meta charset="UTF-8" />
           <style>
-            body { font-family: Vazirmatn, Tahoma, sans-serif; padding: 30px; background: #fafafa; }
-            .invoice-container { background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-            
-            h1 { color: #2c3e50; font-size: 13px; margin-bottom: 20px; text-align: center; }
+            @font-face {
+              font-family: 'YekanBakh';
+              src: url('http://localhost:3002/fonts/Vazir-Medium.ttf') format('woff2');
+              font-weight: normal;
+              font-style: normal;
+            }
+
+            body {
+              font-family: 'YekanBakh', Tahoma, sans-serif;
+              padding: 30px;
+              background: #fafafa;
+            }
+
+            .invoice-container { 
+              background: #fff; 
+              padding: 25px; 
+              border-radius: 10px; 
+              box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+            }
+
+            .logo { text-align: right; margin-bottom: 15px; }
+            .logo img { max-width: 120px; height: auto; }
+
+            h1 { color: #2c3e50; font-size: 16px; margin-bottom: 20px; text-align: center; }
             .info { margin-bottom: 20px; padding: 15px; border: 1px solid #eee; background: #fdfdfd; border-radius: 8px; }
             .info p { margin: 5px 0; font-size: 14px; color: #333; }
 
@@ -29,12 +49,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             tbody tr:nth-child(even) { background-color: #fafafa; }
             tbody tr:hover { background-color: #f1f7ff; }
 
-            .total { margin-top: 20px; text-align: left; font-size: 10px; font-weight: bold; color: #2c3e50; }
+            .total { margin-top: 20px; text-align: left; font-size: 14px; font-weight: bold; color: #2c3e50; }
           </style>
         </head>
         <body>
           <div class="invoice-container">
-            <h1> فاکتور سفارش ${order.id}</h1>
+            <div class="logo">
+              <img src="http://localhost:3002/homepage/logo.png" alt="لوگو"/>
+            </div>
+            <h1>فاکتور سفارش ${order.id}</h1>
 
             <div class="info">
               <p>نام مشتری: ${order.customerName}</p>
@@ -45,7 +68,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               <thead>
                 <tr>
                   <th>محصول</th>
-                  <th>ویژگی‌ها</th>
+                  <th>ویژگی ‌ها</th>
                   <th>تعداد</th>
                   <th>قیمت</th>
                   <th>وضعیت</th>
@@ -76,13 +99,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           </div>
         </body>
       </html>
-    `;
+      `;
 
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: "networkidle0" });
 
-const pdfBuffer = await page.pdf({ format: "A4", printBackground: true });
+    const pdfBuffer = await page.pdf({ format: "A4", printBackground: true });
 
     await browser.close();
 
@@ -94,3 +117,4 @@ const pdfBuffer = await page.pdf({ format: "A4", printBackground: true });
     res.status(500).json({ error: "خطا در تولید PDF" });
   }
 }
+  
