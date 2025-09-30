@@ -60,6 +60,9 @@ p{
   color: #3db4c6;
 }
 
+.toc-sidebar a{
+color: gray;
+}
 
 
 .centered-swiper .swiper-slide {

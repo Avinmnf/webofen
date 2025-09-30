@@ -789,230 +789,237 @@ const BacklinkPage: React.FC = () => {
             </div>
 
             <div className="p-6 space-y-5">
-              {/* Render VIP timer if user is VIP */}
-              {role === "vipclient" && selectedItem && (
-                <div className="  justify-end mb-4">
-                  <button
-                    onClick={() =>
-                      setOpenCalendarId(
-                        openCalendarId === selectedItem.id
-                          ? null
-                          : selectedItem.id
-                      )
-                    }
-                    disabled={deadlineLoading}
-                    className={`px-4 py-2 rounded ${
-                      deadlineLoading ? "cursor-not-allowed" : "cursor-pointer"
-                    } text-white`}
-                  >
-                    <svg
-                      className="w-8 h-8"
-                      version="1.1"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 100 100"
-                      enable-background="new 0 0 100 100"
-                      fill="#ffffff"
+              <div
+                className={`p-6 space-y-5 ${
+                  role === "vipclient" ? "bg-white rounded-2xl text-black" : "bg-transparent"
+                }`}
+              >
+                {" "}
+                {/* Render VIP timer if user is VIP */}
+                {role === "vipclient" && selectedItem && (
+                  <div>
+                    <button
+                      onClick={() =>
+                        setOpenCalendarId(
+                          openCalendarId === selectedItem.id
+                            ? null
+                            : selectedItem.id
+                        )
+                      }
+                      disabled={deadlineLoading}
+                      className={`px-4 py-2 rounded ${
+                        deadlineLoading
+                          ? "cursor-not-allowed"
+                          : "cursor-pointer"
+                      } text-white`}
                     >
-                      <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                      <g
-                        id="SVGRepo_tracerCarrier"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      ></g>
-                      <g id="SVGRepo_iconCarrier">
-                        {" "}
-                        <g id="Download_x5F_25_x25_"> </g>{" "}
-                        <g id="Download_x5F_50_x25_"> </g>{" "}
-                        <g id="Download_x5F_75_x25_"> </g>{" "}
-                        <g id="Download_x5F_100_x25_"> </g> <g id="Upload"> </g>{" "}
-                        <g id="Next"> </g> <g id="Last"> </g> <g id="OK"> </g>{" "}
-                        <g id="Fail"> </g> <g id="Add"> </g>{" "}
-                        <g id="Spinner_x5F_0_x25_"> </g>{" "}
-                        <g id="Spinner_x5F_25_x25_"> </g>{" "}
-                        <g id="Spinner_x5F_50_x25_"> </g>{" "}
-                        <g id="Spinner_x5F_75_x25_"> </g>{" "}
-                        <g id="Brightest_x5F_25_x25_"> </g>{" "}
-                        <g id="Brightest_x5F_50_x25_"> </g>{" "}
-                        <g id="Brightest_x5F_75_x25_"> </g>{" "}
-                        <g id="Brightest_x5F_100_x25_"> </g>{" "}
-                        <g id="Reload"> </g> <g id="Forbidden"> </g>{" "}
-                        <g id="Clock"> </g> <g id="Compass"> </g>{" "}
-                        <g id="World"> </g> <g id="Speed"> </g>{" "}
-                        <g id="Microphone"> </g> <g id="Options"> </g>{" "}
-                        <g id="Chronometer">
-                          {" "}
-                          <circle cx="73.375" cy="30.812" r="2"></circle>{" "}
-                          <circle
-                            fill="none"
-                            stroke="#ffffff"
-                            stroke-width="4"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-miterlimit="10"
-                            cx="50.188"
-                            cy="50"
-                            r="23.188"
-                          ></circle>{" "}
-                          <path
-                            fill="none"
-                            stroke="#ffffff"
-                            stroke-width="4"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-miterlimit="10"
-                            d=" M41.45,21.292C44.215,20.452,47.149,20,50.188,20c3.018,0,5.931,0.446,8.678,1.274"
-                          ></path>{" "}
-                          <line
-                            fill="none"
-                            stroke="#ffffff"
-                            stroke-width="4"
-                            stroke-linecap="round"
-                            stroke-miterlimit="10"
-                            x1="48.644"
-                            y1="50.45"
-                            x2="58.544"
-                            y2="40.55"
-                          ></line>{" "}
-                        </g>{" "}
-                        <g id="Lock"> </g> <g id="User"> </g>{" "}
-                        <g id="Position"> </g> <g id="No_x5F_Signal"> </g>{" "}
-                        <g id="Low_x5F_Signal"> </g>{" "}
-                        <g id="Mid_x5F_Signal"> </g>{" "}
-                        <g id="High_x5F_Signal"> </g> <g id="Options_1_"> </g>{" "}
-                        <g id="Flash"> </g> <g id="No_x5F_Signal_x5F_02"> </g>{" "}
-                        <g id="Low_x5F_Signal_x5F_02"> </g>{" "}
-                        <g id="Mid_x5F_Signal_x5F_02"> </g>{" "}
-                        <g id="High_x5F_Signal_x5F_02"> </g>{" "}
-                        <g id="Favorite"> </g> <g id="Search"> </g>{" "}
-                        <g id="Stats_x5F_01"> </g> <g id="Stats_x5F_02"> </g>{" "}
-                        <g id="Turn_x5F_On_x5F_Off"> </g>{" "}
-                        <g id="Full_x5F_Height"> </g>{" "}
-                        <g id="Full_x5F_Width"> </g>{" "}
-                        <g id="Full_x5F_Screen"> </g>{" "}
-                        <g id="Compress_x5F_Screen"> </g> <g id="Chat"> </g>{" "}
-                        <g id="Bluetooth"> </g> <g id="Share_x5F_iOS"> </g>{" "}
-                        <g id="Share_x5F_Android"> </g>{" "}
-                        <g id="Love__x2F__Favorite"> </g>{" "}
-                        <g id="Hamburguer"> </g> <g id="Flying"> </g>{" "}
-                        <g id="Take_x5F_Off"> </g> <g id="Land"> </g>{" "}
-                        <g id="City"> </g> <g id="Nature"> </g>{" "}
-                        <g id="Pointer"> </g> <g id="Prize"> </g>{" "}
-                        <g id="Extract"> </g> <g id="Play"> </g>{" "}
-                        <g id="Pause"> </g> <g id="Stop"> </g>{" "}
-                        <g id="Forward"> </g> <g id="Reverse"> </g>{" "}
-                        <g id="Next_1_"> </g> <g id="Last_1_"> </g>{" "}
-                        <g id="Empty_x5F_Basket"> </g>{" "}
-                        <g id="Add_x5F_Basket"> </g>{" "}
-                        <g id="Delete_x5F_Basket"> </g>{" "}
-                        <g id="Error_x5F_Basket"> </g>{" "}
-                        <g id="OK_x5F_Basket"> </g>{" "}
-                      </g>
-                    </svg>
-                  </button>
-
-                  {deadlineError && (
-                    <div className="mt-2 text-red-400 text-sm text-center">
-                      {deadlineError}
-                      <button
-                        onClick={resetError}
-                        className="mr-2 text-red-200 hover:text-red-100"
+                      <svg
+                        className="w-8 h-8"
+                        version="1.1"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 100 100"
+                        enable-background="new 0 0 100 100"
+                        fill="#00000"
                       >
-                        ✕
-                      </button>
-                    </div>
-                  )}
+                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                        <g
+                          id="SVGRepo_tracerCarrier"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        ></g>
+                        <g id="SVGRepo_iconCarrier">
+                          {" "}
+                          <g id="Download_x5F_25_x25_"> </g>{" "}
+                          <g id="Download_x5F_50_x25_"> </g>{" "}
+                          <g id="Download_x5F_75_x25_"> </g>{" "}
+                          <g id="Download_x5F_100_x25_"> </g>{" "}
+                          <g id="Upload"> </g> <g id="Next"> </g>{" "}
+                          <g id="Last"> </g> <g id="OK"> </g> <g id="Fail"> </g>{" "}
+                          <g id="Add"> </g> <g id="Spinner_x5F_0_x25_"> </g>{" "}
+                          <g id="Spinner_x5F_25_x25_"> </g>{" "}
+                          <g id="Spinner_x5F_50_x25_"> </g>{" "}
+                          <g id="Spinner_x5F_75_x25_"> </g>{" "}
+                          <g id="Brightest_x5F_25_x25_"> </g>{" "}
+                          <g id="Brightest_x5F_50_x25_"> </g>{" "}
+                          <g id="Brightest_x5F_75_x25_"> </g>{" "}
+                          <g id="Brightest_x5F_100_x25_"> </g>{" "}
+                          <g id="Reload"> </g> <g id="Forbidden"> </g>{" "}
+                          <g id="Clock"> </g> <g id="Compass"> </g>{" "}
+                          <g id="World"> </g> <g id="Speed"> </g>{" "}
+                          <g id="Microphone"> </g> <g id="Options"> </g>{" "}
+                          <g id="Chronometer">
+                            {" "}
+                            <circle cx="73.375" cy="30.812" r="2"></circle>{" "}
+                            <circle
+                              fill="none"
+                              stroke="#000000"
+                              stroke-width="4"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-miterlimit="10"
+                              cx="50.188"
+                              cy="50"
+                              r="23.188"
+                            ></circle>{" "}
+                            <path
+                              fill="none"
+                              stroke="#000000"
+                              stroke-width="4"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-miterlimit="10"
+                              d=" M41.45,21.292C44.215,20.452,47.149,20,50.188,20c3.018,0,5.931,0.446,8.678,1.274"
+                            ></path>{" "}
+                            <line
+                              fill="none"
+                              stroke="#000000"
+                              stroke-width="4"
+                              stroke-linecap="round"
+                              stroke-miterlimit="10"
+                              x1="48.644"
+                              y1="50.45"
+                              x2="58.544"
+                              y2="40.55"
+                            ></line>{" "}
+                          </g>{" "}
+                          <g id="Lock"> </g> <g id="User"> </g>{" "}
+                          <g id="Position"> </g> <g id="No_x5F_Signal"> </g>{" "}
+                          <g id="Low_x5F_Signal"> </g>{" "}
+                          <g id="Mid_x5F_Signal"> </g>{" "}
+                          <g id="High_x5F_Signal"> </g> <g id="Options_1_"> </g>{" "}
+                          <g id="Flash"> </g> <g id="No_x5F_Signal_x5F_02"> </g>{" "}
+                          <g id="Low_x5F_Signal_x5F_02"> </g>{" "}
+                          <g id="Mid_x5F_Signal_x5F_02"> </g>{" "}
+                          <g id="High_x5F_Signal_x5F_02"> </g>{" "}
+                          <g id="Favorite"> </g> <g id="Search"> </g>{" "}
+                          <g id="Stats_x5F_01"> </g> <g id="Stats_x5F_02"> </g>{" "}
+                          <g id="Turn_x5F_On_x5F_Off"> </g>{" "}
+                          <g id="Full_x5F_Height"> </g>{" "}
+                          <g id="Full_x5F_Width"> </g>{" "}
+                          <g id="Full_x5F_Screen"> </g>{" "}
+                          <g id="Compress_x5F_Screen"> </g> <g id="Chat"> </g>{" "}
+                          <g id="Bluetooth"> </g> <g id="Share_x5F_iOS"> </g>{" "}
+                          <g id="Share_x5F_Android"> </g>{" "}
+                          <g id="Love__x2F__Favorite"> </g>{" "}
+                          <g id="Hamburguer"> </g> <g id="Flying"> </g>{" "}
+                          <g id="Take_x5F_Off"> </g> <g id="Land"> </g>{" "}
+                          <g id="City"> </g> <g id="Nature"> </g>{" "}
+                          <g id="Pointer"> </g> <g id="Prize"> </g>{" "}
+                          <g id="Extract"> </g> <g id="Play"> </g>{" "}
+                          <g id="Pause"> </g> <g id="Stop"> </g>{" "}
+                          <g id="Forward"> </g> <g id="Reverse"> </g>{" "}
+                          <g id="Next_1_"> </g> <g id="Last_1_"> </g>{" "}
+                          <g id="Empty_x5F_Basket"> </g>{" "}
+                          <g id="Add_x5F_Basket"> </g>{" "}
+                          <g id="Delete_x5F_Basket"> </g>{" "}
+                          <g id="Error_x5F_Basket"> </g>{" "}
+                          <g id="OK_x5F_Basket"> </g>{" "}
+                        </g>
+                      </svg>
+                    </button>
 
-                  {openCalendarId === selectedItem.id && (
-                    <div
-                      ref={calendarRef}
-                      className="absolute bottom-0 left-1/2 -translate-x-1/2 z-50 bg-white border rounded-md shadow-lg p-4"
-                      onMouseDown={(e) => e.stopPropagation()}
-                    >
-                      <Calendar
-                        calendar={persian}
-                        locale={persian_fa}
-                        value={
-                          selectedDate[selectedItem.id] ||
-                          (selectedItem.vipDeadline
-                            ? new Date(selectedItem.vipDeadline)
-                            : null)
-                        }
-                        onChange={(date) => {
-                          if (!date) return;
-                          setSelectedDate((prev) => ({
-                            ...prev,
-                            [selectedItem.id]: date.toDate(),
-                          }));
-                        }}
-                        plugins={[<TimePicker position="bottom" />]}
-                      />
-                      <div className="flex justify-between mt-2">
+                    {deadlineError && (
+                      <div className="mt-2 text-red-400 text-sm text-center">
+                        {deadlineError}
                         <button
-                          className={`px-3 py-1 rounded text-white ${
-                            deadlineLoading
-                              ? "bg-gray-400 cursor-not-allowed"
-                              : "bg-green-500 hover:bg-green-600"
-                          }`}
-                          onClick={() => {
-                            const date = selectedDate[selectedItem.id];
-                            if (!date || deadlineLoading) return;
-                            handleUpdateVipDeadline(
-                              selectedItem.id,
-                              date.toISOString()
-                            );
-                            setOpenCalendarId(null);
-                          }}
-                          disabled={deadlineLoading}
+                          onClick={resetError}
+                          className="mr-2 text-red-200 hover:text-red-100"
                         >
-                          {deadlineLoading ? "..." : "تایید"}
-                        </button>
-                        <button
-                          className={`px-3 py-1 rounded text-white ${
-                            deadlineLoading
-                              ? "bg-gray-400 cursor-not-allowed"
-                              : "bg-red-500 hover:bg-red-600"
-                          }`}
-                          onClick={() => {
-                            if (deadlineLoading) return;
-                            handleUpdateVipDeadline(selectedItem.id, "");
-                            setSelectedDate((prev) => ({
-                              ...prev,
-                              [selectedItem.id]: null,
-                            }));
-                            setOpenCalendarId(null);
-                          }}
-                          disabled={deadlineLoading}
-                        >
-                          {deadlineLoading ? "..." : "حذف"}
+                          ✕
                         </button>
                       </div>
-                    </div>
-                  )}
-                </div>
-              )}
+                    )}
 
-              {fields?.map((field) => (
-                <div key={field.id} className="flex flex-col">
-                  <label className="text-sm text-gray-300 mb-1">
-                    {field.label}
-                  </label>
-                  <input
-                    type={field.fieldType === "number" ? "number" : "text"}
-                    name={field.id}
-                    placeholder={field.placeholder || field.label}
-                    value={values[field.id] || ""}
-                    onChange={(e) => handleChange(field.id, e.target.value)}
-                    className={`w-full px-4 py-2 rounded-xl border border-cyan-500/30 bg-[#1C2233] text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-500 outline-none transition-all duration-300 ${
-                      !canEdit
-                        ? "opacity-60 cursor-not-allowed"
-                        : "hover:ring-cyan-300"
-                    }`}
-                    required={field.required}
-                    disabled={!canEdit}
-                  />
-                </div>
-              ))}
-
+                    {openCalendarId === selectedItem.id && (
+                      <div
+                        ref={calendarRef}
+                        className="absolute bottom-0 left-1/2 -translate-x-1/2 z-50 bg-white border text-black rounded-md shadow-lg p-4"
+                        onMouseDown={(e) => e.stopPropagation()}
+                      >
+                        <Calendar
+                          calendar={persian}
+                          locale={persian_fa}
+                          value={
+                            selectedDate[selectedItem.id] ||
+                            (selectedItem.vipDeadline
+                              ? new Date(selectedItem.vipDeadline)
+                              : null)
+                          }
+                          onChange={(date) => {
+                            if (!date) return;
+                            setSelectedDate((prev) => ({
+                              ...prev,
+                              [selectedItem.id]: date.toDate(),
+                            }));
+                          }}
+                          plugins={[<TimePicker position="bottom" />]}
+                        />
+                        <div className="flex justify-between mt-2">
+                          <button
+                            className={`px-3 py-1 rounded text-white ${
+                              deadlineLoading
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-green-500 hover:bg-green-600"
+                            }`}
+                            onClick={() => {
+                              const date = selectedDate[selectedItem.id];
+                              if (!date || deadlineLoading) return;
+                              handleUpdateVipDeadline(
+                                selectedItem.id,
+                                date.toISOString()
+                              );
+                              setOpenCalendarId(null);
+                            }}
+                            disabled={deadlineLoading}
+                          >
+                            {deadlineLoading ? "..." : "تایید"}
+                          </button>
+                          <button
+                            className={`px-3 py-1 rounded text-white ${
+                              deadlineLoading
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-red-500 hover:bg-red-600"
+                            }`}
+                            onClick={() => {
+                              if (deadlineLoading) return;
+                              handleUpdateVipDeadline(selectedItem.id, "");
+                              setSelectedDate((prev) => ({
+                                ...prev,
+                                [selectedItem.id]: null,
+                              }));
+                              setOpenCalendarId(null);
+                            }}
+                            disabled={deadlineLoading}
+                          >
+                            {deadlineLoading ? "..." : "حذف"}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {fields?.map((field) => (
+                  <div key={field.id} className="flex flex-col">
+                    <label className="text-sm text-gray-300 mb-1">
+                      {field.label}
+                    </label>
+                    <input
+                      type={field.fieldType === "number" ? "number" : "text"}
+                      name={field.id}
+                      placeholder={field.placeholder || field.label}
+                      value={values[field.id] || ""}
+                      onChange={(e) => handleChange(field.id, e.target.value)}
+                      className={`w-full px-4 py-2 rounded-xl border border-cyan-500/30 bg-[#1C2233] text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-500 outline-none transition-all duration-300 ${
+                        !canEdit
+                          ? "opacity-60 cursor-not-allowed"
+                          : "hover:ring-cyan-300"
+                      }`}
+                      required={field.required}
+                      disabled={!canEdit}
+                    />
+                  </div>
+                ))}
+              </div>
               <button
                 onClick={handleSubmit}
                 className={`w-full py-3 rounded-xl text-lg font-semibold text-white transition-all duration-300 ${
