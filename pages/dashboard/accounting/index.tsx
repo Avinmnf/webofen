@@ -9,6 +9,7 @@ const AccountingPage: React.FC = () => {
     Cancelled: "بسته",
     Pending: "در انتظار",
     Completed: "حل شده",
+
   };
 
   const { orders, loading, error } = useUserOrders();
@@ -44,19 +45,19 @@ const AccountingPage: React.FC = () => {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error(err);
-      alert("خطا در دانلود پیش‌فاکتور");
+      alert("خطا در دانلود  فاکتور");
     }
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6 text-gray-600">تراکنش‌ها</h1>
+    <div className="p-6 h-screen overflow-y-auto">
+    <h1 className="text-2xl font-bold mb-6 text-gray-600">تراکنش‌ ها</h1>
 
-      {orders.map((order: Order) => (
-        <div
-          key={order.id}
-          className="mb-8 bg-white rounded-xl shadow-md p-6 transition-transform hover:scale-[1.01]"
-        >
+    {orders.map((order: Order) => (
+      <div
+        key={order.id}
+        className="mb-8 bg-white rounded-xl shadow-md p-6 transition-transform hover:scale-[1.01]"
+      >
           <div className="flex justify-between mb-3 text-gray-700">
             <span>
               <strong>شناسه سفارش:</strong> {order.id}
@@ -80,42 +81,46 @@ const AccountingPage: React.FC = () => {
           <div className="mb-4 text-gray-700">
             <strong>مبلغ کل:</strong> {order?.totalPrice.toLocaleString()} تومان
           </div>
-
-          <table className="w-full border-collapse text-sm text-right">
+          <table className="w-full border border-gray-300 border-collapse text-sm text-right">
             <thead>
               <tr className="bg-gray-100">
-                <th className="border-b p-3 text-gray-600">محصول</th>
-                <th className="border-b p-3 text-gray-600">ویژگی‌ها</th>
-                <th className="border-b p-3 text-gray-600">تعداد</th>
-                <th className="border-b p-3 text-gray-600">قیمت</th>
-                <th className="border-b p-3 text-gray-600">وضعیت</th>
-                <th className="border-b p-3 text-gray-600">دانلود پیش‌فاکتور</th>
+                <th className="border p-3 text-gray-600 text-center ">محصول</th>
+                <th className="border p-3 text-gray-600 text-center">ویژگی‌ها</th>
+                <th className="border p-3 text-gray-600 text-center">تعداد</th>
+                <th className="border p-3 text-gray-600 text-center">قیمت</th>
+                <th className="border p-3 text-gray-600 text-center">وضعیت</th>
+                <th className="border p-3 text-gray-600 text-center">دانلود فاکتور</th>
               </tr>
             </thead>
             <tbody>
               {order.items.map((item, index) => (
                 <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="border-b p-3 text-gray-700">{item.variant.product.title}</td>
-                  <td className="border-b p-3 text-gray-700">
+                  <td className="border p-3 text-gray-700 text-center">{item.variant.product.title}</td>
+                  <td className="border p-3 text-gray-700 text-center">
                     {item.variant.attributeValues?.map(av => `${av.attribute.name}: ${av.value}`).join(", ")}
                   </td>
-                  <td className="border-b p-3 text-gray-700">{item.quantity}</td>
-                  <td className="border-b p-3 text-gray-700">{item.price?.toLocaleString()} تومان</td>
-                  <td className="border-b p-3 text-gray-700">{item.status}</td>
+                  <td className="border p-3 text-gray-700 text-center">{item.quantity}</td>
+                  <td className="border p-3 text-gray-700 text-center">{item.price?.toLocaleString()} تومان</td>
+                  <td className="border p-3 text-gray-700 text-center">{item.status}</td>
                   {index === 0 && (
-                    <td className="border-b p-3 text-gray-700" rowSpan={order.items.length}>
-                      <button
-                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition"
-                        onClick={() => handleDownloadInvoice(order)}
-                      >
-                        دانلود PDF
-                      </button>
-                    </td>
+                    <td
+                      className="border p-3 text-gray-700 text-center"
+                      rowSpan={order.items.length}
+                    >
+                  <button
+                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition"
+                    onClick={() => handleDownloadInvoice(order)}
+                  >
+                    دانلود
+                  </button>
+                </td>
+
                   )}
                 </tr>
               ))}
             </tbody>
           </table>
+
         </div>
       ))}
     </div>
