@@ -2,166 +2,304 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useProfile } from "@/hooks/useProfile";
 
 export default function ProfilePage() {
-  const { user, refreshUser, logout, loading } = useAuth();
+  const { logout, loading: authLoading } = useAuth();
+  const { profile, loading, error, updateProfile } = useProfile();
 
-  const [isEditing, setIsEditing] = useState(false);
-
-  // form fields
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [showPhoneModal, setShowPhoneModal] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [newPhone, setNewPhone] = useState("");
+  const [phoneStep, setPhoneStep] = useState<"input" | "otp">("input");
+  const [phoneOtp, setPhoneOtp] = useState("");
+  const [otpSentMessage, setOtpSentMessage] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [phoneLoading, setPhoneLoading] = useState(false);
+  const [tempPhone, setTempPhone] = useState("");
 
   useEffect(() => {
-    if (user) {
-      setName(user.name || "");
-      setEmail(user.email || "");
-      setPhone(user.phone || "");
+    if (profile) {
+      setName(profile.name || "");
+      setAddress(profile.address || "");
     }
-  }, [user]);
+  }, [profile]);
 
-  if (loading) {
+  if (authLoading || loading)
     return (
-      <div className="p-6 text-center text-gray-500">Loading profile...</div>
+      <div className="p-6 text-center text-gray-500">در حال بارگذاری...</div>
     );
-  }
 
-  if (!user) {
+  if (!profile)
     return (
       <div className="p-6 text-center text-gray-500">
-        You are not logged in.
+        {error || "You are not logged in."}
       </div>
     );
-  }
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSaveProfile = async () => {
     try {
-      const res = await fetch("/api/auth/update-profile", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, phone, address }),
-      });
-
-      if (res.ok) {
-        await refreshUser();
-        setIsEditing(false);
-      } else {
-        console.error("Failed to update profile");
-      }
+      await updateProfile({ name, address });
     } catch (err) {
-      console.error("Update error:", err);
+      console.error(err);
     }
   };
 
+  const requestEmailChange = async () => {
+    try {
+      await updateProfile({ email: newEmail });
+      setShowEmailModal(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const requestPhoneChange = async () => {
+    setPhoneLoading(true);
+    setPhoneError("");
+    setOtpSentMessage("");
+
+    if (!newPhone) {
+      setPhoneError("شماره تلفن نمی‌تواند خالی باشد");
+      setPhoneLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/auth/profile/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: newPhone, userId: profile.id }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setOtpSentMessage(`کد تایید برای شماره ${newPhone} ارسال شد`);
+        setTempPhone(newPhone);
+        setPhoneStep("otp");
+      } else {
+        setPhoneError(data.error || "مشکلی پیش آمد");
+      }
+    } catch (err: any) {
+      setPhoneError(err.message);
+    }
+
+    setPhoneLoading(false);
+  };
+  const verifyPhoneOtp = async () => {
+    setPhoneLoading(true);
+    setPhoneError("");
+
+    try {
+      const res = await fetch("/api/auth/profile/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone: tempPhone,
+          code: phoneOtp,
+          userId: profile.id,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        // Update phone in profile after OTP verification
+        await updateProfile({ phone: tempPhone } as any);
+        setShowPhoneModal(false);
+        setPhoneStep("input");
+        setPhoneOtp("");
+      } else {
+        setPhoneError(data.error || "کد تایید اشتباه است");
+      }
+    } catch (err: any) {
+      setPhoneError(err.message);
+    }
+
+    setPhoneLoading(false);
+  };
+
   return (
-    <div className="min-h-screen to-white p-6">
+    <div className="p-4 bg-gray-50">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-semibold">پرفایل</h1>
-        <button
-          onClick={logout}
-          className="px-3 py-1 rounded-lg cursor-pointer text-white text-sm"
-        >
-          خروج از حساب
-        </button>
+        <h1 className="text-xl font-semibold text-gray-600">اطلاعات کاربری</h1>
       </div>
 
       {/* Avatar */}
       <div className="flex flex-col items-center mb-6 space-y-3">
-        <div className="w-24 h-24 rounded-full flex items-center justify-center text-white text-xl font-bold">
+        <div className="w-24 h-24 rounded-full bg-purple-500 flex items-center justify-center text-white text-xl font-bold">
           {name.charAt(0).toUpperCase()}
         </div>
       </div>
 
-      {/* Form */}
-      <form
-        onSubmit={handleSave}
-        className="bg-white p-6 rounded-2xl shadow-md space-y-4 text-black"
-      >
-        <svg
-        className="w-8 h-8"
-        viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-          <g
-            id="SVGRepo_tracerCarrier"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          ></g>
-          <g id="SVGRepo_iconCarrier">
-            {" "}
-            <path
-              d="M22 12C22 6.49 17.51 2 12 2C6.49 2 2 6.49 2 12C2 14.9 3.25 17.51 5.23 19.34C5.23 19.35 5.23 19.35 5.22 19.36C5.32 19.46 5.44 19.54 5.54 19.63C5.6 19.68 5.65 19.73 5.71 19.77C5.89 19.92 6.09 20.06 6.28 20.2C6.35 20.25 6.41 20.29 6.48 20.34C6.67 20.47 6.87 20.59 7.08 20.7C7.15 20.74 7.23 20.79 7.3 20.83C7.5 20.94 7.71 21.04 7.93 21.13C8.01 21.17 8.09 21.21 8.17 21.24C8.39 21.33 8.61 21.41 8.83 21.48C8.91 21.51 8.99 21.54 9.07 21.56C9.31 21.63 9.55 21.69 9.79 21.75C9.86 21.77 9.93 21.79 10.01 21.8C10.29 21.86 10.57 21.9 10.86 21.93C10.9 21.93 10.94 21.94 10.98 21.95C11.32 21.98 11.66 22 12 22C12.34 22 12.68 21.98 13.01 21.95C13.05 21.95 13.09 21.94 13.13 21.93C13.42 21.9 13.7 21.86 13.98 21.8C14.05 21.79 14.12 21.76 14.2 21.75C14.44 21.69 14.69 21.64 14.92 21.56C15 21.53 15.08 21.5 15.16 21.48C15.38 21.4 15.61 21.33 15.82 21.24C15.9 21.21 15.98 21.17 16.06 21.13C16.27 21.04 16.48 20.94 16.69 20.83C16.77 20.79 16.84 20.74 16.91 20.7C17.11 20.58 17.31 20.47 17.51 20.34C17.58 20.3 17.64 20.25 17.71 20.2C17.91 20.06 18.1 19.92 18.28 19.77C18.34 19.72 18.39 19.67 18.45 19.63C18.56 19.54 18.67 19.45 18.77 19.36C18.77 19.35 18.77 19.35 18.76 19.34C20.75 17.51 22 14.9 22 12ZM16.94 16.97C14.23 15.15 9.79 15.15 7.06 16.97C6.62 17.26 6.26 17.6 5.96 17.97C4.44 16.43 3.5 14.32 3.5 12C3.5 7.31 7.31 3.5 12 3.5C16.69 3.5 20.5 7.31 20.5 12C20.5 14.32 19.56 16.43 18.04 17.97C17.75 17.6 17.38 17.26 16.94 16.97Z"
-              fill="#696969"
-            ></path>{" "}
-            <path
-              d="M12 6.92969C9.93 6.92969 8.25 8.60969 8.25 10.6797C8.25 12.7097 9.84 14.3597 11.95 14.4197C11.98 14.4197 12.02 14.4197 12.04 14.4197C12.06 14.4197 12.09 14.4197 12.11 14.4197C12.12 14.4197 12.13 14.4197 12.13 14.4197C14.15 14.3497 15.74 12.7097 15.75 10.6797C15.75 8.60969 14.07 6.92969 12 6.92969Z"
-              fill="#696969"
-            ></path>{" "}
-          </g>
-        </svg>
+      {/* Profile Fields */}
+      <div className="bg-white p-6 rounded-2xl shadow-md space-y-4 text-black">
         <input
           type="text"
-          placeholder="Full name"
           value={name}
-          disabled={!isEditing}
           onChange={(e) => setName(e.target.value)}
-          className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 disabled:bg-gray-100"
-        />
-        <input
-          type="email"
-          placeholder="Email address"
-          value={email}
-          disabled={!isEditing}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 disabled:bg-gray-100"
-        />
-        <input
-          type="tel"
-          placeholder="Phone number"
-          value={phone}
-          disabled={!isEditing}
-          onChange={(e) => setPhone(e.target.value)}
-          className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 disabled:bg-gray-100"
-        />
-        <input
-          type="text"
-          placeholder="Address"
-          value={address}
-          disabled={!isEditing}
-          onChange={(e) => setAddress(e.target.value)}
-          className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 disabled:bg-gray-100"
+          onBlur={handleSaveProfile}
+          className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400"
         />
 
-        {/* Buttons */}
-        {!isEditing ? (
-          <button
-            type="button"
-            onClick={() => setIsEditing(true)}
-            className="w-full py-3 rounded-lg bg-purple-600 text-white font-medium hover:bg-purple-700 transition"
+        <div
+          onClick={() => setShowEmailModal(true)}
+          className="w-full p-3 border rounded-lg bg-gray-100 text-gray-600 cursor-pointer"
+        >
+          {profile.email}
+        </div>
+
+        <div
+          onClick={() => setShowPhoneModal(true)}
+          className="w-full p-3 border rounded-lg bg-gray-100 text-gray-600 cursor-pointer"
+        >
+          {profile.phone || "بدون شماره"}
+        </div>
+
+        <button
+          onClick={logout}
+          className="px-3 py-1 flex items-center cursor-pointer rounded-lg text-gray-600 text-sm mt-2"
+        >
+          <svg
+          className="w-5 h-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            ویرایش پروفایل
-          </button>
-        ) : (
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => setIsEditing(false)}
-              className="w-1/2 py-3 rounded-lg bg-gray-300 text-gray-700 font-medium hover:bg-gray-400 transition"
-            >
-              انصراف
-            </button>
-            <button
-              type="submit"
-              className="w-1/2 py-3 rounded-lg bg-purple-600 text-white font-medium hover:bg-purple-700 transition"
-            >
-              ذخیره
-            </button>
+            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g
+              id="SVGRepo_tracerCarrier"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></g>
+            <g id="SVGRepo_iconCarrier">
+              {" "}
+              <path
+                d="M14 7.63636L14 4.5C14 4.22386 13.7761 4 13.5 4L4.5 4C4.22386 4 4 4.22386 4 4.5L4 19.5C4 19.7761 4.22386 20 4.5 20L13.5 20C13.7761 20 14 19.7761 14 19.5L14 16.3636"
+                stroke="#454545"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>{" "}
+              <path
+                d="M10 12L21 12M21 12L18.0004 8.5M21 12L18 15.5"
+                stroke="#454545"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>{" "}
+            </g>
+          </svg>
+          خروج از حساب کاربری
+        </button>
+      </div>
+
+      {/* Email Modal */}
+      {showEmailModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-[90%] max-w-md">
+            <h2 className="text-lg font-semibold mb-4">تغییر ایمیل</h2>
+            <input
+              type="email"
+              placeholder="ایمیل جدید"
+              value={newEmail}
+              onChange={(e) => setNewEmail(e.target.value)}
+              className="w-full p-3 border rounded-lg mb-4"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowEmailModal(false)}
+                className="w-1/2 py-2 bg-gray-300 rounded-lg"
+              >
+                انصراف
+              </button>
+              <button
+                onClick={requestEmailChange}
+                className="w-1/2 py-2 bg-purple-600 text-white rounded-lg"
+              >
+                ارسال کد
+              </button>
+            </div>
           </div>
-        )}
-      </form>
+        </div>
+      )}
+
+      {/* Phone Modal */}
+      {showPhoneModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-[90%] max-w-md">
+            <h2 className="text-lg font-semibold mb-4 text-gray-600">
+              تغییر شماره موبایل
+            </h2>
+
+            {phoneStep === "input" && (
+              <>
+                <input
+                  type="tel"
+                  placeholder="شماره جدید"
+                  value={newPhone}
+                  onChange={(e) => setNewPhone(e.target.value)}
+                  className="w-full p-3 border rounded-lg mb-4 text-gray-600 text-end"
+                />
+                {phoneError && (
+                  <p className="text-red-600 mb-2">{phoneError}</p>
+                )}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowPhoneModal(false)}
+                    className="w-1/2 py-2 bg-gray-300 rounded-lg"
+                  >
+                    انصراف
+                  </button>
+                  <button
+                    onClick={requestPhoneChange}
+                    disabled={phoneLoading}
+                    className="w-1/2 py-2 bg-purple-600 text-white rounded-lg"
+                  >
+                    ارسال کد
+                  </button>
+                </div>
+              </>
+            )}
+
+            {phoneStep === "otp" && (
+              <>
+                <p className="text-sm text-gray-600 mb-2">{otpSentMessage}</p>
+                <input
+                  type="text"
+                  placeholder="کد تایید"
+                  value={phoneOtp}
+                  onChange={(e) => setPhoneOtp(e.target.value)}
+                  className="w-full p-3 border rounded-lg mb-4 text-gray-500"
+                />
+                {phoneError && (
+                  <p className="text-red-600 mb-2">{phoneError}</p>
+                )}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      setPhoneStep("input");
+                      setPhoneOtp("");
+                      setPhoneError("");
+                    }}
+                    className="w-1/2 py-2 bg-gray-300 rounded-lg"
+                  >
+                    بازگشت
+                  </button>
+                  <button
+                    onClick={verifyPhoneOtp}
+                    disabled={phoneLoading}
+                    className="w-1/2 py-2 bg-purple-600 text-white rounded-lg"
+                  >
+                    تایید کد
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
