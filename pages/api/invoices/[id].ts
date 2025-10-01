@@ -25,11 +25,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           <style>
             @font-face {
               font-family: 'YekanBakh';
-              src: url('http://localhost:3002/fonts/YekanBakhFaNum-Regular.ttf') format('woff2');
+              src: url('http://localhost:3002/fonts/YekanBakhFaNum-Regular.ttf') format('truetype');
               font-weight: normal;
               font-style: normal;
             }
-            body { font-family: 'YekanBakh', Tahoma, sans-serif; padding: 30px; background: #fafafa; }
+            body { font-family: 'YekanBakh'; padding: 30px; background: #fafafa; }
             .invoice-container { background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
             .logo { text-align: right; margin-bottom: 15px; }
             .logo img { max-width: 120px; height: auto; }
@@ -50,10 +50,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             <div class="logo">
               <img src="http://localhost:3002/homepage/logo.png" alt="لوگو"/>
             </div>
-            <h1>فاکتور سفارش ${order.id}</h1>
+            <h1>فاکتور  </h1>
 
             <div class="info">
               <p>نام مشتری: ${order.customerName}</p>
+              <p>شناسه سفارش :${order.id}</p>
               <p>تاریخ صدور: ${new Date(order.createdAt).toLocaleDateString("fa-IR")}</p>
             </div>
 

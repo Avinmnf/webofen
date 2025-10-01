@@ -10,6 +10,8 @@ const AccountingPage: React.FC = () => {
     waiting: "در حال پردازش", // اضافه شد در صورت نیاز
     pending: "در انتظار",
     submitted:"تکمیل شده",
+    Completed: "تکمیل شده",
+
   };
 
   const { orders, loading, error } = useUserOrders();
