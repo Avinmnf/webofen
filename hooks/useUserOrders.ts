@@ -48,7 +48,7 @@ export interface Order {
   id: string;
   customerName: string;
   status: string;
-  totalPrice: number;
+  totalPrice: number | string;
   createdAt: string;
   items: OrderItem[];
 }
@@ -84,7 +84,12 @@ export function useUserOrders(): UseUserOrdersResult {
           throw new Error(`Failed to fetch orders: ${res.statusText}`);
         }
         const data = await res.json();
-        setOrders(data.orders || []);
+
+        const normalizedOrders = (data.orders || []).map((o: Order) => ({
+          ...o,
+          totalPrice: Number(o.totalPrice) || 0, // always a number
+        }));
+        setOrders(normalizedOrders);
         setRole(data.role || null);
         setError(null);
       } catch (err: any) {

@@ -9,14 +9,14 @@ const AccountingPage: React.FC = () => {
     Cancelled: "لغو شده",
     waiting: "در حال پردازش", // اضافه شد در صورت نیاز
     pending: "در انتظار",
-    submitted:"تکمیل شده",
+    submitted: "تکمیل شده",
     Completed: "تکمیل شده",
-
   };
 
   const { orders, loading, error } = useUserOrders();
 
-  if (loading) return <p className="text-gray-500">در حال بارگذاری سفارش‌ها...</p>;
+  if (loading)
+    return <p className="text-gray-500">در حال بارگذاری سفارش‌ها...</p>;
   if (error) return <p className="text-red-500">خطا: {error}</p>;
   if (!orders.length) return <p className="text-gray-500">سفارشی یافت نشد.</p>;
 
@@ -48,7 +48,7 @@ const AccountingPage: React.FC = () => {
       alert("خطا در دانلود فاکتور");
     }
   };
-
+  console.log(orders);
   return (
     <div className="h-screen flex flex-col">
       {/* هدر بالا */}
@@ -84,23 +84,37 @@ const AccountingPage: React.FC = () => {
             </div>
 
             <div className="mb-4 text-gray-700">
-              <strong>مبلغ کل:</strong> {order?.totalPrice.toLocaleString()} تومان
+              <strong>مبلغ کل:</strong>{" "}
+              {Number(order.totalPrice).toLocaleString("fa-IR")} تومان
             </div>
 
             <table className="w-full border border-gray-300 border-collapse text-sm text-right">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className="border p-3 text-gray-600 text-center">محصول</th>
-                  <th className="border p-3 text-gray-600 text-center">ویژگی‌ها</th>
-                  <th className="border p-3 text-gray-600 text-center">تعداد</th>
+                  <th className="border p-3 text-gray-600 text-center">
+                    محصول
+                  </th>
+                  <th className="border p-3 text-gray-600 text-center">
+                    ویژگی‌ها
+                  </th>
+                  <th className="border p-3 text-gray-600 text-center">
+                    تعداد
+                  </th>
                   <th className="border p-3 text-gray-600 text-center">قیمت</th>
-                  <th className="border p-3 text-gray-600 text-center">وضعیت</th>
-                  <th className="border p-3 text-gray-600 text-center">دانلود فاکتور</th>
+                  <th className="border p-3 text-gray-600 text-center">
+                    وضعیت
+                  </th>
+                  <th className="border p-3 text-gray-600 text-center">
+                    دانلود فاکتور
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {order.items.map((item, index) => (
-                  <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                  <tr
+                    key={item.id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
                     <td className="border p-3 text-gray-700 text-center">
                       {item.variant.product.title}
                     </td>
@@ -109,9 +123,11 @@ const AccountingPage: React.FC = () => {
                         ?.map((av) => `${av.attribute.name}: ${av.value}`)
                         .join(", ")}
                     </td>
-                    <td className="border p-3 text-gray-700 text-center">{item.quantity}</td>
                     <td className="border p-3 text-gray-700 text-center">
-                      {item.price?.toLocaleString()} تومان
+                      {item.quantity}
+                    </td>
+                    <td className="border p-3 text-gray-700 text-center">
+                      {item.finalPrice?.toLocaleString()} تومان
                     </td>
                     <td className="border p-3 text-gray-700 text-center">
                       {statusMap[item.status?.trim()] ?? item.status}
