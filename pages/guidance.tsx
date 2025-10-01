@@ -3,7 +3,7 @@ import Image from "next/image";
 import React from "react";
 import { useState } from "react";
 import { useRef } from "react";
-
+import GuidanceForm from "@/components/GuidanceForm";
 import HoverVideo from "@/components/videos/hovervideos";
 import Pills from "@/components/pills";
 export default function guidance() {
@@ -587,38 +587,7 @@ export default function guidance() {
             </div>
 
             {/* Form Section */}
-            <div className="bg-white w-full lg:w-[30%] rounded-lg">
-              <div className="p-6">
-                <div className="flex items-center text-xl">
-                  <div className="w-2 h-10 bg-[#6fd6e5] rounded-2xl ml-2"></div>
-                  <span className="text-gray-700 font-semibold">درخواست</span>
-                  <span className="text-[#1d546b] mr-1 font-semibold">
-                    مشاوره رایگان
-                  </span>
-                </div>
-
-                <div className="text-center w-full mt-2">
-                  <p className="text-gray-600">
-                    پس از ارسال همکاران ما با شما تماس خواهند گرفت
-                  </p>
-                </div>
-
-                <div className="text-center w-full mt-10">
-                  <input
-                    className="w-full border border-gray-200 py-2 rounded-md px-1 text-gray-500"
-                    placeholder="نام"
-                  />
-                  <input
-                    className="w-full border border-gray-200 mt-4 py-2 rounded-md px-1 text-gray-500"
-                    placeholder="شماره تماس"
-                  />
-                  <textarea
-                    className="w-full h-26 border border-gray-200 mt-4 px-1 py-2 rounded-md text-gray-500"
-                    placeholder="پیام خود را بنویسید"
-                  />
-                </div>
-              </div>
-            </div>
+        <GuidanceForm/>
           </div>
         </section>
       </div>
