@@ -11,20 +11,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!phone) return res.status(400).json({ error: "Phone is required" });
 
   const code = generateOTP();
-  const expires = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
-  const graphqlUrl = process.env.NEXT_PUBLIC_GRAPHQL_URL;
+  const expires = new Date(Date.now() + 5 * 60 * 1000); // 5 دقیقه
 
-  if (!graphqlUrl) return res.status(500).json({ error: "GRAPHQL_URL missing" });
+  const graphqlUrl = process.env.NEXT_PUBLIC_GRAPHQL_URL;
+  if (!graphqlUrl) return res.status(500).json({ error: "GRAPHQL URL missing in env" });
 
   try {
-    // Find existing user for login
+    // 1. پیدا کردن کاربر
     const findUserRes = await fetch(graphqlUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         query: `
           query FindUser($phone: String!) {
-            users(where: { phone: { equals: $phone } }) { id }
+            users(where: { phone: { equals: $phone } }) {
+              id
+            }
           }
         `,
         variables: { phone },
@@ -32,28 +34,75 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     const findUserJson = await findUserRes.json();
-    const user = findUserJson?.data?.users?.[0];
-    if (!user) return res.status(400).json({ error: "کاربری با این شماره یافت نشد" });
+    console.log("FindUser response:", JSON.stringify(findUserJson, null, 2));
 
-    // Save OTP
-    await fetch(graphqlUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        query: `
-          mutation UpdateUser($id: ID!, $otpCode: String, $otpExpires: DateTime) {
-            updateUser(where: { id: $id }, data: { otpCode: $otpCode, otpExpires: $otpExpires }) { id }
-          }
-        `,
-        variables: { id: user.id, otpCode: code, otpExpires: expires.toISOString() },
-      }),
-    });
+    let userId = findUserJson?.data?.users?.[0]?.id;
 
-    // Send SMS
+    if (userId) {
+      // 2. آپدیت OTP و زمان انقضا در دیتابیس
+      const updateRes = await fetch(graphqlUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          query: `
+            mutation UpdateUser($id: ID!, $otpCode: String, $otpExpires: DateTime) {
+              updateUser(
+                where: { id: $id }
+                data: { otpCode: $otpCode, otpExpires: $otpExpires }
+              ) {
+                id
+                otpCode
+                otpExpires
+              }
+            }
+          `,
+          variables: { id: userId, otpCode: code, otpExpires: expires.toISOString() },
+        }),
+      });
+
+      const updateJson = await updateRes.json();
+      console.log("UpdateUser response:", JSON.stringify(updateJson, null, 2));
+    } else {
+      // 3. ایجاد کاربر جدید با OTP و مقادیر پیش‌فرض برای فیلدهای اجباری
+      const createRes = await fetch(graphqlUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          query: `
+            mutation CreateUser($phone: String!, $otpCode: String!, $otpExpires: DateTime!) {
+              createUser(data: {
+                phone: $phone,
+                otpCode: $otpCode,
+                otpExpires: $otpExpires,
+                name: "Guest",
+                email: $phone + "@guest.com",
+                password: "guest1234"
+              }) {
+                id
+                otpCode
+                otpExpires
+              }
+            }
+          `,
+          variables: { phone, otpCode: code, otpExpires: expires.toISOString() },
+        }),
+      });
+
+      const createJson = await createRes.json();
+      console.log("CreateUser response:", JSON.stringify(createJson, null, 2));
+      userId = createJson?.data?.createUser?.id;
+    }
+
+    console.log("Final userId:", userId, "OTP code:", code);
+
+    // 4. ارسال SMS (FarazSMS)
     const username = process.env.FARAZSMS_USER || "";
     const password = process.env.FARAZSMS_PASS || "";
     const from = process.env.FARAZSMS_FROM || "";
     const pattern = process.env.FARAZSMS_PATTERN || "";
+
+    if (!username || !password || !pattern)
+      return res.status(500).json({ error: "FARAZSMS credentials missing" });
 
     const smsRes = await fetch("http://ippanel.com/api/select", {
       method: "POST",
@@ -69,10 +118,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }),
     });
 
-    if (smsRes.ok) return res.status(200).json({ success: true, otpSentTo: phone });
-    else return res.status(500).json({ error: "ارسال پیامک با خطا مواجه شد" });
+    const smsData = await smsRes.json();
+
+    if (smsRes.ok) {
+      return res.status(200).json({ success: true, otpSentTo: phone, userId, code });
+    } else {
+      return res.status(500).json({ error: smsData });
+    }
   } catch (err: any) {
-    console.error("send-otp (login) error:", err);
+    console.error("Server error in send-otp:", err);
     return res.status(500).json({ error: err.message });
   }
 }
