@@ -78,7 +78,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         ?.map((av: any) => `${av.attribute.name}: ${av.value}`)
                         .join(", ")}</td>
                       <td>${item.quantity}</td>
-                      <td>${item.price?.toLocaleString("fa-IR")} تومان</td>
+                      <td>${item.finalPrice?.toLocaleString("fa-IR")} تومان</td>
                       <td>${statusMap[item.status?.trim()] ?? item.status}</td>
                     </tr>
                   `
