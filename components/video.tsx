@@ -4,7 +4,7 @@ interface Props {
 export default function VideoPlayer({ product }: Props) {
     if (!product) return null; // اگر undefined بود هیچی رندر نمی‌کنه
     return (
-        <video className=" rounded-3xl" autoPlay muted loop playsInline>
+        <video className="seo-video rounded-3xl" autoPlay muted loop playsInline>
             <source src={product} type="video/mp4" />
         </video>
     );
