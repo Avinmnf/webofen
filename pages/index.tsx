@@ -4,7 +4,7 @@ import Popularpills from "@/components/popularpills";
 import Pathsection from "@/components/pathsection";
 import Commentsabtus from "@/components/commentsabtus";
 import Reservetime from "@/components/reservetime";
-
+import FreeConsultationForm from "@/components/FreeConsultationForm";
 export default function Home() {
   return (
     <main className=" m-auto">
@@ -119,39 +119,12 @@ export default function Home() {
             <div className="w-full flex flex-col gap-4 lg:flex-row lg:items-center justify-between rounded-2xl bg-white p-4">
               {/* Input Fields */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-                <input
-                  type="text"
-                  placeholder="نام و نام خانوادگی"
-                  className="bg-[#f7f8fc] rounded-lg p-2 px-4 text-sm border border-transparent focus:outline-none focus:border-[#6FD6E5] focus:ring-2 focus:ring-[#6FD6E5] transition-all duration-200"
-                />
-                <input
-                  type="text"
-                  placeholder="تلفن همراه"
-                  className="bg-[#f7f8fc] rounded-lg p-2 px-4 text-sm border border-transparent focus:outline-none focus:border-[#6FD6E5] focus:ring-2 focus:ring-[#6FD6E5] transition-all duration-200"
-                />
-                <input
-                  type="text"
-                  placeholder="نام دامنه"
-                  className="bg-[#f7f8fc] rounded-lg p-2 px-4 text-sm border border-transparent focus:outline-none focus:border-[#6FD6E5] focus:ring-2 focus:ring-[#6FD6E5] transition-all duration-200"
-                />
-                <input
-                  type="text"
-                  placeholder="خدمت مورد نظر"
-                  className="bg-[#f7f8fc] rounded-lg p-2 px-4 text-sm border border-transparent focus:outline-none focus:border-[#6FD6E5] focus:ring-2 focus:ring-[#6FD6E5] transition-all duration-200"
-                />
-              </div>
-
-              {/* Submit Button */}
-              <div className="w-full lg:w-auto">
-                <button className="w-full lg:w-32 h-10 bg-[#6FD6E5] text-white rounded-lg mt-2 lg:mt-0 font-light transition-all duration-200 hover:bg-[#5ac7d7]">
-                  درخواست نوبت
-                </button>
+               <FreeConsultationForm/>
               </div>
             </div>
           </div>
         </div>
       </section>
-
       <section className="max-w-[1250px] m-auto mt-10 md:mt-20 px-4">
         <div className="flex flex-col lg:flex-row gap-8 justify-center mx-auto items-centerY">
           {/* Left Image */}
