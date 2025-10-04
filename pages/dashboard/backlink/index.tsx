@@ -1,12 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useOrderInput } from "@/hooks/useOrderInput";
 import { useUserOrders } from "@/hooks/useUserOrders";
+import { useVipDeadline } from "@/hooks/useVipDeadline";
 import { useAuth } from "@/contexts/AuthContext";
 import SimpleProgress from "@/components/dashboard/AnimatedProgress";
 import CircularProgressWithTimesmall from "@/components/dashboard/AnimatedProgresssmall";
+import { Calendar } from "react-multi-date-picker";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
+import TimePicker from "react-multi-date-picker/plugins/time_picker";
 
 interface Variant {
   product: {
@@ -33,6 +38,7 @@ export interface BacklinkItem {
   delayed?: string;
   completionTime?: string;
   deadline?: string;
+  vipDeadline?: string;
   createdAt: string;
   startTime: string;
   siteurl?: string;
@@ -51,10 +57,54 @@ const statusProgressMap: Record<string, number> = {
 
 const BacklinkPage: React.FC = () => {
   const { isLoggedIn } = useAuth();
-  const { orders, loading, error } = useUserOrders();
+  const {
+    updateVipDeadline,
+    loading: deadlineLoading,
+    error: deadlineError,
+    resetError,
+  } = useVipDeadline();
+  const { orders, loading, error, role } = useUserOrders();
+  const [openCalendarId, setOpenCalendarId] = useState<string | null>(null);
+  const calendarRef = useRef<HTMLDivElement>(null);
+  const [selectedDate, setSelectedDate] = useState<Record<string, Date | null>>(
+    {}
+  );
   const [inputValuesMap, setInputValuesMap] = useState<Record<string, any[]>>(
     {}
   );
+
+  const [backlinksState, setBacklinksState] = useState<BacklinkItem[]>([]);
+  const [completedOrderId, setCompletedOrderId] = useState<string | null>(null);
+  const [selectedOrderItemId, setSelectedOrderItemId] = useState<string | null>(
+    null
+  );
+  const [showModal, setShowModal] = useState(false);
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [historyFilter, setHistoryFilter] = useState<
+    "all" | "completed" | "cancelled"
+  >("all");
+  const [showNotification, setShowNotification] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<"completed" | "cancelled" | null>(
+    null
+  );
+
+  const {
+    fields,
+    values,
+    setValues,
+    loading: inputLoading,
+    error: inputError,
+    handleChange,
+    submitValues,
+    fetchValues,
+  } = useOrderInput(selectedOrderItemId);
+
+  const selectedItem = backlinksState.find(
+    (item) => item.id === selectedOrderItemId
+  );
+  const canEdit = selectedItem?.adminStatus === "pending";
+
   // Map orders to backlinks
   useEffect(() => {
     const mappedBacklinks: BacklinkItem[] = orders.flatMap((order) =>
@@ -86,6 +136,7 @@ const BacklinkPage: React.FC = () => {
             variant: item.variant,
             startTime: item.startTime,
             deadline: item.deadline,
+            vipDeadline: item.vipDeadline,
             submittedValues: savedValues.map((sv: any) => ({
               id: sv.id,
               label: sv.label,
@@ -98,39 +149,6 @@ const BacklinkPage: React.FC = () => {
     setBacklinksState(mappedBacklinks);
   }, [orders, inputValuesMap]);
 
-  const [completedOrderId, setCompletedOrderId] = useState<string | null>(null);
-
-  const [backlinksState, setBacklinksState] = useState<BacklinkItem[]>([]);
-
-  const [selectedOrderItemId, setSelectedOrderItemId] = useState<string | null>(
-    null
-  );
-  const [showModal, setShowModal] = useState(false);
-  const [historyModalOpen, setHistoryModalOpen] = useState(false);
-  const [historyFilter, setHistoryFilter] = useState<
-    "all" | "completed" | "cancelled"
-  >("all");
-  const [showNotification, setShowNotification] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<"completed" | "cancelled" | null>(
-    null
-  );
-
-  const {
-    fields,
-    values,
-    setValues,
-    loading: inputLoading,
-    error: inputError,
-    handleChange,
-    submitValues,
-    fetchValues,
-  } = useOrderInput(selectedOrderItemId);
-
-  const selectedItem = backlinksState.find(
-    (item) => item.id === selectedOrderItemId
-  );
-  const canEdit = selectedItem?.adminStatus === "pending";
   useEffect(() => {
     const fetchAllValues = async () => {
       const map: Record<string, any[]> = {};
@@ -170,6 +188,7 @@ const BacklinkPage: React.FC = () => {
   const selectedCompletedOrder = backlinksState.find(
     (item) => item.id === completedOrderId
   );
+
   const handleSubmit = async () => {
     try {
       await submitValues();
@@ -191,6 +210,50 @@ const BacklinkPage: React.FC = () => {
       setShowModal(false);
     } catch (err) {
       console.error("Failed to submit input values", err);
+    }
+  };
+
+  // API call to update deadline in database
+  const updateDeadlineInDB = async (itemId: string, deadlineDate: string) => {
+    try {
+      const response = await fetch(`/api/order-items/${itemId}/deadline`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ deadlineDate }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update deadline");
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error updating deadline:", error);
+      throw error;
+    }
+  };
+  const handleUpdateVipDeadline = async (
+    itemId: string,
+    deadlineDate: string
+  ) => {
+    try {
+      await updateVipDeadline(itemId, deadlineDate);
+
+      // Update local state manually - use vipDeadline instead of deadline
+      setBacklinksState((prev) =>
+        prev.map((item) =>
+          item.id === itemId
+            ? {
+                ...item,
+                vipDeadline: deadlineDate, // Update vipDeadline field
+              }
+            : item
+        )
+      );
+    } catch (error) {
+      console.error("Failed to update VIP deadline in component:", error);
     }
   };
 
@@ -217,6 +280,28 @@ const BacklinkPage: React.FC = () => {
       setShowNotification(true);
     }
   }, [backlinksState]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        calendarRef.current &&
+        !calendarRef.current.contains(event.target as Node)
+      ) {
+        setOpenCalendarId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    setBacklinksState((prev) =>
+      prev.map((item) => ({
+        ...item,
+        submittedValues: inputValuesMap[item.id] || [],
+      }))
+    );
+  }, [inputValuesMap]);
 
   // Filtering for different states
   const inProgressItems = backlinksState.filter(
@@ -247,19 +332,12 @@ const BacklinkPage: React.FC = () => {
     (item) =>
       item.adminStatus === "completed" || new Date(item.createdAt) < oneMonthAgo
   );
-  useEffect(() => {
-    setBacklinksState((prev) =>
-      prev.map((item) => ({
-        ...item,
-        submittedValues: inputValuesMap[item.id] || [],
-      }))
-    );
-  }, [inputValuesMap]);
 
   console.log(bigInProgressItem);
   console.log("StartTime:", bigInProgressItem?.startTime);
   console.log("Deadline:", bigInProgressItem?.deadline);
   console.log("bigitem:", bigInProgressItem?.submittedValues);
+
   if (!isLoggedIn)
     return (
       <p className="text-center py-10">ابتدا باید وارد حساب کاربری خود شوید</p>
@@ -282,74 +360,74 @@ const BacklinkPage: React.FC = () => {
           {/* big pill */}
           {bigInProgressItem && (
             <>
-            <div className="flex items-center relative flex-row-reverse w-full justify-between p-4">
-              {bigInProgressItem && (
-                <SimpleProgress
-                  startTime={bigInProgressItem.startTime}
-                  deadline={bigInProgressItem.deadline || ""}
-                  completionTime={bigInProgressItem.completionTime}
-                  canceled={bigInProgressItem.adminStatus === "cancelled"}
-                />
-              )}
-
-              <button
-                onClick={() => handleClick(bigInProgressItem.id)}
-                className="absolute left-14 w-20 h-16 flex items-center justify-center"
-              >
-                <div className="relative w-full h-32 flex justify-center items-center overflow-hidden">
-                  <Image
-                    width={220}
-                    height={220}
-                    alt="Backlink"
-                    src={"/dashboard/backlink.png"}
-                    className="object-contain rotate-30"
+              <div className="flex items-center relative flex-row-reverse w-full justify-between p-4">
+                {bigInProgressItem && (
+                  <SimpleProgress
+                    startTime={bigInProgressItem.startTime}
+                    deadline={bigInProgressItem.deadline || ""}
+                    completionTime={bigInProgressItem.completionTime}
+                    canceled={bigInProgressItem.adminStatus === "cancelled"}
                   />
-                </div>
-              </button>
-              <div className=" mt-2 text-sm w-1/3">
-                <div className="flex gap-2 items-center">
-                  <p className="text-gray-600 font-semibold">تاریخ خرید: </p>
-                  <p className="text-gray-600">
-                    {new Date(bigInProgressItem.createdAt).toLocaleDateString(
-                      "fa-IR"
-                    )}
-                  </p>
-                </div>
-                <div className="flex gap-2 items-center">
-                  <p className="text-gray-600 font-semibold">تعداد:</p>
-                  <p className="text-gray-700">
-                    {bigInProgressItem.attributes
-                      .map((attr) => attr.value)
-                      .join(" / ")}
-                  </p>
-                </div>
-                <div className="flex gap-2 items-center mt-1">
-                  <div className="mt-1 text-sm">
-                    {bigInProgressItem.submittedValues?.length ? (
-                      <div className="mt-2 text-sm">
-                        {bigInProgressItem.submittedValues.map((bigitem) => (
-                          <div
-                            key={bigitem.id}
-                            className="flex gap-1 items-center"
-                          >
-                            <span className="font-semibold text-gray-600">
-                              {bigitem.label}:
-                            </span>
-                            <span className="text-gray-700">
-                              {bigitem.value || "—"}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-gray-400 mt-2">اطلاعات وارد نشده</p>
-                    )}
+                )}
+
+                <button
+                  onClick={() => handleClick(bigInProgressItem.id)}
+                  className="absolute left-14 w-20 h-16 flex items-center justify-center"
+                >
+                  <div className="relative w-full h-32 flex justify-center items-center overflow-hidden">
+                    <Image
+                      width={220}
+                      height={220}
+                      alt="Backlink"
+                      src={"/dashboard/backlink.png"}
+                      className="object-contain rotate-30"
+                    />
+                  </div>
+                </button>
+                <div className=" mt-2 text-sm w-1/3">
+                  <div className="flex gap-2 items-center">
+                    <p className="text-gray-600 font-semibold">تاریخ خرید: </p>
+                    <p className="text-gray-600">
+                      {new Date(bigInProgressItem.createdAt).toLocaleDateString(
+                        "fa-IR"
+                      )}
+                    </p>
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    <p className="text-gray-600 font-semibold">تعداد:</p>
+                    <p className="text-gray-700">
+                      {bigInProgressItem.attributes
+                        .map((attr) => attr.value)
+                        .join(" / ")}
+                    </p>
+                  </div>
+                  <div className="flex gap-2 items-center mt-1">
+                    <div className="mt-1 text-sm">
+                      {bigInProgressItem.submittedValues?.length ? (
+                        <div className="mt-2 text-sm">
+                          {bigInProgressItem.submittedValues.map((bigitem) => (
+                            <div
+                              key={bigitem.id}
+                              className="flex gap-1 items-center"
+                            >
+                              <span className="font-semibold text-gray-600">
+                                {bigitem.label}:
+                              </span>
+                              <span className="text-gray-700">
+                                {bigitem.value || "—"}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-400 mt-2">اطلاعات وارد نشده</p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          <div className="h-1 w-full bg-gray-200 rounded-2xl"></div>
-          </>
+              <div className="h-1 w-full bg-gray-200 rounded-2xl"></div>
+            </>
           )}
           {/* Small pills */}
           <div className="flex flex-col w-full gap-8">
@@ -647,7 +725,7 @@ const BacklinkPage: React.FC = () => {
                             : item.adminStatus === "cancelled"
                             ? "border-red-800"
                             : item.adminStatus === "in_progress"
-                            ? "border-orange-500" 
+                            ? "border-orange-500"
                             : "border-gray-200"
                         }`}
                       >
@@ -711,28 +789,321 @@ const BacklinkPage: React.FC = () => {
             </div>
 
             <div className="p-6 space-y-5">
-              {fields?.map((field) => (
-                <div key={field.id} className="flex flex-col">
-                  <label className="text-sm text-gray-300 mb-1">
-                    {field.label}
-                  </label>
-                  <input
-                    type={field.fieldType === "number" ? "number" : "text"}
-                    name={field.id}
-                    placeholder={field.placeholder || field.label}
-                    value={values[field.id] || ""}
-                    onChange={(e) => handleChange(field.id, e.target.value)}
-                    className={`w-full px-4 py-2 rounded-xl border border-cyan-500/30 bg-[#1C2233] text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-500 outline-none transition-all duration-300 ${
-                      !canEdit
-                        ? "opacity-60 cursor-not-allowed"
-                        : "hover:ring-cyan-300"
-                    }`}
-                    required={field.required}
-                    disabled={!canEdit}
-                  />
-                </div>
-              ))}
+              <div
+                className={` space-y-5 relative ${
+                  role === "vipclient"
+                    ? "bg-white rounded-2xl text-black"
+                    : "bg-transparent"
+                }`}
+              >
+                {/* Crown for VIP users */}
+                {role === "vipclient" && (
+                  <svg
+                    className="w-8 h-8 absolute -top-3 rotate-35 -right-2 z-50"
+                    viewBox="0 -6 34 34"
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="#000000"
+                  >
+                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                    <g
+                      id="SVGRepo_tracerCarrier"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    ></g>
+                    <g id="SVGRepo_iconCarrier">
+                      {" "}
+                      <title>crown</title> <desc>Created with Sketch.</desc>{" "}
+                      <defs>
+                        {" "}
+                        <linearGradient
+                          x1="50%"
+                          y1="0%"
+                          x2="50%"
+                          y2="100%"
+                          id="linearGradient-1"
+                        >
+                          {" "}
+                          <stop stop-color="#FFC923" offset="0%">
+                            {" "}
+                          </stop>{" "}
+                          <stop stop-color="#FFAD41" offset="100%">
+                            {" "}
+                          </stop>{" "}
+                        </linearGradient>{" "}
+                      </defs>{" "}
+                      <g
+                        id="icons"
+                        stroke="none"
+                        stroke-width="1"
+                        fill="none"
+                        fill-rule="evenodd"
+                      >
+                        {" "}
+                        <g
+                          id="ui-gambling-website-lined-icnos-casinoshunter"
+                          transform="translate(-1513.000000, -2041.000000)"
+                          fill="url(#linearGradient-1)"
+                          fill-rule="nonzero"
+                        >
+                          {" "}
+                          <g
+                            id="4"
+                            transform="translate(50.000000, 1871.000000)"
+                          >
+                            {" "}
+                            <path
+                              d="M1480.91651,170.219311 C1481.3389,170.433615 1481.67193,170.790192 1481.85257,171.227002 L1485.64818,180.405177 L1493.44429,170.905749 C1494.13844,170.059929 1495.39769,169.928221 1496.25688,170.61157 C1496.72686,170.98536 1497,171.548271 1497,172.143061 L1497,189.04671 C1497,190.677767 1495.65685,192 1494,192 L1466,192 C1464.34315,192 1463,190.677767 1463,189.04671 L1463,172.142612 C1463,171.055241 1463.89543,170.173752 1465,170.173752 C1465.60413,170.173752 1466.17588,170.442575 1466.55559,170.905145 L1474.35377,180.405143 L1478.1477,171.227264 C1478.54422,170.268054 1479.62151,169.783179 1480.60701,170.093228 L1480.75404,170.145737 L1480.91651,170.219311 Z"
+                              id="crown"
+                            >
+                              {" "}
+                            </path>{" "}
+                          </g>{" "}
+                        </g>{" "}
+                      </g>{" "}
+                    </g>
+                  </svg>
+                )}
 
+                {fields?.map((field) => (
+                  <div key={field.id} className="flex flex-col">
+                    <div className="flex items-center justify-between pr-4">
+                      <label className="text-sm text-gray-600 mb-1">
+                        {field.label}
+                      </label>
+                      {/* Render VIP timer if user is VIP */}
+                      {role === "vipclient" && selectedItem && (
+                        <>
+                          <button
+                            onClick={() =>
+                              setOpenCalendarId(
+                                openCalendarId === selectedItem.id
+                                  ? null
+                                  : selectedItem.id
+                              )
+                            }
+                            disabled={deadlineLoading}
+                            className={`px-4 py-2 rounded animate-pulse ${
+                              deadlineLoading
+                                ? "cursor-not-allowed"
+                                : "cursor-pointer"
+                            } text-white`}
+                          >
+                            <svg
+                              className="w-8 h-8"
+                              version="1.1"
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 100 100"
+                              enable-background="new 0 0 100 100"
+                              fill="#00000"
+                            >
+                              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                              <g
+                                id="SVGRepo_tracerCarrier"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              ></g>
+                              <g id="SVGRepo_iconCarrier">
+                                {" "}
+                                <g id="Download_x5F_25_x25_"> </g>{" "}
+                                <g id="Download_x5F_50_x25_"> </g>{" "}
+                                <g id="Download_x5F_75_x25_"> </g>{" "}
+                                <g id="Download_x5F_100_x25_"> </g>{" "}
+                                <g id="Upload"> </g> <g id="Next"> </g>{" "}
+                                <g id="Last"> </g> <g id="OK"> </g>{" "}
+                                <g id="Fail"> </g> <g id="Add"> </g>{" "}
+                                <g id="Spinner_x5F_0_x25_"> </g>{" "}
+                                <g id="Spinner_x5F_25_x25_"> </g>{" "}
+                                <g id="Spinner_x5F_50_x25_"> </g>{" "}
+                                <g id="Spinner_x5F_75_x25_"> </g>{" "}
+                                <g id="Brightest_x5F_25_x25_"> </g>{" "}
+                                <g id="Brightest_x5F_50_x25_"> </g>{" "}
+                                <g id="Brightest_x5F_75_x25_"> </g>{" "}
+                                <g id="Brightest_x5F_100_x25_"> </g>{" "}
+                                <g id="Reload"> </g> <g id="Forbidden"> </g>{" "}
+                                <g id="Clock"> </g> <g id="Compass"> </g>{" "}
+                                <g id="World"> </g> <g id="Speed"> </g>{" "}
+                                <g id="Microphone"> </g> <g id="Options"> </g>{" "}
+                                <g id="Chronometer">
+                                  {" "}
+                                  <circle
+                                    cx="73.375"
+                                    cy="30.812"
+                                    r="2"
+                                  ></circle>{" "}
+                                  <circle
+                                    fill="none"
+                                    stroke="#000000"
+                                    stroke-width="4"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-miterlimit="10"
+                                    cx="50.188"
+                                    cy="50"
+                                    r="23.188"
+                                  ></circle>{" "}
+                                  <path
+                                    fill="none"
+                                    stroke="#000000"
+                                    stroke-width="4"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-miterlimit="10"
+                                    d=" M41.45,21.292C44.215,20.452,47.149,20,50.188,20c3.018,0,5.931,0.446,8.678,1.274"
+                                  ></path>{" "}
+                                  <line
+                                    fill="none"
+                                    stroke="#000000"
+                                    stroke-width="4"
+                                    stroke-linecap="round"
+                                    stroke-miterlimit="10"
+                                    x1="48.644"
+                                    y1="50.45"
+                                    x2="58.544"
+                                    y2="40.55"
+                                  ></line>{" "}
+                                </g>{" "}
+                                <g id="Lock"> </g> <g id="User"> </g>{" "}
+                                <g id="Position"> </g>{" "}
+                                <g id="No_x5F_Signal"> </g>{" "}
+                                <g id="Low_x5F_Signal"> </g>{" "}
+                                <g id="Mid_x5F_Signal"> </g>{" "}
+                                <g id="High_x5F_Signal"> </g>{" "}
+                                <g id="Options_1_"> </g> <g id="Flash"> </g>{" "}
+                                <g id="No_x5F_Signal_x5F_02"> </g>{" "}
+                                <g id="Low_x5F_Signal_x5F_02"> </g>{" "}
+                                <g id="Mid_x5F_Signal_x5F_02"> </g>{" "}
+                                <g id="High_x5F_Signal_x5F_02"> </g>{" "}
+                                <g id="Favorite"> </g> <g id="Search"> </g>{" "}
+                                <g id="Stats_x5F_01"> </g>{" "}
+                                <g id="Stats_x5F_02"> </g>{" "}
+                                <g id="Turn_x5F_On_x5F_Off"> </g>{" "}
+                                <g id="Full_x5F_Height"> </g>{" "}
+                                <g id="Full_x5F_Width"> </g>{" "}
+                                <g id="Full_x5F_Screen"> </g>{" "}
+                                <g id="Compress_x5F_Screen"> </g>{" "}
+                                <g id="Chat"> </g> <g id="Bluetooth"> </g>{" "}
+                                <g id="Share_x5F_iOS"> </g>{" "}
+                                <g id="Share_x5F_Android"> </g>{" "}
+                                <g id="Love__x2F__Favorite"> </g>{" "}
+                                <g id="Hamburguer"> </g> <g id="Flying"> </g>{" "}
+                                <g id="Take_x5F_Off"> </g> <g id="Land"> </g>{" "}
+                                <g id="City"> </g> <g id="Nature"> </g>{" "}
+                                <g id="Pointer"> </g> <g id="Prize"> </g>{" "}
+                                <g id="Extract"> </g> <g id="Play"> </g>{" "}
+                                <g id="Pause"> </g> <g id="Stop"> </g>{" "}
+                                <g id="Forward"> </g> <g id="Reverse"> </g>{" "}
+                                <g id="Next_1_"> </g> <g id="Last_1_"> </g>{" "}
+                                <g id="Empty_x5F_Basket"> </g>{" "}
+                                <g id="Add_x5F_Basket"> </g>{" "}
+                                <g id="Delete_x5F_Basket"> </g>{" "}
+                                <g id="Error_x5F_Basket"> </g>{" "}
+                                <g id="OK_x5F_Basket"> </g>{" "}
+                              </g>
+                            </svg>
+                          </button>
+
+                          {deadlineError && (
+                            <div className="mt-2 text-red-400 text-sm text-center">
+                              {deadlineError}
+                              <button
+                                onClick={resetError}
+                                className="mr-2 text-red-200 hover:text-red-100"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          )}
+
+                          {openCalendarId === selectedItem.id && (
+                            <div
+                              ref={calendarRef}
+                              className="absolute bottom-0 left-1/2 -translate-x-1/2 z-50 bg-white border text-black rounded-md shadow-lg p-4"
+                              onMouseDown={(e) => e.stopPropagation()}
+                            >
+                              <Calendar
+                                calendar={persian}
+                                locale={persian_fa}
+                                value={
+                                  selectedDate[selectedItem.id] ||
+                                  (selectedItem.vipDeadline
+                                    ? new Date(selectedItem.vipDeadline)
+                                    : null)
+                                }
+                                onChange={(date) => {
+                                  if (!date) return;
+                                  setSelectedDate((prev) => ({
+                                    ...prev,
+                                    [selectedItem.id]: date.toDate(),
+                                  }));
+                                }}
+                                plugins={[<TimePicker position="bottom" />]}
+                              />
+                              <div className="flex justify-between mt-2">
+                                <button
+                                  className={`px-3 py-1 rounded text-white ${
+                                    deadlineLoading
+                                      ? "bg-gray-400 cursor-not-allowed"
+                                      : "bg-green-500 hover:bg-green-600"
+                                  }`}
+                                  onClick={() => {
+                                    const date = selectedDate[selectedItem.id];
+                                    if (!date || deadlineLoading) return;
+                                    handleUpdateVipDeadline(
+                                      selectedItem.id,
+                                      date.toISOString()
+                                    );
+                                    setOpenCalendarId(null);
+                                  }}
+                                  disabled={deadlineLoading}
+                                >
+                                  {deadlineLoading ? "..." : "تایید"}
+                                </button>
+                                <button
+                                  className={`px-3 py-1 rounded text-white ${
+                                    deadlineLoading
+                                      ? "bg-gray-400 cursor-not-allowed"
+                                      : "bg-red-500 hover:bg-red-600"
+                                  }`}
+                                  onClick={() => {
+                                    if (deadlineLoading) return;
+                                    handleUpdateVipDeadline(
+                                      selectedItem.id,
+                                      ""
+                                    );
+                                    setSelectedDate((prev) => ({
+                                      ...prev,
+                                      [selectedItem.id]: null,
+                                    }));
+                                    setOpenCalendarId(null);
+                                  }}
+                                  disabled={deadlineLoading}
+                                >
+                                  {deadlineLoading ? "..." : "حذف"}
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                    <input
+                      type={field.fieldType === "number" ? "number" : "text"}
+                      name={field.id}
+                      placeholder={field.placeholder || field.label}
+                      value={values[field.id] || ""}
+                      onChange={(e) => handleChange(field.id, e.target.value)}
+                      className={`w-full px-4 py-2 rounded-xl border border-cyan-500/30 bg-[#1C2233] text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-500 outline-none transition-all duration-300 ${
+                        !canEdit
+                          ? "opacity-60 cursor-not-allowed"
+                          : "hover:ring-cyan-300"
+                      }`}
+                      required={field.required}
+                      disabled={!canEdit}
+                    />
+                  </div>
+                ))}
+              </div>
               <button
                 onClick={handleSubmit}
                 className={`w-full py-3 rounded-xl text-lg font-semibold text-white transition-all duration-300 ${
@@ -757,13 +1128,15 @@ const BacklinkPage: React.FC = () => {
                 </ul>
               )}
 
-              {loading && (
+              {inputLoading && (
                 <p className="text-cyan-400 text-sm animate-pulse">
                   در حال بارگذاری...
                 </p>
               )}
-              {error && (
-                <p className="text-red-400 text-sm animate-shake">{error}</p>
+              {inputError && (
+                <p className="text-red-400 text-sm animate-shake">
+                  {inputError}
+                </p>
               )}
             </div>
           </div>
