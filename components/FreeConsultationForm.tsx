@@ -84,7 +84,7 @@ export default function FreeConsultationForm() {
   <button
     onClick={handleSubmit}
     disabled={loading}
-  className="h-10 bg-[#6FD6E5] text-white rounded-lg font-light transition-all duration-200 hover:bg-[#5ac7d7] whitespace-nowrap px-3"
+  className="h-10 cursor-pointer bg-[#6FD6E5] text-white rounded-lg font-light transition-all duration-200 hover:bg-[#5ac7d7] whitespace-nowrap px-3"
   >
     {loading ? "در حال ارسال..." : "درخواست نوبت"}
   </button>

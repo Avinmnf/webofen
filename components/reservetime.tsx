@@ -93,7 +93,7 @@ export default function Reservetime() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               transition={{ type: 'spring', stiffness: 300 }}
-              className="w-32 h-10 bg-[#1d546b] text-white rounded-xl whitespace-nowrap px-3"
+              className="w-32 h-10 bg-[#1d546b] cursor-pointer text-white rounded-xl whitespace-nowrap px-3"
             >
               {loading ? 'در حال ارسال...' : 'ثبت درخواست'}
             </motion.button>

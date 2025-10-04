@@ -68,7 +68,7 @@ export default function GuidanceForm() {
 
       <button
         onClick={handleSubmit}
-        className="w-full bg-[#1d546b] text-white py-2 rounded-md"
+        className="w-full bg-[#1d546b] cursor-pointer text-white py-2 rounded-md"
         disabled={loading}
       >
         {loading ? "در حال ارسال..." : "ارسال"}
