@@ -2,7 +2,7 @@ import { useState } from "react";
 
 export type FormField = {
   label: string;
-  type: "text" | "textarea" | "number";
+  type: "text" | "number" | "email" | "textarea";
   content: string;
 };
 
