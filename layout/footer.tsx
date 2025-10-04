@@ -4,10 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 export default function Footer() {
   return (
-    <footer className="w-full bg-white text-gray-800 pt-10 text-center">
-      <div className=" rounded-t-2xl  bg-[#f7f8fc] flex-col-reverse md:flex md:flex-col lg:flex-row px-5 sm:px-10 md:px-20 pt-10 items-stretch gap-10 lg:gap-0">
+    <footer className="w-full  text-gray-800 pt-10 text-center  bg-[#f7f8fc]">
+      <div className=" max-w-[1250px]  m-auto rounded-t-2xl flex-col-reverse md:flex md:flex-col lg:flex-row pt-10 items-stretch gap-6">
         {/* Left Column */}
-        <div className="lg:w-3/12 flex flex-col items-center justify-between">
+        <div className="lg:w-2/12 flex flex-col items-center md:items-start justify-between">
           <Link href="/" className="mb-15 md:mt-15 md:my-10">
             <Image
               width={210}
@@ -17,7 +17,7 @@ export default function Footer() {
               priority
             />
           </Link>
-          <div className="bg-[#6fd6e5] md:w-6/12 rounded-t-4xl h-50 px-4 pt-10 text-white text-center shadow-[0_-30px_0_0px_#1d546b]">
+          <div className="bg-[#6fd6e5] md:w-full rounded-t-4xl h-50  pt-10 text-white text-center shadow-[0_-30px_0_0px_#1d546b]">
             <p className="border-b border-gray-200 text-base pb-5">
               7 روز هفته ، 24 ساعت پاسخگوی شما هستیم
             </p>
@@ -25,10 +25,10 @@ export default function Footer() {
           </div>
         </div>
         {/* Right Column */}
-        <div className="lg:w-9/12 flex flex-col gap-6">
+        <div className="lg:w-10/12 flex flex-col gap-6">
           <div className="flex flex-col lg:flex-row justify-between border-b border-gray-100 pb-6 items-stretch gap-6 lg:gap-0">
             {/* Text */}
-            <div className="lg:w-10/12 p-4 flex flex-col justify-center">
+            <div className="lg:w-10/12 md:pl-4 flex flex-col justify-center">
               <p className="text-sm text-gray-600 text-start line-clamp-6">
                 لورم ایپسوم متن ساختگی بلکه روزنامه و مجله در ستون و سطرآنچنان
                 که لازم است، و برای شرایط فعلی تکنولوژی مورد نیاز، و کاربردهای
@@ -56,36 +56,33 @@ export default function Footer() {
               </Link>
             </div>
           </div>
-
           <div className="flex flex-col md:flex-row justify-between border-b border-gray-100 pb-4 gap-4 md:gap-0">
-            <div className="w-full md:w-4/12">
-              <div className="flex  md:flex-row gap-2">
-                <div className="bg-white p-2 rounded-xl md:ml-3 flex-shrink-0">
-                  <svg
-                    className="w-10 h-10"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 51.29 61.66"
-                  >
-                    <g>
-                      <path
-                        fill="#e2e2e2"
-                        d="M25.64,0C11.49.02.02,11.49,0,25.64c0,6.6,5.11,16.94,15.2,30.71,4.21,5.77,12.3,7.03,18.07,2.82,1.08-.79,2.03-1.74,2.82-2.82,10.08-13.78,15.2-24.11,15.2-30.71C51.27,11.49,39.8.02,25.64,0ZM25.64,35.86c-5.68,0-10.28-4.6-10.28-10.28s4.6-10.28,10.28-10.28,10.28,4.6,10.28,10.28-4.6,10.28-10.28,10.28Z"
-                      />
-                    </g>
-                  </svg>
+            <div className="flex  md:flex-row gap-2 w-full md:w-4/12">
+              <div className="bg-white p-2 rounded-xl md:ml-3 h-15 flex-shrink-0">
+                <svg
+                  className="w-10 h-10"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 51.29 61.66"
+                >
+                  <g>
+                    <path
+                      fill="#e2e2e2"
+                      d="M25.64,0C11.49.02.02,11.49,0,25.64c0,6.6,5.11,16.94,15.2,30.71,4.21,5.77,12.3,7.03,18.07,2.82,1.08-.79,2.03-1.74,2.82-2.82,10.08-13.78,15.2-24.11,15.2-30.71C51.27,11.49,39.8.02,25.64,0ZM25.64,35.86c-5.68,0-10.28-4.6-10.28-10.28s4.6-10.28,10.28-10.28,10.28,4.6,10.28,10.28-4.6,10.28-10.28,10.28Z"
+                    />
+                  </g>
+                </svg>
+              </div>
+              <div>
+                <div className="bg-[#1d546b] rounded-xl w-fit px-2">
+                  <span className="text-[11px] text-white">دفتر مرکزی</span>
                 </div>
-                <div>
-                  <div className="bg-[#1d546b] rounded-xl w-fit px-2">
-                    <span className="text-[11px] text-white">دفتر مرکزی</span>
-                  </div>
-                  <p className="text-[12px] text-gray-600">
-                    تهران - سوم متن ساختگی با تولید سادگی نامفهوم
-                  </p>
-                </div>
+                <p className="text-[12px] text-gray-600">
+                  تهران - سوم متن ساختگی با تولید سادگی نامفهوم
+                </p>
               </div>
             </div>
 
-            <div className="w-full md:w-2/12 text-start">
+            <div className="w-full md:w-3/12 text-start">
               <div className="flex  md:flex-row gap-2">
                 <div className="bg-white p-2 rounded-xl md:ml-3 flex-shrink-0">
                   <svg
@@ -111,16 +108,18 @@ export default function Footer() {
                   </svg>
                 </div>
                 <div>
-                <div className="bg-[#1d546b] rounded-xl w-fit px-2">
-                  <span className="text-[11px] text-white">ایمیل پشتیبانی</span>
-                </div>
-                <p className="text-sm text-gray-600">info@webofen.com </p>
+                  <div className="bg-[#1d546b] rounded-xl w-fit px-2">
+                    <span className="text-[11px] text-white">
+                      ایمیل پشتیبانی
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600">info@webofen.com </p>
                 </div>
               </div>
             </div>
-            <div className="w-full md:w-3/12 flex justify-center md:justify-start items-center flex-wrap gap-2">
+            <div className="w-full md:w-4/12 flex justify-center md:justify-end gap-11 items-center flex-wrap ">
               <svg
-                className="w-10 h-10 m-2 md:mr-6 bg-white rounded-xl p-2"
+                className="w-10 h-10 bg-white rounded-xl p-2"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 34.01 34.01"
               >
@@ -136,7 +135,7 @@ export default function Footer() {
                 </g>
               </svg>
               <svg
-                className="w-10 h-10 m-2 bg-white rounded-xl p-2"
+                className="w-10 h-10 bg-white rounded-xl p-2"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 34 34"
               >
@@ -148,7 +147,7 @@ export default function Footer() {
                 </g>
               </svg>
               <svg
-                className="w-10 h-10 m-2 bg-white rounded-xl p-2"
+                className="w-10 h-10 bg-white rounded-xl p-2"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 34 34"
               >
@@ -168,7 +167,7 @@ export default function Footer() {
                 </g>
               </svg>
               <svg
-                className="w-10 h-10 m-2 bg-white rounded-xl p-2"
+                className="w-10 h-10 bg-white rounded-xl p-2"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 33.97 34"
               >
