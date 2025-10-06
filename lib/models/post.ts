@@ -7,8 +7,10 @@ export type Post = {
     imageAlt?: string;
     description?: string;
     createdAt?: string;
+    updatedAt?: string; // اضافه شد
     category?: { id: string; title: string };
-    tags?: { name: string }[];
+    tags?: { name: string }[]; // حتماً اینجا مشخص باشه
+    author?: { name: string }; // اضافه شد
     ratings?: { value: number }[];
     _ratingsMeta?: { count: number };
     modifiedContent?: string;

@@ -100,16 +100,22 @@ export default function PostPage({ post }: Props) {
 
   return (
     <>
-      <SEO
-        title={post.title}
-        keywords={
-          post?.tags
-            ? post.tags.map((tag: { name: string }) => tag.name).join(", ")
-            : ""
-        }
-        description={post.description}
-        canonical={`https://example.com/article/${post.slug}`}
-      />
+ <SEO
+  title={post?.title || ""}
+  description={post?.description || ""}
+  keywords={post?.tags ? post.tags.map((t) => t.name).join(", ") : ""}
+  canonical={typeof window !== "undefined" ? window.location.href : ""}
+  ogImage={post?.imageUrl || ""}
+  ogType="article"
+  publishedTime={post?.createdAt || ""}
+  modifiedTime={post?.updatedAt || post?.createdAt || ""}
+  section={post?.category?.title || ""}
+  tags={post?.tags ? post.tags.map((t) => t.name) : []}
+  author={post?.author?.name || ""}
+/>
+
+
+
 
       <main className="w-[1250px] mx-auto p-4 relative articles">
         {/*Background Section */}
