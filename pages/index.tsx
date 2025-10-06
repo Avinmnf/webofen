@@ -22,11 +22,7 @@ const organizationSchema = {
       "name": "دکتر مجتبی خداخواه"
     }
   ],
-  "address": {
-    "@type": "PostalAddress",
-    "addressCountry": "IR",
-    "addressLocality": "Tehran"
-  },
+ 
   "contactPoint": {
     "@type": "ContactPoint",
     "telephone": "+98-21-5527334",
