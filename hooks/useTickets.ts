@@ -46,6 +46,7 @@ export function useTickets() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(ticketData),
+      credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to create ticket");
     await fetchTickets();
@@ -56,6 +57,7 @@ export function useTickets() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ content }),
+      credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to create reply");
     const data = await res.json();
