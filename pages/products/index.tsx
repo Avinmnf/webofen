@@ -7,10 +7,11 @@ import GuidanceForm from "@/components/GuidanceForm";
 import HoverVideo from "@/components/videos/hovervideos";
 import Pills from "@/components/pills";
 import { useProducts } from "@/hooks/useproduct";
+import SEO from "@/components/seo";
 
 export default function ProductList() {
   const [page, setPage] = useState(1);
-    const [activeDiv, setActiveDiv] = useState<string | null>("first");
+  const [activeDiv, setActiveDiv] = useState<string | null>("first");
   const [activeIndex, setActiveIndex] = useState<number | null>(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [limit] = useState(10);
@@ -25,6 +26,7 @@ export default function ProductList() {
     sort,
     order,
   });
+
   // Refs for each section
   const firstRef = useRef<HTMLDivElement | null>(null);
   const secondRef = useRef<HTMLDivElement | null>(null);
@@ -40,6 +42,95 @@ export default function ProductList() {
     if (divName === "third") ref = thirdRef;
 
     ref?.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  // متادیتاهای داینامیک بر اساس محتوای صفحه
+  const getDynamicMetaData = () => {
+    const baseTitle = "داروخانه سئو وبوفن";
+    const baseDescription = "درمان تخصصی مشکلات سئو سایت با قرص‌های تخصصی وبوفن";
+    
+    // اگر محصولات وجود دارند، اطلاعات را از آنها بگیر
+    let dynamicTitle = baseTitle;
+    let dynamicDescription = baseDescription;
+    let keywords = "سئو سایت, قرص سئو, داروخانه سئو, بهینه سازی سایت, سئو داخلی, سئو خارجی, سئو فنی, وبوفن";
+
+    if (products && products.length > 0) {
+      const productCount = products.length;
+      const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
+      
+      dynamicTitle = `${baseTitle} - ${productCount} محصول تخصصی سئو`;
+      dynamicDescription = `${baseDescription} ✓ ${productCount} محصول تخصصی ✓ آنالیز رایگان ✓ مشاوره تخصصی`;
+      
+      if (categories.length > 0) {
+        keywords += `, ${categories.join(', ')}`;
+      }
+    }
+
+    return {
+      title: dynamicTitle,
+      description: dynamicDescription,
+      keywords: keywords
+    };
+  };
+
+  // ساخت structured data داینامیک مخصوص صفحه محصولات
+  const generateDynamicStructuredData = () => {
+    const meta = getDynamicMetaData();
+    
+    const baseStructuredData = {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": meta.title,
+      "description": meta.description,
+      "url": `${process.env.NEXT_PUBLIC_SITE_URL}/products`,
+      "publisher": {
+        "@type": "Organization",
+        "name": "وبوفن",
+        "logo": {
+          "@type": "ImageObject",
+          "url": `${process.env.NEXT_PUBLIC_SITE_URL}/logo.png`
+        }
+      },
+      "inLanguage": "fa-IR"
+    };
+
+    // اگر محصولات وجود دارند، لیست محصولات را اضافه کن
+    if (products && products.length > 0) {
+      return {
+        ...baseStructuredData,
+        "@type": ["WebPage", "ItemList"],
+        "mainEntity": {
+          "@type": "ItemList",
+          "numberOfItems": products.length,
+          "itemListElement": products.slice(0, 10).map((product: any, index: number) => ({
+            "@type": "ListItem",
+            "position": index + 1,
+            "item": {
+              "@type": "Product",
+              "name": product.title || product.name,
+              "description": product.description || `محصول تخصصی سئو از داروخانه وبوفن - ${product.title}`,
+              "image": product.imageUrl || `${NEXT_PUBLIC_CMS_URL}${product.image?.url}`,
+              "url": `${process.env.NEXT_PUBLIC_SITE_URL}/products/${product.slug}`,
+              "category": product.category || "خدمات سئو و بهینه‌سازی سایت",
+              "offers": {
+                "@type": "Offer",
+                "priceCurrency": "IRR",
+                "price": product.price || 0,
+                "availability": product.stock > 0 ? 
+                  "https://schema.org/InStock" : 
+                  "https://schema.org/OutOfStock",
+                "seller": {
+                  "@type": "Organization",
+                  "name": "وبوفن"
+                }
+              }
+            }
+          }))
+        }
+      };
+    }
+
+    return baseStructuredData;
   };
 
   const faqs = [
@@ -69,7 +160,7 @@ export default function ProductList() {
     },
     {
       id: 5,
-      question: "چطور می‌ توانم با پشتیبانی تماس بگیرم؟",
+      question: "چطور می‌ توانم با پشتیبانی تماس بگیرم？",
       answer:
         "می‌ توانید از طریق بخش تماس با ما، ایمیل یا شماره تلفن پشتیبانی با ما در ارتباط باشید.",
     },
@@ -78,20 +169,40 @@ export default function ProductList() {
   const toggleFAQ = (index: number) => {
     setActiveIndex(activeIndex === index ? null : index);
   };
+
+  // گرفتن متادیتاهای داینامیک
+  const dynamicMeta = getDynamicMetaData();
+  
   return (
     <main>
+      {/* کامپوننت SEO با داده‌های داینامیک */}
+      <SEO
+        title={dynamicMeta.title}
+        description={dynamicMeta.description}
+        keywords={dynamicMeta.keywords}
+        canonical="/products"
+        ogType="website"
+        ogImage="/images/products-og.jpg"
+        twitterCard="summary_large_image"
+        noindex={false}
+        nofollow={false}
+        author="وبوفن"
+        locale="fa_IR"
+        structuredData={generateDynamicStructuredData()}
+      />
+      
       <div className="max-w-[1250px] m-auto p-4">
         <div className="relative w-full aspect-[3/1] md:aspect-[12/2] mt-10 md:rounded-lg overflow-hidden flex items-start">
           <Image
             src="/guidance/pharmacy-banner-main.webp"
-            alt="Main slide"
+            alt="داروخانه سئو وبوفن - درمان تخصصی مشکلات سئو"
             fill
             className="object-contain md:block hidden"
             priority
           />
           <Image
             src="/guidance/pharmacy-banner.webp"
-            alt="Main slide"
+            alt="داروخانه سئو وبوفن - محصولات تخصصی سئو"
             fill
             className="object-contain md:hidden block rounded-3xl"
             priority
@@ -104,7 +215,7 @@ export default function ProductList() {
               <div className="relative w-full aspect-[16/14] rounded-lg overflow-hidden flex items-start">
                 <Image
                   src="/homepage/peopleAsset 7.png"
-                  alt="Main slide"
+                  alt="متخصصان سئو وبوفن - مشاوره تخصصی سئو"
                   fill
                   className="object-contain"
                   priority
