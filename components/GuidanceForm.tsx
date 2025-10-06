@@ -19,7 +19,7 @@ export default function GuidanceForm() {
       title: "درخواست مشاوره رایگان",
       fields: [
         { label: "نام", type: "textarea", content: name || "" },
-        { label: "شماره تماس", type: "textarea", content: phone || "" },
+        { label: "تلفن همراه", type: "text", content: phone || "" },
         { label: "پیام", type: "textarea", content: message || "" },
       ],
     };
@@ -55,7 +55,7 @@ export default function GuidanceForm() {
       />
       <input
         className="w-full border border-gray-200 py-2 rounded-md px-1 text-gray-500 mb-4"
-        placeholder="شماره تماس"
+        placeholder="تلفن همراه"
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
       />
