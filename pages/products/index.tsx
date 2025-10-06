@@ -74,9 +74,27 @@ export default function ProductList() {
   };
 
   // ساخت structured data داینامیک مخصوص صفحه محصولات
+// ساخت structured data داینامیک مخصوص صفحه محصولات
 const generateDynamicStructuredData = () => {
   const meta = getDynamicMetaData();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://webofen.com";
+
+  // 📍 فقط یک ItemList Schema ساده برای کاروسل
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "لیست محصولات سئو وبوفن",
+    "description": "محصولات تخصصی سئو و بهینه‌سازی سایت",
+    "url": `${siteUrl}/products`,
+    "numberOfItems": products?.length || 0,
+    "itemListElement": products?.slice(0, 10).map((product: any, index: number) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "name": product.title || "محصول سئو", // ✅ اینجا مشکل Unnamed item حل می‌شود
+      "url": `${siteUrl}/products/${product.slug || ""}`,
+      "image": product.imageUrl?.replace('.mp4', '.jpg') || `${siteUrl}/images/default-product.jpg`, // ✅ تصویر باید JPG/PNG باشه نه MP4
+    })) || [],
+  };
 
   // 📍 Breadcrumb Schema
   const breadcrumbSchema = {
@@ -98,44 +116,7 @@ const generateDynamicStructuredData = () => {
     ],
   };
 
-  // 📍 Base WebPage Schema
-  const baseStructuredData = {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": meta.title,
-    "description": meta.description,
-    "url": `${siteUrl}/products`,
-    "publisher": {
-      "@type": "Organization",
-      "name": "وبوفن",
-      "logo": {
-        "@type": "ImageObject",
-        "url": `${siteUrl}/logo.png`,
-      },
-    },
-    "inLanguage": "fa-IR",
-  };
-
-  // 📍 اضافه کردن لیست محصولات در صورت وجود
-  if (products && products.length > 0) {
-    const productListSchema = {
-      "@context": "https://schema.org",
-      "@type": "ItemList",
-      "name": "لیست محصولات سئو وبوفن",
-      "description": "محصولات تخصصی سئو و بهینه‌سازی سایت",
-      "url": `${siteUrl}/products`,
-      "numberOfItems": products.length,
-      "itemListElement": products.slice(0, 10).map((product: any, index: number) => ({
-        "@type": "ListItem",
-        "position": index + 1,
-        "item": generateProductSchema(product),
-      })),
-    };
-
-    return [breadcrumbSchema, baseStructuredData, productListSchema];
-  }
-
-  return [breadcrumbSchema, baseStructuredData];
+  return [breadcrumbSchema, itemListSchema];
 };
 
   // تابع برای ایجاد اسکیما هر محصول
@@ -147,98 +128,95 @@ const generateProductSchema = (product: any) => {
   const priceValidUntil = new Date();
   priceValidUntil.setFullYear(priceValidUntil.getFullYear() + 1);
 
+  // ✅ اصلاح تصویر - حذف ویدیوها
+  const getProductImage = () => {
+    if (!product.imageUrl) return `${siteUrl}/images/default-product.jpg`;
+    if (product.imageUrl.includes('.mp4')) {
+      // اگر ویدیو است، از تصویر جایگزین استفاده کن
+      return `${siteUrl}/images/default-product.jpg`;
+    }
+    return product.imageUrl;
+  };
+
+  // ✅ بررسی قیمت معتبر
+  const productPrice = product.variants?.[0]?.price;
+  const isValidPrice = productPrice && productPrice > 0;
+
   const productSchema: any = {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": product.title || "محصول سئو",
     "description": product.description || "توضیحات محصول سئو وبوفن",
-    "image": product.imageUrl || `${siteUrl}/images/default-product.jpg`,
+    "image": getProductImage(), // ✅ تصویر اصلاح شده
     "url": productUrl,
-    "sku": product.sku || product.id || "UNKNOWN",
+    "sku": product.sku || product.id || `product-${product.id}`,
     "category": product.category?.title || "خدمات سئو",
     "brand": {
       "@type": "Brand",
       "name": product.brand || "وبوفن",
     },
-    "offers": {
+  };
+
+  // ✅ فقط اگر قیمت معتبر وجود دارد، offers را اضافه کن
+  if (isValidPrice) {
+    productSchema.offers = {
       "@type": "Offer",
       "priceCurrency": "IRR",
-      "price": product.variants?.[0]?.price || 0,
+      "price": productPrice,
       "priceValidUntil": priceValidUntil.toISOString(),
-      "availability":
-        product.variants?.[0]?.stock > 0
-          ? "https://schema.org/InStock"
-          : "https://schema.org/OutOfStock",
+      "availability": product.variants?.[0]?.stock > 0
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
       "seller": {
         "@type": "Organization",
         "name": "وبوفن",
       },
       "url": productUrl,
-    },
-  };
+    };
+  }
 
-  // ✅ اضافه کردن رتبه‌بندی و نظرات (حتی اگر داده نباشد)
+  // ✅ فقط اگر نظرات واقعی وجود دارد، aggregateRating و review اضافه کن
   if (product.ratings && product.ratings.length > 0) {
     const ratings = product.ratings;
     const totalRating = ratings.reduce((sum: number, rating: any) => sum + rating.value, 0);
     const averageRating = totalRating / ratings.length;
     const reviewCount = ratings.length;
 
-    productSchema.aggregateRating = {
-      "@type": "AggregateRating",
-      "ratingValue": averageRating.toFixed(1),
-      "bestRating": "5",
-      "worstRating": "1",
-      "ratingCount": reviewCount,
-      "reviewCount": reviewCount,
-    };
-
-    productSchema.review = ratings.map((rating: any, index: number) => ({
-      "@type": "Review",
-      "author": {
-        "@type": "Person",
-        "name": rating.author || "کاربر وبوفن",
-      },
-      "datePublished": rating.createdAt || new Date().toISOString(),
-      "reviewBody": rating.comment || `نظر درباره ${product.title}`,
-      "name": `نظر ${index + 1} درباره ${product.title}`,
-      "reviewRating": {
-        "@type": "Rating",
-        "ratingValue": rating.value,
+    // فقط اگر حداقل یک نظر واقعی وجود دارد
+    if (reviewCount > 0) {
+      productSchema.aggregateRating = {
+        "@type": "AggregateRating",
+        "ratingValue": averageRating.toFixed(1),
         "bestRating": "5",
         "worstRating": "1",
-      },
-    }));
-  } else {
-    // ⚙️ اگر هیچ نظری وجود ندارد، فیلدهای پایه را برای سازگاری اضافه می‌کنیم
-    productSchema.aggregateRating = {
-      "@type": "AggregateRating",
-      "ratingValue": "5.0",
-      "bestRating": "5",
-      "worstRating": "1",
-      "ratingCount": 1,
-      "reviewCount": 1,
-    };
-    productSchema.review = [
-      {
+        "ratingCount": reviewCount,
+        "reviewCount": reviewCount,
+      };
+
+      productSchema.review = ratings.map((rating: any, index: number) => ({
         "@type": "Review",
-        "author": { "@type": "Person", "name": "مشتری وبوفن" },
-        "datePublished": new Date().toISOString(),
-        "reviewBody": `بازخورد اولیه درباره ${product.title || "محصول وبوفن"}`,
-        "name": `نظر اولیه درباره ${product.title || "محصول"}`,
+        "author": {
+          "@type": "Person",
+          "name": rating.author || "کاربر وبوفن",
+        },
+        "datePublished": rating.createdAt || new Date().toISOString(),
+        "reviewBody": rating.comment || `نظر درباره ${product.title}`,
+        "name": `نظر درباره ${product.title}`,
         "reviewRating": {
           "@type": "Rating",
-          "ratingValue": "5",
+          "ratingValue": rating.value,
           "bestRating": "5",
           "worstRating": "1",
         },
-      },
-    ];
+      }));
+    }
   }
+
+  // ❌ حذف کامل بخش نظرات جعلی
+  // هیچگاه نظرات و رتبه‌بندی ساختگی اضافه نکنید
 
   return productSchema;
 };
-
   const faqs = [
     {
       id: 1,

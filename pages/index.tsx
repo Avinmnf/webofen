@@ -29,7 +29,7 @@ const organizationSchema = {
   },
   "contactPoint": {
     "@type": "ContactPoint",
-    "telephone": "+98-21-XXXXXXX",
+    "telephone": "+98-21-5527334",
     "contactType": "customer service",
     "areaServed": "IR"
   },

@@ -27,7 +27,8 @@ function generateArticleSchema(posts: Post[]) {
     "image": post.imageUrl ? `${post.imageUrl}` : "https://webofen.com/images/og-blog.jpg",
     "author": {
       "@type": "Organization",
-      "name": "وبوفن"
+      "name": "وبوفن",
+      "url": "siteUrl" 
     },
     "publisher": {
       "@type": "Organization",
