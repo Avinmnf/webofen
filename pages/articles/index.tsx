@@ -13,43 +13,49 @@ type PostsPageProps = {
   initialPage?: number;
 };
 
+const SITE_URL = "https://webofen.com";
+
 function isRecommended(post: Post) {
   return post.tags?.some((tag) => tag.name === "پیشنهاد ما");
 }
 
+function normalizeImageUrl(url?: string): string {
+  if (!url) return `${SITE_URL}/images/og-blog.jpg`;
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  if (url.startsWith("/")) return `${SITE_URL}${url}`;
+  return `${SITE_URL}/${url}`;
+}
 // تابع برای ایجاد اسکیما مقالات
 function generateArticleSchema(posts: Post[]) {
-  const articleSchemas = posts.map((post, index) => ({
+  return posts.map((post) => ({
     "@context": "https://schema.org",
     "@type": "Article",
     "headline": post.title,
     "description": post.description,
-    "image": "imageUrl",
+    "image": normalizeImageUrl(post.imageUrl),
     "author": {
       "@type": "Organization",
       "name": "webofen",
-      "url": "siteUrl" 
+      "url": SITE_URL, // ✅ اصلاح شده
     },
     "publisher": {
       "@type": "Organization",
       "name": "webofen",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://webofen.com/logo.png"
-      }
+        "url": `${SITE_URL}/logo.png`,
+      },
     },
     "datePublished": post.createdAt,
-    "dateModified": post.createdAt, // استفاده از createdAt به جای updatedAt
+    "dateModified": post.createdAt,
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://webofen.com/articles/${post.slug}`
+      "@id": `${SITE_URL}/articles/${post.slug}`,
     },
     "articleSection": post.category?.title || "دیجیتال مارکتینگ",
-    "wordCount": 0, // مقدار پیش‌فرض
-    "timeRequired": `PT${post.readtime || 5}M` // مقدار پیش‌فرض 5 دقیقه
+    "wordCount": post.content ? post.content.split(/\s+/).length : 0,
+    "timeRequired": `PT${post.readtime || 5}M`,
   }));
-
-  return articleSchemas;
 }
 
 // اسکیما برای صفحه مقالات
@@ -170,13 +176,15 @@ export default function PostsPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPageSchema) }}
       />
       
-      {articleSchemas.map((schema, index) => (
-        <script
-          key={index}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-        />
-      ))}
+    {/* ✅ اسکیما برای هر مقاله به‌صورت جداگانه */}
+{articleSchemas.map((schema, index) => (
+  <script
+    key={index}
+    type="application/ld+json"
+    dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+  />
+))}
+
       
     <main className="bg-[#f7f8fc] pb-10">
       <div className="w-full pt-10">
