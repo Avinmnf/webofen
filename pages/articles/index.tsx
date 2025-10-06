@@ -6,6 +6,7 @@ import { fetchPosts } from "@/lib/posts";
 import { Post, PostWithViews } from "@/lib/models/postlist";
 import { useRouter } from "next/router";
 import SEO from "@/components/seo";
+
 type PostsPageProps = {
   initialPosts: Post[];
   total: number;
@@ -13,7 +14,68 @@ type PostsPageProps = {
 };
 
 function isRecommended(post: Post) {
-  return post.tags.some((tag) => tag.name === "پیشنهاد ما");
+  return post.tags?.some((tag) => tag.name === "پیشنهاد ما");
+}
+
+// تابع برای ایجاد اسکیما مقالات
+function generateArticleSchema(posts: Post[]) {
+  const articleSchemas = posts.map((post, index) => ({
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": post.title,
+    "description": post.description,
+    "image": post.imageUrl ? `${post.imageUrl}` : "https://webofen.com/images/og-blog.jpg",
+    "author": {
+      "@type": "Organization",
+      "name": "وبوفن"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "وبوفن",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://webofen.com/logo.png"
+      }
+    },
+    "datePublished": post.createdAt,
+    "dateModified": post.createdAt, // استفاده از createdAt به جای updatedAt
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://webofen.com/articles/${post.slug}`
+    },
+    "articleSection": post.category?.title || "دیجیتال مارکتینگ",
+    "wordCount": 0, // مقدار پیش‌فرض
+    "timeRequired": `PT${post.readtime || 5}M` // مقدار پیش‌فرض 5 دقیقه
+  }));
+
+  return articleSchemas;
+}
+
+// اسکیما برای صفحه مقالات
+function generateBlogPageSchema(posts: Post[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "مقالات وبوفن",
+    "description": "آخرین مقالات وبوفن درباره دیجیتال مارکتینگ، کسب درآمد آنلاین و آموزش‌های کاربردی",
+    "url": "https://webofen.com/articles",
+    "publisher": {
+      "@type": "Organization",
+      "name": "وبوفن",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://webofen.com/logo.png"
+      }
+    },
+    "blogPost": posts.slice(0, 10).map(post => ({
+      "@type": "BlogPosting",
+      "headline": post.title,
+      "description": post.description,
+      "url": `https://webofen.com/articles/${post.slug}`,
+      "datePublished": post.createdAt,
+      "dateModified": post.createdAt // استفاده از createdAt به جای updatedAt
+    }))
+  };
 }
 
 export default function PostsPage({
@@ -27,6 +89,10 @@ export default function PostsPage({
   const [page, setPage] = useState(initialPage);
   const [hasMore, setHasMore] = useState(initialPosts.length < total);
   const limit = 10;
+
+  // تولید اسکیما برای مقالات و صفحه بلاگ
+  const articleSchemas = generateArticleSchema(posts);
+  const blogPageSchema = generateBlogPageSchema(posts);
 
   const socialCards = [
     {
@@ -88,15 +154,28 @@ export default function PostsPage({
 
   return (
     <>
-        <SEO
+      <SEO
         title="مقالات وبوفن | بلاگ وبوفن"
         description="آخرین مقالات وبوفن درباره دیجیتال مارکتینگ، کسب درآمد آنلاین و آموزش‌های کاربردی."
         keywords="مقالات وبوفن, بلاگ, آموزش دیجیتال مارکتینگ, کسب درآمد آنلاین"
         canonical="https://webofen.com/articles"
         ogType="website"
         ogImage="https://webofen.com/images/og-blog.jpg"
-        
       />
+      
+      {/* اسکیماهای JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPageSchema) }}
+      />
+      
+      {articleSchemas.map((schema, index) => (
+        <script
+          key={index}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      ))}
       
     <main className="bg-[#f7f8fc] pb-10">
       <div className="w-full pt-10">
@@ -152,7 +231,7 @@ export default function PostsPage({
                                 viewBox="0 0 20 20"
                                 xmlns="http://www.w3.org/2000/svg"
                               >
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.954a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.953c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.539-1.118l1.286-3.953a1 1 0 00-.364-1.118L2.073 9.38c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.950-.69l1.286-3.954z" />
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.954a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.953c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37-2.448c-.784.57-1.838-.197-1.539-1.118l1.286-3.953a1 1 0 00-.364-1.118L2.073 9.38c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.950-.69l1.286-3.954z" />
                               </svg>
 
                               {/* Tooltip */}
@@ -218,7 +297,7 @@ export default function PostsPage({
                       width={150}
                       height={100}
                       src="/blog/blog-digital-marketing-icon.jpg"
-                      alt="social"
+                      alt="آموزش دیجیتال مارکتینگ و کسب درآمد آنلاین"
                     />
                   </div>
                 </div>
@@ -228,7 +307,7 @@ export default function PostsPage({
                     <div>
                       <p className="text-lg text-gray-600">آموزش</p>
                       <p className="text-xl text-gray-700 font-semibold">
-                        کسب درآمد آنلاین
+                        سئو و بهینه‌سازی
                       </p>
                     </div>
                   </div>
@@ -237,7 +316,7 @@ export default function PostsPage({
                       width={150}
                       height={100}
                       src="/blog/blog-seo-icon.jpg"
-                      alt="social"
+                      alt="آموزش سئو و بهینه‌سازی سایت"
                     />
                   </div>
                 </div>
@@ -246,7 +325,7 @@ export default function PostsPage({
                     <div>
                       <p className="text-lg text-gray-600">آموزش</p>
                       <p className="text-xl text-gray-700 font-semibold">
-                        کسب درآمد آنلاین
+                        تولید محتوا
                       </p>
                     </div>
                   </div>
@@ -255,7 +334,7 @@ export default function PostsPage({
                       width={150}
                       height={100}
                       src="/blog/blog-content-icon.jpg"
-                      alt="social"
+                      alt="آموزش تولید محتوا حرفه‌ای"
                     />
                   </div>
                 </div>
@@ -444,7 +523,7 @@ export default function PostsPage({
                                   viewBox="0 0 20 20"
                                   xmlns="http://www.w3.org/2000/svg"
                                 >
-                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.954a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.953c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.539-1.118l1.286-3.953a1 1 0 00-.364-1.118L2.073 9.38c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.954z" />
+                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.954a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.953c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37-2.448c-.784.57-1.838-.197-1.539-1.118l1.286-3.953a1 1 0 00-.364-1.118L2.073 9.38c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.954z" />
                                 </svg>
 
                                 {/* Tooltip */}

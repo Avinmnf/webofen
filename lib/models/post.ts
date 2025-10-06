@@ -7,13 +7,14 @@ export type Post = {
     imageAlt?: string;
     description?: string;
     createdAt?: string;
-    updatedAt?: string; // اضافه شد
     category?: { id: string; title: string };
-    tags?: { name: string }[]; // حتماً اینجا مشخص باشه
-    author?: { name: string }; // اضافه شد
+    tags?: { name: string }[];
+    author?: { name: string };
     ratings?: { value: number }[];
     _ratingsMeta?: { count: number };
     modifiedContent?: string;
     toc?: TOCItem[];
+    updatedAt?:string;
+    wordCount?:string;
 };
 type TOCItem = { id: string; text: string; tag: string; level: number };

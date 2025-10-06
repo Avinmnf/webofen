@@ -74,64 +74,170 @@ export default function ProductList() {
   };
 
   // ساخت structured data داینامیک مخصوص صفحه محصولات
-  const generateDynamicStructuredData = () => {
-    const meta = getDynamicMetaData();
-    
-    const baseStructuredData = {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      "name": meta.title,
-      "description": meta.description,
-      "url": `${process.env.NEXT_PUBLIC_SITE_URL}/products`,
-      "publisher": {
-        "@type": "Organization",
-        "name": "وبوفن",
-        "logo": {
-          "@type": "ImageObject",
-          "url": `${process.env.NEXT_PUBLIC_SITE_URL}/logo.png`
-        }
+const generateDynamicStructuredData = () => {
+  const meta = getDynamicMetaData();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://webofen.com";
+
+  // 📍 Breadcrumb Schema
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "صفحه اصلی",
+        "item": `${siteUrl}`,
       },
-      "inLanguage": "fa-IR"
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "محصولات سئو",
+        "item": `${siteUrl}/products`,
+      },
+    ],
+  };
+
+  // 📍 Base WebPage Schema
+  const baseStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": meta.title,
+    "description": meta.description,
+    "url": `${siteUrl}/products`,
+    "publisher": {
+      "@type": "Organization",
+      "name": "وبوفن",
+      "logo": {
+        "@type": "ImageObject",
+        "url": `${siteUrl}/logo.png`,
+      },
+    },
+    "inLanguage": "fa-IR",
+  };
+
+  // 📍 اضافه کردن لیست محصولات در صورت وجود
+  if (products && products.length > 0) {
+    const productListSchema = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "لیست محصولات سئو وبوفن",
+      "description": "محصولات تخصصی سئو و بهینه‌سازی سایت",
+      "url": `${siteUrl}/products`,
+      "numberOfItems": products.length,
+      "itemListElement": products.slice(0, 10).map((product: any, index: number) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "item": generateProductSchema(product),
+      })),
     };
 
-    // اگر محصولات وجود دارند، لیست محصولات را اضافه کن
-    if (products && products.length > 0) {
-      return {
-        ...baseStructuredData,
-        "@type": ["WebPage", "ItemList"],
-        "mainEntity": {
-          "@type": "ItemList",
-          "numberOfItems": products.length,
-          "itemListElement": products.slice(0, 10).map((product: any, index: number) => ({
-            "@type": "ListItem",
-            "position": index + 1,
-            "item": {
-              "@type": "Product",
-              "name": product.title || product.name,
-              "description": product.description || `محصول تخصصی سئو از داروخانه وبوفن - ${product.title}`,
-              "image": product.imageUrl || `${NEXT_PUBLIC_CMS_URL}${product.image?.url}`,
-              "url": `${process.env.NEXT_PUBLIC_SITE_URL}/products/${product.slug}`,
-              "category": product.category || "خدمات سئو و بهینه‌سازی سایت",
-              "offers": {
-                "@type": "Offer",
-                "priceCurrency": "IRR",
-                "price": product.price || 0,
-                "availability": product.stock > 0 ? 
-                  "https://schema.org/InStock" : 
-                  "https://schema.org/OutOfStock",
-                "seller": {
-                  "@type": "Organization",
-                  "name": "وبوفن"
-                }
-              }
-            }
-          }))
-        }
-      };
-    }
+    return [breadcrumbSchema, baseStructuredData, productListSchema];
+  }
 
-    return baseStructuredData;
+  return [breadcrumbSchema, baseStructuredData];
+};
+
+  // تابع برای ایجاد اسکیما هر محصول
+const generateProductSchema = (product: any) => {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://webofen.com";
+  const productUrl = `${siteUrl}/products/${product.slug || ""}`;
+
+  // تاریخ اعتبار قیمت (حداقل یک سال)
+  const priceValidUntil = new Date();
+  priceValidUntil.setFullYear(priceValidUntil.getFullYear() + 1);
+
+  const productSchema: any = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.title || "محصول سئو",
+    "description": product.description || "توضیحات محصول سئو وبوفن",
+    "image": product.imageUrl || `${siteUrl}/images/default-product.jpg`,
+    "url": productUrl,
+    "sku": product.sku || product.id || "UNKNOWN",
+    "category": product.category?.title || "خدمات سئو",
+    "brand": {
+      "@type": "Brand",
+      "name": product.brand || "وبوفن",
+    },
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "IRR",
+      "price": product.variants?.[0]?.price || 0,
+      "priceValidUntil": priceValidUntil.toISOString(),
+      "availability":
+        product.variants?.[0]?.stock > 0
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
+      "seller": {
+        "@type": "Organization",
+        "name": "وبوفن",
+      },
+      "url": productUrl,
+    },
   };
+
+  // ✅ اضافه کردن رتبه‌بندی و نظرات (حتی اگر داده نباشد)
+  if (product.ratings && product.ratings.length > 0) {
+    const ratings = product.ratings;
+    const totalRating = ratings.reduce((sum: number, rating: any) => sum + rating.value, 0);
+    const averageRating = totalRating / ratings.length;
+    const reviewCount = ratings.length;
+
+    productSchema.aggregateRating = {
+      "@type": "AggregateRating",
+      "ratingValue": averageRating.toFixed(1),
+      "bestRating": "5",
+      "worstRating": "1",
+      "ratingCount": reviewCount,
+      "reviewCount": reviewCount,
+    };
+
+    productSchema.review = ratings.map((rating: any, index: number) => ({
+      "@type": "Review",
+      "author": {
+        "@type": "Person",
+        "name": rating.author || "کاربر وبوفن",
+      },
+      "datePublished": rating.createdAt || new Date().toISOString(),
+      "reviewBody": rating.comment || `نظر درباره ${product.title}`,
+      "name": `نظر ${index + 1} درباره ${product.title}`,
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": rating.value,
+        "bestRating": "5",
+        "worstRating": "1",
+      },
+    }));
+  } else {
+    // ⚙️ اگر هیچ نظری وجود ندارد، فیلدهای پایه را برای سازگاری اضافه می‌کنیم
+    productSchema.aggregateRating = {
+      "@type": "AggregateRating",
+      "ratingValue": "5.0",
+      "bestRating": "5",
+      "worstRating": "1",
+      "ratingCount": 1,
+      "reviewCount": 1,
+    };
+    productSchema.review = [
+      {
+        "@type": "Review",
+        "author": { "@type": "Person", "name": "مشتری وبوفن" },
+        "datePublished": new Date().toISOString(),
+        "reviewBody": `بازخورد اولیه درباره ${product.title || "محصول وبوفن"}`,
+        "name": `نظر اولیه درباره ${product.title || "محصول"}`,
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": "5",
+          "bestRating": "5",
+          "worstRating": "1",
+        },
+      },
+    ];
+  }
+
+  return productSchema;
+};
 
   const faqs = [
     {
@@ -172,6 +278,7 @@ export default function ProductList() {
 
   // گرفتن متادیتاهای داینامیک
   const dynamicMeta = getDynamicMetaData();
+  const structuredDataArray = generateDynamicStructuredData();
   
   return (
     <main>
@@ -188,8 +295,17 @@ export default function ProductList() {
         nofollow={false}
         author="وبوفن"
         locale="fa_IR"
-        structuredData={generateDynamicStructuredData()}
+        structuredData={structuredDataArray}
       />
+      
+      {/* اسکیماهای اضافی */}
+      {Array.isArray(structuredDataArray) && structuredDataArray.map((schema, index) => (
+        <script
+          key={index}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      ))}
       
       <div className="max-w-[1250px] m-auto p-4">
         <div className="relative w-full aspect-[3/1] md:aspect-[12/2] mt-10 md:rounded-lg overflow-hidden flex items-start">

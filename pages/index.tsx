@@ -5,8 +5,98 @@ import Pathsection from "@/components/pathsection";
 import Commentsabtus from "@/components/commentsabtus";
 import Reservetime from "@/components/reservetime";
 import FreeConsultationForm from "@/components/FreeConsultationForm";
+import SEO from "@/components/seo";
+
+// اسکیما Organization برای وبوفن
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "وبوفن - کلینیک تخصصی سئو",
+  "description": "اولین کلینیک تخصصی سئو با ارائه بسته‌های درمانی ماژولار برای وبسایت‌ها",
+  "url": "https://webofen.com",
+  "logo": "https://webofen.com/images/logo.png",
+  "foundingDate": "2023",
+  "founders": [
+    {
+      "@type": "Person",
+      "name": "دکتر مجتبی خداخواه"
+    }
+  ],
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "IR",
+    "addressLocality": "Tehran"
+  },
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+98-21-XXXXXXX",
+    "contactType": "customer service",
+    "areaServed": "IR"
+  },
+  "sameAs": [
+    "https://instagram.com/webofen",
+    "https://t.me/webofen"
+  ],
+  "areaServed": {
+    "@type": "Country",
+    "name": "Iran"
+  }
+};
+
+// اسکیما Breadcrumb برای صفحه اصلی
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "صفحه اصلی",
+      "item": "https://webofen.com"
+    }
+  ]
+};
+
+// اسکیما WebSite
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "وبوفن",
+  "description": "کلینیک تخصصی سئو و دیجیتال مارکتینگ",
+  "url": "https://webofen.com",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://webofen.com/search?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+};
+
 export default function Home() {
   return (
+    <>
+      <SEO
+        title="وبوفن | اولین کلینیک تخصصی سئو در ایران"
+        description="وبوفن - کلینیک تخصصی سئو با ارائه بسته‌های درمانی ماژولار. تحلیل رایگان وبسایت و درمان بیماری‌های سئو با متخصصان مجرب."
+        keywords="سئو, کلینیک سئو, بهینه‌سازی سایت, دیجیتال مارکتینگ, وبوفن"
+        canonical="https://webofen.com"
+        ogType="website"
+        ogImage="https://webofen.com/images/og-home.jpg"
+      />
+
+      {/* اسکیماهای JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
+
     <main className=" m-auto">
       <section className="bg-[#f7f8fc] pb-4 w-full rounded-2xl">
         <div className="max-w-[1250px] m-auto flex justify-center">
@@ -15,7 +105,7 @@ export default function Home() {
             <div className="relative w-[90%] mx-auto md:w-[62%] aspect-[16/9] rounded-lg overflow-hidden">
               <Image
                 src="/homepage/slider.webp"
-                alt="Main slide"
+                alt="کلینیک تخصصی سئو وبوفن - خدمات سئو و بهینه‌سازی سایت"
                 fill
                 className="object-contain"
                 priority
@@ -38,7 +128,7 @@ export default function Home() {
             <div className="relative w-full hidden md:flex lg:w-[38%] aspect-auto rounded-lg">
               <Image
                 src="/homepage/sideslide.webp"
-                alt="Side slide"
+                alt="خدمات تخصصی سئو و طراحی سایت وبوفن"
                 fill
                 className="object-contain"
                 priority
@@ -76,7 +166,7 @@ export default function Home() {
             <div className="relative flex w-[90%] mx-auto aspect-[3/1] mt-2 rounded-lg md:hidden">
               <Image
                 src="/homepage/sideslidemobile.png"
-                alt="Side slide mobile"
+                alt="خدمات سئو وبوفن - نسخه موبایل"
                 fill
                 className="object-contain"
                 priority
@@ -132,7 +222,7 @@ export default function Home() {
             <div className="relative aspect-[16/12] md:aspect-[1]">
               <Image
                 src="/homepage/peopleAsset 7.png"
-                alt="Main slide"
+                alt="متخصصان سئو وبوفن - دکتر مجتبی خداخواه"
                 fill
                 className="object-contain"
                 priority
@@ -313,7 +403,7 @@ export default function Home() {
               <div className="relative w-full md:w-2/4 mx-auto h-[220px] md:h-[100%]  rounded-lg">
                 <Image
                   src="/homepage/hero2.webp"
-                  alt="Main slide"
+                  alt="خدمات تخصصی سئو و طراحی سایت وبوفن"
                   fill
                   className="object-contain"
                 />
@@ -345,7 +435,7 @@ export default function Home() {
             <div className="relative w-full aspect-[13/5] md:aspect-[13/2] rounded-lg overflow-hidden flex items-start">
               <Image
                 src="/homepage/ourteam.png"
-                alt="Main slide"
+                alt="تیم متخصصان سئو وبوفن"
                 fill
                 className="object-cover"
               />
@@ -406,5 +496,6 @@ export default function Home() {
         </div>
       </section>
     </main>
+</>
   );
 }
