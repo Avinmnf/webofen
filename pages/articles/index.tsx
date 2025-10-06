@@ -5,7 +5,7 @@ import { GetServerSideProps } from "next";
 import { fetchPosts } from "@/lib/posts";
 import { Post, PostWithViews } from "@/lib/models/postlist";
 import { useRouter } from "next/router";
-
+import SEO from "@/components/seo";
 type PostsPageProps = {
   initialPosts: Post[];
   total: number;
@@ -87,6 +87,17 @@ export default function PostsPage({
   };
 
   return (
+    <>
+        <SEO
+        title="مقالات وبوفن | بلاگ وبوفن"
+        description="آخرین مقالات وبوفن درباره دیجیتال مارکتینگ، کسب درآمد آنلاین و آموزش‌های کاربردی."
+        keywords="مقالات وبوفن, بلاگ, آموزش دیجیتال مارکتینگ, کسب درآمد آنلاین"
+        canonical="https://webofen.com/articles"
+        ogType="website"
+        ogImage="https://webofen.com/images/og-blog.jpg"
+        
+      />
+      
     <main className="bg-[#f7f8fc] pb-10">
       <div className="w-full pt-10">
         <div className="w-[1250px] mx-auto">
@@ -252,7 +263,6 @@ export default function PostsPage({
             </div>
           </div>
 
-          {/* Smaller Posts List with Grid Layout */}
           {/* Smaller Posts List with Masonry Layout */}
           <div className="md:columns-3 md:p-0 p-4 gap-8 md:mt-2">
             {cards.map((card) => (
@@ -520,6 +530,7 @@ export default function PostsPage({
         </div>
       </div>
     </main>
+    </>
   );
 }
 
@@ -536,12 +547,26 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       sort: "createdAt",
       order: "desc",
     });
-    // دریافت آمار بازدیدها
+
+    // آماده‌سازی داده‌های SEO
+    const seoData = {
+      title: "مقالات وبوفن | بلاگ وبوفن",
+      description: "آخرین مقالات وبوفن درباره دیجیتال مارکتینگ، کسب درآمد آنلاین و آموزش‌های کاربردی.",
+      keywords: "مقالات وبوفن, بلاگ, آموزش دیجیتال مارکتینگ, کسب درآمد آنلاین",
+      canonical: "https://webofen.com/articles",
+      ogType: "website",
+      ogImage: "https://webofen.com/images/og-blog.jpg"
+    };
+
+    // چاپ در ترمینال سرور
+    console.log("SEO Data for PostsPage:", seoData);
+
     return {
       props: {
         initialPosts: postsData.posts,
         total: postsData.total,
         initialPage: page,
+        seoData,
       },
     };
   } catch (error) {
@@ -550,7 +575,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       props: {
         initialPosts: [],
         total: 0,
-        pageViewCounts: {},
         initialPage: 1,
       },
     };

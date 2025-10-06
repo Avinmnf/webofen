@@ -38,7 +38,7 @@ const AccountingPage: React.FC = () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `فاکتور-${order.id}.pdf`;
+      a.download = `فاکتور-${order.customerName}.pdf`;
       document.body.appendChild(a);
       a.click();
       a.remove();
