@@ -24,15 +24,15 @@ function generateArticleSchema(posts: Post[]) {
     "@type": "Article",
     "headline": post.title,
     "description": post.description,
-    "image": post.imageUrl ? `${post.imageUrl}` : "https://webofen.com/images/og-blog.jpg",
+    "image": "imageUrl",
     "author": {
       "@type": "Organization",
-      "name": "وبوفن",
+      "name": "webofen",
       "url": "siteUrl" 
     },
     "publisher": {
       "@type": "Organization",
-      "name": "وبوفن",
+      "name": "webofen",
       "logo": {
         "@type": "ImageObject",
         "url": "https://webofen.com/logo.png"
