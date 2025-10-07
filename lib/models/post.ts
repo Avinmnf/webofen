@@ -8,7 +8,7 @@ export type Post = {
   description?: string;
   createdAt?: string;
   updatedAt?: string; // ✅ اضافه شد
-  category?: { id: string; title: string };
+  category?: { id: string; title: string; slug :string};
   tags?: { name: string }[];
   author?: { name: string; url?: string }; // اضافه شد
   ratings?: { value: number }[];
