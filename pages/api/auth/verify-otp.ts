@@ -1,18 +1,26 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { setCookie } from "cookies-next";
 import jwt from "jsonwebtoken";
+import { sendLoginSms } from "./loginSms";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   const { phone, code } = req.body;
-  if (!phone || !code) return res.status(400).json({ error: "Phone and code are required" });
+  if (!phone || !code)
+    return res.status(400).json({ error: "Phone and code are required" });
 
   const graphqlUrl = process.env.NEXT_PUBLIC_GRAPHQL_URL;
-const JWT_SECRET = process.env.AUTH_SECRET!;
-  if (!graphqlUrl || !JWT_SECRET) return res.status(500).json({ error: "GRAPHQL_URL or JWT_SECRET missing in env" });
+  const JWT_SECRET = process.env.AUTH_SECRET!;
+  if (!graphqlUrl || !JWT_SECRET)
+    return res
+      .status(500)
+      .json({ error: "GRAPHQL_URL or JWT_SECRET missing in env" });
 
   try {
     // 1. پیدا کردن کاربر با شماره تلفن
@@ -45,7 +53,8 @@ const JWT_SECRET = process.env.AUTH_SECRET!;
     }
 
     // 2. بررسی OTP
-    if (String(user.otpCode) !== String(code)) return res.status(400).json({ error: "کد تایید اشتباه است" });
+    if (String(user.otpCode) !== String(code))
+      return res.status(400).json({ error: "کد تایید اشتباه است" });
     if (!user.otpExpires || new Date(user.otpExpires).getTime() < Date.now())
       return res.status(400).json({ error: "کد تایید منقضی شده است" });
 
@@ -84,11 +93,15 @@ const JWT_SECRET = process.env.AUTH_SECRET!;
       res,
       maxAge: 60 * 60 * 24 * 7, // 7 روز
       path: "/",
-      httpOnly: true,           // امن‌تر
+      httpOnly: true, // امن‌تر
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
     });
-
+    await sendLoginSms({
+      userId: user.id,
+      userName: user.name,
+      userPhone: user.phone,
+    });
     return res.status(200).json({ user, token });
   } catch (err: any) {
     console.error("Server error in verify-otp:", err);
