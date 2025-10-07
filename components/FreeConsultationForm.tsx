@@ -57,32 +57,32 @@ export default function FreeConsultationForm() {
       )}
 
       {/* Desktop Layout - همه چیز در یک خط */}
-      <div className="hidden lg:flex gap-4 ">
+      <div className="hidden lg:flex   gap-4 w-full items-center ">
         <input
           type="text"
           placeholder="نام و نام خانوادگی"
-          className="flex-1  border border-gray-200 rounded-lg px-10 py-3 text-sm focus:outline-none focus:border-[#6FD6E5] focus:ring-2 focus:ring-[#6FD6E5] transition-all duration-200"
+    className=" bg-[#f7f8fc]  rounded-lg px-10 py-2 text-sm border border-transparent focus:outline-none focus:border-[#6FD6E5] focus:ring-2 focus:ring-[#6FD6E5] transition-all duration-200"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
         <input
           type="text"
           placeholder="تلفن همراه"
-          className="flex-1 bg-white border border-gray-200 rounded-lg px-10 py-3 text-sm focus:outline-none focus:border-[#6FD6E5] focus:ring-2 focus:ring-[#6FD6E5] transition-all duration-200"
+    className=" bg-[#f7f8fc] rounded-lg px-10 py-2 text-sm border border-transparent focus:outline-none focus:border-[#6FD6E5] focus:ring-2 focus:ring-[#6FD6E5] transition-all duration-200"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
         />
         <input
           type="text"
           placeholder="نام دامنه"
-          className="flex-1 bg-white border border-gray-200 rounded-lg px-10 py-3 text-sm focus:outline-none focus:border-[#6FD6E5] focus:ring-2 focus:ring-[#6FD6E5] transition-all duration-200"
+    className=" bg-[#f7f8fc] rounded-lg px-10 py-2 text-sm border border-transparent focus:outline-none focus:border-[#6FD6E5] focus:ring-2 focus:ring-[#6FD6E5] transition-all duration-200"
           value={domain}
           onChange={(e) => setDomain(e.target.value)}
         />
         <input
           type="text"
           placeholder="خدمت مورد نظر"
-          className="flex-1 bg-white border border-gray-200 rounded-lg px-10 py-3 text-sm focus:outline-none focus:border-[#6FD6E5] focus:ring-2 focus:ring-[#6FD6E5] transition-all duration-200"
+    className=" bg-[#f7f8fc] rounded-lg px-10 py-2 text-sm border border-transparent focus:outline-none focus:border-[#6FD6E5] focus:ring-2 focus:ring-[#6FD6E5] transition-all duration-200"
           value={service}
           onChange={(e) => setService(e.target.value)}
         />
@@ -101,28 +101,28 @@ export default function FreeConsultationForm() {
           <input
             type="text"
             placeholder="نام و نام خانوادگی"
-            className="bg-white border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-[#6FD6E5] focus:ring-2 focus:ring-[#6FD6E5] transition-all duration-200"
+    className=" bg-[#f7f8fc] rounded-lg px-12  py-2 text-sm border border-transparent focus:outline-none focus:border-[#6FD6E5] focus:ring-2 focus:ring-[#6FD6E5] transition-all duration-200"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
           <input
             type="text"
             placeholder="تلفن همراه"
-            className="bg-white border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-[#6FD6E5] focus:ring-2 focus:ring-[#6FD6E5] transition-all duration-200"
+    className=" bg-[#f7f8fc] rounded-lg px-12 py-2 text-sm border border-transparent focus:outline-none focus:border-[#6FD6E5] focus:ring-2 focus:ring-[#6FD6E5] transition-all duration-200"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
           />
           <input
             type="text"
             placeholder="نام دامنه"
-            className="bg-white border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-[#6FD6E5] focus:ring-2 focus:ring-[#6FD6E5] transition-all duration-200"
+    className=" bg-[#f7f8fc] rounded-lg px-12 py-2 text-sm border border-transparent focus:outline-none focus:border-[#6FD6E5] focus:ring-2 focus:ring-[#6FD6E5] transition-all duration-200"
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
           />
           <input
             type="text"
             placeholder="خدمت مورد نظر"
-            className="bg-white border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-[#6FD6E5] focus:ring-2 focus:ring-[#6FD6E5] transition-all duration-200"
+    className=" bg-[#f7f8fc] rounded-lg px-12 py-2 text-sm border border-transparent focus:outline-none focus:border-[#6FD6E5] focus:ring-2 focus:ring-[#6FD6E5] transition-all duration-200"
             value={service}
             onChange={(e) => setService(e.target.value)}
           />
