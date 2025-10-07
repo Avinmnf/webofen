@@ -73,11 +73,13 @@ export default function ProductList() {
     };
   };
 
+  // ساخت structured data داینامیک مخصوص صفحه محصولات
 // ساخت structured data داینامیک مخصوص صفحه محصولات
 const generateDynamicStructuredData = () => {
   const meta = getDynamicMetaData();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://webofen.com";
 
+  // 📍 فقط یک ItemList Schema ساده برای کاروسل
   const itemListSchema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -88,29 +90,10 @@ const generateDynamicStructuredData = () => {
     "itemListElement": products?.slice(0, 10).map((product: any, index: number) => ({
       "@type": "ListItem",
       "position": index + 1,
+      "name": product.title || "محصول سئو", // ✅ اینجا مشکل Unnamed item حل می‌شود
       "url": `${siteUrl}/products/${product.slug || ""}`,
-      "name": product.title || "محصول سئو",
-      "image": product.imageUrl?.replace('.mp4', '.jpg') || `${siteUrl}/images/default-product.jpg`,
-      "description": product.description || "توضیحات محصول سئو وبوفن",
-      // 📦 اضافه کردن item داخل هر ListItem مطابق استاندارد schema.org
-      "item": {
-        "@type": "Product",
-        "name": product.title || "محصول سئو",
-        "image": product.imageUrl?.replace('.mp4', '.jpg') || `${siteUrl}/images/default-product.jpg`,
-        "description": product.description || "توضیحات محصول سئو وبوفن",
-        "sku": product.sku || product.id || `product-${index + 1}`,
-        "brand": {
-          "@type": "Brand",
-          "name": product.brand || "وبوفن"
-        },
-        "offers": {
-          "@type": "Offer",
-          "priceCurrency": "IRR",
-          "price": product.variants?.[0]?.price || "0",
-          "url": `${siteUrl}/products/${product.slug || ""}`
-        }
-      }
-    })) || []
+      "image": product.imageUrl?.replace('.mp4', '.jpg') || `${siteUrl}/images/default-product.jpg`, // ✅ تصویر باید JPG/PNG باشه نه MP4
+    })) || [],
   };
 
   // 📍 Breadcrumb Schema
