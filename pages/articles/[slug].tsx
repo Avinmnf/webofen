@@ -31,7 +31,11 @@ const ArticleSchema = ({ post }: SchemaProps) => {
     "dateModified": post.updatedAt || post.createdAt,
     "author": {
       "@type": "Person",
-      "name": post.author?.name || "نویسنده ناشناس"
+      "name": post.author?.name || "نویسنده ناشناس",
+      "url": post.author?.url || "https://webofen.com",// می‌توانید URL پیش‌فرض سایت را بگذارید
+      "image": post.author?.url || post.imageUrl || undefined
+
+
     },
     "publisher": {
       "@type": "Organization",
