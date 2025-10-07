@@ -25,29 +25,30 @@ function normalizeImageUrl(url?: string): string {
   if (url.startsWith("/")) return `${SITE_URL}${url}`;
   return `${SITE_URL}/${url}`;
 }
+
 // تابع برای ایجاد اسکیما مقالات
 function generateArticleSchema(posts: Post[]) {
   return posts.map((post) => ({
     "@context": "https://schema.org",
     "@type": "Article",
     "headline": post.title,
-    "description": post.description,
-    "image": normalizeImageUrl(post.imageUrl),
-    "author": {
-      "@type": "Organization",
-      "name": "webofen",
-      "url": SITE_URL, // ✅ اصلاح شده
-    },
+    "description": post.description || "",
+    "image": normalizeImageUrl(post.imageUrl), // اگر نداشت، تصویر پیش‌فرض استفاده می‌کنه
+  "author": {
+  "@type": "Person",
+  "name": (post as any).author?.name || "وبوفن",
+  "url": (post as any).author?.url || SITE_URL,
+},
+
     "publisher": {
       "@type": "Organization",
-      "name": "webofen",
+      "name": "وبوفن",
       "logo": {
         "@type": "ImageObject",
         "url": `${SITE_URL}/logo.png`,
       },
     },
     "datePublished": post.createdAt,
-    "dateModified": post.createdAt,
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": `${SITE_URL}/articles/${post.slug}`,
@@ -57,6 +58,7 @@ function generateArticleSchema(posts: Post[]) {
     "timeRequired": `PT${post.readtime || 5}M`,
   }));
 }
+
 
 // اسکیما برای صفحه مقالات
 function generateBlogPageSchema(posts: Post[]) {
