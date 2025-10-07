@@ -22,7 +22,7 @@ export default function CartPage() {
   const [refId, setRefId] = useState<string | null>(null);
   const { handleCheckout, loading } = useCheckout();
   const [orderUpdateFailed, setOrderUpdateFailed] = useState(false);
-
+  const [phoneError, setPhoneError] = useState("");
   // Use coupon hook
   const {
     appliedCoupon,
@@ -99,7 +99,17 @@ export default function CartPage() {
       hasRefId: !!router.query.ref_id,
     });
   }, [router.query]);
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\s/g, ""); // remove spaces
+    setCustomerPhone(value);
 
+    // Validate only when input has some content
+    if (value && !/^(\+98|0)?9\d{9}$/.test(value)) {
+      setPhoneError("شماره تماس معتبر نیست");
+    } else {
+      setPhoneError("");
+    }
+  };
   // Also add this to check if the effect is running
   useEffect(() => {
     console.log("🔄 Cart page useEffect triggered");
@@ -227,7 +237,7 @@ export default function CartPage() {
                   <div>
                     <p className="font-semibold text-lg mb-2">{item.title}</p>
                     <p className="text-sm text-gray-500">
-                    تعداد بسته قرص: {item.quantity}
+                      تعداد بسته قرص: {item.quantity}
                     </p>
                     {item.variantAttributes && (
                       <div className="text-sm text-gray-500 mt-1">
@@ -266,7 +276,7 @@ export default function CartPage() {
                   className="p-2 rounded-lg  text-red-600 hover:bg-red-50"
                 >
                   <svg
-                  className="w-5 h-5"
+                    className="w-5 h-5"
                     viewBox="0 0 24 24"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
@@ -363,15 +373,20 @@ export default function CartPage() {
               placeholder="نام و نام خانوادگی"
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
-              className="w-full px-4 py-2 rounded-md bg-gray-100 text-sm border border-gray-200"
+              className="w-full px-4 py-4 rounded-md bg-gray-100 text-sm border border-gray-200"
             />
             <input
               type="text"
               placeholder="شماره تماس"
               value={customerPhone}
-              onChange={(e) => setCustomerPhone(e.target.value)}
-              className="w-full px-4 py-2 rounded-md bg-gray-100 text-sm border border-gray-200"
+              onChange={handlePhoneChange}
+              className={`w-full px-4 py-2 rounded-md bg-gray-100 text-sm border ${
+                phoneError ? "border-red-500" : "border-gray-200"
+              }`}
             />
+            {phoneError && (
+              <p className="text-red-500 text-xs mt-1">{phoneError}</p>
+            )}
           </div>
           <button
             onClick={handlePlaceOrder}
