@@ -37,7 +37,7 @@ export default function GuidanceForm() {
   };
 
   return (
-    <div className="bg-white w-full lg:w-[30%] rounded-lg p-6">
+    <div className="bg-white w-full lg:w-[30%] rounded-2xl p-6">
       <div className="flex items-center text-xl mb-4">
         <div className="w-2 h-10 bg-[#6fd6e5] rounded-2xl ml-2"></div>
         <span className="text-gray-700 font-semibold">درخواست</span>

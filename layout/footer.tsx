@@ -5,9 +5,9 @@ import Image from "next/image";
 export default function Footer() {
   return (
     <footer className="w-full  text-gray-800 pt-10 text-center  bg-[#f7f8fc]">
-      <div className=" max-w-[1250px]  m-auto rounded-t-2xl flex-col-reverse md:flex md:flex-col lg:flex-row pt-10 items-stretch gap-6">
+<div className="max-w-[1250px] m-auto rounded-t-2xl flex flex-col-reverse lg:flex-row pt-10 items-stretch gap-6">
         {/* Left Column */}
-        <div className="lg:w-2/12 flex flex-col items-center md:items-start justify-between">
+        <div className="md:w-2/12 flex flex-col items-center md:items-start justify-between">
           <Link href="/" className="mb-15 md:mt-15 md:my-10">
             <Image
               width={210}
@@ -17,19 +17,19 @@ export default function Footer() {
               priority
             />
           </Link>
-          <div className="bg-[#6fd6e5] md:w-full rounded-t-4xl h-50  pt-10 text-white text-center shadow-[0_-30px_0_0px_#1d546b]">
+          <div className="bg-[#6fd6e5] w-full rounded-t-4xl h-50  pt-10 text-white text-center shadow-[0_-30px_0_0px_#1d546b]">
             <p className="border-b border-gray-200 text-base pb-5">
               7 روز هفته ، 24 ساعت پاسخگوی شما هستیم
             </p>
-            <p className="border-b border-gray-200 text-xl pt-2">021-88515914</p>
+            <p className="border-b border-gray-200 text-lg py-2">021-88515914</p>
           </div>
         </div>
         {/* Right Column */}
-        <div className="lg:w-10/12 flex flex-col gap-6">
-          <div className="flex flex-col lg:flex-row justify-between border-b border-gray-100 pb-6 items-stretch gap-6 lg:gap-0">
+        <div className="lg:w-10/12 flex flex-col gap-6  md:p-0 p-4">
+          <div className="flex flex-col lg:flex-row justify-between border-b border-gray-100 pb-6  gap-6 lg:gap-0">
             {/* Text */}
-            <div className="lg:w-10/12 md:pl-4 flex flex-col justify-center">
-              <p className="text-sm text-gray-600 text-start line-clamp-6">
+            <div className="lg:w-10/12 md:pl-4 flex flex-col  justify-center  md:p-0 p-4">
+              <p className="text-sm text-gray-600 md:text-start text-center line-clamp-6">
               وبوفن (Webofen) یک پلتفرم تحلیلی و هوشمند است که با هدف بهبود عملکرد، سئو و تجربه کاربری وب‌سایت‌ها طراحی شده است. ما در وبوفن تلاش می‌کنیم تا با استفاده از ابزارهای دقیق تحلیل داده، بررسی فنی و گزارش‌های قابل‌فهم، به صاحبان وب‌سایت‌ها کمک کنیم تا نقاط ضعف و قوت وب خود را شناسایی و برطرف کنند.
               </p>
             </div>

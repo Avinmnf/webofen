@@ -782,9 +782,9 @@ const generateProductSchema = (product: any) => {
 
         <section>
           {/*FAQ*/}
-          <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center bg-[#f5f4f2]  rounded-4xl justify-between mt-14">
+          <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center bg-[#f5f4f2] p-6 rounded-4xl justify-between mt-14">
             {/* FAQ Section */}
-            <div className="w-full lg:w-3/5 p-4">
+            <div className="w-full lg:w-3/5">
               {faqs.map((faq, index) => (
                 <div
                   key={index}

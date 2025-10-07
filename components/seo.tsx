@@ -17,6 +17,7 @@ type SEOProps = {
   publishedTime?: string;
   modifiedTime?: string;
   section?: string;
+  additionalScripts?: React.ReactNode; // اضافه کردن این خط
   tags?: string[];
   locale?: string;
   post?: {
@@ -63,6 +64,7 @@ const SEO: React.FC<SEOProps> = ({
   locale = "fa_IR",
   post,
   product,
+  additionalScripts, // اضافه کردن این پارامتر
 }) => {
   const router = useRouter();
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://example.com";
@@ -199,6 +201,9 @@ const SEO: React.FC<SEOProps> = ({
           }}
         />
       )}
+
+      {/* --- Additional Scripts (اسکیماهای اضافی) --- */}
+      {additionalScripts}
 
       {/* --- Icons --- */}
       <link rel="icon" href="/favicon.ico" />
