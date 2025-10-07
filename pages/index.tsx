@@ -411,7 +411,6 @@ export default function Home() {
         {/* Background section starts from mid-image */}
         <div className="w-full  relative ">
           <div className="max-w-[1250px] p-8 md:p-0 mx-auto">
-            
               <div className="flex items-center justify-center md:justify-start">
                 <h3 className="text-gray-800 font-semibold">
                   قرص های پر بازدید کیلینیک
@@ -420,10 +419,8 @@ export default function Home() {
               </div>
               <Popularpills />
             </div>
-          
         </div>
       </section>
-
       <section className="max-w-[1250px] m-auto ">
         <Pathsection />
         <div className="w-full">
