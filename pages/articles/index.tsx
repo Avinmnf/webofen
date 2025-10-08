@@ -118,7 +118,7 @@ export default function PostsPage({
   const articleSchemas = generateArticleSchema(posts);
   const blogPageSchema = generateBlogPageSchema(posts);
 
-  // تابع برای استخراج تمام تگ‌های منحصربه‌فرد از تمام پست‌ها
+  // استخراج تمام تگ‌ها از پست‌ها
   useEffect(() => {
     const extractAllTags = () => {
       const allTagsFromPosts = allPosts.flatMap(
@@ -126,7 +126,6 @@ export default function PostsPage({
           post.tags?.map((tag) => ({ id: tag.id, name: tag.name })) || []
       );
 
-      // حذف تگ‌های تکراری بر اساس id و حذف تگ "پیشنهاد ما"
       const uniqueTags = allTagsFromPosts.filter(
         (tag, index, self) =>
           index === self.findIndex((t) => t.id === tag.id) &&
@@ -161,42 +160,47 @@ export default function PostsPage({
     views: post.countview || 0,
   }));
 
-  // Create cards array with fixed positions for social cards
+  // ساخت کارت‌ها با قرارگیری پست‌ها و کارت‌های شبکه‌های اجتماعی
   const cards: (PostWithViews | (typeof socialCards)[0])[] = [
     ...postsWithViews.slice(1),
   ];
   if (cards.length > 1) cards.splice(1, 0, socialCards[0]);
   if (cards.length > 5) cards.splice(5, 0, socialCards[1]);
 
-  // تابع برای کلیک روی تگ (فیلتر سمت کلاینت)
+  // ✅ تابع ساده برای تغییر تگ
   const handleTagClick = (tagName: string) => {
     setCurrentTag(tagName);
-
-    // آپدیت URL بدون ریلود صفحه
-    router.push(
-      {
-        pathname: "/articles",
-        query: { tag: tagName },
-      },
-      undefined,
-      { shallow: true }
-    );
   };
 
-  // تابع برای حذف فیلتر تگ
+  // ✅ حذف فیلتر تگ
   const handleClearTagFilter = () => {
     setCurrentTag(undefined);
-
-    // حذف پارامتر تگ از URL
-    router.push(
-      {
-        pathname: "/articles",
-      },
-      undefined,
-      { shallow: true }
-    );
   };
 
+  // ✅ به‌روزرسانی URL وقتی currentTag تغییر کند
+  useEffect(() => {
+    if (currentTag) {
+      router.push(
+        {
+          pathname: "/articles",
+          query: { tag: currentTag },
+        },
+        undefined,
+        { shallow: true }
+      );
+    } else {
+      router.push(
+        {
+          pathname: "/articles",
+        },
+        undefined,
+        { shallow: true }
+      );
+    }
+  }, [currentTag]);
+
+ 
+  // لود پست‌های بیشتر
   const handleLoadMore = async () => {
     if (loading || !hasMore) return;
 
@@ -226,14 +230,14 @@ export default function PostsPage({
     }
   };
 
-  // تابع برای کلیک روی تگ در کارت مقالات
+  // کلیک روی تگ در کارت‌ها
   const handleCardTagClick = (e: React.MouseEvent, tagName: string) => {
     e.preventDefault();
     e.stopPropagation();
     handleTagClick(tagName);
   };
 
-  // تابع برای دیباگ - نمایش تگ‌های موجود
+  // برای دیباگ
   useEffect(() => {
     console.log("تمامی تگ‌های موجود:", allTags);
     console.log(
@@ -244,7 +248,7 @@ export default function PostsPage({
       }))
     );
   }, [allTags, allPosts]);
-
+  
   return (
     <>
       <SEO

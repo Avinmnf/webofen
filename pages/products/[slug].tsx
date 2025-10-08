@@ -151,9 +151,15 @@ export default function ProductDetailPage({ product }: Props) {
             comment: r.comment,
             user: { name: r.user?.name },
           })),
+          aggregateRating: product.reviews && product.reviews.length > 0 ? {
+        ratingValue: (
+          product.reviews.reduce((sum, r) => sum + r.rating, 0) /
+          product.reviews.length
+        ).toFixed(1),
+        reviewCount: product.reviews.length,
+        } : undefined,
         }}
       />
-
       <main>
         <div className="max-w-[1250px] m-auto">
           <div className="flex flex-wrap text-gray-700 pt-10">
