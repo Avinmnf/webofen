@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePageView } from "@/hooks/usePageView";
 import SEO from "@/components/seo";
+import BlogSkeleton from "@/components/Skeleton/BlogSkeleton";
 
 type Props = { post: Post };
 
@@ -174,12 +175,7 @@ export default function PostPage({ post }: Props) {
     }
   };
 
-  if (!post)
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-gray-700 text-xl">Post not found.</p>
-      </div>
-    );
+
 
   return (
     <>
@@ -200,6 +196,7 @@ export default function PostPage({ post }: Props) {
       {/* اضافه کردن اسکیماها */}
       <ArticleSchema post={post} />
       <BreadcrumbSchema post={post} />
+
 <main className="w-[1250px] mx-auto p-4 relative articles">
         {/*Background Section */}
         <div className="relative pt-20">
@@ -457,7 +454,7 @@ export default function PostPage({ post }: Props) {
         </div>
 
       </main>
-    </>
+          </>
   );
 }
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
@@ -466,20 +463,31 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const safeSlug = encodeURIComponent(slug);
   const website = process.env.NEXT_PUBLIC_WEBOFEN || "https://webofen.com";
 
-  let post: Post | null = null;
   try {
     const res = await fetch(`${website}/api/proxy/postbyslug/${safeSlug}`, {
       headers: {
         "Content-Type": "application/json",
       },
     });
-    if (!res.ok) throw new Error("Failed to fetch product");
+
+    if (!res.ok) {
+      // If the API returns an error status
+      return { notFound: true };
+    }
+
     const data = await res.json();
-    post = data.post;
+
+    if (!data.post) {
+      // If no post found
+      return { notFound: true };
+    }
+
+    return {
+      props: { post: data.post },
+    };
   } catch (err) {
     console.error(err);
+    // If fetch throws an exception
+    return { notFound: true };
   }
-  return {
-    props: { post },
-  };
 };

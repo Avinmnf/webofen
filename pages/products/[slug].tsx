@@ -333,7 +333,6 @@ export default function ProductDetailPage({ product }: Props) {
   );
 }
 
-// --- دریافت اطلاعات محصول ---
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { slug } = ctx.params as { slug: string };
   let product: Product | null = null;
@@ -343,18 +342,25 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const res = await fetch(`${website}/api/proxy/productbyslug/${slug}`, {
       headers: { "Content-Type": "application/json" },
     });
-    if (!res.ok) throw new Error("Failed to fetch product");
+
+    if (!res.ok) {
+      console.error(`Failed to fetch product slug=${slug}`);
+      return { notFound: true }; 
+    }
 
     const data = await res.json();
     product = data.product;
 
-    // 🔹 این خط باعث می‌شود داده محصول در ترمینال نشان داده شود
-    console.log(`GET /api/proxy/productbyslug/${slug} ${res.status} in ${res.headers.get('x-response-time') || '??'}ms`);
+    console.log(`GET /api/proxy/productbyslug/${slug} ${res.status}`);
     console.log(product);
+
+    if (!product) {
+      return { notFound: true };
+    }
   } catch (err) {
     console.error(err);
+    return { notFound: true };
   }
 
   return { props: { product } };
 };
-

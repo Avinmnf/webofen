@@ -7,6 +7,8 @@ import { Post, PostWithViews } from "@/lib/models/postlist";
 import { useRouter } from "next/router";
 import SEO from "@/components/seo";
 import Masonry from "react-masonry-css";
+import ArticlesListSkeleton from "@/components/Skeleton/ArticlesListSkeleton";
+import PostDetail from "../post";
 
 type PostsPageProps = {
   initialPosts: Post[];
@@ -248,6 +250,8 @@ export default function PostsPage({
     e.stopPropagation();
     handleTagClick(tagName);
   };
+
+  if (loading) return <ArticlesListSkeleton />;
 
   return (
     <>
@@ -919,6 +923,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         seoData,
       },
     };
+    
   } catch (error) {
     console.error("Error in getServerSideProps:", error);
     return {
