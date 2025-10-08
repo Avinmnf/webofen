@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { GetStaticProps } from "next";
+import { GetStaticPaths } from "next";
 import { GetServerSideProps } from "next";
 import CommentForm from "@/components/comments/comments";
 import CommentsList from "@/components/comments/CommentsList";
@@ -457,37 +459,41 @@ export default function PostPage({ post }: Props) {
           </>
   );
 }
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { slug } = ctx.params as { slug: string };
 
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: [],
+    fallback: "blocking",
+  };
+};
+
+export const getStaticProps: GetStaticProps = async (ctx) => {
+  const { slug } = ctx.params as { slug: string };
   const safeSlug = encodeURIComponent(slug);
   const website = process.env.NEXT_PUBLIC_WEBOFEN || "https://webofen.com";
 
   try {
     const res = await fetch(`${website}/api/proxy/postbyslug/${safeSlug}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
     });
 
     if (!res.ok) {
-      // If the API returns an error status
       return { notFound: true };
     }
 
     const data = await res.json();
 
     if (!data.post) {
-      // If no post found
       return { notFound: true };
     }
 
     return {
       props: { post: data.post },
+      revalidate: 60, // ⏳ Regenerate at most once every 60s when a new request comes
     };
   } catch (err) {
     console.error(err);
-    // If fetch throws an exception
     return { notFound: true };
   }
 };

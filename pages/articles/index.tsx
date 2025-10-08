@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { GetStaticProps } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { GetServerSideProps } from "next";
@@ -8,7 +9,6 @@ import { useRouter } from "next/router";
 import SEO from "@/components/seo";
 import Masonry from "react-masonry-css";
 import ArticlesListSkeleton from "@/components/Skeleton/ArticlesListSkeleton";
-import PostDetail from "../post";
 
 type PostsPageProps = {
   initialPosts: Post[];
@@ -890,13 +890,11 @@ export default function PostsPage({
     </>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getStaticProps: GetStaticProps = async () => {
   try {
-    const page = parseInt(context.query.page as string) || 1;
-    const limit = 15; // تعداد بیشتری پست بگیریم تا تگ‌های بیشتری داشته باشیم
+    const page = 1;
+    const limit = 15;
 
-    // دریافت پست‌ها (بدون پارامتر tag)
     const postsData = await fetchPosts({
       page,
       limit,
@@ -922,16 +920,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         initialPage: page,
         seoData,
       },
+      revalidate: 60,
     };
-    
   } catch (error) {
-    console.error("Error in getServerSideProps:", error);
+    console.error("Error in getStaticProps:", error);
     return {
       props: {
         initialPosts: [],
         total: 0,
         initialPage: 1,
       },
+      revalidate: 60,
     };
   }
 };
