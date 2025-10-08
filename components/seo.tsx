@@ -17,7 +17,7 @@ type SEOProps = {
   publishedTime?: string;
   modifiedTime?: string;
   section?: string;
-  additionalScripts?: React.ReactNode; // اضافه کردن این خط
+  additionalScripts?: React.ReactNode;
   tags?: string[];
   locale?: string;
   post?: {
@@ -39,8 +39,20 @@ type SEOProps = {
     galleryUrls?: string[];
     sku?: string;
     brand?: string;
-    variants?: { price: number; stock: number }[];
-    reviews?: { rating: number; comment: string; user?: { name?: string } }[];
+    variants?: {
+      price: number;
+      stock: number;
+      priceValidUntil?: string;
+    }[];
+    reviews?: {
+      rating: number;
+      comment: string;
+      user?: { name?: string };
+    }[];
+    aggregateRating?: {
+      ratingValue: number | string;
+      reviewCount: number;
+    };
   };
 };
 
@@ -64,7 +76,7 @@ const SEO: React.FC<SEOProps> = ({
   locale = "fa_IR",
   post,
   product,
-  additionalScripts, // اضافه کردن این پارامتر
+  additionalScripts,
 }) => {
   const router = useRouter();
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://example.com";
@@ -83,8 +95,8 @@ const SEO: React.FC<SEOProps> = ({
     },
   };
 
-  // --- ساخت structured data داینامیک ---
-  let finalStructuredData: object | null = productSchema || structuredData || defaultStructuredData;
+  let finalStructuredData: object | null =
+    productSchema || structuredData || defaultStructuredData;
 
   if (ogType === "article" && post) {
     finalStructuredData = {
@@ -117,6 +129,17 @@ const SEO: React.FC<SEOProps> = ({
       inLanguage: "fa-IR",
     };
   } else if (ogType === "product" && product) {
+    const aggregateRating =
+      product.reviews && product.reviews.length > 0
+        ? {
+            ratingValue: (
+              product.reviews.reduce((sum, r) => sum + r.rating, 0) /
+              product.reviews.length
+            ).toFixed(1),
+            reviewCount: product.reviews.length,
+          }
+        : undefined;
+
     finalStructuredData = {
       "@context": "https://schema.org",
       "@type": "Product",
@@ -125,16 +148,17 @@ const SEO: React.FC<SEOProps> = ({
       image: product.galleryUrls?.length ? product.galleryUrls : [product.imageUrl],
       sku: product.sku,
       brand: { "@type": "Brand", name: product.brand || "وبوفن" },
-      offers: {
+      offers: product.variants?.map((v) => ({
         "@type": "Offer",
         url: `${baseUrl}/products/${product.slug}`,
         priceCurrency: "IRR",
-        price: product.variants?.[0]?.price,
+        price: v.price,
+        priceValidUntil: v.priceValidUntil || "2030-12-31",
         availability:
-          (product.variants?.[0]?.stock ?? 0) > 0
+          (v.stock ?? 0) > 0
             ? "https://schema.org/InStock"
             : "https://schema.org/OutOfStock",
-      },
+      })),
       review: product.reviews?.map((r) => ({
         "@type": "Review",
         author: { "@type": "Person", name: r.user?.name || "کاربر" },
@@ -146,12 +170,12 @@ const SEO: React.FC<SEOProps> = ({
         },
         reviewBody: r.comment,
       })),
+      aggregateRating,
     };
   }
 
   return (
     <Head>
-      {/* --- Basic Meta Tags --- */}
       <title>{title.includes("وبوفن") ? title : `${title} | وبوفن`}</title>
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
@@ -160,11 +184,7 @@ const SEO: React.FC<SEOProps> = ({
         content={`${noindex ? "noindex" : "index"}, ${nofollow ? "nofollow" : "follow"}`}
       />
       <meta name="author" content={author} />
-
-      {/* --- Canonical URL --- */}
       <link rel="canonical" href={currentUrl} />
-
-      {/* --- Open Graph --- */}
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={defaultImage} />
@@ -172,8 +192,6 @@ const SEO: React.FC<SEOProps> = ({
       <meta property="og:type" content={ogType} />
       <meta property="og:locale" content={locale} />
       <meta property="og:site_name" content="وبوفن" />
-
-      {/* --- Article OG Tags --- */}
       {ogType === "article" && (
         <>
           {publishedTime && <meta property="article:published_time" content={publishedTime} />}
@@ -185,33 +203,21 @@ const SEO: React.FC<SEOProps> = ({
           {author && <meta property="article:author" content={author} />}
         </>
       )}
-
-      {/* --- Twitter Card --- */}
       <meta name="twitter:card" content={twitterCard} />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={defaultImage} />
-
-      {/* --- Structured Data --- */}
       {finalStructuredData && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(finalStructuredData),
-          }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(finalStructuredData) }}
         />
       )}
-
-      {/* --- Additional Scripts (اسکیماهای اضافی) --- */}
       {additionalScripts}
-
-      {/* --- Icons --- */}
       <link rel="icon" href="/favicon.ico" />
       <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
       <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
       <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-
-      {/* --- Google Analytics --- */}
       {process.env.NODE_ENV === "production" && process.env.NEXT_PUBLIC_GA_ID && (
         <>
           <script

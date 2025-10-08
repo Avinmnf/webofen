@@ -2,7 +2,9 @@
 import { GetServerSideProps } from "next";
 
 const GRAPHQL_URL = process.env.NEXT_PUBLIC_GRAPHQL_URL || "http://localhost:3000/api/graphql";
-const BASE_URL = (process.env.NEXT_PUBLIC_WEBOFEN || "http://localhost:3002").replace(/\/$/, "");
+const BASE_URL = ((process.env.NEXT_PUBLIC_WEBOFEN || "http://localhost:3002")
+  .replace(/\/$/, "")       // حذف اسلش آخر
+  .replace("website.", "")); // حذف پیشوند website.
 
 type DataKey =
   | "pages"
