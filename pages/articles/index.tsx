@@ -251,8 +251,6 @@ export default function PostsPage({
     handleTagClick(tagName);
   };
 
-  if (loading) return <ArticlesListSkeleton />;
-
   return (
     <>
       <SEO
