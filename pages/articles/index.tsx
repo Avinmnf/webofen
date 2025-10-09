@@ -169,11 +169,17 @@ export default function PostsPage({
   }));
 
   // ساخت کارت‌ها با قرارگیری پست‌ها و کارت‌های شبکه‌های اجتماعی
-  const cards: (PostWithViews | (typeof socialCards)[0])[] = [
-    ...postsWithViews.slice(1),
-  ];
-  if (cards.length > 1) cards.splice(1, 0, socialCards[0]);
-  if (cards.length > 5) cards.splice(5, 0, socialCards[1]);
+const cards: (PostWithViews | (typeof socialCards)[0])[] = [];
+
+// Keep the featured post aside (posts[0])
+for (let i = 1; i < postsWithViews.length; i++) {
+  // insert social cards at certain indexes without overwriting order
+  if (i === 4) cards.push(socialCards[0]);
+  if (i === 10) cards.push(socialCards[1]);
+
+  cards.push(postsWithViews[i]);
+}
+
 
   // ✅ تابع ساده برای تغییر تگ
   const handleTagClick = (tagName: string) => {
@@ -891,7 +897,7 @@ export default function PostsPage({
 export const getStaticProps: GetStaticProps = async () => {
   try {
     const page = 1;
-    const limit = 15;
+    const limit = 14;
 
     const postsData = await fetchPosts({
       page,
