@@ -1,9 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactStrictMode: true,
-    images: {
+  images: {
     remotePatterns: [
       {
         protocol: "https",
@@ -17,6 +16,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-};
+  async rewrites() {
+    return [
+      {
+        source: '/:slug-sitemap.xml',      // URL که میخوای
+        destination: '/sitemap/:slug',     // مسیر فایل [slug].ts داخل pages/sitemap
+      },
+    ]
+  },
+}
 
 export default nextConfig;
