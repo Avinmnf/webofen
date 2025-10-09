@@ -320,7 +320,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const website = process.env.NEXT_PUBLIC_WEBOFEN || "https://webofen.com";
 
   try {
-    const res = await fetch(`http://localhost:3000/api/proxy/productbyslug/${slug}`, {
+    const res = await fetch(`${website}/api/proxy/productbyslug/${slug}`, {
       headers: { "Content-Type": "application/json" },
     });
 

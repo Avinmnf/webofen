@@ -474,7 +474,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
   const website = process.env.NEXT_PUBLIC_WEBOFEN || "https://webofen.com";
 
   try {
-    const res = await fetch(`http://localhost:3000/api/proxy/postbyslug/${safeSlug}`, {
+    const res = await fetch(`${website}/api/proxy/postbyslug/${safeSlug}`, {
       headers: { "Content-Type": "application/json" },
     });
 
