@@ -12,19 +12,19 @@ export default function Popularpills() {
             src: "/guidance/backlink.mp4",
             title: "قرص بک لینک سازی",
             desc: "سئو خارجی سایت",
-            link: "https://example.com/video-2"
+            link: "/products/backlink"
           },
           {
             src: "/guidance/optimization.mp4",
             title: "قرص  بهینه سازی",
             desc: "سئو داخلی سایت",
-            link: "https://example.com/video-1"
+            link: "/products/optimization"
           },
           {
             src: "/guidance/screamingfrog.mp4",
             title: "قرص اسکریمینگ فراگ",
             desc: "سئو داخلی سایت",
-            link: "https://example.com/video-3"
+            link: "/products/screaming-frog"
           }
         ].map((item, idx) => (
           <div
@@ -58,8 +58,10 @@ export default function Popularpills() {
                             bg-white rounded-full py-1 w-[100px]
                             transform transition duration-300 ease-in-out
                             hover:-translate-x-1 hover:shadow-lg cursor-pointer
-                          " href={"#"}>
+                          "   href={item.link}
+                            >
                 <span className="mr-2 text-sm">مشاهده</span>
+              
                 <svg
                   className="w-5 h-5 p-1 ml-1 rounded-full bg-[#f63e2f] transition duration-300 ease-in-out hover:bg-[#ff5a3c]"
                   fill="#ffffff"

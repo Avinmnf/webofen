@@ -6,6 +6,7 @@ import Commentsabtus from "@/components/commentsabtus";
 import Reservetime from "@/components/reservetime";
 import FreeConsultationForm from "@/components/FreeConsultationForm";
 import SEO from "@/components/seo";
+import Link from "next/link";
 
 // اسکیما Organization برای وبوفن
 const organizationSchema = {
@@ -106,8 +107,10 @@ export default function Home() {
                 className="object-contain"
                 priority
               />
+              <Link href={"/products"}>
               <button
-                className="absolute w-[25.3%] md:w-[27%] text-[2.8vw] md:text-[1.2vw] right-0 md:rounded-[1.2rem] rounded-lg"
+              
+                className="absolute w-[25.3%] md:w-[27%] text-[2.8vw] md:text-[1.2vw] right-0 md:rounded-[1.2rem] rounded-lg cursor-pointer"
                 style={{
                   bottom: "0",
                   height: "16%",
@@ -116,9 +119,12 @@ export default function Home() {
                   boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
                   transition: "all 0.3s ease",
                 }}
+                
+                
               >
                 خدمات درمانی
               </button>
+              </Link>
             </div>
             {/* Side Image - Desktop Version */}
             <div className="relative w-full hidden md:flex lg:w-[38%] aspect-auto rounded-lg">
@@ -244,9 +250,9 @@ export default function Home() {
                 </g>
               </svg>
               <div className="mr-4">
-                <p className="text-[#1d546b] text-lg md:text-lg font-semibold">
+                <h1 className="text-[#1d546b] text-lg md:text-lg font-semibold">
                   اولین کلینیک تخصصی سئو
-                </p>
+                </h1>
                 <div className="flex flex-wrap items-center text-sm md:text-lg">
                   <p className="text-gray-800 text-sm">
                     فروشگاه تخصصی بسته های درمانی برای وبسایت شما
@@ -262,9 +268,9 @@ export default function Home() {
             <p className="pt-6 text-sm md:text-sm text-gray-600 leading-relaxed text-justify">
               وبوفن، اولین کلینیک تخصصی سئو است که با نسخه هوشمندانه، بیماری‌های وبسایتتان را درمان می‌کند. ما با ارائه "بسته‌های درمانی ماژولار" (مانند قرص بک‌لینک، قرص بهینه‌سازی و قرص بهینه سازی)، پیچیده‌ترین مفاهیم سئو را به ساده‌ترین و مؤثرترین راهکارها تبدیل کرده‌ایم. با تحلیل رایگان وبسایت توسط متخصصان ما، قرص های مناسب برای رشد کسب‌وکار خود را دریافت کنید.
             </p>
-            <p className="pt-6 flex text-[#1d546b] text-lg md:text-lg font-semibold">
+            <h2 className="pt-6 flex text-[#1d546b] text-lg md:text-lg font-semibold">
               <svg width="40px" height="40px" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#1d546b"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="8"></g><g id="SVGRepo_iconCarrier"> <path d="M142 125.853C155.049 97.8883 180.62 82.7645 200.381 78.4757C227.189 72.6575 249.859 84.0511 257.624 112.528C260.302 122.352 259.217 138.128 253.081 148.517C247.426 158.092 239.904 165.942 227.555 176.481C225.251 178.447 217.389 185.018 216.649 185.643C199.849 199.818 191.567 209.152 186.81 220.972C182.053 232.792 182.305 269.489 216.649 266.35" stroke="#1d546b" stroke-opacity="0.9" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M198.744 315.68C198.744 317.274 198.744 319.614 198.744 322.7" stroke="#1d546b" stroke-opacity="0.9" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>  چرا وبوفن را انتخاب کنیم؟
-            </p>
+            </h2>
             <div className="grid md:flex w-full">
               <div className="w-full md:w-1/2">
                 <p className="pt-3 flex text-sm md:text-sm text-gray-600 leading-relaxed text-justify">
@@ -338,13 +344,13 @@ export default function Home() {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-[#1d546b] text-xl font-semibold">
+                    <h2 className="text-[#1d546b] text-xl font-semibold">
                       حوزه تخصصی و درمان
-                    </p>
+                    </h2>
                     <div className="flex flex-wrap items-center mt-1">
-                      <p className="text-gray-800 text-2xl font-semibold">
+                      <h3 className="text-gray-800 text-2xl font-semibold">
                         خدمات تخصصی کلینیک
-                      </p>
+                      </h3>
                       <p className="text-[#6FD6E5] text-2xl pr-2 font-semibold">
                         وبوفن
                       </p>
@@ -412,10 +418,10 @@ export default function Home() {
         <div className="w-full  relative ">
           <div className="max-w-[1250px] p-8 md:p-0 mx-auto">
               <div className="flex items-center justify-center md:justify-start">
-                <h3 className="text-gray-800 font-semibold">
+                <h2 className="text-gray-800 font-semibold">
                   قرص های پر بازدید کیلینیک
-                </h3>
-                <h3 className="text-[#6FD6E5] pr-2">وبوفن</h3>
+                </h2>
+                <h2 className="text-[#6FD6E5] pr-2">وبوفن</h2>
               </div>
               <Popularpills />
             </div>

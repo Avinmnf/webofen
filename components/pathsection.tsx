@@ -42,10 +42,10 @@ export default function Pathsection() {
         <div className="w-full mt-8 md:mt-16 lg:mt-22 md:flex hidden">
             <div className="mx-auto">
                 <div className="text-right mb-6 md:mb-10">
-                    <p className="text-[#1d546b] text-sm md:text-base mb-1">مراحل درمان</p>
-                    <div className="flex items-center flex-wrap ">
-                        <h3 className="text-gray-800 text-2xl font-semibold">صفر تا صد مسیر</h3>
-                        <h3 className="text-[#6FD6E5] text-2xl font-semibold mr-2">درمان سایت</h3>
+                    <h2 className="text-[#1d546b]  text-3xl md:text-base mb-1">مراحل درمان</h2>
+                    <div className="flex items-center  flex-wrap ">
+                        <h3 className="text-gray-800 text-xl font-semibold">صفر تا صد مسیر</h3>
+                        <h3 className="text-[#6FD6E5] text-xl font-semibold mr-2">درمان سایت</h3>
                     </div>
                 </div>
 
