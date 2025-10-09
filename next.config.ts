@@ -19,11 +19,19 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: '/:slug-sitemap.xml',      // URL که میخوای
-        destination: '/sitemap/:slug',     // مسیر فایل [slug].ts داخل pages/sitemap
+        source: '/articles-sitemap.xml',
+        destination: '/api/sitemap/articles-sitemap',
       },
-    ]
+      {
+        source: '/products-sitemap.xml',
+        destination: '/api/sitemap/products-sitemap',
+      },
+      {
+        source: '/category-sitemap.xml',
+        destination: '/api/sitemap/category-sitemap',
+      },
+    ];
   },
-}
+};
 
-export default nextConfig;
+module.exports = nextConfig;

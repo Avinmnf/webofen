@@ -34,11 +34,11 @@ export default function Header() {
   }, [profileDropdownOpen]);
 
   const menuItems = [
-    { label: "خانه", href: "/" },
+    { label: "وبوفن", href: "/" },
     { label: " داروخانه", href: "/products" },
     { label: "وبلاگ", href: "/articles" },
-    { label: "درباره ما", href: "/" },
-    { label: "بیمه وب و فن", href: "/" },
+    { label: "درباره ما", href: "#" },
+    { label: "بیمه وب و فن", href: "#" },
   ];
 
   // Logout called from modal, no redirect
