@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { GetStaticProps } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { GetServerSideProps } from "next";
@@ -6,6 +7,8 @@ import { fetchPosts } from "@/lib/posts";
 import { Post, PostWithViews } from "@/lib/models/postlist";
 import { useRouter } from "next/router";
 import SEO from "@/components/seo";
+import Masonry from "react-masonry-css";
+import ArticlesListSkeleton from "@/components/Skeleton/ArticlesListSkeleton";
 
 type PostsPageProps = {
   initialPosts: Post[];
@@ -102,6 +105,11 @@ export default function PostsPage({
     (queryTag as string) || undefined
   );
   const [allTags, setAllTags] = useState<{ id: string; name: string }[]>([]);
+  const breakpointColumnsObj = {
+    default: 3,
+    1100: 2,
+    700: 1,
+  };
 
   // فیلتر پست‌ها بر اساس تگ (سمت کلاینت)
   const filteredPosts = useMemo(() => {
@@ -199,7 +207,6 @@ export default function PostsPage({
     }
   }, [currentTag]);
 
- 
   // لود پست‌های بیشتر
   const handleLoadMore = async () => {
     if (loading || !hasMore) return;
@@ -217,7 +224,14 @@ export default function PostsPage({
       });
 
       if (postsData.posts.length > 0) {
-        setAllPosts((prevPosts) => [...prevPosts, ...postsData.posts]);
+        setAllPosts((prevPosts) => {
+          const combined = [...prevPosts, ...postsData.posts];
+          const uniquePosts = combined.filter(
+            (post, index, self) =>
+              index === self.findIndex((p) => p.id === post.id)
+          );
+          return uniquePosts;
+        });
         setPage(nextPage);
         setHasMore(postsData.posts.length === limit);
       } else {
@@ -237,18 +251,8 @@ export default function PostsPage({
     handleTagClick(tagName);
   };
 
-  // برای دیباگ
-  useEffect(() => {
-    console.log("تمامی تگ‌های موجود:", allTags);
-    console.log(
-      "تمامی پست‌ها:",
-      allPosts.map((p) => ({
-        title: p.title,
-        tags: p.tags?.map((t) => t.name),
-      }))
-    );
-  }, [allTags, allPosts]);
-  
+  if (loading) return <ArticlesListSkeleton />;
+
   return (
     <>
       <SEO
@@ -566,7 +570,11 @@ export default function PostsPage({
 
                 {/* Smaller Posts List with Masonry Layout */}
                 {posts.length > 1 && (
-                  <div className="md:columns-3 md:p-0 p-4 gap-8 md:mt-2">
+                  <Masonry
+                    breakpointCols={breakpointColumnsObj}
+                    className="flex w-auto gap-6 "
+                    columnClassName="bg-clip-padding"
+                  >
                     {cards.map((card) => (
                       <div
                         key={"id" in card ? card.id : (card as Post).id}
@@ -828,7 +836,7 @@ export default function PostsPage({
                         )}
                       </div>
                     ))}
-                  </div>
+                  </Masonry>
                 )}
               </>
             )}
@@ -882,13 +890,11 @@ export default function PostsPage({
     </>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getStaticProps: GetStaticProps = async () => {
   try {
-    const page = parseInt(context.query.page as string) || 1;
-    const limit = 50; // تعداد بیشتری پست بگیریم تا تگ‌های بیشتری داشته باشیم
+    const page = 1;
+    const limit = 15;
 
-    // دریافت پست‌ها (بدون پارامتر tag)
     const postsData = await fetchPosts({
       page,
       limit,
@@ -914,15 +920,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         initialPage: page,
         seoData,
       },
+      revalidate: 60,
     };
   } catch (error) {
-    console.error("Error in getServerSideProps:", error);
+    console.error("Error in getStaticProps:", error);
     return {
       props: {
         initialPosts: [],
         total: 0,
         initialPage: 1,
       },
+      revalidate: 60,
     };
   }
 };

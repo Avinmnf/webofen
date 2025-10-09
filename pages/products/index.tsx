@@ -74,7 +74,6 @@ export default function ProductList() {
   };
 
   // ساخت structured data داینامیک مخصوص صفحه محصولات
-// ساخت structured data داینامیک مخصوص صفحه محصولات
 const generateDynamicStructuredData = () => {
   const meta = getDynamicMetaData();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://webofen.com";
