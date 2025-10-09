@@ -19,7 +19,7 @@ export function useForms() {
     setLoading(true);
     try {
       // همه فیلدها حتی اگر خالی باشند
-      const res = await fetch(`${process.env.NEXT_PUBLIC_CMS_API}/form`, {
+      const res = await fetch(`api/proxy/form`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

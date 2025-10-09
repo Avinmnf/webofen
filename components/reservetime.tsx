@@ -86,13 +86,13 @@ export default function Reservetime() {
                         onChange={(e) => setPhone(e.target.value)}
                         className="bg-[#f7f8fc] text-gray-700 rounded-lg p-2 px-4 text-sm border border-transparent focus:outline-none focus:border-[#1d546b] focus:ring-2 focus:ring-[#1d546b] transition-all duration-200"
                     />
-                    <div className="w-full lg:w-auto">
+                    <div className="w-full lg:w-auto flex justify-center">
                        <motion.button
                         onClick={handleSubmit}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         transition={{ type: 'spring', stiffness: 300 }}
-                        className="w-32 h-10 bg-[#1d546b] text-white rounded-xl whitespace-nowrap px-3"
+                        className="w-32 h-10 bg-[#1d546b] text-white  rounded-xl whitespace-nowrap px-3"
                       >
                       {loading ? 'در حال ارسال...' : 'ثبت درخواست'}
                     </motion.button>

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { GetStaticProps } from "next";
+import { GetStaticPaths } from "next";
 import { GetServerSideProps } from "next";
 import CommentForm from "@/components/comments/comments";
 import CommentsList from "@/components/comments/CommentsList";
@@ -9,6 +11,7 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePageView } from "@/hooks/usePageView";
 import SEO from "@/components/seo";
+import BlogSkeleton from "@/components/Skeleton/BlogSkeleton";
 
 type Props = { post: Post };
 
@@ -174,12 +177,7 @@ export default function PostPage({ post }: Props) {
     }
   };
 
-  if (!post)
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-gray-700 text-xl">Post not found.</p>
-      </div>
-    );
+
 
   return (
     <>
@@ -200,6 +198,7 @@ export default function PostPage({ post }: Props) {
       {/* اضافه کردن اسکیماها */}
       <ArticleSchema post={post} />
       <BreadcrumbSchema post={post} />
+
 <main className="w-[1250px] mx-auto p-4 relative articles">
         {/*Background Section */}
         <div className="relative pt-20">
@@ -457,29 +456,44 @@ export default function PostPage({ post }: Props) {
         </div>
 
       </main>
-    </>
+          </>
   );
 }
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { slug } = ctx.params as { slug: string };
 
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: [],
+    fallback: "blocking",
+  };
+};
+
+export const getStaticProps: GetStaticProps = async (ctx) => {
+  const { slug } = ctx.params as { slug: string };
   const safeSlug = encodeURIComponent(slug);
   const website = process.env.NEXT_PUBLIC_WEBOFEN || "https://webofen.com";
 
-  let post: Post | null = null;
   try {
     const res = await fetch(`${website}/api/proxy/postbyslug/${safeSlug}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
     });
-    if (!res.ok) throw new Error("Failed to fetch product");
+
+    if (!res.ok) {
+      return { notFound: true };
+    }
+
     const data = await res.json();
-    post = data.post;
+
+    if (!data.post) {
+      return { notFound: true };
+    }
+
+    return {
+      props: { post: data.post },
+      revalidate: 60, // ⏳ Regenerate at most once every 60s when a new request comes
+    };
   } catch (err) {
     console.error(err);
+    return { notFound: true };
   }
-  return {
-    props: { post },
-  };
 };
