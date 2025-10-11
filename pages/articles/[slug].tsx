@@ -298,10 +298,10 @@ export default function PostPage({ post }: Props) {
 
             {/* Sidebar */}
             <aside className="w-1/5">
-              <div className=" top-2 space-y-6  justify-center">
+              <div className="toc-sidebar top-2 space-y-6  justify-center">
                 <div>
                   {post.toc && post.toc.length > 0 && (
-                    <div className="toc-sidebar">
+                    <div>
                       <h3 className="text-gray-600">فهرست مطالب</h3>
                       <nav className="toc-nav text-sm">
                         <ul>

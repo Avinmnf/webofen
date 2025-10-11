@@ -13,10 +13,10 @@ import AverageRating from "@/components/rating/AverageRating";
 import { usePageView } from "@/hooks/usePageView";
 import { useCheckPurchase } from "@/hooks/useCheckPurchase";
 import { useUserOrders } from "@/hooks/useUserOrders";
-import VideoPlayer from "@/components/video";
+import Productvideo from "@/components/productvideo";
 import Link from "next/link";
 import SEO from "@/components/seo";
-
+import Backlinkfeatures from "@/components/pillfeatures/Backlinkfeatures";
 type Props = { product: Product };
 
 export default function ProductDetailPage({ product }: Props) {
@@ -152,12 +152,12 @@ export default function ProductDetailPage({ product }: Props) {
             user: { name: r.user?.name },
           })),
           aggregateRating: product.reviews && product.reviews.length > 0 ? {
-        ratingValue: (
-          product.reviews.reduce((sum, r) => sum + r.rating, 0) /
-          product.reviews.length
-        ).toFixed(1),
-        reviewCount: product.reviews.length,
-        } : undefined,
+            ratingValue: (
+              product.reviews.reduce((sum, r) => sum + r.rating, 0) /
+              product.reviews.length
+            ).toFixed(1),
+            reviewCount: product.reviews.length,
+          } : undefined,
         }}
       />
       <main>
@@ -166,30 +166,13 @@ export default function ProductDetailPage({ product }: Props) {
             {/* --- تصاویر و توضیحات محصول --- */}
             <div className="flex w-2/3">
               <div className="flex ml-2 p-2 rounded-3xl border-2 border-[#f7f8fc] bg-[#f7f8fc]">
-                <div className="w-1/2 p-6">
-                  <VideoPlayer product={product.imageUrl} />
+                <div className="w-1/2 p-6 flex items-center">
+                  <Productvideo product={product.imageUrl} />
                 </div>
                 <div className="w-1/2 p-6">
                   <h1 className="font-bold pb-4">خرید قرص {product.title}</h1>
                   <p className="text-justify text-sm">{product.description}</p>
-                  <div className="flex flex-col gap-2 mt-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Image src="/productsvg/link.svg" width={20} height={20} alt="لینک سازی" />
-                      لینک سازی ترکیبی
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Image src="/productsvg/boo.svg" width={20} height={20} alt="رتبه گوگل" />
-                      افزایش رتبه سریع تر در گوگل
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Image src="/productsvg/chart.svg" width={20} height={20} alt="رسانه" />
-                      انتشار در رسانه های معتبر
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Image src="/productsvg/web.svg" width={20} height={20} alt="سایت معتبر" />
-                      سایت های معتبر با DA و DR بالا
-                    </div>
-                  </div>
+                  <Backlinkfeatures/>
                 </div>
               </div>
             </div>
@@ -207,11 +190,10 @@ export default function ProductDetailPage({ product }: Props) {
                         <button
                           key={value}
                           onClick={() => setSelectedAttributes(prev => ({ ...prev, [attrName]: value }))}
-                          className={`px-4 py-2 rounded-[100px] border ${
-                            selectedAttributes[attrName] === value
-                              ? "bg-green-600 text-white border-indigo-600"
-                              : "bg-white border-gray-300"
-                          }`}
+                          className={`px-4 py-2 rounded-[100px] border ${selectedAttributes[attrName] === value
+                            ? "bg-green-600 text-white border-indigo-600"
+                            : "bg-white border-gray-300"
+                            }`}
                         >
                           {value}
                         </button>
@@ -255,9 +237,8 @@ export default function ProductDetailPage({ product }: Props) {
                   )}
 
                   <button
-                    className={`flex p-2 rounded-3xl text-white items-center w-full cursor-pointer justify-center ${
-                      isAddToCartDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-green-700 hover:bg-green-800"
-                    }`}
+                    className={`flex p-2 rounded-3xl text-white items-center w-full cursor-pointer justify-center ${isAddToCartDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-green-700 hover:bg-green-800"
+                      }`}
                     disabled={isAddToCartDisabled}
                     onClick={handleAddToCart}
                   >
@@ -269,7 +250,7 @@ export default function ProductDetailPage({ product }: Props) {
           </div>
 
           {/* --- توضیحات محصول و نظرات --- */}
-          <section className="flex mt-6">
+          <section className="flex mt-6 content">
             <div className="w-4/5 p-2 text-gray-700">
               <div dangerouslySetInnerHTML={{ __html: product.modifiedContent || "" }} />
               <div className="bg-gray-100 mt-6 w-full h-1"></div>
@@ -297,14 +278,14 @@ export default function ProductDetailPage({ product }: Props) {
             </div>
 
             {/* --- TOC --- */}
-            <div className="w-1/5 mt-6">
+            <div className="w-1/5 mt-6 asidenav">
               {product.toc && product.toc.length > 0 && (
-                <div className="toc-sidebar">
+                <div className="toc-sidebar top-2 space-y-6  justify-center">
                   <h3 className="text-gray-600">فهرست مطالب</h3>
                   <nav className="toc-nav text-sm">
                     <ul>
                       {[...product.toc].reverse().map((item) => (
-                        <li key={item.id} className={`toc-item toc-level-${item.level} mb-2 text-[#545454] hover:text-[#000]`}>
+                        <li key={item.id} className={`toc-item toc-level-${item.level} mb-2  hover:text-[#000]`}>
                           <a href={`#${item.id}`} className="block">{item.text}</a>
                         </li>
                       ))}
@@ -345,7 +326,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
     if (!res.ok) {
       console.error(`Failed to fetch product slug=${slug}`);
-      return { notFound: true }; 
+      return { notFound: true };
     }
 
     const data = await res.json();
