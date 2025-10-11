@@ -31,35 +31,60 @@ function normalizeImageUrl(url?: string): string {
 
 // تابع برای ایجاد اسکیما مقالات
 function generateArticleSchema(posts: Post[]) {
-  return posts.map((post) => ({
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: post.title,
-    description: post.description || "",
-    image: normalizeImageUrl(post.imageUrl),
-    author: {
-      "@type": "Person",
-      name: (post as any).author?.name || "وبوفن",
-      url: (post as any).author?.url || SITE_URL,
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "وبوفن",
-      logo: {
-        "@type": "ImageObject",
-        url: `${SITE_URL}/logo.png`,
+  return posts.map((post) => {
+    const imageUrl = normalizeImageUrl(post.imageUrl);
+    const hasValidImage = imageUrl && imageUrl !== `${SITE_URL}/images/og-blog.jpg`;
+    
+    const schema: any = {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: post.title,
+      description: post.description || "",
+      datePublished: post.createdAt,
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": `${SITE_URL}/articles/${post.slug}`,
       },
-    },
-    datePublished: post.createdAt,
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": `${SITE_URL}/articles/${post.slug}`,
-    },
-    articleSection: post.category?.title || "دیجیتال مارکتینگ",
-    wordCount: post.content ? post.content.split(/\s+/).length : 0,
-    timeRequired: `PT${post.readtime || 5}M`,
-  }));
+      publisher: {
+        "@type": "Organization",
+        name: "وبوفن",
+        logo: {
+          "@type": "ImageObject",
+          url: `${SITE_URL}/logo.png`,
+        },
+      },
+      articleSection: post.category?.title || "دیجیتال مارکتینگ",
+      wordCount: post.content ? post.content.split(/\s+/).length : 0,
+      timeRequired: `PT${post.readtime || 5}M`,
+    };
+
+    // ✅ فقط اگر تصویر واقعی موجود است
+    if (hasValidImage) {
+      schema.image = imageUrl;
+    } else {
+      schema.image = `${SITE_URL}/images/og-blog.jpg`; // تصویر پیش‌فرض معتبر
+    }
+
+    // ✅ فقط اگر نویسنده موجود است، اضافه کن
+    if ((post as any).author?.name) {
+      schema.author = {
+        "@type": "Person",
+        name: (post as any).author.name,
+        url: (post as any).author.url || SITE_URL,
+      };
+    } else {
+      // فallback معتبر برای جلوگیری از هشدار
+      schema.author = {
+        "@type": "Organization",
+        name: "تیم وبوفن",
+        url: SITE_URL,
+      };
+    }
+
+    return schema;
+  });
 }
+
 
 // اسکیما برای صفحه مقالات
 function generateBlogPageSchema(posts: Post[]) {
