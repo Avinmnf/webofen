@@ -275,15 +275,7 @@ const generateProductSchema = (product: any) => {
         structuredData={structuredDataArray}
       />
       
-      {/* اسکیماهای اضافی */}
-      {Array.isArray(structuredDataArray) && structuredDataArray.map((schema, index) => (
-        <script
-          key={index}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-        />
-      ))}
-      
+    
       <div className="max-w-[1250px] m-auto p-4">
         <div className="relative w-full aspect-[3/1] md:aspect-[12/2] mt-10 md:rounded-lg overflow-hidden flex items-start">
           <Image
@@ -334,13 +326,13 @@ const generateProductSchema = (product: any) => {
                   </g>
                 </svg>
                 <div className="mr-4">
-                  <p className="text-[#1d546b] text-base md:text-lg font-semibold">
+                  <h1 className="text-[#1d546b] text-base md:text-lg font-semibold">
                     داروخانه وبوفن
-                  </p>
+                  </h1>
                   <div className="flex flex-wrap items-center text-base md:text-lg">
-                    <p className="text-gray-800 font-semibold">
+                    <h2 className="text-gray-800 font-semibold">
                       انتخاب مسیر درمان
-                    </p>
+                    </h2>
                     <p className="text-[#1d546b] pr-2 font-semibold">وب سایت</p>
                   </div>
                 </div>
@@ -349,12 +341,12 @@ const generateProductSchema = (product: any) => {
               {/* Paragraph */}
               <p className="pt-6 text-sm md:text-sm text-gray-600 leading-relaxed text-justify">
                 در داروخانه وبوفن، هر «قرص» یک درمان تخصصی برای مشکل خاصی از
-                سئوی سایت شماست. ما پیچیدگی‌های سئو را کنار زده‌ایم و آن را به
-                شکل بسته‌های خدماتی شفاف، ساده و نتیجه‌بخش «قرص» درآورده‌ایم.
+                سئوی سایت شماست. ما پیچیدگی‌ های سئو را کنار زده‌ایم و آن را به
+                شکل بسته‌های خدماتی شفاف، ساده و نتیجه‌ بخش «قرص» درآورده‌ایم.
                 شما تنها با چند کلیک و بر اساس نیاز واقعی سایتتان، داروی مناسب
                 را انتخاب و خریداری کنید.
               </p>
-              <p className="pt-6 flex text-[#1d546b] text-lg md:text-lg font-semibold">
+              <h2 className="pt-6 flex text-[#1d546b] text-lg md:text-lg font-semibold">
                 <svg
                   fill="#1d546b"
                   version="1.1"
@@ -380,7 +372,7 @@ const generateProductSchema = (product: any) => {
                   </g>
                 </svg>
                 کدام روش درمان را انتخاب کنیم؟
-              </p>
+              </h2>
               <div className="pt-3 flex text-sm md:text-sm text-gray-600 leading-relaxed text-justify">
                 <svg
                   width="24px"

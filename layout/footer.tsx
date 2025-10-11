@@ -179,7 +179,9 @@ export default function Footer() {
             <div className="flex flex-col gap-4">
               <div className="inline-flex items-center gap-2 cursor-pointer px-3 py-1 rounded-full border border-transparent hover:border-[#1d546b] box-border transition-colors duration-200">
                 <span className="w-3 h-3 rounded-full border border-[#1d546b]"></span>
+                <Link href={"/"}>
                 <span className="text-gray-800 text-sm">خانه</span>
+                </Link>
               </div>
 
               <div className="inline-flex items-center gap-2 cursor-pointer px-3 py-1 rounded-full border border-transparent hover:border-[#1d546b] box-border transition-colors duration-200">
@@ -203,7 +205,9 @@ export default function Footer() {
             <div className="flex flex-col gap-4">
               <div className="inline-flex items-center gap-2 cursor-pointer px-3 py-1 rounded-full border border-transparent hover:border-[#1d546b] box-border transition-colors duration-200">
                 <span className="w-3 h-3 rounded-full border border-[#1d546b]"></span>
+                <Link href={"/articles"}>
                 <span className="text-gray-800 text-sm">مقالات</span>
+                </Link>
               </div>
 
               <div className="inline-flex items-center gap-2 cursor-pointer px-3 py-1 rounded-full border border-transparent hover:border-[#1d546b] box-border transition-colors duration-200">
@@ -215,7 +219,9 @@ export default function Footer() {
             <div className="flex flex-col gap-4">
               <div className="inline-flex items-center gap-2 cursor-pointer px-3 py-1 rounded-full border border-transparent hover:border-[#1d546b] box-border transition-colors duration-200">
                 <span className="w-3 h-3 rounded-full border border-[#1d546b]"></span>
+                <Link href={"/products"}>
                 <span className="text-gray-800 text-sm">داروخانه</span>
+                </Link>
               </div>
 
               <div className="inline-flex items-center gap-2 cursor-pointer px-3 py-1 rounded-full border border-transparent hover:border-[#1d546b] box-border transition-colors duration-200">

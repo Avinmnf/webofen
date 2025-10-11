@@ -89,6 +89,62 @@ function generateBlogPageSchema(posts: Post[]) {
   };
 }
 
+// اسکیما برای سازمان
+function generateOrganizationSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "وبوفن",
+    url: "https://webofen.com",
+    logo: "https://webofen.com/logo.png",
+    description: "وبوفن - پلتفرم تخصصی دیجیتال مارکتینگ و کسب درآمد آنلاین",
+    sameAs: [
+      "https://t.me/yourchannel",
+      "https://instagram.com/yourpage",
+    ],
+    contactPoint: {
+      "@type": "ContactPoint",
+      telephone: "+98-XXX-XXX-XXXX",
+      contactType: "پشتیبانی",
+      areaServed: "IR",
+      availableLanguage: ["fa", "en"],
+    },
+  };
+}
+
+// اسکیما برای breadcrumb
+function generateBreadcrumbSchema(currentTag?: string) {
+  const breadcrumbs = [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "خانه",
+      item: "https://webofen.com",
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "مقالات",
+      item: "https://webofen.com/articles",
+    },
+  ];
+
+  if (currentTag) {
+    breadcrumbs.push({
+      "@type": "ListItem",
+      position: 3,
+      name: `مقالات با تگ ${currentTag}`,
+      item: `https://webofen.com/articles?tag=${encodeURIComponent(currentTag)}`,
+    });
+  }
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: breadcrumbs,
+  };
+}
+
 export default function PostsPage({
   initialPosts,
   total,
@@ -125,6 +181,8 @@ export default function PostsPage({
   // تولید اسکیما برای مقالات و صفحه بلاگ
   const articleSchemas = generateArticleSchema(posts);
   const blogPageSchema = generateBlogPageSchema(posts);
+  const organizationSchema = generateOrganizationSchema();
+  const breadcrumbSchema = generateBreadcrumbSchema(currentTag);
 
   // استخراج تمام تگ‌ها از پست‌ها
   useEffect(() => {
@@ -169,17 +227,16 @@ export default function PostsPage({
   }));
 
   // ساخت کارت‌ها با قرارگیری پست‌ها و کارت‌های شبکه‌های اجتماعی
-const cards: (PostWithViews | (typeof socialCards)[0])[] = [];
+  const cards: (PostWithViews | (typeof socialCards)[0])[] = [];
 
-// Keep the featured post aside (posts[0])
-for (let i = 1; i < postsWithViews.length; i++) {
-  // insert social cards at certain indexes without overwriting order
-  if (i === 4) cards.push(socialCards[0]);
-  if (i === 10) cards.push(socialCards[1]);
+  // Keep the featured post aside (posts[0])
+  for (let i = 1; i < postsWithViews.length; i++) {
+    // insert social cards at certain indexes without overwriting order
+    if (i === 4) cards.push(socialCards[0]);
+    if (i === 10) cards.push(socialCards[1]);
 
-  cards.push(postsWithViews[i]);
-}
-
+    cards.push(postsWithViews[i]);
+  }
 
   // ✅ تابع ساده برای تغییر تگ
   const handleTagClick = (tagName: string) => {
@@ -291,6 +348,16 @@ for (let i = 1; i < postsWithViews.length; i++) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPageSchema) }}
       />
+      
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+      
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
 
       {articleSchemas.map((schema, index) => (
         <script
@@ -303,6 +370,40 @@ for (let i = 1; i < postsWithViews.length; i++) {
       <main className="bg-[#f7f8fc] pb-10">
         <div className="w-full pt-10">
           <div className="md:w-[1250px] mx-auto">
+            
+            {/* Breadcrumb Navigation */}
+            <nav className="mb-6 px-4" aria-label="breadcrumb">
+              <ol className="flex items-center space-x-2 space-x-reverse text-sm text-gray-500">
+                <li>
+                  <Link href="/" className="hover:text-[#ff5084] transition-colors">
+                    خانه
+                  </Link>
+                </li>
+                <li className="flex items-center">
+                  <svg className="w-4 h-4 mx-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                  </svg>
+                </li>
+                <li>
+                  <Link href="/articles" className="hover:text-[#ff5084] transition-colors">
+                    مقالات
+                  </Link>
+                </li>
+                {currentTag && (
+                  <>
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 mx-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </li>
+                    <li className="text-[#ff5084] font-medium">
+                      {currentTag}
+                    </li>
+                  </>
+                )}
+              </ol>
+            </nav>
+
             {/* بخش تگ‌ها */}
             <div className="mb-8 px-4">
               <div className="flex flex-wrap gap-2 items-center">
@@ -894,6 +995,7 @@ for (let i = 1; i < postsWithViews.length; i++) {
     </>
   );
 }
+
 export const getStaticProps: GetStaticProps = async () => {
   try {
     const page = 1;
