@@ -32,18 +32,33 @@ function normalizeImageUrl(url?: string): string {
 // تابع برای ایجاد اسکیما مقالات
 function generateArticleSchema(posts: Post[]) {
   return posts.map((post) => {
-    const imageUrl = normalizeImageUrl(post.imageUrl);
-    const hasValidImage = imageUrl && imageUrl !== `${SITE_URL}/images/og-blog.jpg`;
-    
-    const schema: any = {
+    const SITE_URL = "https://webofen.com";
+
+    // بررسی تصویر
+    let imageUrl = post?.imageUrl?.trim();
+    if (!imageUrl || imageUrl === "") {
+      imageUrl = `${SITE_URL}/images/og-blog.jpg`;
+    } else if (!/^https?:\/\//.test(imageUrl)) {
+      // اگر مسیر نسبی بود
+      imageUrl = `${SITE_URL}${imageUrl.startsWith("/") ? "" : "/"}${imageUrl}`;
+    }
+
+    // بررسی نویسنده
+    const authorName = (post as any)?.author?.name?.trim() || "تیم وبوفن";
+    const authorUrl = (post as any)?.author?.url || SITE_URL;
+
+    return {
       "@context": "https://schema.org",
       "@type": "Article",
-      headline: post.title,
-      description: post.description || "",
-      datePublished: post.createdAt,
-      mainEntityOfPage: {
-        "@type": "WebPage",
-        "@id": `${SITE_URL}/articles/${post.slug}`,
+      headline: post.title || "مقاله وبوفن",
+      description:
+        post.description ||
+        "مطالب آموزشی و مقالات تخصصی دیجیتال مارکتینگ در وبوفن.",
+      image: imageUrl, // ✅ همیشه وجود دارد
+      author: {
+        "@type": "Person",
+        name: "وبوفن",
+        url: "https://webofen.com"
       },
       publisher: {
         "@type": "Organization",
@@ -53,35 +68,13 @@ function generateArticleSchema(posts: Post[]) {
           url: `${SITE_URL}/logo.png`,
         },
       },
+      datePublished: post.createdAt || new Date().toISOString(),
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": `${SITE_URL}/articles/${post.slug}`,
+      },
       articleSection: post.category?.title || "دیجیتال مارکتینگ",
-      wordCount: post.content ? post.content.split(/\s+/).length : 0,
-      timeRequired: `PT${post.readtime || 5}M`,
     };
-
-    // ✅ فقط اگر تصویر واقعی موجود است
-    if (hasValidImage) {
-      schema.image = imageUrl;
-    } else {
-      schema.image = `${SITE_URL}/images/og-blog.jpg`; // تصویر پیش‌فرض معتبر
-    }
-
-    // ✅ فقط اگر نویسنده موجود است، اضافه کن
-    if ((post as any).author?.name) {
-      schema.author = {
-        "@type": "Person",
-        name: (post as any).author.name,
-        url: (post as any).author.url || SITE_URL,
-      };
-    } else {
-      // فallback معتبر برای جلوگیری از هشدار
-      schema.author = {
-        "@type": "Organization",
-        name: "تیم وبوفن",
-        url: SITE_URL,
-      };
-    }
-
-    return schema;
   });
 }
 
