@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           <style>
             @font-face {
               font-family: 'YekanBakh';
-              src: url('http://localhost:3002/fonts/YekanBakhFaNum-Regular.ttf') format('truetype');
+              src: url('http://webofen.com/fonts/YekanBakhFaNum-Regular.ttf') format('truetype');
               font-weight: normal;
               font-style: normal;
             }
@@ -48,7 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         <body>
           <div class="invoice-container">
             <div class="logo">
-              <img src="http://localhost:3002/homepage/logo.png" alt="لوگو"/>
+              <img src="http://webofen.com/homepage/logo.png" alt="لوگو"/>
             </div>
             <h1>فاکتور  </h1>
 
