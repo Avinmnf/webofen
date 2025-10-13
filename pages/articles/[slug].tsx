@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { usePageView } from "@/hooks/usePageView";
 import SEO from "@/components/seo";
 import { InjectRelatedCategories } from "@/lib/functions/injectRelatedCategories";
+import { useRelatedPosts } from "@/hooks/useRelatedPosts";
 type Props = { post: Post };
 
 interface SchemaProps {
@@ -112,7 +113,8 @@ export default function PostPage({ post }: Props) {
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
   const router = useRouter();
-  const { slug } = router.query;
+  const slug = router.query.slug as string | undefined;
+  const { relatedPosts, loading, error } = useRelatedPosts(slug ?? "");
 
   useEffect(() => {
     if (post) {
@@ -195,7 +197,7 @@ export default function PostPage({ post }: Props) {
       <ArticleSchema post={post} />
       <BreadcrumbSchema post={post} />
 
-      <main className="w-[1250px] mx-auto p-4 relative articles">
+      <main className="md:w-[1250px] mx-auto p-4 relative articles">
         {/*Background Section */}
         <div className="relative pt-20">
           <div className="w-full m-auto">
@@ -280,13 +282,13 @@ export default function PostPage({ post }: Props) {
             </article>
           </div>
 
-          <div className="flex w-full m-auto justify-between content">
-            <div className="text-gray-700 mt-6 w-4/5">
+          <div className="flex flex-wrap w-full m-auto justify-between content">
+            <div className="text-gray-700 mt-6 w-full md:w-4/5">
               <InjectRelatedCategories
                 html={post.modifiedContent || ""}
                 relatedCategories={post.relatedCategories}
+                relatedPosts={relatedPosts}
               />
-
               <div className="bg-gray-100 mt-6 w-full h-1"></div>
               <CommentForm
                 contentType="post"
@@ -295,7 +297,7 @@ export default function PostPage({ post }: Props) {
             </div>
 
             {/* Sidebar */}
-            <aside className="w-1/5">
+            <aside className="md:w-1/5 w-full">
               <div className="toc-sidebar top-2 space-y-6  justify-center">
                 <div>
                   {post.toc && post.toc.length > 0 && (

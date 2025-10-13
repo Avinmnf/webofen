@@ -35,6 +35,9 @@ body {
 .content ol li{list-style-type:decimal; line-height: 2.5rem; }
 .content ul li{list-style-type: disc;}
 .content ul li a{color: #3db4c6;}
+.related {
+  color: black;
+}
 .toc-level-1{margin-right: 1px;}
 .toc-level-2{margin-right: 5px;}
 .toc-level-3{margin-right: 10px;}
