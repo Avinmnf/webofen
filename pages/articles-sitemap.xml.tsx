@@ -22,27 +22,33 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
       body: JSON.stringify({ query }),
     }).then(r => r.json());
 
-    const posts = (result.data?.posts || []).filter((p: any) => p.includeInSitemap && p.isIndexed);
+        const posts = (result.data?.posts || [])
+      .filter((p: any) => p.includeInSitemap && p.isIndexed)
+      .sort((a: any, b: any) => {
+        const dateA = new Date(a.updatedAt || a.publishedAt).getTime();
+        const dateB = new Date(b.updatedAt || b.publishedAt).getTime();
+        return dateB - dateA; // مرتب‌سازی از جدیدترین به قدیمی‌ترین
+      });
     const categories = (result.data?.categories || []).filter((c: any) => c.includeInSitemap && c.isIndexed);
     const tags = (result.data?.tags || []).filter((t: any) => t.includeInSitemap && t.isIndexed);
 
     const urls = [
-      ...posts.map((p: any) => ({ slug: `articles/${p.slug}`, lastmod: formatDate(p.updatedAt) })),
+      ...posts.map((p: any) => ({ slug: `articles/${p.slug}`, lastmod: formatDate(p.updatedAt || p.publishedAt) })),
       ...categories.map((c: any) => ({ slug: `category/${c.slug}`, lastmod: formatDate(c.updatedAt) })),
       ...tags.map((t: any) => ({ slug: `tag/${t.slug}`, lastmod: formatDate(t.updatedAt) })),
     ];
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls
+      <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+      ${urls
       .map(
         (u) => `  <url>
-    <loc>${BASE_URL}/${u.slug}</loc>
-    <lastmod>${u.lastmod}</lastmod>
-  </url>`
+        <loc>${BASE_URL}/${u.slug}</loc>
+        <lastmod>${u.lastmod}</lastmod>
+      </url>`
       )
       .join("\n")}
-</urlset>`;
+      </urlset>`;
 
     res!.setHeader("Content-Type", "application/xml");
     res!.write(sitemap);

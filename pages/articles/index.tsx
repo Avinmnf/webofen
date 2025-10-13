@@ -78,7 +78,6 @@ function generateArticleSchema(posts: Post[]) {
   });
 }
 
-
 // اسکیما برای صفحه مقالات
 function generateBlogPageSchema(posts: Post[]) {
   return {
@@ -178,7 +177,7 @@ export default function PostsPage({
   const [currentTag, setCurrentTag] = useState<string | undefined>(
     (queryTag as string) || undefined
   );
-  const [allTags, setAllTags] = useState<{ id: string; name: string }[]>([]);
+  const [allTags, setAllTags] = useState<{ name: string }[]>([]);
   const breakpointColumnsObj = {
     default: 3,
     1100: 2,
@@ -206,20 +205,22 @@ export default function PostsPage({
   useEffect(() => {
     const extractAllTags = () => {
       const allTagsFromPosts = allPosts.flatMap(
-        (post) =>
-          post.tags?.map((tag) => ({ id: tag.id, name: tag.name })) || []
+        (post) => post.tags?.map((tag) => ({ name: tag.name })) || []
       );
 
+      // حذف تگ‌های تکراری بر اساس name
       const uniqueTags = allTagsFromPosts.filter(
         (tag, index, self) =>
-          index === self.findIndex((t) => t.id === tag.id) &&
-          tag.name !== "پیشنهاد ما"
+          index === self.findIndex((t) => t.name === tag.name)
       );
 
+      console.log('تگ‌های منحصر به فرد:', uniqueTags);
       setAllTags(uniqueTags);
     };
 
-    extractAllTags();
+    if (allPosts.length > 0) {
+      extractAllTags();
+    }
   }, [allPosts]);
 
   const socialCards = [
@@ -272,7 +273,7 @@ export default function PostsPage({
       router.push(
         {
           pathname: "/articles",
-          query: { tag: currentTag },
+          
         },
         undefined,
         { shallow: true }
@@ -442,9 +443,9 @@ export default function PostsPage({
                 </button>
 
                 {/* لیست تگ‌ها - نمایش تمام تگ‌های موجود در پست‌ها */}
-                {allTags.map((tag) => (
+                {allTags.map((tag, index) => (
                   <button
-                    key={tag.id}
+                    key={index}
                     onClick={() => handleTagClick(tag.name)}
                     className={`px-4 py-2 rounded-full text-sm border-2 transition-colors ${
                       currentTag === tag.name
@@ -581,27 +582,22 @@ export default function PostsPage({
                               {posts[0].description}
                             </p>
 
-                            {/* تگ‌های پست اصلی (بدون تگ "پیشنهاد ما") */}
-                            {posts[0].tags &&
-                              posts[0].tags.filter(
-                                (tag) => tag.name !== "پیشنهاد ما"
-                              ).length > 0 && (
-                                <div className="mt-3 flex flex-wrap gap-1">
-                                  {posts[0].tags
-                                    .filter((tag) => tag.name !== "پیشنهاد ما")
-                                    .map((tag) => (
-                                      <span
-                                        key={tag.id}
-                                        onClick={(e) =>
-                                          handleCardTagClick(e, tag.name)
-                                        }
-                                        className="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full cursor-pointer hover:bg-gray-200 transition-colors border border-gray-200"
-                                      >
-                                        {tag.name}
-                                      </span>
-                                    ))}
-                                </div>
-                              )}
+                            {/* تگ‌های پست اصلی */}
+                            {posts[0].tags && posts[0].tags.length > 0 && (
+                              <div className="mt-3 flex flex-wrap gap-1">
+                                {posts[0].tags.map((tag, index) => (
+                                  <span
+                                    key={index}
+                                    onClick={(e) =>
+                                      handleCardTagClick(e, tag.name)
+                                    }
+                                    className="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full cursor-pointer hover:bg-gray-200 transition-colors border border-gray-200"
+                                  >
+                                    {tag.name}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
 
                             <div className="text-xs text-gray-400 mt-2 flex justify-between items-center">
                               <div className="flex items-center">
@@ -698,9 +694,9 @@ export default function PostsPage({
                     className="flex w-auto gap-6 "
                     columnClassName="bg-clip-padding"
                   >
-                    {cards.map((card) => (
+                    {cards.map((card, index) => (
                       <div
-                        key={"id" in card ? card.id : (card as Post).id}
+                        key={"id" in card ? card.id : `post-${index}`}
                         className="mb-8 break-inside-avoid"
                       >
                         {"type" in card && card.type === "social" ? (
@@ -905,29 +901,22 @@ export default function PostsPage({
                                   {(card as Post).description}
                                 </p>
 
-                                {/* تگ‌های پست (بدون تگ "پیشنهاد ما") */}
-                                {(card as Post).tags &&
-                                  (card as Post).tags.filter(
-                                    (tag) => tag.name !== "پیشنهاد ما"
-                                  ).length > 0 && (
-                                    <div className="mt-2 flex flex-wrap gap-1">
-                                      {(card as Post).tags
-                                        .filter(
-                                          (tag) => tag.name !== "پیشنهاد ما"
-                                        )
-                                        .map((tag) => (
-                                          <span
-                                            key={tag.id}
-                                            onClick={(e) =>
-                                              handleCardTagClick(e, tag.name)
-                                            }
-                                            className="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full cursor-pointer hover:bg-gray-200 transition-colors border border-gray-200"
-                                          >
-                                            {tag.name}
-                                          </span>
-                                        ))}
-                                    </div>
-                                  )}
+                                {/* تگ‌های پست */}
+                                {(card as Post).tags && (card as Post).tags.length > 0 && (
+                                  <div className="mt-2 flex flex-wrap gap-1">
+                                    {(card as Post).tags.map((tag, index) => (
+                                      <span
+                                        key={index}
+                                        onClick={(e) =>
+                                          handleCardTagClick(e, tag.name)
+                                        }
+                                        className="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full cursor-pointer hover:bg-gray-200 transition-colors border border-gray-200"
+                                      >
+                                        {tag.name}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
 
                                 <p className="text-md text-gray-400 mt-2 line-clamp-2">
                                   {(card as Post).desc}
