@@ -11,48 +11,43 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePageView } from "@/hooks/usePageView";
 import SEO from "@/components/seo";
-import BlogSkeleton from "@/components/Skeleton/BlogSkeleton";
-
+import { InjectRelatedCategories } from "@/lib/functions/injectRelatedCategories";
 type Props = { post: Post };
 
-// تعریف تایپ برای کامپوننت اسکیما
 interface SchemaProps {
   post: Post;
 }
 
-// کامپوننت اسکیما
 const ArticleSchema = ({ post }: SchemaProps) => {
   if (!post) return null;
 
   const schemaData = {
     "@context": "https://schema.org",
     "@type": "Article",
-    "headline": post.title,
-    "description": post.description,
-    "image": post.imageUrl ? [post.imageUrl] : [],
-    "datePublished": post.createdAt,
-    "dateModified": post.updatedAt || post.createdAt,
-    "author": {
+    headline: post.title,
+    description: post.description,
+    image: post.imageUrl ? [post.imageUrl] : [],
+    datePublished: post.createdAt,
+    dateModified: post.updatedAt || post.createdAt,
+    author: {
       "@type": "Person",
-      "name": post.author?.name || "نویسنده ناشناس",
-      "url": post.author?.url || "https://webofen.com",// می‌توانید URL پیش‌فرض سایت را بگذارید
-      "image": post.author?.url || post.imageUrl || undefined
-
-
+      name: post.author?.name || "نویسنده ناشناس",
+      url: post.author?.url || "https://webofen.com", // می‌توانید URL پیش‌فرض سایت را بگذارید
+      image: post.author?.url || post.imageUrl || undefined,
     },
-    "publisher": {
+    publisher: {
       "@type": "Organization",
-      "name": "Webofen",
-      "url": "https://webofen.com"
+      name: "Webofen",
+      url: "https://webofen.com",
     },
-    "mainEntityOfPage": {
+    mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": typeof window !== 'undefined' ? window.location.href : ""
+      "@id": typeof window !== "undefined" ? window.location.href : "",
     },
-    "articleSection": post.category?.title,
-    "keywords": post.tags ? post.tags.map(t => t.name).join(", ") : "",
-    "wordCount": post.content ? post.content.length : 0,
-    "inLanguage": "fa-IR"
+    articleSection: post.category?.title,
+    keywords: post.tags ? post.tags.map((t) => t.name).join(", ") : "",
+    wordCount: post.content ? post.content.length : 0,
+    inLanguage: "fa-IR",
   };
 
   return (
@@ -66,38 +61,41 @@ const ArticleSchema = ({ post }: SchemaProps) => {
 // اسکیما برای Breadcrumb
 const BreadcrumbSchema = ({ post }: SchemaProps) => {
   // استفاده از slug از post یا ایجاد یک slug ساده از title
-  const categorySlug = post?.category?.slug || 
-    (post?.category?.title ? post.category.title.toLowerCase().replace(/\s+/g, '-') : "");
+  const categorySlug =
+    post?.category?.slug ||
+    (post?.category?.title
+      ? post.category.title.toLowerCase().replace(/\s+/g, "-")
+      : "");
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    "itemListElement": [
+    itemListElement: [
       {
         "@type": "ListItem",
-        "position": 1,
-        "name": "خانه",
-        "item": "https://webofen.com"
+        position: 1,
+        name: "خانه",
+        item: "https://webofen.com",
       },
       {
         "@type": "ListItem",
-        "position": 2,
-        "name": "مقالات",
-        "item": "https://webofen.com/articles"
+        position: 2,
+        name: "مقالات",
+        item: "https://webofen.com/articles",
       },
       {
         "@type": "ListItem",
-        "position": 3,
-        "name": post?.category?.title || "دسته‌بندی",
-        "item": `https://webofen.com/category/${categorySlug}`
+        position: 3,
+        name: post?.category?.title || "دسته‌بندی",
+        item: `https://webofen.com/category/${categorySlug}`,
       },
       {
         "@type": "ListItem",
-        "position": 4,
-        "name": post?.title || "",
-        "item": typeof window !== 'undefined' ? window.location.href : ""
-      }
-    ]
+        position: 4,
+        name: post?.title || "",
+        item: typeof window !== "undefined" ? window.location.href : "",
+      },
+    ],
   };
 
   return (
@@ -177,8 +175,6 @@ export default function PostPage({ post }: Props) {
     }
   };
 
-
-
   return (
     <>
       <SEO
@@ -199,7 +195,7 @@ export default function PostPage({ post }: Props) {
       <ArticleSchema post={post} />
       <BreadcrumbSchema post={post} />
 
-<main className="w-[1250px] mx-auto p-4 relative articles">
+      <main className="w-[1250px] mx-auto p-4 relative articles">
         {/*Background Section */}
         <div className="relative pt-20">
           <div className="w-full m-auto">
@@ -286,9 +282,11 @@ export default function PostPage({ post }: Props) {
 
           <div className="flex w-full m-auto justify-between content">
             <div className="text-gray-700 mt-6 w-4/5">
-              <div
-                dangerouslySetInnerHTML={{ __html: post.modifiedContent || "" }}
+              <InjectRelatedCategories
+                html={post.modifiedContent || ""}
+                relatedCategories={post.relatedCategories}
               />
+
               <div className="bg-gray-100 mt-6 w-full h-1"></div>
               <CommentForm
                 contentType="post"
@@ -454,12 +452,10 @@ export default function PostPage({ post }: Props) {
             </aside>
           </div>
         </div>
-
       </main>
-          </>
+    </>
   );
 }
-
 
 export const getStaticPaths: GetStaticPaths = async () => {
   return {
