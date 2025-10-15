@@ -199,7 +199,7 @@ export default function ProductDetailPage({ product }: Props) {
                       <h4 className="text-sm">{attrName}:</h4>
                       <div className="relative group">
                         <svg
-                          className="w-5 h-5 cursor-pointer"
+                          className="w-4 h-4 cursor-pointer"
                           viewBox="0 0 24 24"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
