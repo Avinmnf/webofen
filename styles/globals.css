@@ -44,11 +44,11 @@ body {
 }
 .toc-sidebar {
   position: sticky;
-  top: 20px; /* فاصله از بالای صفحه */
-  align-self: flex-start; /* برای flex container */
+  top: 20px;
+  align-self: flex-start;
   height: fit-content;
-  max-height: 80vh; /* حداکثر ارتفاع */
-  overflow-y: auto; /* اسکرول داخلی اگر محتوا بلند شد */
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 /* برای responsive design */
