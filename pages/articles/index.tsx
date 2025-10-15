@@ -2,13 +2,11 @@ import React, { useState, useMemo, useEffect } from "react";
 import { GetStaticProps } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { GetServerSideProps } from "next";
 import { fetchPosts } from "@/lib/posts";
 import { Post, PostWithViews } from "@/lib/models/postlist";
 import { useRouter } from "next/router";
 import SEO from "@/components/seo";
 import Masonry from "react-masonry-css";
-import ArticlesListSkeleton from "@/components/Skeleton/ArticlesListSkeleton";
 
 type PostsPageProps = {
   initialPosts: Post[];

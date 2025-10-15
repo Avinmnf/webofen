@@ -11,6 +11,9 @@ export type RelatedCategory = {
   products: Product[];
 };
 
+export type PostWithViews = Post & {
+  views: number;
+};
 export type Post = {
   id: string;
   title: string;
@@ -31,6 +34,7 @@ export type Post = {
   wordCount?: string; // ✅ اضافه شد
   images?: string[]; // ✅ اضافه شد
   relatedCategories?: RelatedCategory[];
+  views: number;
 };
 
 type TOCItem = { id: string; text: string; tag: string; level: number };

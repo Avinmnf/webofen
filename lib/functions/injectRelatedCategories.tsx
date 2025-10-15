@@ -40,7 +40,7 @@ export function InjectRelatedCategories({
     ? relatedCategories!.flatMap((cat) => cat.products)
     : [];
 
-  // 🛍 Related Products Section
+  //Related Products
   const renderRelatedProducts = (index: number) => (
     <section key={`related-products-${index}`} className="my-8 md:w-full">
       <h4 className="text-lg text-[#3db4c6] font-semibold mb-4 border-b border-gray-200 pb-2">
@@ -54,8 +54,10 @@ export function InjectRelatedCategories({
             className="bg-white rounded-xl related border border-gray-200 overflow-hidden shadow-sm transition-shadow duration-200 flex items-center p-2"
           >
             <div className="w-15 h-15 flex-shrink-0 ml-4">
-              {prod.videoUrl ? (
-                <Productvideo product={prod.videoUrl} />
+              {prod.videoUrl ||
+              prod.imageUrl?.endsWith(".mp4") ||
+              prod.imageUrl?.includes(".mp4") ? (
+                <Productvideo product={prod.videoUrl || prod.imageUrl!} />
               ) : prod.imageUrl ? (
                 <img
                   src={prod.imageUrl}
@@ -63,7 +65,7 @@ export function InjectRelatedCategories({
                   className="w-full h-full object-cover rounded-lg"
                 />
               ) : (
-                <div className="w-full h-full bg-gray-100 rounded-lg flex items-center text-center text-sm p-1 justify-center text-gray-400">
+                <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-sm">
                   No Image
                 </div>
               )}
@@ -134,7 +136,6 @@ export function InjectRelatedCategories({
         <div key={`content-${i}`} dangerouslySetInnerHTML={{ __html: part }} />
       );
 
-
       if (h2Count === 1 && hasProducts && !productsInjected) {
         console.log("🛍 Injecting related products after first H2 content");
         finalContent.push(renderRelatedProducts(h2Count));
@@ -147,8 +148,7 @@ export function InjectRelatedCategories({
           const postElement = renderRelatedPosts(h2Count, postInjectionCount);
           if (postElement) finalContent.push(postElement);
           postInjectionCount++;
-        }
-        else if (h2Count === 7 && postInjectionCount === 1) {
+        } else if (h2Count === 7 && postInjectionCount === 1) {
           console.log(
             "📰 Injecting second related post after fifth H2 content"
           );

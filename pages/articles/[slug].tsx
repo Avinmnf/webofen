@@ -247,7 +247,7 @@ export default function PostPage({ post }: Props) {
                   <p className="text-blue-500">{post.category?.title}</p>
                 </div>
                 <div className="">
-                  <h1 className="text-gray-800 font-semibold mt-2">
+                  <h1 className="text-gray-800 font-semibold mt-2 text-3xl">
                     {post.title}
                   </h1>
                 </div>
