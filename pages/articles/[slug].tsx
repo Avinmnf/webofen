@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { useRef } from "react";
 import { GetStaticProps } from "next";
 import { GetStaticPaths } from "next";
 import { GetServerSideProps } from "next";
@@ -13,7 +14,10 @@ import { usePageView } from "@/hooks/usePageView";
 import SEO from "@/components/seo";
 import { InjectRelatedCategories } from "@/lib/functions/injectRelatedCategories";
 import { useRelatedPosts } from "@/hooks/useRelatedPosts";
-type Props = { post: Post };
+type Props = {
+  post: Post;
+  viewCount: number;
+};
 
 interface SchemaProps {
   post: Post;
@@ -107,75 +111,24 @@ const BreadcrumbSchema = ({ post }: SchemaProps) => {
   );
 };
 
-export default function PostPage({ post }: Props) {
-  console.log(post);
-  const { user } = useAuth();
+export default function PostPage({ post, viewCount }: Props) {
+  const countedRef = useRef(false);
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
   const router = useRouter();
   const slug = router.query.slug as string | undefined;
-  const { relatedPosts, loading, error } = useRelatedPosts(slug ?? "");
-
+  const { relatedPosts } = useRelatedPosts(slug ?? "");
+  usePageView({
+    slug: post?.slug || "",
+    title: post?.title,
+    type: "article",
+  });
   useEffect(() => {
     if (post) {
       setLikes(post.ratings?.filter((r) => r.value === 5).length || 0);
       setDislikes(post.ratings?.filter((r) => r.value === 1).length || 0);
     }
   }, [post]);
-
-  usePageView({ slug: post?.slug || "", title: post?.title || "" });
-
-  const handleLike = async () => {
-    const res = await fetch("/api/graphql", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: `
-          mutation LikePost($slug: String!) {
-            likePost(slug: $slug) {
-              likes
-              dislikes
-            }
-          }
-        `,
-        variables: { slug: post?.slug ?? "" },
-      }),
-    });
-
-    const data = await res.json();
-    if (data.data?.likePost) {
-      setLikes(data.data.likePost.likes);
-      setDislikes(data.data.likePost.dislikes);
-    }
-  };
-
-  const handleDislike = async () => {
-    const res = await fetch("/api/graphql", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: `
-          mutation DislikePost($slug: String!) {
-            dislikePost(slug: $slug) {
-              likes
-              dislikes
-            }
-          }
-        `,
-        variables: { slug: post?.slug ?? "" },
-      }),
-    });
-
-    const data = await res.json();
-    if (data.data?.dislikePost) {
-      setLikes(data.data.dislikePost.likes);
-      setDislikes(data.data.dislikePost.dislikes);
-    }
-  };
 
   return (
     <>
@@ -264,7 +217,7 @@ export default function PostPage({ post }: Props) {
                         fill="#db3006"
                       />
                     </svg>
-                    <span className="mr-2">{(5).toLocaleString("fa-IR")}</span>
+                    <span className="mr-2">{viewCount}</span>
                   </div>
                   <div>
                     <span>
@@ -325,10 +278,7 @@ export default function PostPage({ post }: Props) {
                 </div>
                 <div className="flex flex-wrap justify-center">
                   <div className="w-full flex gap-6 justify-center items-center">
-                    <button
-                      onClick={handleLike}
-                      className="flex items-center gap-2 text-blue-400 hover:text-green-400 cursor-pointer"
-                    >
+                    <button className="flex items-center gap-2 text-blue-400 hover:text-green-400 cursor-pointer">
                       <svg
                         className="w-6 h-7 hover:text-green-400"
                         viewBox="0 0 24 24"
@@ -351,10 +301,7 @@ export default function PostPage({ post }: Props) {
                       </svg>
                       <span>{likes}</span>
                     </button>
-                    <button
-                      onClick={handleDislike}
-                      className="flex items-center gap-2 text-gray-400 hover:text-red-400"
-                    >
+                    <button className="flex items-center gap-2 text-gray-400 hover:text-red-400">
                       <svg
                         className="w-6 h-7 mt-2 hover:text-red-400 cursor-pointer"
                         viewBox="0 0 24 24"
@@ -465,33 +412,41 @@ export const getStaticPaths: GetStaticPaths = async () => {
     fallback: "blocking",
   };
 };
-
 export const getStaticProps: GetStaticProps = async (ctx) => {
   const { slug } = ctx.params as { slug: string };
   const safeSlug = encodeURIComponent(slug);
   const website = process.env.NEXT_PUBLIC_WEBOFEN || "https://webofen.com";
 
   try {
-    const res = await fetch(`${website}/api/proxy/postbyslug/${safeSlug}`, {
+    // 1️⃣ Get post data
+    const postRes = await fetch(`${website}/api/proxy/postbyslug/${safeSlug}`, {
       headers: { "Content-Type": "application/json" },
     });
 
-    if (!res.ok) {
-      return { notFound: true };
-    }
+    if (!postRes.ok) return { notFound: true };
 
-    const data = await res.json();
+    const postData = await postRes.json();
+    if (!postData.post) return { notFound: true };
 
-    if (!data.post) {
-      return { notFound: true };
-    }
+    // 2️⃣ Get view count
+    const viewsRes = await fetch(
+      `${website}/api/proxy/getviewbyslug/${safeSlug}?type=article`
+    );
+    const viewsData = await viewsRes.json();
 
+    // If your route returns { count, slug }
+    const viewCount = viewsData.count || 0;
+
+    // 3️⃣ Pass both post and view count as props
     return {
-      props: { post: data.post },
-      revalidate: 60, // ⏳ Regenerate at most once every 60s when a new request comes
+      props: {
+        post: postData.post,
+        viewCount,
+      },
+      revalidate: 60, // ISR
     };
   } catch (err) {
-    console.error(err);
+    console.error("getStaticProps error:", err);
     return { notFound: true };
   }
 };

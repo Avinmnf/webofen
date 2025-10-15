@@ -258,13 +258,16 @@ export default function CartPage() {
                         item.couponApplied ? "line-through text-gray-400" : ""
                       }`}
                     >
-                      قیمت: {item.price?.toLocaleString()} تومان
+                      قیمت:{" "}
+                      {item.price ? (item.price / 10).toLocaleString() : 0}{" "}
+                      تومان
                     </p>
 
                     {/* Show discounted price if coupon applied */}
                     {item.couponApplied && (
                       <p className="text-sm text-emerald-600 font-semibold">
-                        بعد از کوپن: {item.finalUnit.toLocaleString()} تومان
+                        بعد از کوپن: {(item.finalUnit / 10).toLocaleString()}{" "}
+                        تومان
                       </p>
                     )}
                   </div>
@@ -335,11 +338,11 @@ export default function CartPage() {
                 تخفیف: {discountTotal.toLocaleString()} تومان
               </p>
             )}
-            <p className=" text-sm mt-1">
-              قیمت محصولات: {subtotal.toLocaleString()} تومان
+            <p className="text-sm mt-1">
+              قیمت محصولات: {(subtotal / 10).toLocaleString()} تومان
             </p>
-            <p className=" text-sm mt-1">
-              جمع سبد خرید: {totalPrice.toLocaleString()} تومان
+            <p className="text-sm mt-1">
+              جمع سبد خرید: {(totalPrice / 10).toLocaleString()} تومان
             </p>
           </div>
           <div className="flex gap-2 items-center mt-6">
