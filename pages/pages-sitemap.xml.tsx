@@ -7,6 +7,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     const urls = [
       { slug: "", lastmod: "2025-10-08" },          // صفحه اصلی
       { slug: "about-us", lastmod: "2025-10-07" },  // درباره ما
+      { slug: "contact-us", lastmod: "2025-10-07" }, // تماس با ما
       { slug: "articles-sitemap.xml", lastmod: "2025-10-08" }, // لینک به sitemap articles
       { slug: "products-sitemap.xml", lastmod: "2025-10-08" }, // لینک به sitemap products
     ];
