@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 type Post = {
   id: string;
@@ -11,7 +11,7 @@ type Post = {
   createdAt?: string;
   category?: { id: string; title: string };
   tags?: { name: string }[];
-    ratings?: { value: number }[];
+  ratings?: { value: number }[];
   _ratingsMeta?: { count: number };
 };
 
@@ -35,7 +35,8 @@ export function usePostBySlug(slug?: string) {
           method: "GET",
         });
 
-        if (!res.ok) throw new Error(`Failed to fetch post (status ${res.status})`);
+        if (!res.ok)
+          throw new Error(`Failed to fetch post (status ${res.status})`);
         const data = await res.json();
         setPost(data);
       } catch (err: any) {

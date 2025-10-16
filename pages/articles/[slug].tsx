@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { useRef } from "react";
 import { GetStaticProps } from "next";
 import { GetStaticPaths } from "next";
 import { GetServerSideProps } from "next";
@@ -11,48 +12,47 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePageView } from "@/hooks/usePageView";
 import SEO from "@/components/seo";
-import BlogSkeleton from "@/components/Skeleton/BlogSkeleton";
+import { InjectRelatedCategories } from "@/lib/functions/injectRelatedCategories";
+import { useRelatedPosts } from "@/hooks/useRelatedPosts";
+type Props = {
+  post: Post;
+  viewCount: number;
+};
 
-type Props = { post: Post };
-
-// تعریف تایپ برای کامپوننت اسکیما
 interface SchemaProps {
   post: Post;
 }
 
-// کامپوننت اسکیما
 const ArticleSchema = ({ post }: SchemaProps) => {
   if (!post) return null;
 
   const schemaData = {
     "@context": "https://schema.org",
     "@type": "Article",
-    "headline": post.title,
-    "description": post.description,
-    "image": post.imageUrl ? [post.imageUrl] : [],
-    "datePublished": post.createdAt,
-    "dateModified": post.updatedAt || post.createdAt,
-    "author": {
+    headline: post.title,
+    description: post.description,
+    image: post.imageUrl ? [post.imageUrl] : [],
+    datePublished: post.createdAt,
+    dateModified: post.updatedAt || post.createdAt,
+    author: {
       "@type": "Person",
-      "name": post.author?.name || "نویسنده ناشناس",
-      "url": post.author?.url || "https://webofen.com",// می‌توانید URL پیش‌فرض سایت را بگذارید
-      "image": post.author?.url || post.imageUrl || undefined
-
-
+      name: post.author?.name || "نویسنده ناشناس",
+      url: post.author?.url || "https://webofen.com", // می‌توانید URL پیش‌فرض سایت را بگذارید
+      image: post.author?.url || post.imageUrl || undefined,
     },
-    "publisher": {
+    publisher: {
       "@type": "Organization",
-      "name": "Webofen",
-      "url": "https://webofen.com"
+      name: "Webofen",
+      url: "https://webofen.com",
     },
-    "mainEntityOfPage": {
+    mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": typeof window !== 'undefined' ? window.location.href : ""
+      "@id": typeof window !== "undefined" ? window.location.href : "",
     },
-    "articleSection": post.category?.title,
-    "keywords": post.tags ? post.tags.map(t => t.name).join(", ") : "",
-    "wordCount": post.content ? post.content.length : 0,
-    "inLanguage": "fa-IR"
+    articleSection: post.category?.title,
+    keywords: post.tags ? post.tags.map((t) => t.name).join(", ") : "",
+    wordCount: post.content ? post.content.length : 0,
+    inLanguage: "fa-IR",
   };
 
   return (
@@ -66,38 +66,41 @@ const ArticleSchema = ({ post }: SchemaProps) => {
 // اسکیما برای Breadcrumb
 const BreadcrumbSchema = ({ post }: SchemaProps) => {
   // استفاده از slug از post یا ایجاد یک slug ساده از title
-  const categorySlug = post?.category?.slug || 
-    (post?.category?.title ? post.category.title.toLowerCase().replace(/\s+/g, '-') : "");
+  const categorySlug =
+    post?.category?.slug ||
+    (post?.category?.title
+      ? post.category.title.toLowerCase().replace(/\s+/g, "-")
+      : "");
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    "itemListElement": [
+    itemListElement: [
       {
         "@type": "ListItem",
-        "position": 1,
-        "name": "خانه",
-        "item": "https://webofen.com"
+        position: 1,
+        name: "خانه",
+        item: "https://webofen.com",
       },
       {
         "@type": "ListItem",
-        "position": 2,
-        "name": "مقالات",
-        "item": "https://webofen.com/articles"
+        position: 2,
+        name: "مقالات",
+        item: "https://webofen.com/articles",
       },
       {
         "@type": "ListItem",
-        "position": 3,
-        "name": post?.category?.title || "دسته‌بندی",
-        "item": `https://webofen.com/category/${categorySlug}`
+        position: 3,
+        name: post?.category?.title || "دسته‌بندی",
+        item: `https://webofen.com/category/${categorySlug}`,
       },
       {
         "@type": "ListItem",
-        "position": 4,
-        "name": post?.title || "",
-        "item": typeof window !== 'undefined' ? window.location.href : ""
-      }
-    ]
+        position: 4,
+        name: post?.title || "",
+        item: typeof window !== "undefined" ? window.location.href : "",
+      },
+    ],
   };
 
   return (
@@ -108,76 +111,24 @@ const BreadcrumbSchema = ({ post }: SchemaProps) => {
   );
 };
 
-export default function PostPage({ post }: Props) {
-  console.log(post);
-  const { user } = useAuth();
+export default function PostPage({ post, viewCount }: Props) {
+  const countedRef = useRef(false);
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
   const router = useRouter();
-  const { slug } = router.query;
-
+  const slug = router.query.slug as string | undefined;
+  const { relatedPosts } = useRelatedPosts(slug ?? "");
+  usePageView({
+    slug: post?.slug || "",
+    title: post?.title,
+    type: "article",
+  });
   useEffect(() => {
     if (post) {
       setLikes(post.ratings?.filter((r) => r.value === 5).length || 0);
       setDislikes(post.ratings?.filter((r) => r.value === 1).length || 0);
     }
   }, [post]);
-
-  usePageView({ slug: post?.slug || "", title: post?.title || "" });
-
-  const handleLike = async () => {
-    const res = await fetch("/api/graphql", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: `
-          mutation LikePost($slug: String!) {
-            likePost(slug: $slug) {
-              likes
-              dislikes
-            }
-          }
-        `,
-        variables: { slug: post?.slug ?? "" },
-      }),
-    });
-
-    const data = await res.json();
-    if (data.data?.likePost) {
-      setLikes(data.data.likePost.likes);
-      setDislikes(data.data.likePost.dislikes);
-    }
-  };
-
-  const handleDislike = async () => {
-    const res = await fetch("/api/graphql", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: `
-          mutation DislikePost($slug: String!) {
-            dislikePost(slug: $slug) {
-              likes
-              dislikes
-            }
-          }
-        `,
-        variables: { slug: post?.slug ?? "" },
-      }),
-    });
-
-    const data = await res.json();
-    if (data.data?.dislikePost) {
-      setLikes(data.data.dislikePost.likes);
-      setDislikes(data.data.dislikePost.dislikes);
-    }
-  };
-
-
 
   return (
     <>
@@ -199,7 +150,7 @@ export default function PostPage({ post }: Props) {
       <ArticleSchema post={post} />
       <BreadcrumbSchema post={post} />
 
-<main className="w-[1250px] mx-auto p-4 relative articles">
+      <main className="md:w-[1250px] mx-auto p-4 relative articles">
         {/*Background Section */}
         <div className="relative pt-20">
           <div className="w-full m-auto">
@@ -249,7 +200,7 @@ export default function PostPage({ post }: Props) {
                   <p className="text-blue-500">{post.category?.title}</p>
                 </div>
                 <div className="">
-                  <h1 className="text-gray-800 font-semibold mt-2">
+                  <h1 className="text-gray-800 font-semibold mt-2 text-3xl">
                     {post.title}
                   </h1>
                 </div>
@@ -266,7 +217,7 @@ export default function PostPage({ post }: Props) {
                         fill="#db3006"
                       />
                     </svg>
-                    <span className="mr-2">{(5).toLocaleString("fa-IR")}</span>
+                    <span className="mr-2">{viewCount}</span>
                   </div>
                   <div>
                     <span>
@@ -284,10 +235,12 @@ export default function PostPage({ post }: Props) {
             </article>
           </div>
 
-          <div className="flex w-full m-auto justify-between content">
-            <div className="text-gray-700 mt-6 w-4/5">
-              <div
-                dangerouslySetInnerHTML={{ __html: post.modifiedContent || "" }}
+          <div className="flex flex-wrap w-full m-auto justify-between content">
+            <div className="text-gray-700 mt-6 w-full md:w-4/5">
+              <InjectRelatedCategories
+                html={post.modifiedContent || ""}
+                relatedCategories={post.relatedCategories}
+                relatedPosts={relatedPosts}
               />
               <div className="bg-gray-100 mt-6 w-full h-1"></div>
               <CommentForm
@@ -297,7 +250,7 @@ export default function PostPage({ post }: Props) {
             </div>
 
             {/* Sidebar */}
-            <aside className="w-1/5">
+            <aside className="md:w-1/5 w-full">
               <div className="toc-sidebar top-2 space-y-6  justify-center">
                 <div>
                   {post.toc && post.toc.length > 0 && (
@@ -325,10 +278,7 @@ export default function PostPage({ post }: Props) {
                 </div>
                 <div className="flex flex-wrap justify-center">
                   <div className="w-full flex gap-6 justify-center items-center">
-                    <button
-                      onClick={handleLike}
-                      className="flex items-center gap-2 text-blue-400 hover:text-green-400 cursor-pointer"
-                    >
+                    <button className="flex items-center gap-2 text-blue-400 hover:text-green-400 cursor-pointer">
                       <svg
                         className="w-6 h-7 hover:text-green-400"
                         viewBox="0 0 24 24"
@@ -351,10 +301,7 @@ export default function PostPage({ post }: Props) {
                       </svg>
                       <span>{likes}</span>
                     </button>
-                    <button
-                      onClick={handleDislike}
-                      className="flex items-center gap-2 text-gray-400 hover:text-red-400"
-                    >
+                    <button className="flex items-center gap-2 text-gray-400 hover:text-red-400">
                       <svg
                         className="w-6 h-7 mt-2 hover:text-red-400 cursor-pointer"
                         viewBox="0 0 24 24"
@@ -454,12 +401,10 @@ export default function PostPage({ post }: Props) {
             </aside>
           </div>
         </div>
-
       </main>
-          </>
+    </>
   );
 }
-
 
 export const getStaticPaths: GetStaticPaths = async () => {
   return {
@@ -467,33 +412,41 @@ export const getStaticPaths: GetStaticPaths = async () => {
     fallback: "blocking",
   };
 };
-
 export const getStaticProps: GetStaticProps = async (ctx) => {
   const { slug } = ctx.params as { slug: string };
   const safeSlug = encodeURIComponent(slug);
   const website = process.env.NEXT_PUBLIC_WEBOFEN || "https://webofen.com";
 
   try {
-    const res = await fetch(`${website}/api/proxy/postbyslug/${safeSlug}`, {
+    // 1️⃣ Get post data
+    const postRes = await fetch(`${website}/api/proxy/postbyslug/${safeSlug}`, {
       headers: { "Content-Type": "application/json" },
     });
 
-    if (!res.ok) {
-      return { notFound: true };
-    }
+    if (!postRes.ok) return { notFound: true };
 
-    const data = await res.json();
+    const postData = await postRes.json();
+    if (!postData.post) return { notFound: true };
 
-    if (!data.post) {
-      return { notFound: true };
-    }
+    // 2️⃣ Get view count
+    const viewsRes = await fetch(
+      `${website}/api/proxy/getviewbyslug/${safeSlug}?type=article`
+    );
+    const viewsData = await viewsRes.json();
 
+    // If your route returns { count, slug }
+    const viewCount = viewsData.count || 0;
+
+    // 3️⃣ Pass both post and view count as props
     return {
-      props: { post: data.post },
-      revalidate: 60, // ⏳ Regenerate at most once every 60s when a new request comes
+      props: {
+        post: postData.post,
+        viewCount,
+      },
+      revalidate: 60, // ISR
     };
   } catch (err) {
-    console.error(err);
+    console.error("getStaticProps error:", err);
     return { notFound: true };
   }
 };

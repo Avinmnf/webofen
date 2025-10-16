@@ -32,8 +32,12 @@ export default function ProductDetailPage({ product }: Props) {
   );
   const [orderMessage, setOrderMessage] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
-  const [attributeMap, setAttributeMap] = useState<Record<string, string[]>>({});
+  const [selectedAttributes, setSelectedAttributes] = useState<
+    Record<string, string>
+  >({});
+  const [attributeMap, setAttributeMap] = useState<Record<string, string[]>>(
+    {}
+  );
   const [showVariantTooltip, setShowVariantTooltip] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [orderItemId, setOrderItemId] = useState<string | undefined>();
@@ -56,7 +60,8 @@ export default function ProductDetailPage({ product }: Props) {
     }
 
     const sortedOrders = [...userOrders].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
     for (const order of sortedOrders) {
@@ -145,19 +150,25 @@ export default function ProductDetailPage({ product }: Props) {
           galleryUrls: product.galleryUrls,
           sku: product.sku,
           brand: product.brand,
-          variants: product.variants?.map((v) => ({ price: v.price, stock: v.stock })),
+          variants: product.variants?.map((v) => ({
+            price: v.price,
+            stock: v.stock,
+          })),
           reviews: product.reviews?.map((r) => ({
             rating: r.rating,
             comment: r.comment,
             user: { name: r.user?.name },
           })),
-          aggregateRating: product.reviews && product.reviews.length > 0 ? {
-            ratingValue: (
-              product.reviews.reduce((sum, r) => sum + r.rating, 0) /
-              product.reviews.length
-            ).toFixed(1),
-            reviewCount: product.reviews.length,
-          } : undefined,
+          aggregateRating:
+            product.reviews && product.reviews.length > 0
+              ? {
+                  ratingValue: (
+                    product.reviews.reduce((sum, r) => sum + r.rating, 0) /
+                    product.reviews.length
+                  ).toFixed(1),
+                  reviewCount: product.reviews.length,
+                }
+              : undefined,
         }}
       />
       <main>
@@ -172,7 +183,7 @@ export default function ProductDetailPage({ product }: Props) {
                 <div className="w-1/2 p-6">
                   <h1 className="font-bold pb-4">خرید قرص {product.title}</h1>
                   <p className="text-justify text-sm">{product.description}</p>
-                  <Backlinkfeatures/>
+                  <Backlinkfeatures />
                 </div>
               </div>
             </div>
@@ -180,20 +191,70 @@ export default function ProductDetailPage({ product }: Props) {
             {/* --- پنل انتخاب ویژگی‌ها و افزودن به سبد --- */}
             <div className="w-1/3 p-2 rounded-3xl border-2 border-[#29b0cb] bg-[#fff]">
               <div className="space-y-6 p-6">
-                <h2 className="text-xl font-semibold mb-2">انتخاب ویژگی‌ها</h2>
+                <h2 className="text-xl font-semibold mb-2">انتخاب ویژگی ها</h2>
 
                 {Object.entries(attributeMap).map(([attrName, values]) => (
                   <div key={attrName}>
-                    <h4 className="text-sm mb-2">{attrName}:</h4>
+                    <div className="flex items-center gap-1 my-4">
+                      <h4 className="text-sm">{attrName}:</h4>
+                      <div className="relative group">
+                        <svg
+                          className="w-4 h-4 cursor-pointer"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <g id="SVGRepo_iconCarrier">
+                            <circle
+                              cx="12"
+                              cy="12"
+                              r="9"
+                              stroke="#292929"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                            ></circle>
+                            <rect
+                              height="0.01"
+                              stroke="#292929"
+                              strokeLinejoin="round"
+                              strokeWidth="3"
+                              width="0.01"
+                              x="12"
+                              y="16"
+                            ></rect>
+                            <path
+                              d="M10.5858 7.58572C10.9754 7.1961 11.4858 7.00083 11.9965 6.99994C12.5095 6.99904 13.0228 7.1943 13.4142 7.58572C13.8047 7.97625 14 8.48809 14 8.99994C14 9.51178 13.8047 10.0236 13.4142 10.4141C13.0228 10.8056 12.5095 11.0008 11.9965 10.9999L12 11.9999"
+                              stroke="#292929"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                            ></path>
+                          </g>
+                        </svg>
+
+                        {/* Tooltip */}
+                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition">
+                          اطلاعات بیشتر درباره {attrName}
+                        </span>
+                      </div>
+                    </div>
+
                     <div className="flex flex-wrap gap-2">
                       {values.map((value) => (
                         <button
                           key={value}
-                          onClick={() => setSelectedAttributes(prev => ({ ...prev, [attrName]: value }))}
-                          className={`px-4 py-2 rounded-[100px] border ${selectedAttributes[attrName] === value
-                            ? "bg-green-600 text-white border-indigo-600"
-                            : "bg-white border-gray-300"
-                            }`}
+                          onClick={() =>
+                            setSelectedAttributes((prev) => ({
+                              ...prev,
+                              [attrName]: value,
+                            }))
+                          }
+                          className={`px-4 py-2 rounded-[100px] border ${
+                            selectedAttributes[attrName] === value
+                              ? "bg-green-600 text-white border-indigo-600"
+                              : "bg-white border-gray-300"
+                          }`}
                         >
                           {value}
                         </button>
@@ -201,10 +262,19 @@ export default function ProductDetailPage({ product }: Props) {
                     </div>
                   </div>
                 ))}
-
                 <div className="p-4 border rounded bg-gray-50 mb-6">
-                  <p className="text-sm"><strong>قیمت:</strong> {matchedVariant ? matchedVariant.price.toLocaleString() + " ریال" : "تعداد را مشخص کنید"}</p>
-                  <p className="text-sm"><strong>موجودی:</strong> {matchedVariant ? matchedVariant.stock : "تعداد را مشخص کنید"}</p>
+                  <p className="text-sm">
+                    <strong>قیمت:</strong>{" "}
+                    {matchedVariant
+                      ? (matchedVariant.price / 10).toLocaleString() + " تومان"
+                      : "تعداد را مشخص کنید"}
+                  </p>
+                  <p className="text-sm">
+                    <strong>موجودی:</strong>{" "}
+                    {matchedVariant
+                      ? matchedVariant.stock
+                      : "تعداد را مشخص کنید"}
+                  </p>
                 </div>
 
                 <div className="flex items-center gap-3 w-full justify-between bg-gray-100 rounded-4xl px-4 py-4">
@@ -215,19 +285,38 @@ export default function ProductDetailPage({ product }: Props) {
                     onChange={(e) => {
                       let val = parseInt(e.target.value);
                       if (isNaN(val) || val < 1) val = 1;
-                      if (matchedVariant && val > matchedVariant.stock) val = matchedVariant.stock;
+                      if (matchedVariant && val > matchedVariant.stock)
+                        val = matchedVariant.stock;
                       setQuantity(val);
                     }}
                   />
-                  <button className="w-5 h-5 flex items-center justify-center bg-white rounded hover:bg-gray-200" onClick={() => setQuantity(q => Math.max(1, q - 1))}>-</button>
-                  <button className="w-5 h-5 flex items-center justify-center bg-white rounded hover:bg-gray-200" onClick={() => setQuantity(q => matchedVariant ? Math.min(q + 1, matchedVariant.stock) : q + 1)}>+</button>
+                  <button
+                    className="w-5 h-5 flex items-center justify-center bg-white rounded hover:bg-gray-200"
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  >
+                    -
+                  </button>
+                  <button
+                    className="w-5 h-5 flex items-center justify-center bg-white rounded hover:bg-gray-200"
+                    onClick={() =>
+                      setQuantity((q) =>
+                        matchedVariant
+                          ? Math.min(q + 1, matchedVariant.stock)
+                          : q + 1
+                      )
+                    }
+                  >
+                    +
+                  </button>
                 </div>
 
                 <AverageRating productId={product?.id} />
 
                 <div
                   className="relative w-full"
-                  onMouseEnter={() => isAddToCartDisabled && setShowVariantTooltip(true)}
+                  onMouseEnter={() =>
+                    isAddToCartDisabled && setShowVariantTooltip(true)
+                  }
                   onMouseLeave={() => setShowVariantTooltip(false)}
                 >
                   {showVariantTooltip && (
@@ -237,8 +326,11 @@ export default function ProductDetailPage({ product }: Props) {
                   )}
 
                   <button
-                    className={`flex p-2 rounded-3xl text-white items-center w-full cursor-pointer justify-center ${isAddToCartDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-green-700 hover:bg-green-800"
-                      }`}
+                    className={`flex p-2 rounded-3xl text-white items-center w-full cursor-pointer justify-center ${
+                      isAddToCartDisabled
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-green-700 hover:bg-green-800"
+                    }`}
                     disabled={isAddToCartDisabled}
                     onClick={handleAddToCart}
                   >
@@ -252,7 +344,11 @@ export default function ProductDetailPage({ product }: Props) {
           {/* --- توضیحات محصول و نظرات --- */}
           <section className="flex mt-6 content">
             <div className="w-4/5 p-2 text-gray-700">
-              <div dangerouslySetInnerHTML={{ __html: product.modifiedContent || "" }} />
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: product.modifiedContent || "",
+                }}
+              />
               <div className="bg-gray-100 mt-6 w-full h-1"></div>
 
               {!checkingBought ? (
@@ -274,7 +370,11 @@ export default function ProductDetailPage({ product }: Props) {
                 </p>
               )}
 
-              <RatingForm contentType="product" contentId={product?.id ?? ""} orderItemId={orderItemId} />
+              <RatingForm
+                contentType="product"
+                contentId={product?.id ?? ""}
+                orderItemId={orderItemId}
+              />
             </div>
 
             {/* --- TOC --- */}
@@ -285,8 +385,13 @@ export default function ProductDetailPage({ product }: Props) {
                   <nav className="toc-nav text-sm">
                     <ul>
                       {[...product.toc].reverse().map((item) => (
-                        <li key={item.id} className={`toc-item toc-level-${item.level} mb-2  hover:text-[#000]`}>
-                          <a href={`#${item.id}`} className="block">{item.text}</a>
+                        <li
+                          key={item.id}
+                          className={`toc-item toc-level-${item.level} mb-2  hover:text-[#000]`}
+                        >
+                          <a href={`#${item.id}`} className="block">
+                            {item.text}
+                          </a>
                         </li>
                       ))}
                     </ul>
@@ -301,10 +406,15 @@ export default function ProductDetailPage({ product }: Props) {
             <div className="fixed bottom-6 left-[50%] transform -translate-x-1/2 py-2 px-4 bg-[#6fd6e5] text-gray-700 rounded-lg shadow-lg z-50 transition-all">
               {!user ? (
                 <p className="text-sm">
-                  برای افزودن محصول ابتدا <Link href="/login" className="underline font-semibold">وارد شوید</Link>
+                  برای افزودن محصول ابتدا{" "}
+                  <Link href="/login" className="underline font-semibold">
+                    وارد شوید
+                  </Link>
                 </p>
               ) : (
-                <p className="text-sm">محصول {product.title} با موفقیت اضافه شد</p>
+                <p className="text-sm">
+                  محصول {product.title} با موفقیت اضافه شد
+                </p>
               )}
             </div>
           )}

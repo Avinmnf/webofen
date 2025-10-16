@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 interface PageViewOptions {
   slug: string;
@@ -7,8 +7,10 @@ interface PageViewOptions {
 }
 
 export function usePageView({ slug, title, type }: PageViewOptions) {
+  const hasCounted = useRef(false);
+
   useEffect(() => {
-    if (!slug) return;
+    if (!slug || hasCounted.current) return;
 
     fetch("/api/proxy/pages-view", {
       method: "POST",
@@ -17,5 +19,7 @@ export function usePageView({ slug, title, type }: PageViewOptions) {
     }).catch((err) => console.error("Failed to record page view:", err));
 
     console.log("Page view recorded:", slug, title, type);
+
+    hasCounted.current = true; // mark as counted
   }, [slug, title, type]);
 }
