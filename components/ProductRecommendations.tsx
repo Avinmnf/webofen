@@ -91,33 +91,27 @@ export const ProductRecommendations = ({ scores }: ProductRecommendationsProps) 
         {products.map((product) => (
           <div key={product.id} className="bg-white rounded-xl border border-green-200 p-6 hover:shadow-lg transition-all duration-300 group">
             <div className="flex flex-col h-full">
-              {/* تصویر یا ویدیو محصول */}
-             {product.imageUrl && (
-                product.imageUrl.endsWith(".mp4") ? (
-                    <video
-                    src="/guidance/optimization.mp4" // ویدیوی محصول اول
-                    className="object-cover rounded-lg mb-4"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    />
-                ) : (
-                    <video
-                    src="/guidance/screamingfrog.mp4" // ویدیوی محصول دوم
-                    className="object-cover rounded-lg mb-4"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    />
-                )
-                )}
+          {/* تصویر یا ویدیو محصول */}
+            {product.imageUrl && (
+            <video
+                src={
+                product.id === "1"
+                    ? "/guidance/optimization.mp4"       // ویدیوی محصول اول
+                    : "/guidance/screamingfrog.mp4"     // ویدیوی محصول دوم
+                }
+                className="object-cover rounded-lg mb-4"
+                autoPlay
+                loop
+                muted
+                playsInline
+            />
+            )}
+
 
 
               <div className="flex-1">
                 <div className="flex items-start justify-between mb-3">
-                  <h3 className="font-bold text-lg text-gray-800 group-hover:text-green-700 transition-colors">
+                  <h3 className="font-bold text-lg text-gray-800  transition-colors">
                     {product.title}
                   </h3>
                 </div>
@@ -168,7 +162,7 @@ function getProductReasons(productId: string, scores: Record<string, number>): s
   switch (productId) {
     case "1":
       if ([seo, performance, accessibility, bestPractices].some(s => (s || 0) < 0.8)) {
-        reasons.push("امتیازهای پایین در چند بخش");
+        reasons.push("امتیاز های پایین در چند بخش");
       }
       break;
 
