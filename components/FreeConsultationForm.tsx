@@ -12,32 +12,39 @@ export default function FreeConsultationForm() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async () => {
-    setError("");
-    setSuccess(false);
+const handleSubmit = async () => {
+  setError("");
+  setSuccess(false);
 
-    const payload: FormPayload = {
-      title: "درخواست نوبت",
-      fields: [
-        { label: "نام و نام خانوادگی", type: "text", content: name || "" },
-        { label: "تلفن همراه", type: "text", content: phone || "" },
-        { label: "نام دامنه", type: "text", content: domain || "" },
-        { label: "خدمت مورد نظر", type: "text", content: service || "" },
-      ],
-    };
+  // چک می‌کنیم که همه فیلدها پر باشند
+  if (!name || !phone || !domain || !service) {
+    setError("لطفاً همه فیلدها را پر کنید.");
+    return; // جلوگیری از ارسال فرم
+  }
 
-    const result = await submitForm(payload);
-
-    if (result) {
-      setSuccess(true);
-      setName("");
-      setPhone("");
-      setDomain("");
-      setService("");
-    } else {
-      setError("خطا در ارسال فرم. لطفاً دوباره تلاش کنید.");
-    }
+  const payload: FormPayload = {
+    title: "درخواست نوبت",
+    fields: [
+      { label: "نام و نام خانوادگی", type: "text", content: name },
+      { label: "تلفن همراه", type: "text", content: phone },
+      { label: "نام دامنه", type: "text", content: domain },
+      { label: "خدمت مورد نظر", type: "text", content: service },
+    ],
   };
+
+  const result = await submitForm(payload);
+
+  if (result) {
+    setSuccess(true);
+    setName("");
+    setPhone("");
+    setDomain("");
+    setService("");
+  } else {
+    setError("خطا در ارسال فرم. لطفاً دوباره تلاش کنید.");
+  }
+};
+
 
   return (
     <div>

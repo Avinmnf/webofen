@@ -14,6 +14,10 @@ export default function GuidanceForm() {
   const handleSubmit = async () => {
     setError("");
     setSuccess(false);
+        if (!name || !phone ||  !message) {
+      setError('لطفاً همه فیلدها را پر کنید.');
+      return;
+    }
 
     const payload: FormPayload = {
       title: "درخواست مشاوره رایگان",
