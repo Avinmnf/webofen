@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCheckout } from "@/hooks/useCheckout";
 import { useRouter } from "next/router";
+import Productvideo from "@/components/productvideo";
 
 export default function CartPage() {
   const router = useRouter();
@@ -226,14 +227,20 @@ export default function CartPage() {
             >
               <Link href={`/products/${item.productId}`}>
                 <div className="flex space-y-1">
-                  <Image
-                    width={100}
-                    height={90}
-                    src={item.imageUrl || "/dashboard/backlink.png"}
-                    loader={({ src }) => src}
-                    alt={item.title}
-                    className="rounded-t-2xl"
-                  />
+                  <div className="w-1/6 ml-6">
+                    {item.imageUrl ? (
+                      <Productvideo product={item.imageUrl} />
+                    ) : (
+                      <Image
+                        width={100}
+                        height={90}
+                        src={item.imageUrl || "/dashboard/backlink.png"}
+                        loader={({ src }) => src}
+                        alt={item.title}
+                        className="rounded-t-2xl"
+                      />
+                    )}
+                  </div>
                   <div>
                     <p className="font-semibold text-lg mb-2">{item.title}</p>
                     <p className="text-sm text-gray-500">

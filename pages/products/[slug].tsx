@@ -102,7 +102,7 @@ export default function ProductDetailPage({ product }: Props) {
 •	مدت زمان افزایش DA متغیر خواهد بود
 `,
     },
-        {
+    {
       slug: "security",
       name: "Product 8",
       tooltip: `•	بستن راه های نفوذ
@@ -258,7 +258,7 @@ export default function ProductDetailPage({ product }: Props) {
                 <div className="w-1/2 p-6">
                   <h1 className="font-bold pb-4">خرید قرص {product.title}</h1>
                   <p className="text-justify text-sm">{product.description}</p>
-                  <Backlinkfeatures />
+                  <Backlinkfeatures slug={product.slug} />
                 </div>
               </div>
             </div>
