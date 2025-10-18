@@ -8,8 +8,6 @@ interface SimpleProduct {
   imageUrl?: string;
   description?: string;
   slug?: string;
-  variants?: Array<{ price?: number; stock?: number }>;
-  category?: { id: string; title?: string };
 }
 
 interface ProductRecommendationsProps {
@@ -46,10 +44,15 @@ export const ProductRecommendations = ({ scores }: ProductRecommendationsProps) 
       seo: scores["seo"] ?? scores["سئو"],
     };
 
-    const scoreEntries = Object.entries(mappedScores || {});
-    const allAbove90 = scoreEntries.every(([_, score]) => Number(score || 0) >= 0.9);
+    // فقط ۳ تا معیار اصلی بررسی میشه
+    const { accessibility, bestPractices, seo } = mappedScores;
+    const allMainAbove90 =
+      Number(accessibility || 0) >= 0.9 &&
+      Number(bestPractices || 0) >= 0.9 &&
+      Number(seo || 0) >= 0.9;
 
-    if (allAbove90) {
+    // اگه همه‌شون بالای ۹۰ بودن، هیچ محصولی پیشنهاد نده
+    if (allMainAbove90) {
       setProducts([]);
       setLoading(false);
       return;
@@ -57,16 +60,16 @@ export const ProductRecommendations = ({ scores }: ProductRecommendationsProps) 
 
     const recommended: SimpleProduct[] = [];
 
-    // اگر یکی از امتیازها کمتر از 0.8 بود، پیشنهاد بسته بهینه‌سازی
-    const hasLowScore = scoreEntries.some(([_, score]) => Number(score || 0) < 0.8);
+    // اگر یکی از امتیازها کمتر از ۰.۸ بود، بسته بهینه‌سازی پیشنهاد بشه
+    const hasLowScore = Object.values(mappedScores).some((s) => Number(s || 0) < 0.8);
     if (hasLowScore) recommended.push(mockProducts[0]);
 
-    // اگر سئو کمتر از 0.9 بود، پیشنهاد Screaming Frog
+    // اگر سئو کمتر از ۰.۹ بود، Screaming Frog پیشنهاد بشه
     if ((mappedScores.seo || 0) < 0.9) recommended.push(mockProducts[1]);
 
-    // حذف محصولات تکراری
+    // حذف تکراری‌ها
     const uniqueProducts = recommended.filter(
-      (p, i, self) => i === self.findIndex(x => x.id === p.id)
+      (p, i, self) => i === self.findIndex((x) => x.id === p.id)
     );
 
     setProducts(uniqueProducts);
@@ -74,7 +77,6 @@ export const ProductRecommendations = ({ scores }: ProductRecommendationsProps) 
   }, [scores]);
 
   if (loading || products.length === 0) return null;
-
   return (
     <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 shadow-sm border border-green-100">
       <div className="flex items-center justify-between mb-6">
@@ -150,7 +152,7 @@ export const ProductRecommendations = ({ scores }: ProductRecommendationsProps) 
   );
 };
 
-// 🎯 تابع تشخیص دلایل پیشنهاد محصول
+// 🎯 تابع نمایش دلایل پیشنهاد محصول
 function getProductReasons(productId: string, scores: Record<string, number>): string[] {
   const reasons: string[] = [];
 
@@ -161,8 +163,8 @@ function getProductReasons(productId: string, scores: Record<string, number>): s
 
   switch (productId) {
     case "1":
-      if ([seo, performance, accessibility, bestPractices].some(s => (s || 0) < 0.8)) {
-        reasons.push("امتیاز های پایین در چند بخش");
+      if ([seo, performance, accessibility, bestPractices].some((s) => (s || 0) < 0.8)) {
+        reasons.push("امتیازهای پایین در چند بخش");
       }
       break;
 
