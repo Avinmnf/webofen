@@ -51,6 +51,17 @@ body {
   height: fit-content;
   max-height: 90vh;
   overflow-y: auto;
+  color: black;
+}
+.toc-sidebar ul li a {
+  text-decoration: none; 
+  color: gray;
+  transition: all 0.2s ease;
+}
+
+.toc-sidebar ul li a:hover {
+  text-decoration: underline;
+  color: #6fd6e5;
 }
 
 /* برای responsive design */
