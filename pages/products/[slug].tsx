@@ -25,11 +25,7 @@ export default function ProductDetailPage({ product }: Props) {
   const { slug } = router.query;
   const [skip, setSkip] = useState(0);
   const take = 5;
-  const { related, loading: loadingRelated } = useRelatedProducts(
-    product?.slug,
-    skip,
-    take
-  );
+
   const [orderMessage, setOrderMessage] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [selectedAttributes, setSelectedAttributes] = useState<
@@ -43,6 +39,85 @@ export default function ProductDetailPage({ product }: Props) {
   const [orderItemId, setOrderItemId] = useState<string | undefined>();
 
   const { user } = useAuth();
+  const products = [
+    {
+      slug: "reportage",
+      name: "Product 1",
+      tooltip: `•	استراتژی رپورتاژ آگهی
+•	پیشنهاد خرید طبق بودجه شما
+•	تولید محتوا کامل به همراه تصویر
+•	اعلام مدت زمان انجام پس از بررسی اولیه
+`,
+    },
+    {
+      slug: "content",
+      name: "Product 2",
+      tooltip: `• بدون استفاده از هوش مصنوعی
+• رعایت اصول نگارشی و ساختار
+• بررسی کیورد های موضوعی و رعایت آن
+• مدت زمان انجام 4 روز کاری`,
+    },
+    {
+      slug: "internal-linking",
+      name: "Product 3",
+      tooltip: `•	انجام لینک سازی دستی داخلی
+•	مطابق با هدف گذاری کسب و کار شما
+•	تاثیر بر افزایش رتبه کلمات کلیدی
+•	اعلام مدت زمان انجام پس از بررسی اولیه
+`,
+    },
+    {
+      slug: "keyword-cluster",
+      name: "Product 4",
+      tooltip: `•	خوشه بندی کامل صنف شما
+•	ارائه کلاسترتخصصی طبق بازار هدف
+•	کمک به روند تولید محتوا واستراتژی ان
+•	زمان انجام حداکثر 14روز کاری
+`,
+    },
+    {
+      slug: "backlink",
+      name: "Product 5",
+      tooltip: `•	لینک سازی در منابع قدرتمند
+•	کمک به افزایش اعتبار دامنه
+•	سایت های معتبر با دامین ریت بالای 50
+•	زمان تحویل تا 30 روز کاری
+`,
+    },
+    {
+      slug: "screaming-frog",
+      name: "Product 6",
+      tooltip: `•	بهینه سازی ارور های تکنیکالی
+•	کمک به بهبود رتبه
+•	کمک به افزایش اعتبار سایت
+•	زمان تحویل نهایتاً 30 روز کاری
+`,
+    },
+    {
+      slug: "rank-domain",
+      name: "Product 7",
+      tooltip: `•	افزایش DA تضمینی
+•	تضمین کیفیت و عدم مشکل روی رنکینگ
+•	استفاده از روش های اصولی
+•	مدت زمان افزایش DA متغیر خواهد بود
+`,
+    },
+        {
+      slug: "security",
+      name: "Product 8",
+      tooltip: `•	بستن راه های نفوذ
+•	ایجاد امنیت کامل
+•	گزارش کار و تست های نفوذ
+•	تحویل 15 تا 30 روز کاری
+
+`,
+    },
+  ];
+
+  const tooltipMap: Record<string, string> = products.reduce((acc, product) => {
+    acc[product.slug] = product.tooltip;
+    return acc;
+  }, {} as Record<string, string>);
 
   usePageView({
     slug: product?.slug || "",
@@ -197,45 +272,26 @@ export default function ProductDetailPage({ product }: Props) {
                   <div key={attrName}>
                     <div className="flex items-center gap-1 my-4">
                       <h4 className="text-sm">{attrName}:</h4>
-                      <div className="relative group">
+                      <div className="relative group inline-block cursor-pointer">
                         <svg
-                          className="w-4 h-4 cursor-pointer"
-                          viewBox="0 0 24 24"
-                          fill="none"
+                          className="w-5 h-4"
+                          fill="#707070"
+                          viewBox="0 0 32 32"
+                          version="1.1"
                           xmlns="http://www.w3.org/2000/svg"
                         >
+                          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                          <g
+                            id="SVGRepo_tracerCarrier"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          ></g>
                           <g id="SVGRepo_iconCarrier">
-                            <circle
-                              cx="12"
-                              cy="12"
-                              r="9"
-                              stroke="#292929"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                            ></circle>
-                            <rect
-                              height="0.01"
-                              stroke="#292929"
-                              strokeLinejoin="round"
-                              strokeWidth="3"
-                              width="0.01"
-                              x="12"
-                              y="16"
-                            ></rect>
-                            <path
-                              d="M10.5858 7.58572C10.9754 7.1961 11.4858 7.00083 11.9965 6.99994C12.5095 6.99904 13.0228 7.1943 13.4142 7.58572C13.8047 7.97625 14 8.48809 14 8.99994C14 9.51178 13.8047 10.0236 13.4142 10.4141C13.0228 10.8056 12.5095 11.0008 11.9965 10.9999L12 11.9999"
-                              stroke="#292929"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                            ></path>
+                            <path d="M15.5 3c-7.456 0-13.5 6.044-13.5 13.5s6.044 13.5 13.5 13.5 13.5-6.044 13.5-13.5-6.044-13.5-13.5-13.5zM15.5 27c-5.799 0-10.5-4.701-10.5-10.5s4.701-10.5 10.5-10.5 10.5 4.701 10.5 10.5-4.701 10.5-10.5 10.5zM15.5 10c-0.828 0-1.5 0.671-1.5 1.5v5.062c0 0.828 0.672 1.5 1.5 1.5s1.5-0.672 1.5-1.5v-5.062c0-0.829-0.672-1.5-1.5-1.5zM15.5 20c-0.828 0-1.5 0.672-1.5 1.5s0.672 1.5 1.5 1.5 1.5-0.672 1.5-1.5-0.672-1.5-1.5-1.5z"></path>{" "}
                           </g>
                         </svg>
-
-                        {/* Tooltip */}
-                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition">
-                          اطلاعات بیشتر درباره {attrName}
+                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-3 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition whitespace-pre-line min-w-[300px]  text-start">
+                          {tooltipMap[product.slug]}
                         </span>
                       </div>
                     </div>

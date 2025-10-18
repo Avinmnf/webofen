@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useRef } from "react";
+import { useGuestReaction } from "@/hooks/useGuestReaction";
 import { GetStaticProps } from "next";
 import { GetStaticPaths } from "next";
 import { GetServerSideProps } from "next";
@@ -113,8 +114,12 @@ const BreadcrumbSchema = ({ post }: SchemaProps) => {
 
 export default function PostPage({ post, viewCount }: Props) {
   const countedRef = useRef(false);
-  const [likes, setLikes] = useState(0);
-  const [dislikes, setDislikes] = useState(0);
+  const { likes, dislikes, hasReacted, handleReaction } = useGuestReaction({
+    postId: post.id,
+    initialLikes: post.ratings?.filter((r) => r.value === 5).length || 0,
+    initialDislikes: post.ratings?.filter((r) => r.value === 1).length || 0,
+  });
+
   const router = useRouter();
   const slug = router.query.slug as string | undefined;
   const { relatedPosts } = useRelatedPosts(slug ?? "");
@@ -123,12 +128,6 @@ export default function PostPage({ post, viewCount }: Props) {
     title: post?.title,
     type: "article",
   });
-  useEffect(() => {
-    if (post) {
-      setLikes(post.ratings?.filter((r) => r.value === 5).length || 0);
-      setDislikes(post.ratings?.filter((r) => r.value === 1).length || 0);
-    }
-  }, [post]);
 
   return (
     <>
@@ -278,7 +277,14 @@ export default function PostPage({ post, viewCount }: Props) {
                 </div>
                 <div className="flex flex-wrap justify-center">
                   <div className="w-full flex gap-6 justify-center items-center">
-                    <button className="flex items-center gap-2 text-blue-400 hover:text-green-400 cursor-pointer">
+                    <button
+                      onClick={() => handleReaction("like")}
+                      className={ 
+                        hasReacted === "like"
+                          ? "text-green-400 flex items-center gap-2"
+                          : "text-blue-400 flex items-center gap-2"
+                      }
+                    >
                       <svg
                         className="w-6 h-7 hover:text-green-400"
                         viewBox="0 0 24 24"
@@ -301,7 +307,14 @@ export default function PostPage({ post, viewCount }: Props) {
                       </svg>
                       <span>{likes}</span>
                     </button>
-                    <button className="flex items-center gap-2 text-gray-400 hover:text-red-400">
+                    <button
+                      onClick={() => handleReaction("dislike")}
+                      className={
+                        hasReacted === "dislike"
+                          ? "text-red-400 flex items-center gap-2"
+                          : "text-gray-400 flex items-center gap-2"
+                      }
+                    >
                       <svg
                         className="w-6 h-7 mt-2 hover:text-red-400 cursor-pointer"
                         viewBox="0 0 24 24"
@@ -322,7 +335,7 @@ export default function PostPage({ post, viewCount }: Props) {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
-                      </svg>
+                      </svg>{" "}
                       <span>{dislikes}</span>
                     </button>
                   </div>
