@@ -282,74 +282,74 @@ const SecurityPage: React.FC = () => {
           {/* big pill */}
           {bigInProgressItem && (
             <>
-            <div className="flex items-center relative flex-row-reverse w-full justify-between p-4">
-              {bigInProgressItem && (
-                <SimpleProgress
-                  startTime={bigInProgressItem.startTime}
-                  deadline={bigInProgressItem.deadline || ""}
-                  completionTime={bigInProgressItem.completionTime}
-                  canceled={bigInProgressItem.adminStatus === "cancelled"}
-                />
-              )}
-
-              <button
-                onClick={() => handleClick(bigInProgressItem.id)}
-                className="absolute left-14 w-20 h-16 flex items-center justify-center"
-              >
-                <div className="relative w-full h-32 flex justify-center items-center overflow-hidden">
-                  <Image
-                    width={220}
-                    height={220}
-                    alt="Backlink"
-                    src={"/dashboard/security.png"}
-                    className="object-contain rotate-30"
+              <div className="flex items-center relative flex-row-reverse w-full justify-between p-4">
+                {bigInProgressItem && (
+                  <SimpleProgress
+                    startTime={bigInProgressItem.startTime}
+                    deadline={bigInProgressItem.deadline || ""}
+                    completionTime={bigInProgressItem.completionTime}
+                    canceled={bigInProgressItem.adminStatus === "cancelled"}
                   />
-                </div>
-              </button>
-              <div className=" mt-2 text-sm w-1/3">
-                <div className="flex gap-2 items-center">
-                  <p className="text-gray-600 font-semibold">تاریخ خرید: </p>
-                  <p className="text-gray-600">
-                    {new Date(bigInProgressItem.createdAt).toLocaleDateString(
-                      "fa-IR"
-                    )}
-                  </p>
-                </div>
-                <div className="flex gap-2 items-center">
-                  <p className="text-gray-600 font-semibold">تعداد:</p>
-                  <p className="text-gray-700">
-                    {bigInProgressItem.attributes
-                      .map((attr) => attr.value)
-                      .join(" / ")}
-                  </p>
-                </div>
-                <div className="flex gap-2 items-center mt-1">
-                  <div className="mt-1 text-sm">
-                    {bigInProgressItem.submittedValues?.length ? (
-                      <div className="mt-2 text-sm">
-                        {bigInProgressItem.submittedValues.map((bigitem) => (
-                          <div
-                            key={bigitem.id}
-                            className="flex gap-1 items-center"
-                          >
-                            <span className="font-semibold text-gray-600">
-                              {bigitem.label}:
-                            </span>
-                            <span className="text-gray-700">
-                              {bigitem.value || "—"}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-gray-400 mt-2">اطلاعات وارد نشده</p>
-                    )}
+                )}
+
+                <button
+                  onClick={() => handleClick(bigInProgressItem.id)}
+                  className="absolute left-14 w-20 h-16 flex items-center justify-center"
+                >
+                  <div className="relative w-full h-32 flex justify-center items-center overflow-hidden">
+                    <Image
+                      width={220}
+                      height={220}
+                      alt="Backlink"
+                      src={"/dashboard/security.png"}
+                      className="object-contain rotate-30"
+                    />
+                  </div>
+                </button>
+                <div className=" mt-2 text-sm w-1/3">
+                  <div className="flex gap-2 items-center">
+                    <p className="text-gray-600 font-semibold">تاریخ خرید: </p>
+                    <p className="text-gray-600">
+                      {new Date(bigInProgressItem.createdAt).toLocaleDateString(
+                        "fa-IR"
+                      )}
+                    </p>
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    <p className="text-gray-600 font-semibold">تعداد:</p>
+                    <p className="text-gray-700">
+                      {bigInProgressItem.attributes
+                        .map((attr) => attr.value)
+                        .join(" / ")}
+                    </p>
+                  </div>
+                  <div className="flex gap-2 items-center mt-1">
+                    <div className="mt-1 text-sm">
+                      {bigInProgressItem.submittedValues?.length ? (
+                        <div className="mt-2 text-sm">
+                          {bigInProgressItem.submittedValues.map((bigitem) => (
+                            <div
+                              key={bigitem.id}
+                              className="flex gap-1 items-center"
+                            >
+                              <span className="font-semibold text-gray-600">
+                                {bigitem.label}:
+                              </span>
+                              <span className="text-gray-700">
+                                {bigitem.value || "—"}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-400 mt-2">اطلاعات وارد نشده</p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          <div className="h-1 w-full bg-gray-200 rounded-2xl"></div>
-          </>
+              <div className="h-1 w-full bg-gray-200 rounded-2xl"></div>
+            </>
           )}
           {/* Small pills */}
           <div className="flex flex-col w-full gap-8">
@@ -505,26 +505,12 @@ const SecurityPage: React.FC = () => {
 
             <div className="bg-gray-50 p-4 rounded-lg">
               <h3 className="font-semibold text-gray-800 mb-2">گزارش تکمیل</h3>
-              {selectedCompletedOrder.completionReport
-                ?.split("\n")
-                .map((line, idx) =>
-                  line.startsWith("http") ? (
-                    <div key={idx}>
-                      <a
-                        href={line}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 underline break-all"
-                      >
-                        {line}
-                      </a>
-                    </div>
-                  ) : (
-                    <p key={idx} className="text-gray-700">
-                      {line}
-                    </p>
-                  )
-                )}
+              <div
+                className="bg-gray-50 p-4 rounded-lg prose max-w-none text-gray-700"
+                dangerouslySetInnerHTML={{
+                  __html: selectedCompletedOrder.completionReport || "",
+                }}
+              />
             </div>
           </div>
         </div>
@@ -625,61 +611,59 @@ const SecurityPage: React.FC = () => {
 
             {/* Orders Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {SecuritysState
-                .filter((item) =>
-                  historyFilter === "all"
-                    ? true
-                    : item.adminStatus === historyFilter
-                )
-                .map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center bg-gray-50 rounded-xl p-4 shadow-sm hover:shadow-lg transition"
+              {SecuritysState.filter((item) =>
+                historyFilter === "all"
+                  ? true
+                  : item.adminStatus === historyFilter
+              ).map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center bg-gray-50 rounded-xl p-4 shadow-sm hover:shadow-lg transition"
+                >
+                  <button
+                    onClick={() => handleClick(item.id)}
+                    className="relative w-14 h-14 flex justify-center items-center"
                   >
-                    <button
-                      onClick={() => handleClick(item.id)}
-                      className="relative w-14 h-14 flex justify-center items-center"
-                    >
-                      <div
-                        className={`absolute w-12 h-12 flex justify-center items-center rounded-full border-2 ${
-                          item.adminStatus === "completed"
-                            ? "border-green-700 animate-bounce"
-                            : item.adminStatus === "cancelled"
-                            ? "border-red-800"
-                            : item.adminStatus === "in_progress"
-                            ? "border-orange-500" 
-                            : "border-gray-200"
-                        }`}
-                      >
-                        <Image
-                          width={32}
-                          height={32}
-                          alt="Backlink"
-                          src={"/dashboard/security.png"}
-                          className="object-contain rotate-12"
-                        />
-                      </div>
-                    </button>
-
-                    <div className="ml-4 flex-1">
-                      <p className="text-gray-700 text-sm font-bold">
-                        تاریخ خرید:{" "}
-                        {new Date(item.createdAt).toLocaleDateString("fa-IR")}
-                      </p>
-                      <p className="text-gray-700 text-sm font-semibold">
-                        محصول: {item.productTitle}
-                      </p>
-                      <p className="text-gray-500 text-sm">
-                        وضعیت:{" "}
-                        {item.adminStatus === "completed"
-                          ? "تکمیل شده"
+                    <div
+                      className={`absolute w-12 h-12 flex justify-center items-center rounded-full border-2 ${
+                        item.adminStatus === "completed"
+                          ? "border-green-700 animate-bounce"
                           : item.adminStatus === "cancelled"
-                          ? "لغو شده"
-                          : "در حال انجام"}
-                      </p>
+                          ? "border-red-800"
+                          : item.adminStatus === "in_progress"
+                          ? "border-orange-500"
+                          : "border-gray-200"
+                      }`}
+                    >
+                      <Image
+                        width={32}
+                        height={32}
+                        alt="Backlink"
+                        src={"/dashboard/security.png"}
+                        className="object-contain rotate-12"
+                      />
                     </div>
+                  </button>
+
+                  <div className="ml-4 flex-1">
+                    <p className="text-gray-700 text-sm font-bold">
+                      تاریخ خرید:{" "}
+                      {new Date(item.createdAt).toLocaleDateString("fa-IR")}
+                    </p>
+                    <p className="text-gray-700 text-sm font-semibold">
+                      محصول: {item.productTitle}
+                    </p>
+                    <p className="text-gray-500 text-sm">
+                      وضعیت:{" "}
+                      {item.adminStatus === "completed"
+                        ? "تکمیل شده"
+                        : item.adminStatus === "cancelled"
+                        ? "لغو شده"
+                        : "در حال انجام"}
+                    </p>
                   </div>
-                ))}
+                </div>
+              ))}
             </div>
           </div>
         </div>
