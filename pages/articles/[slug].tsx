@@ -168,7 +168,7 @@ export default function PostPage({ post, viewCount }: Props) {
           </div>
 
           {/* Post Content + Sidebar */}
-          <div className="w-full justify-between mx-auto flex gap-8 mt-8">
+          <div className="flex flex-col-reverse md:flex-row w-full gap-8 mt-8">
             {/* Post Content */}
             <article className="w-full">
               <div className="w-full text-gray-700 m-auto">
@@ -279,7 +279,7 @@ export default function PostPage({ post, viewCount }: Props) {
                   <div className="w-full flex gap-6 justify-center items-center">
                     <button
                       onClick={() => handleReaction("like")}
-                      className={ 
+                      className={
                         hasReacted === "like"
                           ? "text-green-400 flex items-center gap-2"
                           : "text-blue-400 flex items-center gap-2"
