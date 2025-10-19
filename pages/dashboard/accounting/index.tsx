@@ -16,7 +16,7 @@ const AccountingPage: React.FC = () => {
   const { orders, loading, error } = useUserOrders();
 
   if (loading)
-    return <p className="text-gray-500">در حال بارگذاری سفارش‌ها...</p>;
+    return <p className="text-gray-500">در حال بارگذاری سفارش‌ ها...</p>;
   if (error) return <p className="text-red-500">خطا: {error}</p>;
   if (!orders.length) return <p className="text-gray-500">سفارشی یافت نشد.</p>;
 
@@ -53,7 +53,7 @@ const AccountingPage: React.FC = () => {
     <div className="h-screen flex flex-col">
       {/* هدر بالا */}
       <div className="p-6 border-b">
-        <h1 className="text-2xl font-bold text-gray-600">تراکنش‌ها</h1>
+        <h1 className="text-2xl font-bold text-gray-600">تراکنش‌ ها</h1>
       </div>
 
       {/* بخش اسکرول‌دار */}
@@ -95,7 +95,7 @@ const AccountingPage: React.FC = () => {
                     محصول
                   </th>
                   <th className="border p-3 text-gray-600 text-center">
-                    ویژگی‌ها
+                    ویژگی‌ ها
                   </th>
                   <th className="border p-3 text-gray-600 text-center">
                     تعداد
