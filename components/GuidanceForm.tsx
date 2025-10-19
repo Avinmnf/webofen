@@ -15,7 +15,7 @@ export default function GuidanceForm() {
     setError("");
     setSuccess(false);
         if (!name || !phone ||  !message) {
-      setError('لطفاً همه فیلدها را پر کنید.');
+      setError('لطفاً همه فیلدها را پر کنید.');    
       return;
     }
 
