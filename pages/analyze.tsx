@@ -300,13 +300,7 @@ export default function AnalyzePage() {
                         SI: "سرعت نشانگر"
                       };
                       
-                      const descriptions: Record<string, string> = {
-                        FCP: "زمان اولین رندر محتوا",
-                        LCP: "زمان رندر بزرگترین المان",
-                        TBT: "کل زمان مسدودسازی صفحه",
-                        CLS: "میزان تغییر چیدمان صفحه",
-                        SI: "سرعت نشان دادن محتوا"
-                      };
+                      
 
                       return (
                         <div 
@@ -316,7 +310,6 @@ export default function AnalyzePage() {
                         >
                           <span className="text-3xl font-bold text-gray-800">{value}</span>
                           <span className="text-sm text-gray-500">{labels[key] || key}</span>
-                          <span className="text-xs text-gray-400">{descriptions[key] || ""}</span>
                         </div>
                       );
                     })}
