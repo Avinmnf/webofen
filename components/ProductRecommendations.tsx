@@ -17,8 +17,8 @@ interface ProductRecommendationsProps {
 export const ProductRecommendations = ({ scores }: ProductRecommendationsProps) => {
   const [products, setProducts] = useState<SimpleProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [allMainAbove90, setAllMainAbove90] = useState(false);
 
-  // 📦 محصولات پیشنهادی mock
   const mockProducts: SimpleProduct[] = [
     {
       id: "1",
@@ -44,15 +44,15 @@ export const ProductRecommendations = ({ scores }: ProductRecommendationsProps) 
       seo: scores["seo"] ?? scores["سئو"],
     };
 
-    // فقط ۳ تا معیار اصلی بررسی میشه
     const { accessibility, bestPractices, seo } = mappedScores;
-    const allMainAbove90 =
+    const allAbove90 =
       Number(accessibility || 0) >= 0.9 &&
       Number(bestPractices || 0) >= 0.9 &&
       Number(seo || 0) >= 0.9;
 
-    // اگه همه‌شون بالای ۹۰ بودن، هیچ محصولی پیشنهاد نده
-    if (allMainAbove90) {
+    setAllMainAbove90(allAbove90);
+
+    if (allAbove90) {
       setProducts([]);
       setLoading(false);
       return;
@@ -60,14 +60,11 @@ export const ProductRecommendations = ({ scores }: ProductRecommendationsProps) 
 
     const recommended: SimpleProduct[] = [];
 
-    // اگر یکی از امتیازها کمتر از ۰.۸ بود، بسته بهینه‌سازی پیشنهاد بشه
     const hasLowScore = Object.values(mappedScores).some((s) => Number(s || 0) < 0.8);
     if (hasLowScore) recommended.push(mockProducts[0]);
 
-    // اگر سئو کمتر از ۰.۹ بود، Screaming Frog پیشنهاد بشه
     if ((mappedScores.seo || 0) < 0.9) recommended.push(mockProducts[1]);
 
-    // حذف تکراری‌ها
     const uniqueProducts = recommended.filter(
       (p, i, self) => i === self.findIndex((x) => x.id === p.id)
     );
@@ -76,7 +73,22 @@ export const ProductRecommendations = ({ scores }: ProductRecommendationsProps) 
     setLoading(false);
   }, [scores]);
 
-  if (loading || products.length === 0) return null;
+  if (loading) return null;
+
+  // ✅ اگر هیچ محصولی نیست و امتیازها همگی بالای ۹۰ هستن
+  if (products.length === 0 && allMainAbove90) {
+    return (
+      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 shadow-sm border border-green-100 text-center">
+        <h2 className="font-bold text-2xl text-green-700 mb-2">وضعیت وبسایتت عالی است 🎉</h2>
+        <p className="text-gray-700">
+          وبسایت شما در وضعیت بسیار خوبی قرار دارد 🌟
+        </p>
+      </div>
+    );
+  }
+
+  if (products.length === 0) return null;
+
   return (
     <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 shadow-sm border border-green-100">
       <div className="flex items-center justify-between mb-6">
@@ -93,33 +105,24 @@ export const ProductRecommendations = ({ scores }: ProductRecommendationsProps) 
         {products.map((product) => (
           <div key={product.id} className="bg-white rounded-xl border border-green-200 p-6 hover:shadow-lg transition-all duration-300 group">
             <div className="flex flex-col h-full">
-          {/* تصویر یا ویدیو محصول */}
-            {product.imageUrl && (
-            <video
-                src={
-                product.id === "1"
-                    ? "/guidance/optimization.mp4"       // ویدیوی محصول اول
-                    : "/guidance/screamingfrog.mp4"     // ویدیوی محصول دوم
-                }
-                className="object-cover rounded-lg mb-4"
-                autoPlay
-                loop
-                muted
-                playsInline
-            />
-            )}
-
-
+              {product.imageUrl && (
+                <video
+                  src={
+                    product.id === "1"
+                      ? "/guidance/optimization.mp4"
+                      : "/guidance/screamingfrog.mp4"
+                  }
+                  className="object-cover rounded-lg mb-4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                />
+              )}
 
               <div className="flex-1">
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="font-bold text-lg text-gray-800  transition-colors">
-                    {product.title}
-                  </h3>
-                </div>
+                <h3 className="font-bold text-lg text-gray-800 mb-2">{product.title}</h3>
                 <p className="text-gray-600 text-sm mb-4 leading-relaxed">{product.description}</p>
-
-                {/* دلایل پیشنهاد */}
                 <div className="mt-3 flex flex-wrap gap-2">
                   {getProductReasons(product.id, scores).map((reason, index) => (
                     <span 
@@ -152,11 +155,11 @@ export const ProductRecommendations = ({ scores }: ProductRecommendationsProps) 
   );
 };
 
-// 🎯 تابع نمایش دلایل پیشنهاد محصول
+// 🎯 دلایل پیشنهاد محصول
 function getProductReasons(productId: string, scores: Record<string, number>): string[] {
   const reasons: string[] = [];
 
-  const seo = scores["seo"] ?? scores["سئو"];
+  const seo = scores["seo"] ?? scores["سئو"]; 
   const performance = scores["performance"] ?? scores["عملکرد"];
   const accessibility = scores["accessibility"] ?? scores["دسترس‌پذیری"];
   const bestPractices = scores["bestPractices"] ?? scores["بهترین شیوه‌ها"];
@@ -167,7 +170,6 @@ function getProductReasons(productId: string, scores: Record<string, number>): s
         reasons.push("امتیازهای پایین در چند بخش");
       }
       break;
-
     case "2":
       if ((seo || 0) < 0.9) {
         reasons.push("سئو نیاز به بهبود دارد");
