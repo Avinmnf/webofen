@@ -79,9 +79,10 @@ export const ProductRecommendations = ({ scores }: ProductRecommendationsProps) 
   if (products.length === 0 && allMainAbove90) {
     return (
       <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 shadow-sm border border-green-100 text-center">
-        <h2 className="font-bold text-2xl text-green-700 mb-2">وضعیت وبسایتت عالی است 🎉</h2>
+        <h2 className="font-bold text-2xl text-green-700 mb-2">وضعیت وبسایت شما عالی است 🎉</h2>
         <p className="text-gray-700">
-          وبسایت شما در وضعیت بسیار خوبی قرار دارد 🌟
+          تمام بخش‌ های اصلی وبسایت شما (سئو، بهترین شیوه‌ ها، دسترس‌ پذیری) امتیاز بالای ۹۰ دارند.
+          <br />
         </p>
       </div>
     );
