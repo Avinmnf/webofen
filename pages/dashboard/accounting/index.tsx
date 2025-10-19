@@ -111,26 +111,25 @@ const AccountingPage: React.FC = () => {
               </thead>
               <tbody>
                 {order.items.map((item, index) => (
-                  <tr
-                    key={item.id}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
+                  <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                     <td className="border p-3 text-gray-700 text-center">
-                      {item.variant.product.title}
+                      {item.variant?.product?.title || "محصول حذف‌شده"}
                     </td>
                     <td className="border p-3 text-gray-700 text-center">
-                      {item.variant.attributeValues
-                        ?.map((av) => `${av.attribute.name}: ${av.value}`)
-                        .join(", ")}
+                      {item.variant?.attributeValues
+                        ?.map((av) => `${av.attribute?.name || "ویژگی"}: ${av.value || "-"}`)
+                        .join(", ") || "-"}
                     </td>
                     <td className="border p-3 text-gray-700 text-center">
-                      {item.quantity}
+                      {item.quantity || 0}
                     </td>
                     <td className="border p-3 text-gray-700 text-center">
-                      {item.finalPrice?.toLocaleString()} تومان
+                      {item.finalPrice
+                        ? `${item.finalPrice.toLocaleString()} تومان`
+                        : "—"}
                     </td>
                     <td className="border p-3 text-gray-700 text-center">
-                      {statusMap[item.status?.trim()] ?? item.status}
+                      {statusMap[item.status?.trim()] ?? item.status ?? "نامشخص"}
                     </td>
                     {index === 0 && (
                       <td
