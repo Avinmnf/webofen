@@ -139,13 +139,13 @@ export default function PostPage({ post, viewCount }: Props) {
   const showPopup = (message: string) => {
     setPopupMessage(message);
     setPopupVisible(true);
-    setTimeout(() => setPopupVisible(false), 2000); // hide after 2 seconds
+    setTimeout(() => setPopupVisible(false), 2000);
   };
 
   const handleClick = (type: "like" | "dislike", value: number) => {
     if (hasReacted) {
       showPopup(
-        `شما قبلاً این مطلب را ${hasReacted === "like" ? "پسندیدید" : "نپسندیدید"}  `
+        `شما قبلا به این مطلب واکنش داده اید. `
       );
       return;
     }
@@ -314,8 +314,8 @@ export default function PostPage({ post, viewCount }: Props) {
                     <button
                       className={
                         hasReacted === "like"
-                          ? "text-red-400 flex items-center gap-2"
-                          : "text-gray-400 flex items-center gap-2"
+                          ? "text-blue-800 hover:text-blue-800 flex items-center gap-2 cursor-pointer"
+                          : "text-gray-400 hover:text-blue-800 flex items-center gap-2 cursor-pointer"
                       }
                       onClick={() => handleClick("like", 5)}
                     >
@@ -346,8 +346,8 @@ export default function PostPage({ post, viewCount }: Props) {
                       onClick={() => handleClick("dislike", 1)}
                       className={
                         hasReacted === "dislike"
-                          ? "text-red-400 flex items-center gap-2"
-                          : "text-gray-400 flex items-center gap-2"
+                          ? "text-red-400 flex items-center gap-2 cursor-pointer"
+                          : "text-gray-400 flex items-center gap-2 cursor-pointer"
                       }
                     >
                       <svg
