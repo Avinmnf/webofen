@@ -9,18 +9,39 @@ export default function GuidanceForm() {
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({
+    name: false,
+    phone: false,
+    message: false
+  });
 
   const handleSubmit = async () => {
-    setError("");
+    // Reset errors
+    setErrors({
+      name: false,
+      phone: false,
+      message: false
+    });
     setSuccess(false);
+
+    // Validate fields
+    const newErrors = {
+      name: !name,
+      phone: !phone,
+      message: !message
+    };
+
+    if (newErrors.name || newErrors.phone || newErrors.message) {
+      setErrors(newErrors);
+      return;
+    }
 
     const payload: FormPayload = {
       title: "درخواست مشاوره رایگان",
       fields: [
-        { label: "نام", type: "textarea", content: name || "" },
-        { label: "تلفن همراه", type: "text", content: phone || "" },
-        { label: "پیام", type: "textarea", content: message || "" },
+        { label: "نام", type: "textarea", content: name },
+        { label: "تلفن همراه", type: "text", content: phone },
+        { label: "پیام", type: "textarea", content: message },
       ],
     };
 
@@ -31,8 +52,6 @@ export default function GuidanceForm() {
       setName("");
       setPhone("");
       setMessage("");
-    } else {
-      setError("خطا در ارسال فرم");
     }
   };
 
@@ -45,25 +64,45 @@ export default function GuidanceForm() {
       </div>
 
       {success && <p className="text-green-500 mb-4">فرم با موفقیت ارسال شد!</p>}
-      {error && <p className="text-red-500 mb-4">{error}</p>}
 
       <input
-        className="w-full border border-gray-200 py-2 rounded-md px-1 text-gray-500 mb-4"
+        className={`w-full border py-2 rounded-md px-1 text-gray-500 mb-4 ${
+          errors.name ? 'border-red-500' : 'border-gray-200'
+        }`}
         placeholder="نام"
         value={name}
-        onChange={(e) => setName(e.target.value)}
+        onChange={(e) => {
+          setName(e.target.value);
+          if (errors.name) {
+            setErrors(prev => ({...prev, name: false}));
+          }
+        }}
       />
       <input
-        className="w-full border border-gray-200 py-2 rounded-md px-1 text-gray-500 mb-4"
+        className={`w-full border py-2 rounded-md px-1 text-gray-500 mb-4 ${
+          errors.phone ? 'border-red-500' : 'border-gray-200'
+        }`}
         placeholder="تلفن همراه"
         value={phone}
-        onChange={(e) => setPhone(e.target.value)}
+        onChange={(e) => {
+          setPhone(e.target.value);
+          if (errors.phone) {
+            setErrors(prev => ({...prev, phone: false}));
+          }
+        }}
       />
       <textarea
-        className="w-full h-26 border border-gray-200 px-1 py-2 rounded-md text-gray-500 mb-4"
+        className={`w-full h-26 border px-1 py-2 rounded-md text-gray-500 mb-4 ${
+          errors.message ? 'border-red-500' : 'border-gray-200'
+        }`}
         placeholder="پیام خود را بنویسید"
         value={message}
-        onChange={(e) => setMessage(e.target.value)}
+        onChange={(e) => {
+          setMessage(e.target.value);
+          if (errors.message) {
+            setErrors(prev => ({...prev, message: false}));
+          }
+        }}
       />
 
       <button
