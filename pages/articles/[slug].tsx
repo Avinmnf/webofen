@@ -15,6 +15,7 @@ import { usePageView } from "@/hooks/usePageView";
 import SEO from "@/components/seo";
 import { InjectRelatedCategories } from "@/lib/functions/injectRelatedCategories";
 import { useRelatedPosts } from "@/hooks/useRelatedPosts";
+import { useReactions } from "@/hooks/useReactions";
 type Props = {
   post: Post;
   viewCount: number;
@@ -113,12 +114,45 @@ const BreadcrumbSchema = ({ post }: SchemaProps) => {
 };
 
 export default function PostPage({ post, viewCount }: Props) {
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupVisible, setPopupVisible] = useState(false);
   const countedRef = useRef(false);
-  const { likes, dislikes, hasReacted, handleReaction } = useGuestReaction({
+  const {
+    likes: initialLikes,
+    dislikes: initialDislikes,
+    hasReacted,
+    handleReaction: handleGuestReaction,
+  } = useGuestReaction({
     postId: post.id,
     initialLikes: post.ratings?.filter((r) => r.value === 5).length || 0,
     initialDislikes: post.ratings?.filter((r) => r.value === 1).length || 0,
   });
+
+  const { reactionCounts, handleReaction, loading } = useReactions(
+    "post",
+    post.id
+  );
+
+  const likes = reactionCounts[5] || initialLikes;
+  const dislikes = reactionCounts[1] || initialDislikes;
+
+  const showPopup = (message: string) => {
+    setPopupMessage(message);
+    setPopupVisible(true);
+    setTimeout(() => setPopupVisible(false), 2000); // hide after 2 seconds
+  };
+
+  const handleClick = (type: "like" | "dislike", value: number) => {
+    if (hasReacted) {
+      showPopup(
+        `شما قبلاً این مطلب را ${hasReacted === "like" ? "پسندیدید" : "نپسندیدید"}  `
+      );
+      return;
+    }
+
+    handleGuestReaction(type);
+    handleReaction(value);
+  };
 
   const router = useRouter();
   const slug = router.query.slug as string | undefined;
@@ -278,15 +312,15 @@ export default function PostPage({ post, viewCount }: Props) {
                 <div className="flex flex-wrap justify-center">
                   <div className="w-full flex gap-6 justify-center items-center">
                     <button
-                      onClick={() => handleReaction("like")}
                       className={
                         hasReacted === "like"
-                          ? "text-green-400 flex items-center gap-2"
-                          : "text-blue-400 flex items-center gap-2"
+                          ? "text-red-400 flex items-center gap-2"
+                          : "text-gray-400 flex items-center gap-2"
                       }
+                      onClick={() => handleClick("like", 5)}
                     >
                       <svg
-                        className="w-6 h-7 hover:text-green-400"
+                        className="w-6 h-6"
                         viewBox="0 0 24 24"
                         fill="currentColor"
                         xmlns="http://www.w3.org/2000/svg"
@@ -305,10 +339,11 @@ export default function PostPage({ post, viewCount }: Props) {
                           strokeLinejoin="round"
                         />
                       </svg>
-                      <span>{likes}</span>
+                      <span className="ml-1">{likes}</span>
                     </button>
+
                     <button
-                      onClick={() => handleReaction("dislike")}
+                      onClick={() => handleClick("dislike", 1)}
                       className={
                         hasReacted === "dislike"
                           ? "text-red-400 flex items-center gap-2"
@@ -338,6 +373,11 @@ export default function PostPage({ post, viewCount }: Props) {
                       </svg>{" "}
                       <span>{dislikes}</span>
                     </button>
+                    {popupVisible && (
+                      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-[#6fd6e5] text-white px-4 py-2 rounded-lg shadow-lg z-50">
+                        {popupMessage}
+                      </div>
+                    )}
                   </div>
                   <div className="w-full flex gap-6 p-2 mt-3 justify-center items-center">
                     <Link href={"/instagram"}>
