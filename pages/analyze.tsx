@@ -36,7 +36,7 @@ export default function AnalyzePage() {
   const [error, setError] = useState<string | null>(null);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   
-  const analyzeUrl = process.env.NEXT_PUBLIC_ANALYZE_URL || "http://localhost:4000";
+const analyzeUrl = process.env.NEXT_PUBLIC_ANALYZE_URL;
   
   const groupedIssues = result
     ? result.issues.reduce<Record<string, Issue[]>>((acc: Record<string, Issue[]>, issue: Issue) => {
