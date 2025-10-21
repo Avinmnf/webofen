@@ -49,59 +49,60 @@ const analyzeUrl = process.env.NEXT_PUBLIC_ANALYZE_URL || "http://localhost:4000
 
   const tabs = result ? ["all", ...Object.keys(groupedIssues)] : [];
 
-  const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setResult(null);
-    setError(null);
-    setProgress(0);
-    setElapsedTime(0);
+const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  setLoading(true);
+  setResult(null);
+  setError(null);
+  setProgress(0);
+  setElapsedTime(0);
 
-    const startTime = Date.now();
-    const timeInterval = setInterval(() => {
-      setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
-    }, 1000);
+  const startTime = Date.now();
+  const timeInterval = setInterval(() => {
+    setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+  }, 1000);
 
-    const minLoadingTime = new Promise<void>((resolve) => {
-      const start = Date.now();
-      const interval = setInterval(() => {
-        const elapsed = Date.now() - start;
-        const pct = Math.min(100, Math.floor((elapsed / 30000) * 100));
-        setProgress(pct);
-        if (pct >= 100) {
-          clearInterval(interval);
-          resolve();
-        }
-      }, 100);
+  const minLoadingTime = new Promise<void>((resolve) => {
+    const start = Date.now();
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - start;
+      const pct = Math.min(100, Math.floor((elapsed / 30000) * 100));
+      setProgress(pct);
+      if (pct >= 100) {
+        clearInterval(interval);
+        resolve();
+      }
+    }, 100);
+  });
+
+  try {
+    // تغییر آدرس به API داخلی
+    const response = await fetch(`/api/analyze`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({ url }),
     });
 
-    try {
-      const response = await fetch(`${analyzeUrl}/analyze`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({ url }),
-      });
-
-      if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`خطا در آنالیز سایت: ${response.status} - ${text}`);
-      }
-
-      const data = await response.json();
-      await minLoadingTime;
-      setResult(data);
-    } catch (err: any) {
-      console.error("Error analyzing site:", err);
-      setError(err.message || "خطایی در ارتباط با سرور آنالایزر رخ داد");
-    } finally {
-      setLoading(false);
-      setProgress(100);
-      clearInterval(timeInterval);
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`خطا در آنالیز سایت: ${response.status} - ${text}`);
     }
-  };
+
+    const data = await response.json();
+    await minLoadingTime;
+    setResult(data);
+  } catch (err: any) {
+    console.error("Error analyzing site:", err);
+    setError(err.message || "خطایی در ارتباط با سرور آنالایزر رخ داد");
+  } finally {
+    setLoading(false);
+    setProgress(100);
+    clearInterval(timeInterval);
+  }
+};
   
   useEffect(() => {
     if (!result) return;
