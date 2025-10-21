@@ -62,9 +62,9 @@ export default function AnalyzePage() {
       setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
     }, 1000);
 
-    const minLoadingTime = new Promise<void>(resolve => {
-      let start = Date.now();
-      let interval = setInterval(() => {
+    const minLoadingTime = new Promise<void>((resolve) => {
+      const start = Date.now();
+      const interval = setInterval(() => {
         const elapsed = Date.now() - start;
         const pct = Math.min(100, Math.floor((elapsed / 30000) * 100));
         setProgress(pct);
@@ -76,22 +76,22 @@ export default function AnalyzePage() {
     });
 
     try {
-      const fetchData = fetch(`${analyzeUrl}/analyze`, {
+      const response = await fetch(`${analyzeUrl}/analyze`, {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json"
+          Accept: "application/json",
         },
         body: JSON.stringify({ url }),
-      }).then(async res => {
-        if (!res.ok) {
-          const errorText = await res.text();
-          throw new Error(`خطا در آنالیز سایت: ${res.status} - ${errorText}`);
-        }
-        return res.json();
       });
 
-      const [data] = await Promise.all([fetchData, minLoadingTime]);
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`خطا در آنالیز سایت: ${response.status} - ${text}`);
+      }
+
+      const data = await response.json();
+      await minLoadingTime;
       setResult(data);
     } catch (err: any) {
       console.error("Error analyzing site:", err);
@@ -102,7 +102,7 @@ export default function AnalyzePage() {
       clearInterval(timeInterval);
     }
   };
-
+  
   useEffect(() => {
     if (!result) return;
     const intervalIds: NodeJS.Timeout[] = [];
