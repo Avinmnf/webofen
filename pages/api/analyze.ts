@@ -1,6 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-const analyzeUrl = (process.env.ANALYZE_URL || 'http://localhost:4000');
+const analyzeUrl = process.env.ANALYZE_URL || 'http://localhost:4000';
+
+// مدت زمان حداکثر انتظار (میلی‌ثانیه)
+const MAX_TIMEOUT = 120000; // 2 دقیقه
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -8,12 +11,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 120000); // 20s timeout
+  const timeout = setTimeout(() => controller.abort(), MAX_TIMEOUT);
 
   try {
     console.log('--- Incoming Request to /api/analyze ---');
     console.log('Body:', JSON.stringify(req.body, null, 2));
 
+    // درخواست به سرور آنالایزر
     const response = await fetch(`${analyzeUrl}/analyze`, {
       method: 'POST',
       headers: {
@@ -41,6 +45,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     clearTimeout(timeout);
     console.error('--- Error in /api/analyze ---');
     console.error(error);
-    res.status(500).json({ message: error.message || 'خطایی در ارتباط با سرور آنالایزر رخ داد' });
+
+    if (error.name === 'AbortError') {
+      // Timeout
+      res.status(504).json({ message: 'درخواست آنالیز طولانی شد و زمان انتظار تمام شد (504 Gateway Timeout)' });
+    } else {
+      res.status(500).json({ message: error.message || 'خطا در ارتباط با سرور آنالایزر' });
+    }
   }
 }

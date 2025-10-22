@@ -71,9 +71,9 @@ const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
         clearInterval(interval);
         resolve();
       }
-    }, 100);
+    }, 1000);
   });
-
+  
   try {
     // تغییر آدرس به API داخلی
     const response = await fetch(`/api/analyze`, {
