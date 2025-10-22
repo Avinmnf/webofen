@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useRef } from "react";
-import { useGuestReaction } from "@/hooks/useGuestReaction";
 import { GetStaticProps } from "next";
 import { GetStaticPaths } from "next";
 import { GetServerSideProps } from "next";
@@ -15,6 +14,7 @@ import { usePageView } from "@/hooks/usePageView";
 import SEO from "@/components/seo";
 import { InjectRelatedCategories } from "@/lib/functions/injectRelatedCategories";
 import { useRelatedPosts } from "@/hooks/useRelatedPosts";
+import { useReactions } from "@/hooks/useReactions";
 type Props = {
   post: Post;
   viewCount: number;
@@ -113,12 +113,39 @@ const BreadcrumbSchema = ({ post }: SchemaProps) => {
 };
 
 export default function PostPage({ post, viewCount }: Props) {
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupVisible, setPopupVisible] = useState(false);
   const countedRef = useRef(false);
-  const { likes, dislikes, hasReacted, handleReaction } = useGuestReaction({
-    postId: post.id,
-    initialLikes: post.ratings?.filter((r) => r.value === 5).length || 0,
-    initialDislikes: post.ratings?.filter((r) => r.value === 1).length || 0,
-  });
+
+  const { 
+    reactionCounts, 
+    handleReaction, 
+    loading, 
+    hasReacted 
+  } = useReactions("post", post.id);
+
+  const likes = reactionCounts["like"] || 0;
+  const dislikes = reactionCounts["dislike"] || 0;
+  const showPopup = (message: string) => {
+    setPopupMessage(message);
+    setPopupVisible(true);
+    setTimeout(() => setPopupVisible(false), 2000);
+  };
+
+  const handleClick = async (type: "like" | "dislike") => {
+    if (hasReacted) {
+      showPopup(`شما قبلا به این مطلب واکنش داده‌اید.`);
+      return;
+    }
+
+    try {
+      await handleReaction(type);
+      showPopup(`واکنش شما ثبت شد!`);
+    } catch (error: any) {
+      console.error("Error handling reaction:", error);
+      showPopup(error.message || "خطا در ثبت واکنش");
+    }
+  };
 
   const router = useRouter();
   const slug = router.query.slug as string | undefined;
@@ -278,15 +305,15 @@ export default function PostPage({ post, viewCount }: Props) {
                 <div className="flex flex-wrap justify-center">
                   <div className="w-full flex gap-6 justify-center items-center">
                     <button
-                      onClick={() => handleReaction("like")}
                       className={
                         hasReacted === "like"
-                          ? "text-green-400 flex items-center gap-2"
-                          : "text-blue-400 flex items-center gap-2"
+                          ? "text-blue-800 hover:text-blue-800 flex items-center gap-2 cursor-pointer"
+                          : "text-gray-400 hover:text-blue-800 flex items-center gap-2 cursor-pointer"
                       }
+                      onClick={() => handleClick("like")}
                     >
                       <svg
-                        className="w-6 h-7 hover:text-green-400"
+                        className="w-6 h-6"
                         viewBox="0 0 24 24"
                         fill="currentColor"
                         xmlns="http://www.w3.org/2000/svg"
@@ -305,14 +332,15 @@ export default function PostPage({ post, viewCount }: Props) {
                           strokeLinejoin="round"
                         />
                       </svg>
-                      <span>{likes}</span>
+                      <span className="ml-1">{likes}</span>
                     </button>
+
                     <button
-                      onClick={() => handleReaction("dislike")}
+                      onClick={() => handleClick("dislike")}
                       className={
                         hasReacted === "dislike"
-                          ? "text-red-400 flex items-center gap-2"
-                          : "text-gray-400 flex items-center gap-2"
+                          ? "text-red-400 flex items-center gap-2 cursor-pointer"
+                          : "text-gray-400 flex items-center gap-2 cursor-pointer"
                       }
                     >
                       <svg
@@ -338,6 +366,11 @@ export default function PostPage({ post, viewCount }: Props) {
                       </svg>{" "}
                       <span>{dislikes}</span>
                     </button>
+                    {popupVisible && (
+                      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-[#6fd6e5] text-white px-4 py-2 rounded-lg shadow-lg z-50">
+                        {popupMessage}
+                      </div>
+                    )}
                   </div>
                   <div className="w-full flex gap-6 p-2 mt-3 justify-center items-center">
                     <Link href={"/instagram"}>

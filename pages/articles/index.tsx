@@ -56,7 +56,7 @@ function generateArticleSchema(posts: Post[]) {
       author: {
         "@type": "Person",
         name: "وبوفن",
-        url: "https://webofen.com"
+        url: "https://webofen.com",
       },
       publisher: {
         "@type": "Organization",
@@ -113,10 +113,7 @@ function generateOrganizationSchema() {
     url: "https://webofen.com",
     logo: "https://webofen.com/logo.png",
     description: "وبوفن - پلتفرم تخصصی دیجیتال مارکتینگ و کسب درآمد آنلاین",
-    sameAs: [
-      "https://t.me/yourchannel",
-      "https://instagram.com/yourpage",
-    ],
+    sameAs: ["https://t.me/yourchannel", "https://instagram.com/yourpage"],
     contactPoint: {
       "@type": "ContactPoint",
       telephone: "+98-XXX-XXX-XXXX",
@@ -149,7 +146,9 @@ function generateBreadcrumbSchema(currentTag?: string) {
       "@type": "ListItem",
       position: 3,
       name: `مقالات با تگ ${currentTag}`,
-      item: `https://webofen.com/articles?tag=${encodeURIComponent(currentTag)}`,
+      item: `https://webofen.com/articles?tag=${encodeURIComponent(
+        currentTag
+      )}`,
     });
   }
 
@@ -212,7 +211,7 @@ export default function PostsPage({
           index === self.findIndex((t) => t.name === tag.name)
       );
 
-      console.log('تگ‌های منحصر به فرد:', uniqueTags);
+      console.log("تگ‌های منحصر به فرد:", uniqueTags);
       setAllTags(uniqueTags);
     };
 
@@ -271,7 +270,6 @@ export default function PostsPage({
       router.push(
         {
           pathname: "/articles",
-          
         },
         undefined,
         { shallow: true }
@@ -365,12 +363,12 @@ export default function PostsPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPageSchema) }}
       />
-      
+
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
       />
-      
+
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
@@ -387,35 +385,54 @@ export default function PostsPage({
       <main className="bg-[#f7f8fc] pb-10">
         <div className="w-full pt-10">
           <div className="md:w-[1250px] mx-auto">
-            
             {/* Breadcrumb Navigation */}
             <nav className="mb-6 px-4" aria-label="breadcrumb">
               <ol className="flex items-center space-x-2 space-x-reverse text-sm text-gray-500">
                 <li>
-                  <Link href="/" className="hover:text-[#ff5084] transition-colors">
+                  <Link
+                    href="/"
+                    className="hover:text-[#ff5084] transition-colors"
+                  >
                     خانه
                   </Link>
                 </li>
                 <li className="flex items-center">
-                  <svg className="w-4 h-4 mx-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                  <svg
+                    className="w-4 h-4 mx-1"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </li>
                 <li>
-                  <Link href="/articles" className="hover:text-[#ff5084] transition-colors">
+                  <Link
+                    href="/articles"
+                    className="hover:text-[#ff5084] transition-colors"
+                  >
                     مقالات
                   </Link>
                 </li>
                 {currentTag && (
                   <>
                     <li className="flex items-center">
-                      <svg className="w-4 h-4 mx-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                      <svg
+                        className="w-4 h-4 mx-1"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                     </li>
-                    <li className="text-[#ff5084] font-medium">
-                      {currentTag}
-                    </li>
+                    <li className="text-[#ff5084] font-medium">{currentTag}</li>
                   </>
                 )}
               </ol>
@@ -522,56 +539,70 @@ export default function PostsPage({
                             />
                           )}
                           <div className="w-full mt-6 p-6">
-                            <div className="flex items-center relative group">
-                              {postsWithViews[0].views > 10 && (
-                                <>
-                                  <svg
-                                    className="w-5 h-5 ml-2"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path
-                                      d="M2 9.1371C2 14 6.01943 16.5914 8.96173 18.9109C10 19.7294 11 20.5 12 20.5C13 20.5 14 19.7294 15.0383 18.9109C17.9806 16.5914 22 14 22 9.1371C22 4.27416 16.4998 0.825464 12 5.50063C7.50016 0.825464 2 4.27416 2 9.1371Z"
-                                      fill="#ff5084"
-                                    />
-                                  </svg>
-                                  <div
-                                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 
-                                  hidden group-hover:block px-2 py-1 rounded-md 
-                                  bg-gray-800 text-white text-xs shadow-md whitespace-nowrap"
-                                  >
-                                    پربازدید
-                                  </div>
-                                </>
-                              )}
-
-                              <div className="relative group inline-block">
-                                {isRecommended(posts[0]) && (
+                            <div className="flex items-center justify-between relative group">
+                              <div className="flex items-center">
+                                {postsWithViews[0].views > 10 && (
                                   <>
                                     <svg
-                                      className="w-5 h-5 ml-2 text-yellow-400 cursor-pointer"
-                                      fill="#f06330"
-                                      viewBox="0 0 20 20"
+                                      className="w-5 h-5 ml-2"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
                                       xmlns="http://www.w3.org/2000/svg"
                                     >
-                                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.954a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.953c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37-2.448c-.784.57-1.838-.197-1.539-1.118l1.286-3.953a1 1 0 00-.364-1.118L2.073 9.38c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.954z" />
+                                      <path
+                                        d="M2 9.1371C2 14 6.01943 16.5914 8.96173 18.9109C10 19.7294 11 20.5 12 20.5C13 20.5 14 19.7294 15.0383 18.9109C17.9806 16.5914 22 14 22 9.1371C22 4.27416 16.4998 0.825464 12 5.50063C7.50016 0.825464 2 4.27416 2 9.1371Z"
+                                        fill="#ff5084"
+                                      />
                                     </svg>
-
-                                    {/* Tooltip */}
                                     <div
                                       className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 
                                   hidden group-hover:block px-2 py-1 rounded-md 
                                   bg-gray-800 text-white text-xs shadow-md whitespace-nowrap"
                                     >
-                                      پیشنهاد ما
+                                      پربازدید
                                     </div>
                                   </>
                                 )}
+
+                                <div className="relative group inline-block">
+                                  {isRecommended(posts[0]) && (
+                                    <>
+                                      <svg
+                                        className="w-5 h-5 ml-2 text-yellow-400 cursor-pointer"
+                                        fill="#f06330"
+                                        viewBox="0 0 20 20"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.954a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.953c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37-2.448c-.784.57-1.838-.197-1.539-1.118l1.286-3.953a1 1 0 00-.364-1.118L2.073 9.38c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.954z" />
+                                      </svg>
+
+                                      {/* Tooltip */}
+                                      <div
+                                        className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 
+                                  hidden group-hover:block px-2 py-1 rounded-md 
+                                  bg-gray-800 text-white text-xs shadow-md whitespace-nowrap"
+                                      >
+                                        پیشنهاد ما
+                                      </div>
+                                    </>
+                                  )}
+                                </div>
+
+                                <p className="text-sm text-gray-500">
+                                  {posts[0].category?.title}
+                                </p>
                               </div>
-                              <p className="text-sm text-gray-500">
-                                {posts[0].category?.title}
-                              </p>
+                              <span className="text-gray-400 text-sm">
+                                {posts[0].createdAt
+                                  ? new Date(
+                                      posts[0].createdAt
+                                    ).toLocaleDateString("fa-IR", {
+                                      year: "numeric",
+                                      month: "long",
+                                      day: "numeric",
+                                    })
+                                  : "تاریخ نامشخص"}
+                              </span>
                             </div>
                             <p className="text-gray-700 mt-1 text-xl font-semibold">
                               {posts[0].title}
@@ -853,7 +884,8 @@ export default function PostsPage({
                                 />
                               )}
                               <div className="flex flex-col justify-between p-8">
-                                <div className="flex items-center">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center">
                                   {(card as PostWithViews).countview > 10 && (
                                     <svg
                                       className="w-5 h-5 ml-2"
@@ -891,6 +923,18 @@ export default function PostsPage({
                                   <p className="text-sm text-gray-500">
                                     {(card as Post).category?.title}
                                   </p>
+                                  </div>
+                                  <span className="text-gray-400 text-sm">
+                                    {(card as Post).createdAt
+                                      ? new Date(
+                                          (card as Post).createdAt
+                                        ).toLocaleDateString("fa-IR", {
+                                          year: "numeric",
+                                          month: "long",
+                                          day: "numeric",
+                                        })
+                                      : "تاریخ نامشخص"}
+                                  </span>
                                 </div>
                                 <p className="text-base font-semibold text-gray-700 hover:text-[#1d546b]">
                                   {(card as Post).title}
@@ -900,21 +944,22 @@ export default function PostsPage({
                                 </p>
 
                                 {/* تگ‌های پست */}
-                                {(card as Post).tags && (card as Post).tags.length > 0 && (
-                                  <div className="mt-2 flex flex-wrap gap-1">
-                                    {(card as Post).tags.map((tag, index) => (
-                                      <span
-                                        key={index}
-                                        onClick={(e) =>
-                                          handleCardTagClick(e, tag.name)
-                                        }
-                                        className="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full cursor-pointer hover:bg-gray-200 transition-colors border border-gray-200"
-                                      >
-                                        {tag.name}
-                                      </span>
-                                    ))}
-                                  </div>
-                                )}
+                                {(card as Post).tags &&
+                                  (card as Post).tags.length > 0 && (
+                                    <div className="mt-2 flex flex-wrap gap-1">
+                                      {(card as Post).tags.map((tag, index) => (
+                                        <span
+                                          key={index}
+                                          onClick={(e) =>
+                                            handleCardTagClick(e, tag.name)
+                                          }
+                                          className="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full cursor-pointer hover:bg-gray-200 transition-colors border border-gray-200"
+                                        >
+                                          {tag.name}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
 
                                 <p className="text-md text-gray-400 mt-2 line-clamp-2">
                                   {(card as Post).desc}

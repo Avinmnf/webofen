@@ -46,7 +46,7 @@ export function useGuestReaction({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            userId: guestId,
+            guestId, // 👈 use guestId here
             module: "post",
             targetId: postId,
             value: type === "like" ? 5 : 1,
@@ -54,6 +54,7 @@ export function useGuestReaction({
         });
 
         if (!res.ok) throw new Error("Failed to save reaction");
+
         // Optimistic UI update
         if (type === "like") setLikes((prev) => prev + 1);
         else setDislikes((prev) => prev + 1);

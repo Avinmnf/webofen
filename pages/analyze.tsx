@@ -36,7 +36,6 @@ export default function AnalyzePage() {
   const [error, setError] = useState<string | null>(null);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   
-  const analyzeUrl = process.env.NEXT_PUBLIC_ANALYZE_URL || "https://analyze.webofen.com";
   
   const groupedIssues = result
     ? result.issues.reduce<Record<string, Issue[]>>((acc: Record<string, Issue[]>, issue: Issue) => {
@@ -46,66 +45,71 @@ export default function AnalyzePage() {
         return acc;
       }, {})
     : {};
+    console.log(groupedIssues);
 
   const tabs = result ? ["all", ...Object.keys(groupedIssues)] : [];
 
-  const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setResult(null);
-    setError(null);
-    setProgress(0);
-    setElapsedTime(0);
+const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  setLoading(true);
+  setResult(null);
+  setError(null);
+  setProgress(0);
+  setElapsedTime(0);
 
-    const startTime = Date.now();
-    const timeInterval = setInterval(() => {
-      setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
-    }, 1000);
+  const startTime = Date.now();
+  const timeInterval = setInterval(() => {
+    setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+  }, 1000);
 
-    const minLoadingTime = new Promise<void>(resolve => {
-      let start = Date.now();
-      let interval = setInterval(() => {
-        const elapsed = Date.now() - start;
-        const pct = Math.min(100, Math.floor((elapsed / 30000) * 100));
-        setProgress(pct);
-        if (pct >= 100) {
-          clearInterval(interval);
-          resolve();
-        }
-      }, 100);
+  const minLoadingTime = new Promise<void>((resolve) => {
+    const start = Date.now();
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - start;
+      const pct = Math.min(100, Math.floor((elapsed / 30000) * 100));
+      setProgress(pct);
+      if (pct >= 100) {
+        clearInterval(interval);
+        resolve();
+      }
+    }, 100);
+  });
+  console.log(minLoadingTime);
+  
+  try {
+    // تغییر آدرس به API داخلی
+    const response = await fetch(`/api/analyze`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({ url }),
     });
 
-    try {
-      const fetchData = fetch(`${analyzeUrl}/analyze`, {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
-        body: JSON.stringify({ url }),
-      }).then(async res => {
-        if (!res.ok) {
-          const errorText = await res.text();
-          throw new Error(`خطا در آنالیز سایت: ${res.status} - ${errorText}`);
-        }
-        return res.json();
-      });
-
-      const [data] = await Promise.all([fetchData, minLoadingTime]);
-      setResult(data);
-    } catch (err: any) {
-      console.error("Error analyzing site:", err);
-      setError(err.message || "خطایی در ارتباط با سرور آنالایزر رخ داد");
-    } finally {
-      setLoading(false);
-      setProgress(100);
-      clearInterval(timeInterval);
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`خطا در آنالیز سایت: ${response.status} - ${text}`);
     }
-  };
 
+    const data = await response.json();
+    console.log(data);
+    await minLoadingTime;
+    setResult(data);
+  } catch (err: any) {
+    console.error("Error analyzing site:", err);
+    setError(err.message || "خطایی در ارتباط با سرور آنالایزر رخ داد");
+  } finally {
+    setLoading(false);
+    setProgress(100);
+    clearInterval(timeInterval);
+  }
+};
+  
   useEffect(() => {
     if (!result) return;
     const intervalIds: NodeJS.Timeout[] = [];
+    console.log(intervalIds);
 
     Object.entries(result.scores).forEach(([key, score]) => {
       if (score === undefined) return;
