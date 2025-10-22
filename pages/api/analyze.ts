@@ -1,9 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const analyzeUrl = process.env.ANALYZE_URL || 'http://localhost:4000';
-
-// مدت زمان حداکثر انتظار (میلی‌ثانیه)
-const MAX_TIMEOUT = 120000; // 2 دقیقه
+const MAX_TIMEOUT = 250000; // احتمالا تایپ اشتباه بوده — 2,500,000 یعنی 41 دقیقه 😅
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -15,9 +13,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     console.log('--- Incoming Request to /api/analyze ---');
-    console.log('Body:', JSON.stringify(req.body, null, 2));
+    console.log('Body:', req.body);
 
-    // درخواست به سرور آنالایزر
     const response = await fetch(`${analyzeUrl}/analyze`, {
       method: 'POST',
       headers: {
@@ -30,24 +27,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     clearTimeout(timeout);
 
-    const text = await response.text();
-    console.log('--- Response from Analyzer ---');
-    console.log('Status:', response.status);
-    console.log('Body:', text);
-
     if (!response.ok) {
-      throw new Error(`خطا در آنالیز سایت: ${response.status} - ${text}`);
+      const text = await response.text();
+      return res.status(response.status).json({ message: text });
     }
 
-    const data = JSON.parse(text);
+    // 👇 سریع‌تر و سبک‌تر از text() + parse
+    const data = await response.json();
     res.status(200).json(data);
+
   } catch (error: any) {
     clearTimeout(timeout);
-    console.error('--- Error in /api/analyze ---');
-    console.error(error);
+    console.error('--- Error in /api/analyze ---', error);
 
     if (error.name === 'AbortError') {
-      // Timeout
       res.status(504).json({ message: 'درخواست آنالیز طولانی شد و زمان انتظار تمام شد (504 Gateway Timeout)' });
     } else {
       res.status(500).json({ message: error.message || 'خطا در ارتباط با سرور آنالایزر' });

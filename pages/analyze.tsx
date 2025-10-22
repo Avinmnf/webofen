@@ -71,7 +71,7 @@ const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
         clearInterval(interval);
         resolve();
       }
-    }, 1000);
+    }, 100);
   });
   
   try {
@@ -91,6 +91,7 @@ const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
     }
 
     const data = await response.json();
+    console.log(data);
     await minLoadingTime;
     setResult(data);
   } catch (err: any) {
