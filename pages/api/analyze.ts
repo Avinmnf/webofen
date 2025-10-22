@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-const analyzeUrl = process.env.NEXT_PUBLIC_ANALYZE_URL || 'http://localhost:4000';
+const analyzeUrl = process.env.ANALYZE_URL || 'http://localhost:4000';
 const MAX_TIMEOUT = 250000; // احتمالا تایپ اشتباه بوده — 2,500,000 یعنی 41 دقیقه 😅
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
