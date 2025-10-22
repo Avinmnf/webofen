@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useRef } from "react";
-import { useGuestReaction } from "@/hooks/useGuestReaction";
 import { GetStaticProps } from "next";
 import { GetStaticPaths } from "next";
 import { GetServerSideProps } from "next";
@@ -117,41 +116,35 @@ export default function PostPage({ post, viewCount }: Props) {
   const [popupMessage, setPopupMessage] = useState("");
   const [popupVisible, setPopupVisible] = useState(false);
   const countedRef = useRef(false);
-  const {
-    likes: initialLikes,
-    dislikes: initialDislikes,
-    hasReacted,
-    handleReaction: handleGuestReaction,
-  } = useGuestReaction({
-    postId: post.id,
-    initialLikes: post.ratings?.filter((r) => r.value === 5).length || 0,
-    initialDislikes: post.ratings?.filter((r) => r.value === 1).length || 0,
-  });
 
-  const { reactionCounts, handleReaction, loading } = useReactions(
-    "post",
-    post.id
-  );
+  const { 
+    reactionCounts, 
+    handleReaction, 
+    loading, 
+    hasReacted 
+  } = useReactions("post", post.id);
 
-  const likes = reactionCounts[5] || initialLikes;
-  const dislikes = reactionCounts[1] || initialDislikes;
-
+  const likes = reactionCounts["like"] || 0;
+  const dislikes = reactionCounts["dislike"] || 0;
   const showPopup = (message: string) => {
     setPopupMessage(message);
     setPopupVisible(true);
     setTimeout(() => setPopupVisible(false), 2000);
   };
 
-  const handleClick = (type: "like" | "dislike", value: number) => {
+  const handleClick = async (type: "like" | "dislike") => {
     if (hasReacted) {
-      showPopup(
-        `شما قبلا به این مطلب واکنش داده اید. `
-      );
+      showPopup(`شما قبلا به این مطلب واکنش داده‌اید.`);
       return;
     }
 
-    handleGuestReaction(type);
-    handleReaction(value);
+    try {
+      await handleReaction(type);
+      showPopup(`واکنش شما ثبت شد!`);
+    } catch (error: any) {
+      console.error("Error handling reaction:", error);
+      showPopup(error.message || "خطا در ثبت واکنش");
+    }
   };
 
   const router = useRouter();
@@ -317,7 +310,7 @@ export default function PostPage({ post, viewCount }: Props) {
                           ? "text-blue-800 hover:text-blue-800 flex items-center gap-2 cursor-pointer"
                           : "text-gray-400 hover:text-blue-800 flex items-center gap-2 cursor-pointer"
                       }
-                      onClick={() => handleClick("like", 5)}
+                      onClick={() => handleClick("like")}
                     >
                       <svg
                         className="w-6 h-6"
@@ -343,7 +336,7 @@ export default function PostPage({ post, viewCount }: Props) {
                     </button>
 
                     <button
-                      onClick={() => handleClick("dislike", 1)}
+                      onClick={() => handleClick("dislike")}
                       className={
                         hasReacted === "dislike"
                           ? "text-red-400 flex items-center gap-2 cursor-pointer"

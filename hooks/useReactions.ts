@@ -1,63 +1,109 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+// hooks/useReactions.ts
+import { useEffect, useState } from "react";
 
-interface Reaction {
-  id: string;
-  value: number;
-  createdAt: string;
+// Create guest ID utility
+export function getGuestId(): string {
+  if (typeof window === 'undefined') {
+    return 'temp-guest-id';
+  }
+  
+  let guestId = localStorage.getItem("guestId");
+  if (!guestId) {
+    guestId = crypto.randomUUID();
+    localStorage.setItem("guestId", guestId);
+  }
+  return guestId;
 }
 
-interface UseReactionsReturn {
-  reactions: Reaction[];
-  reactionCounts: Record<number, number>;
-  totalCount: number;
-  loading: boolean;
-  error: string | null;
-  handleReaction: (value: number) => void; // just update counts locally
-  refetch: () => void;
-}
-
-export function useReactions(module: string, targetId: string): UseReactionsReturn {
-  const [reactions, setReactions] = useState<Reaction[]>([]);
+export function useReactions(module: string, targetId: string) {
+  const [reactionCounts, setReactionCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
+  const [hasReacted, setHasReacted] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchReactions = useCallback(async () => {
-    if (!module || !targetId) return;
-    setLoading(true);
-    setError(null);
+  // ✅ Fetch reaction counts and user's reaction
+  const fetchReactions = async () => {
+    try {
+      setError(null);
+      const guestId = getGuestId();
+      console.log("🔄 Fetching reactions for:", { module, targetId, guestId });
+      
+      const res = await fetch(`/api/proxy/reactions-get/${module}/${targetId}?guestId=${guestId}`);
+      
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      
+      const data = await res.json();
+      console.log("📥 Fetched reaction data:", data);
+      
+      // Handle response whether it has success flag or not
+      if (data.success !== false && data.counts !== undefined) {
+        setReactionCounts(data.counts || {});
+        setHasReacted(data.userReaction || null);
+      } else {
+        setError(data.error || "Failed to fetch reactions");
+      }
+    } catch (err) {
+      console.error("❌ Failed to fetch reactions:", err);
+      setError("Failed to load reactions");
+    }
+  };
+
+  // ✅ Submit a new reaction
+  const handleReaction = async (value: "like" | "dislike") => {
+    if (hasReacted) {
+      throw new Error("Already reacted");
+    }
 
     try {
-      const res = await fetch(`/api/proxy/getreactions?module=${module}&targetId=${targetId}`);
+      setLoading(true);
+      setError(null);
+      const guestId = getGuestId();
+      
+      console.log("📤 Sending reaction:", { module, targetId, value, guestId });
+      
+      const res = await fetch(`/api/proxy/reactions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          module, 
+          targetId, 
+          value, 
+          guestId 
+        }),
+      });
+      
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to fetch reactions");
-      setReactions(data.reactions || []);
-    } catch (err: any) {
-      setError(err.message);
+      console.log("📨 Reaction response:", data);
+      
+      if (data.success) {
+        await fetchReactions(); // Refresh counts
+        return true;
+      } else {
+        throw new Error(data.error || "Reaction save failed");
+      }
+    } catch (err) {
+      console.error("❌ Error saving reaction:", err);
+      setError(err instanceof Error ? err.message : "Failed to save reaction");
+      throw err;
     } finally {
       setLoading(false);
     }
-  }, [module, targetId]);
-
-  useEffect(() => {
-    fetchReactions();
-  }, [fetchReactions]);
-
-  // group counts dynamically
-  const reactionCounts = useMemo(() => {
-    return reactions.reduce((acc, r) => {
-      acc[r.value] = (acc[r.value] || 0) + 1;
-      return acc;
-    }, {} as Record<number, number>);
-  }, [reactions]);
-
-  const totalCount = reactions.length;
-
-  // handle reaction: just update local state for UI
-  const handleReaction = (value: number) => {
-    // increment the count locally
-    setReactions(prev => [...prev, { id: Date.now().toString(), value, createdAt: new Date().toISOString() }]);
-
   };
 
-  return { reactions, reactionCounts, totalCount, loading, error, handleReaction, refetch: fetchReactions };
+  useEffect(() => {
+    if (module && targetId) {
+      fetchReactions();
+    }
+  }, [module, targetId]);
+
+  return { 
+    reactionCounts, 
+    handleReaction, 
+    loading, 
+    hasReacted,
+    error,
+    refreshReactions: fetchReactions 
+  };
 }
