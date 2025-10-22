@@ -1,16 +1,16 @@
-// pages/api/analyze.ts
-
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const analyzeUrl = process.env.NEXT_PUBLIC_ANALYZE_URL || 'http://localhost:4000';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // فقط درخواست های POST مجاز هستند
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
   try {
+    console.log('--- Incoming Request to /api/analyze ---');
+    console.log('Body:', JSON.stringify(req.body, null, 2));
+
     const response = await fetch(`${analyzeUrl}/analyze`, {
       method: 'POST',
       headers: {
@@ -20,15 +20,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       body: JSON.stringify(req.body),
     });
 
+    const text = await response.text();
+    console.log('--- Response from Analyzer ---');
+    console.log('Status:', response.status);
+    console.log('Body:', text);
+
     if (!response.ok) {
-      const text = await response.text();
       throw new Error(`خطا در آنالیز سایت: ${response.status} - ${text}`);
     }
 
-    const data = await response.json();
+    const data = JSON.parse(text);
     res.status(200).json(data);
   } catch (error: any) {
-    console.error('Error in analyze API route:', error);
+    console.error('--- Error in /api/analyze ---');
+    console.error(error);
     res.status(500).json({ message: error.message || 'خطایی در ارتباط با سرور آنالایزر رخ داد' });
   }
 }
