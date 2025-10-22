@@ -1,14 +1,15 @@
 "use client";
 
 import React from "react";
-import { useRatings } from "@/hooks/useRatings";
+import { useProductRating } from "@/hooks/useProductRating";
 
 interface AverageRatingProps {
   productId: string;
 }
 
 export default function AverageRating({ productId }: AverageRatingProps) {
-  const { data, loading, error } = useRatings({ productId });
+  // ✅ use the new hook
+  const { rating: ratingData, loading, error } = useProductRating(productId);
 
   if (loading) {
     return <p className="text-gray-500 text-sm">Loading rating...</p>;
@@ -18,18 +19,18 @@ export default function AverageRating({ productId }: AverageRatingProps) {
     return <p className="text-red-500 text-sm">Failed to load rating</p>;
   }
 
-  if (!data || data.average === null) {
+  if (!ratingData || ratingData.average === 0) {
     return <p className="text-gray-500 text-sm text-center">No ratings yet</p>;
   }
 
-  // ✅ Tell TS that average is definitely a number
-  const average: number = data.average;
+  const average: number = ratingData.average;
+  const count: number = ratingData.totalRatings;
 
   return (
     <div className="flex items-center space-x-2">
       {/* Stars */}
       <div className="flex">
-        {Array.from({ length: 5 }).map((_, i) => (
+        {Array.from({ length: ratingData.maxStars || 5 }).map((_, i) => (
           <svg
             key={i}
             xmlns="http://www.w3.org/2000/svg"
@@ -50,7 +51,7 @@ export default function AverageRating({ productId }: AverageRatingProps) {
       </span>
 
       {/* Count */}
-      <span className="text-sm text-gray-500">({data.count})</span>
+      <span className="text-sm text-gray-500">({count})</span>
     </div>
   );
 }

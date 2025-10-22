@@ -17,9 +17,11 @@ import Productvideo from "@/components/productvideo";
 import Link from "next/link";
 import SEO from "@/components/seo";
 import Backlinkfeatures from "@/components/pillfeatures/Backlinkfeatures";
+import { useProductRating } from "@/hooks/useProductRating";
 type Props = { product: Product };
 
 export default function ProductDetailPage({ product }: Props) {
+  const { user } = useAuth();
   const { addItem } = useCart();
   const router = useRouter();
   const { slug } = router.query;
@@ -37,8 +39,13 @@ export default function ProductDetailPage({ product }: Props) {
   const [showVariantTooltip, setShowVariantTooltip] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [orderItemId, setOrderItemId] = useState<string | undefined>();
-
-  const { user } = useAuth();
+  const {
+    rating,
+    loading: ratingLoading,
+    error: ratingError,
+    submitRating,
+    refetch,
+  } = useProductRating(product.id, user?.id);
   const products = [
     {
       slug: "reportage",
