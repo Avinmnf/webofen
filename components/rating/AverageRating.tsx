@@ -5,11 +5,12 @@ import { useProductRating } from "@/hooks/useProductRating";
 
 interface AverageRatingProps {
   productId: string;
+  userId: string;
 }
 
-export default function AverageRating({ productId }: AverageRatingProps) {
+export default function AverageRating({ productId, userId }: AverageRatingProps) {
   // ✅ use the new hook
-  const { rating: ratingData, loading, error } = useProductRating(productId);
+  const { rating: ratingData, loading, error } = useProductRating(productId, userId);
 
   if (loading) {
     return <p className="text-gray-500 text-sm">Loading rating...</p>;
