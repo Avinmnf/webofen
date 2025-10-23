@@ -35,6 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // 👇 سریع‌تر و سبک‌تر از text() + parse
     const data = await response.json();
     res.status(200).json(data);
+    console.log(data);
 
   } catch (error: any) {
     clearTimeout(timeout);

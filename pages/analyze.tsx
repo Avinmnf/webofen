@@ -45,6 +45,7 @@ export default function AnalyzePage() {
         return acc;
       }, {})
     : {};
+    console.log(groupedIssues);
 
   const tabs = result ? ["all", ...Object.keys(groupedIssues)] : [];
 
@@ -73,6 +74,7 @@ const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
       }
     }, 100);
   });
+  console.log(minLoadingTime);
   
   try {
     // تغییر آدرس به API داخلی
@@ -107,6 +109,7 @@ const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
   useEffect(() => {
     if (!result) return;
     const intervalIds: NodeJS.Timeout[] = [];
+    console.log(intervalIds);
 
     Object.entries(result.scores).forEach(([key, score]) => {
       if (score === undefined) return;
