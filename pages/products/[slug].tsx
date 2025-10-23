@@ -27,7 +27,6 @@ export default function ProductDetailPage({ product }: Props) {
   const { slug } = router.query;
   const [skip, setSkip] = useState(0);
   const take = 5;
-
   const [orderMessage, setOrderMessage] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [selectedAttributes, setSelectedAttributes] = useState<
@@ -39,13 +38,16 @@ export default function ProductDetailPage({ product }: Props) {
   const [showVariantTooltip, setShowVariantTooltip] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [orderItemId, setOrderItemId] = useState<string | undefined>();
-  const {
-    rating,
-    loading: ratingLoading,
-    error: ratingError,
-    submitRating,
-    refetch,
-  } = useProductRating(product.id, user?.id);
+  const { rating, loading, error, submitRating, refetch } = user?.id
+    ? useProductRating(product.id, user.id)
+    : {
+        rating: null,
+        loading: false,
+        error: null,
+        submitRating: () => {},
+        refetch: () => {},
+      };
+
   const products = [
     {
       slug: "reportage",
@@ -373,7 +375,10 @@ export default function ProductDetailPage({ product }: Props) {
                   </button>
                 </div>
 
-                <AverageRating productId={product?.id} />
+                <AverageRating
+                  productId={product?.id}
+                  userId={user?.id || ""}
+                />
 
                 <div
                   className="relative w-full"
