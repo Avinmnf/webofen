@@ -396,8 +396,9 @@ export default function Home() {
                     <div className="text-start pr-5">
                       <h2 className="pb-1 text-xl">خدمات سئو</h2>
                       <p className="text-sm">
-                        لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ
-                      </p>
+
+                        بهینه‌ سازی سایت برای رشد پایدار در نتایج جستجو و جذب مخاطبان هدف  
+                    </p>
                     </div>
                   </div>
                 </div>
@@ -416,7 +417,8 @@ export default function Home() {
                     <div className="text-start pr-5">
                       <h2 className="pb-1 text-xl">خدمات طراحی سایت</h2>
                       <p className="text-sm">
-                        لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ
+
+                      از ایده تا اجرای وب‌ سایت؛ طراحی اصولی و کاربر پسند با جدید ترین استاندارد های وب        
                       </p>
                     </div>
                   </div>
@@ -436,7 +438,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Background section starts from mid-image */}
+        {/* Background section starts from mid-image */}  
         <div className="w-full  relative ">
           <div className="max-w-[1250px] p-8 md:p-0 mx-auto">
               <div className="flex items-center justify-center md:justify-start">
@@ -474,6 +476,7 @@ export default function Home() {
                   </div>
                 </div>
 
+
                 <div className="w-full md:w-[70%] mt-3 md:mt-4 text-sm md:text-base text-white">
                   <p>
                     لورم ایپسوم متن ساختگی با تولید سادگی که لازم است، و برای شرایط فعلی
@@ -504,6 +507,7 @@ export default function Home() {
               </p>
             </div>
           </div>
+
 
           {/* Right Section: Swiper */}
           <div className="md:w-[60%] w-full">
