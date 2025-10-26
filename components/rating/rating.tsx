@@ -1,81 +1,75 @@
 "use client";
 
 import React, { useState } from "react";
-import { useSubmitRating } from "@/hooks/useSubmitRating";
-import { article } from "framer-motion/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useProductRating } from "@/hooks/useProductRating";
 
 interface RatingFormProps {
-  contentType: "post" | "product";
-  contentId: string; // productId or postId
-  orderItemId?: string; // required for product rating
+  productId: string;
 }
 
-export default function RatingForm({
-  contentType,
-  contentId,
-  orderItemId,
-}: RatingFormProps) {
-  const name: Record<string, string> = {
-    product: "محصول",
-    article: "مقاله",
-  };
+export default function RatingForm({ productId }: RatingFormProps) {
+  const { user } = useAuth();
+  const [hoverValue, setHoverValue] = useState<number | null>(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
 
-  const [value, setValue] = useState<number>(0);
-  const { submitRating, loading, error, success } = useSubmitRating();
-
-  const handleClick = async (starValue: number) => {
-    setValue(starValue);
-    await submitRating({
-      value: starValue,
-      productId: contentType === "product" ? contentId : undefined,
-      postId: contentType === "post" ? contentId : undefined,
-      orderItemId: contentType === "product" ? orderItemId : undefined,
-    });
-  };
-
-  return (
-    <div className="rating-form max-w-md text-sm mt-4 p-4 ">
-      <p className="mb-2">
-        به این {name[contentType]} امتیاز دهید:
-      </p>
-      <div className="stars flex gap-2 w-40 cursor-pointer">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Star
-            key={star}
-            filled={star <= value}
-            onClick={() => handleClick(star)}
-            disabled={loading}
-          />
-        ))}
-      </div>
-      {loading && <p className="mt-2 text-gray-600">Submitting...</p>}
-      {error && <p className="mt-2 text-red-600">{error}</p>}
-      {success && <p className="mt-2 text-green-600">ممنون بابت امتیاز شما!</p>}
-    </div>
+  const { rating: ratingData, loading, error, submitRating } = useProductRating(
+    productId,
+    user?.id
   );
-}
 
-function Star({
-  filled,
-  onClick,
-  disabled,
-}: {
-  filled: boolean;
-  onClick: () => void;
-  disabled: boolean;
-}) {
+  const handleRate = async (value: number) => {
+    if (!user) {
+      setPopupMessage("برای امتیاز دادن باید وارد شوید.");
+      setShowPopup(true);
+      return;
+    }
+
+    const res = await submitRating(value);
+
+    if (!res.success) {
+      setPopupMessage(res.error || "خطایی رخ داد.");
+      setShowPopup(true);
+    }
+  };
+
+  if (loading)
+    return <p className="text-gray-500 text-sm">در حال بارگذاری...</p>;
+  if (error) return <p className="text-red-500 text-sm">{error}</p>;
+
   return (
-    <svg
-      onClick={disabled ? undefined : onClick}
-      xmlns="http://www.w3.org/2000/svg"
-      fill={filled ? "gold" : "gray"}
-      viewBox="0 0 24 24"
-      stroke="none"
-      className={`w-8 h-8 ${
-        disabled ? "cursor-not-allowed" : "cursor-pointer"
-      }`}
-    >
-      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-    </svg>
+    <div className="flex items-center justify-center space-x-1 mt-1">
+      {Array.from({ length: ratingData?.maxStars || 5 }).map((_, i) => {
+        const starValue = i + 1;
+        const isFilled =
+          hoverValue !== null
+            ? starValue <= hoverValue
+            : starValue <= (ratingData?.userRating || 0);
+
+        return (
+          <svg
+            key={i}
+            onMouseEnter={() => setHoverValue(starValue)}
+            onMouseLeave={() => setHoverValue(null)}
+            onClick={() => handleRate(starValue)}
+            xmlns="http://www.w3.org/2000/svg"
+            className={`h-6 w-6 cursor-pointer transition ${
+              isFilled ? "text-yellow-400" : "text-gray-300"
+            } hover:scale-110`}
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.974a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.384 2.46a1 1 0 00-.364 1.118l1.287 3.974c.3.921-.755 1.688-1.54 1.118l-3.384-2.46a1 1 0 00-1.176 0l-3.384 2.46c-.784.57-1.838-.197-1.539-1.118l1.287-3.974a1 1 0 00-.364-1.118L2.045 9.4c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.287-3.974z" />
+          </svg>
+        );
+      })}
+
+      {showPopup && (
+        <div className="absolute mt-2 p-2 bg-red-100 text-red-700 text-sm rounded">
+          {popupMessage}
+        </div>
+      )}
+    </div>
   );
 }

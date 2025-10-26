@@ -13,18 +13,14 @@ interface UseProductRatingReturn {
   rating: ProductRating | null;
   loading: boolean;
   error: string | null;
-  submitRating: (value: number) => Promise<void>;
+  submitRating: (value: number) => Promise<{ success: boolean; error?: string }>;
   refetch: () => Promise<void>;
 }
 
-export function useProductRating(productId: string, userId: string): UseProductRatingReturn {
+export function useProductRating(productId: string, userId?: string): UseProductRatingReturn {
   const [rating, setRating] = useState<ProductRating | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  if (!userId) {
-    throw new Error("useProductRating requires a logged-in userId.");
-  }
 
   const fetchRatings = useCallback(async () => {
     if (!productId) return;
@@ -33,22 +29,33 @@ export function useProductRating(productId: string, userId: string): UseProductR
     setError(null);
 
     try {
-      const res = await fetch(`/api/proxy/rate-product/${productId}?userId=${userId}`);
+      const url = userId
+        ? `/api/proxy/rateproduct-get/${productId}?userId=${userId}`
+        : `/api/proxy/rateproduct-get/${productId}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Network error while fetching ratings");
+
       const data = await res.json();
 
-      if (!data.success) throw new Error(data.error || "Failed to fetch ratings");
-
       setRating({
-        productId: data.productId,
-        totalRatings: data.totalRatings,
-        counts: data.counts,
-        average: data.average,
-        userRating: data.userRating,
+        productId,
+        totalRatings: data.totalRatings || 0,
+        counts: data.counts || {},
+        average: data.average || 0,
+        userRating: data.userRating ?? null,
         maxStars: data.maxStars || 5,
       });
     } catch (err: any) {
       console.error("Fetch rating error:", err);
-      setError(err.message || "Failed to fetch ratings");
+      setRating({
+        productId,
+        totalRatings: 0,
+        counts: {},
+        average: 0,
+        userRating: null,
+        maxStars: 5,
+      });
+      setError(null); // don’t block UI if fetch fails
     } finally {
       setLoading(false);
     }
@@ -59,17 +66,18 @@ export function useProductRating(productId: string, userId: string): UseProductR
   }, [fetchRatings]);
 
   const submitRating = useCallback(
-    async (value: number) => {
-      if (!productId || !userId) {
-        setError("User must be logged in to rate.");
-        return;
+    async (value: number): Promise<{ success: boolean; error?: string }> => {
+      if (!userId) {
+        const msg = "برای امتیاز دادن باید وارد شوید.";
+        setError(msg);
+        return { success: false, error: msg };
       }
 
       setLoading(true);
       setError(null);
 
       try {
-        const res = await fetch(`/api/proxy/rateproduct-get`, {
+        const res = await fetch(`/api/proxy/rate-product`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userId, productId, value }),
@@ -78,11 +86,13 @@ export function useProductRating(productId: string, userId: string): UseProductR
         const data = await res.json();
         if (!data.success) throw new Error(data.error || "Failed to submit rating");
 
-        // Refresh after submitting
-        await fetchRatings();
+        await fetchRatings(); // refresh ratings after submit
+        return { success: true };
       } catch (err: any) {
         console.error("Submit rating error:", err);
-        setError(err.message || "Failed to submit rating");
+        const msg = err.message || "Failed to submit rating";
+        setError(msg);
+        return { success: false, error: msg };
       } finally {
         setLoading(false);
       }
@@ -90,11 +100,5 @@ export function useProductRating(productId: string, userId: string): UseProductR
     [productId, userId, fetchRatings]
   );
 
-  return {
-    rating,
-    loading,
-    error,
-    submitRating,
-    refetch: fetchRatings,
-  };
+  return { rating, loading, error, submitRating, refetch: fetchRatings };
 }

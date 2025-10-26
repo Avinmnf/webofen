@@ -38,15 +38,12 @@ export default function ProductDetailPage({ product }: Props) {
   const [showVariantTooltip, setShowVariantTooltip] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [orderItemId, setOrderItemId] = useState<string | undefined>();
-  const { rating, loading, error, submitRating, refetch } = user?.id
-    ? useProductRating(product.id, user.id)
-    : {
-        rating: null,
-        loading: false,
-        error: null,
-        submitRating: () => {},
-        refetch: () => {},
-      };
+  const {
+    rating: ratingData,
+    loading,
+    error,
+    submitRating,
+  } = useProductRating(product.id, user?.id || "");
 
   const products = [
     {
@@ -374,11 +371,7 @@ export default function ProductDetailPage({ product }: Props) {
                     +
                   </button>
                 </div>
-
-                <AverageRating
-                  productId={product?.id}
-                  userId={user?.id || ""}
-                />
+                <AverageRating productId={product.id} userId={user?.id} />
 
                 <div
                   className="relative w-full"
@@ -438,11 +431,7 @@ export default function ProductDetailPage({ product }: Props) {
                 </p>
               )}
 
-              <RatingForm
-                contentType="product"
-                contentId={product?.id ?? ""}
-                orderItemId={orderItemId}
-              />
+              <RatingForm productId={product?.id ?? ""} />
             </div>
 
             {/* --- TOC --- */}
