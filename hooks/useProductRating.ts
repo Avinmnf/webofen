@@ -7,6 +7,7 @@ interface ProductRating {
   average: number;
   userRating: number | null;
   maxStars: number;
+  canRate: boolean;
 }
 
 interface UseProductRatingReturn {
@@ -24,7 +25,6 @@ export function useProductRating(productId: string, userId?: string): UseProduct
 
   const fetchRatings = useCallback(async () => {
     if (!productId) return;
-
     setLoading(true);
     setError(null);
 
@@ -34,7 +34,6 @@ export function useProductRating(productId: string, userId?: string): UseProduct
         : `/api/proxy/rateproduct-get/${productId}`;
       const res = await fetch(url);
       if (!res.ok) throw new Error("Network error while fetching ratings");
-
       const data = await res.json();
 
       setRating({
@@ -44,6 +43,7 @@ export function useProductRating(productId: string, userId?: string): UseProduct
         average: data.average || 0,
         userRating: data.userRating ?? null,
         maxStars: data.maxStars || 5,
+        canRate: data.canRate ?? false,
       });
     } catch (err: any) {
       console.error("Fetch rating error:", err);
@@ -54,8 +54,9 @@ export function useProductRating(productId: string, userId?: string): UseProduct
         average: 0,
         userRating: null,
         maxStars: 5,
+        canRate: false,
       });
-      setError(null); // don’t block UI if fetch fails
+      setError(null);
     } finally {
       setLoading(false);
     }
@@ -72,21 +73,23 @@ export function useProductRating(productId: string, userId?: string): UseProduct
         setError(msg);
         return { success: false, error: msg };
       }
+      if (!rating?.canRate) {
+        const msg = "شما هنوز این محصول را خریداری نکرده‌اید.";
+        setError(msg);
+        return { success: false, error: msg };
+      }
 
       setLoading(true);
       setError(null);
-
       try {
         const res = await fetch(`/api/proxy/rate-product`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userId, productId, value }),
         });
-
         const data = await res.json();
         if (!data.success) throw new Error(data.error || "Failed to submit rating");
-
-        await fetchRatings(); // refresh ratings after submit
+        await fetchRatings(); // refresh after submit
         return { success: true };
       } catch (err: any) {
         console.error("Submit rating error:", err);
@@ -97,7 +100,7 @@ export function useProductRating(productId: string, userId?: string): UseProduct
         setLoading(false);
       }
     },
-    [productId, userId, fetchRatings]
+    [productId, userId, fetchRatings, rating?.canRate]
   );
 
   return { rating, loading, error, submitRating, refetch: fetchRatings };

@@ -25,21 +25,27 @@ export default function RatingForm({ productId }: RatingFormProps) {
       setShowPopup(true);
       return;
     }
-
+    if (!ratingData?.canRate) {
+      setPopupMessage("شما هنوز این محصول را خریداری نکرده‌اید.");
+      setShowPopup(true);
+      return;
+    }
     const res = await submitRating(value);
-
     if (!res.success) {
       setPopupMessage(res.error || "خطایی رخ داد.");
       setShowPopup(true);
     }
   };
 
-  if (loading)
-    return <p className="text-gray-500 text-sm">در حال بارگذاری...</p>;
+  if (loading) return <p className="text-gray-500 text-sm">در حال بارگذاری...</p>;
   if (error) return <p className="text-red-500 text-sm">{error}</p>;
 
+  if (!ratingData?.canRate) {
+    return <p className="text-gray-500 text-sm">شما هنوز این محصول را خریداری نکرده‌اید.</p>;
+  }
+
   return (
-    <div className="flex items-center justify-center space-x-1 mt-1">
+    <div className="flex items-center justify-center space-x-1 mt-1 relative">
       {Array.from({ length: ratingData?.maxStars || 5 }).map((_, i) => {
         const starValue = i + 1;
         const isFilled =
