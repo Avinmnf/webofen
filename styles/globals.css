@@ -132,3 +132,17 @@ p{
   font-weight: bold;
   text-align: center;
 }
+@media (max-width: 320px) {
+  .mx-auto-sm {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+@media (min-width: 321px) {
+  .mx-auto-sm {
+
+        margin-left: auto;
+    margin-right: auto;
+  }
+}

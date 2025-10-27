@@ -347,7 +347,7 @@ export default function Home() {
         {/* Image container (no background color) */}
         <div className="max-w-[1250px] m-auto relative p-4 md:p-0">
           <div className="grid md:flex w-full md:h-[344] mb-0 md:mb-10 rounded-3xl bg-[#29b0cb] md:bg-white md:bg-[url(/homepage/bg1.webp)]">
-            <div id="first" className="order-2 md:order-1 w-full md:w-2/3">
+            <div id="first" className="order-2 md:order-1 w-11/12 md:w-2/3 mx-auto-sm">
               <div className="w-full">
                 <div className="flex md:mr-4 h-26 mb-1 items-center">
                   <div className="ml-3">
@@ -380,7 +380,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <div className="block md:flex w-full h-100 md:h-58 items-center">
+              <div className="block md:flex w-full h-120 md:h-58 items-center">
                 <div className="w-full px-6 py-2 md:p-6 md:w-1/2">
                   <div className="w-full border border-white hover:bg-[#1d546b] hover:border-[#1d546b] flex items-center text-white rounded-4xl p-4 h-full sm:w-auto text-center text-sm sm:text-base">
                     <svg
@@ -425,7 +425,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div id="Second" className="order-1 md:order-2 w-full pt-2 md:w-1/3">
+            <div id="Second" className="order-1 md:order-2 pt-2 md:w-1/3 w-11/12 mx-auto-sm">
               <div className="relative w-full md:w-2/4 mx-auto h-[220px] md:h-[100%]  rounded-lg">
                 <Image
                   src="/homepage/hero2.webp"
