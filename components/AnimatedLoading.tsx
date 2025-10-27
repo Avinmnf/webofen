@@ -101,28 +101,7 @@ export const AnimatedLoading = ({ progress, elapsedTime }: { progress: number; e
         {/* Encouragement Messages */}
         <EncouragementMessages showEncouragement={showEncouragement} />
 
-        {/* Time Remaining */}
-        <div className="text-center mt-6">
-          <div className="inline-flex items-center space-x-2 space-x-reverse bg-white/10 rounded-full px-4 py-2 backdrop-blur-sm">
-            <svg
-              className="w-4 h-4 text-blue-200 animate-pulse"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span className="text-blue-200 text-sm font-medium">
-              {30 - Math.floor((progress / 100) * 30)} ثانیه باقی مانده
-            </span>
-          </div>
-        </div>
+   
 
         {/* Quick Tips Section */}
         {elapsedTime > 15 && (
@@ -145,7 +124,7 @@ export const AnimatedLoading = ({ progress, elapsedTime }: { progress: number; e
                 </div>
                 <div className="flex items-center space-x-2 space-x-reverse">
                   <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                  <span>بررسی امنیت و بهترین روش‌ها</span>
+                  <span>بررسی امنیت و بهترین روش‌ ها</span>
                 </div>
                 <div className="flex items-center space-x-2 space-x-reverse">
                   <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>

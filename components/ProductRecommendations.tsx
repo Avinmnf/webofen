@@ -22,8 +22,8 @@ export const ProductRecommendations = ({ scores }: ProductRecommendationsProps) 
   const mockProducts: SimpleProduct[] = [
     {
       id: "1",
-      title: "قرص بهینه‌سازی",
-      description: "بهینه‌سازی کامل سئو، عملکرد، دسترسی‌پذیری و بهترین شیوه‌ها برای بهبود کلی وبسایت",
+      title: "قرص بهینه‌ سازی",
+      description: "بهینه‌ سازی کامل سئو، عملکرد، دسترسی‌ پذیری و بهترین شیوه‌ ها برای بهبود کلی وبسایت",
       imageUrl: "optimization.mp4",
       slug: "optimization",
     },
@@ -44,8 +44,9 @@ export const ProductRecommendations = ({ scores }: ProductRecommendationsProps) 
       seo: scores["seo"] ?? scores["سئو"],
     };
 
-    const { accessibility, bestPractices, seo } = mappedScores;
+    const { performance, accessibility, bestPractices, seo } = mappedScores;
     const allAbove90 =
+      Number(performance || 0) >= 0.9 &&
       Number(accessibility || 0) >= 0.9 &&
       Number(bestPractices || 0) >= 0.9 &&
       Number(seo || 0) >= 0.9;
@@ -60,10 +61,19 @@ export const ProductRecommendations = ({ scores }: ProductRecommendationsProps) 
 
     const recommended: SimpleProduct[] = [];
 
-    const hasLowScore = Object.values(mappedScores).some((s) => Number(s || 0) < 0.8);
-    if (hasLowScore) recommended.push(mockProducts[0]);
+    // شرط جدید: اگر performance زیر ۹۰ باشد، محصول بهینه‌سازی پیشنهاد شود
+    if ((mappedScores.performance || 0) < 0.9) {
+      recommended.push(mockProducts[0]);
+    }
 
-    if ((mappedScores.seo || 0) < 0.9) recommended.push(mockProducts[1]);
+    const hasLowScore = Object.values(mappedScores).some((s) => Number(s || 0) < 0.8);
+    if (hasLowScore && !recommended.some(p => p.id === "1")) {
+      recommended.push(mockProducts[0]);
+    }
+
+    if ((mappedScores.seo || 0) < 0.9) {
+      recommended.push(mockProducts[1]);
+    }
 
     const uniqueProducts = recommended.filter(
       (p, i, self) => i === self.findIndex((x) => x.id === p.id)
@@ -81,7 +91,7 @@ export const ProductRecommendations = ({ scores }: ProductRecommendationsProps) 
       <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 shadow-sm border border-green-100 text-center">
         <h2 className="font-bold text-2xl text-green-700 mb-2">وضعیت وبسایت شما عالی است 🎉</h2>
         <p className="text-gray-700">
-          تمام بخش‌ های اصلی وبسایت شما (سئو، بهترین شیوه‌ ها، دسترس‌ پذیری) امتیاز بالای ۹۰ دارند.
+          تمام بخش‌ های اصلی وبسایت شما (عملکرد، سئو، بهترین شیوه‌ ها، دسترس‌ پذیری) امتیاز بالای ۹۰ دارند.
           <br />
         </p>
       </div>
@@ -98,7 +108,7 @@ export const ProductRecommendations = ({ scores }: ProductRecommendationsProps) 
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
-          <span>بر اساس تحلیل امتیازها</span>
+          <span>بر اساس تحلیل امتیاز ها</span>
         </div>
       </div>
 
@@ -137,10 +147,10 @@ export const ProductRecommendations = ({ scores }: ProductRecommendationsProps) 
               </div>
 
               <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
-                <div className="text-green-600 font-medium text-sm">راه‌حل تخصصی</div>
+                <div className="text-blue-800 font-medium text-sm">راه‌ حل تخصصی</div>
                 <Link 
                   href={`/products/${product.slug}`}
-                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center group/btn"
+                  className="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center group/btn"
                 >
                   <span>خرید محصول</span>
                   <svg className="w-4 h-4 mr-1 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -168,7 +178,10 @@ function getProductReasons(productId: string, scores: Record<string, number>): s
   switch (productId) {
     case "1":
       if ([seo, performance, accessibility, bestPractices].some((s) => (s || 0) < 0.8)) {
-        reasons.push("امتیازهای پایین در چند بخش");
+        reasons.push("امتیاز های پایین در چند بخش");
+      }
+      if ((performance || 0) < 0.9) {
+        reasons.push("عملکرد نیاز به بهبود دارد");
       }
       break;
     case "2":

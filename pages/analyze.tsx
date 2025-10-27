@@ -19,7 +19,6 @@ import { ProductRecommendations } from "@/components/ProductRecommendations";
 import { WaveBackground } from "@/components/WaveBackground";
 import { HeroSection } from "@/components/HeroSection";
 
-
 // Import types
 import { AnalyzeResult } from "@/lib/models/analyze";
 import { Issue } from "@/lib/models/analyze";
@@ -35,7 +34,8 @@ export default function AnalyzePage() {
   const [animatedScores, setAnimatedScores] = useState<Record<string, number>>({});
   const [error, setError] = useState<string | null>(null);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
-  
+  const [showSuccessAlert, setShowSuccessAlert] = useState<boolean>(false);
+  const [pendingResult, setPendingResult] = useState<AnalyzeResult | null>(null); // اضافه شده
   
   const groupedIssues = result
     ? result.issues.reduce<Record<string, Issue[]>>((acc: Record<string, Issue[]>, issue: Issue) => {
@@ -46,44 +46,76 @@ export default function AnalyzePage() {
       }, {})
     : {};
     console.log(groupedIssues);
+    
 
   const tabs = result ? ["all", ...Object.keys(groupedIssues)] : [];
 
+  // کامپوننت SuccessAlert
+const SuccessAlert = () => (
+  <div className="fixed inset-0 flex items-center justify-center z-50 bg-blue-50 bg-opacity-50 animate-fade-in">
+    <div className="bg-white rounded-2xl p-6 mx-4 max-w-md w-full animate-scale-in shadow-2xl border border-green-200 relative">
+      <div className="text-center">
+
+        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg 
+            className="w-8 h-8 text-green-500 animate-bounce" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" 
+            />
+          </svg>
+        </div>
+
+        <h3 className="text-xl font-bold text-gray-800 mb-2">
+          🎉 آنالیز کامل شد!
+        </h3>
+        <p className="text-gray-600 mb-6">
+          نتیجه آنالیز وب‌سایت شما آماده است. برای مشاهده روی دکمه زیر بزنید.
+        </p>
+
+        <button
+          onClick={() => {
+            setShowSuccessAlert(false);
+            if (pendingResult) {
+              setResult(pendingResult);
+              setPendingResult(null);
+            }
+          }}
+          className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 px-4 rounded-lg font-medium hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+        >
+          مشاهده نتایج
+        </button>
+
+        <button
+          onClick={() => setShowSuccessAlert(false)}
+          className="absolute top-3 left-3 text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+);
 const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
-  setLoading(true);
-  setResult(null);
+  if (!url) return setError("لطفاً URL را وارد کنید");
+
   setError(null);
   setProgress(0);
   setElapsedTime(0);
 
-  const startTime = Date.now();
-  const timeInterval = setInterval(() => {
-    setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
-  }, 1000);
-
-  const minLoadingTime = new Promise<void>((resolve) => {
-    const start = Date.now();
-    const interval = setInterval(() => {
-      const elapsed = Date.now() - start;
-      const pct = Math.min(100, Math.floor((elapsed / 30000) * 100));
-      setProgress(pct);
-      if (pct >= 100) {
-        clearInterval(interval);
-        resolve();
-      }
-    }, 100);
-  });
-  console.log(minLoadingTime);
-  
   try {
-    // تغییر آدرس به API داخلی
-    const response = await fetch(`/api/analyze`, {
+    const response = await fetch("/api/analyze", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ url }),
     });
 
@@ -93,18 +125,80 @@ const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
     }
 
     const data = await response.json();
-    console.log(data);
-    await minLoadingTime;
-    setResult(data);
+
+    if (data.status === "completed" && data.scores) {
+      setPendingResult(data);
+      setProgress(100);
+      setLoading(false);
+      setTimeout(() => setShowSuccessAlert(true), 300);
+      return;
+    }
+
+    setLoading(true);
+    setResult(null);
+
+    const startTime = Date.now();
+    const timeInterval = setInterval(() => {
+      setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+    }, 1000);
+
+    const analysisId = data.analysisId;
+    if (!analysisId) throw new Error("analysisId معتبر ایجاد نشد");
+    setProgress(10);
+
+    const checkInterval = 3000; // هر 3 ثانیه
+    const maxRetries = 40; // حداکثر 50 بار (حدود 150 ثانیه)
+    let retries = 0;
+
+    const intervalId = setInterval(async () => {
+      retries++;
+      try {
+        const statusRes = await fetch(`/api/analyze?id=${analysisId}`);
+        if (!statusRes.ok) return; // هنوز آماده نیست
+
+        const statusData = await statusRes.json();
+
+        if (statusData.status === "completed" && statusData.scores) {
+          clearInterval(intervalId);
+          clearInterval(timeInterval);
+          setProgress(100);
+          setLoading(false);
+          setPendingResult(statusData);
+          setTimeout(() => setShowSuccessAlert(true), 300);
+          return;
+        }
+
+        // ✅ پیشرفت نرم‌تر
+        const newProgress = Math.min(95, 10 + retries * 3);
+        setProgress(newProgress);
+
+        // ✅ انیمیشن روشن شدن چراغ‌ها با پیشرفت
+
+        if (retries >= maxRetries) {
+          clearInterval(intervalId);
+          clearInterval(timeInterval);
+          setProgress(100);
+          setLoading(false);
+          setError("زمان آنالیز بیش از حد طول کشید");
+        }
+      } catch (err: any) {
+        console.error(err);
+        clearInterval(intervalId);
+        clearInterval(timeInterval);
+        setProgress(100);
+        setLoading(false);
+        setError(err.message || "خطا در بررسی وضعیت آنالیز");
+      }
+    }, checkInterval);
   } catch (err: any) {
-    console.error("Error analyzing site:", err);
-    setError(err.message || "خطایی در ارتباط با سرور آنالایزر رخ داد");
-  } finally {
-    setLoading(false);
+    console.error(err);
     setProgress(100);
-    clearInterval(timeInterval);
+    setLoading(false);
+    setError(err.message || "خطایی در شروع آنالیز رخ داد");
   }
 };
+
+
   
   useEffect(() => {
     if (!result) return;
@@ -159,16 +253,25 @@ const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30">
+      {/* اعلان موفقیت */}
+      {showSuccessAlert && <SuccessAlert />}
+      
       <div className="w-full">
         <HeroSection url={url} setUrl={setUrl} loading={loading} handleAnalyze={handleAnalyze} />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start animate-shake">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500 mt-0.5 ml-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+            <div className={`mb-6 p-4 border rounded-xl flex items-start animate-shake ${
+              error.includes("🎉") 
+                ? "bg-green-50 border-green-200 text-green-800" 
+                : "bg-red-50 border-red-200 text-red-800"
+            }`}>
+              <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mt-0.5 ml-2 flex-shrink-0 ${
+                error.includes("🎉") ? "text-green-500" : "text-red-500"
+              }`} viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
-              <p className="text-red-700">{error}</p>
+              <p className={error.includes("🎉") ? "text-green-700" : "text-red-700"}>{error}</p>
             </div>
           )}
 
@@ -520,6 +623,20 @@ const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(100%); }
         }
+        @keyframes bounce {
+          0%, 20%, 53%, 80%, 100% {
+            transform: translate3d(0,0,0);
+          }
+          40%, 43% {
+            transform: translate3d(0,-8px,0);
+          }
+          70% {
+            transform: translate3d(0,-4px,0);
+          }
+          90% {
+            transform: translate3d(0,-2px,0);
+          }
+        }
         .animate-fade-in { animation: fade-in 0.6s ease-out; }
         .animate-fade-in-up { animation: fade-in-up 0.6s ease-out; }
         .animate-slide-up { animation: slide-up 0.5s ease-out; }
@@ -530,6 +647,7 @@ const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
         .animate-spin-slow { animation: spin-slow 8s linear infinite; }
         .animate-spin-slow-reverse { animation: spin-slow-reverse 8s linear infinite; }
         .animate-shine { animation: shine 2s infinite; }
+        .animate-bounce { animation: bounce 1s ease-in-out; }
       `}</style>
     </div>
   );
