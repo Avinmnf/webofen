@@ -15,6 +15,7 @@ import SEO from "@/components/seo";
 import { InjectRelatedCategories } from "@/lib/functions/injectRelatedCategories";
 import { useRelatedPosts } from "@/hooks/useRelatedPosts";
 import { useReactions } from "@/hooks/useReactions";
+import { article } from "framer-motion/client";
 type Props = {
   post: Post;
   viewCount: number;
@@ -117,12 +118,10 @@ export default function PostPage({ post, viewCount }: Props) {
   const [popupVisible, setPopupVisible] = useState(false);
   const countedRef = useRef(false);
 
-  const { 
-    reactionCounts, 
-    handleReaction, 
-    loading, 
-    hasReacted 
-  } = useReactions("post", post.id);
+  const { reactionCounts, handleReaction, loading, hasReacted } = useReactions(
+    "post",
+    post.id
+  );
 
   const likes = reactionCounts["like"] || 0;
   const dislikes = reactionCounts["dislike"] || 0;
@@ -180,9 +179,64 @@ export default function PostPage({ post, viewCount }: Props) {
         {/*Background Section */}
         <div className="relative pt-20">
           <div className="w-full m-auto">
+            {/* Breadcrumb Navigation */}
+            <nav className="mb-6 px-4 text-gray-500 " aria-label="breadcrumb">
+              <ol className="flex items-center space-x-2 space-x-reverse text-sm text-gray-500 ">
+                <li>
+                  <Link
+                    href="/"
+                    className="hover:text-[#ff5084] transition-colors bread"
+                  >
+                    خانه
+                  </Link>
+                </li>
+                <li className="flex items-center bread">
+                  <svg
+                    className="w-4 h-4 mx-1 transform rotate-180"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </li>
+                <li>
+                  <Link
+                    href="/articles"
+                    className="hover:text-[#ff5084] transition-colors bread"
+                  >
+                    مقالات
+                  </Link>
+                </li>
+                <li className="flex items-center bread">
+                  <svg
+                    className="w-4 h-4 mx-1 transform rotate-180"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </li>
+                <li>
+                  <Link
+                    href={`/articles/${post.slug}`}
+                    className="hover:text-[#ff5084] transition-colors bread"
+                  >
+                    {post.title}
+                  </Link>
+                </li>
+              </ol>
+            </nav>
             {/* Hero Section */}
             {post.imageUrl && (
-              <div className="relative w-full h-[500px]">
+              <div className="relative w-full md:h-[500px] h-[200px]">
                 <Image
                   src={`${post.imageUrl}`}
                   alt={post.imageAlt || post.title}
@@ -344,7 +398,6 @@ export default function PostPage({ post, viewCount }: Props) {
                       }
                     >
                       <svg
-                        className="w-6 h-7 mt-2 hover:text-red-400 cursor-pointer"
                         viewBox="0 0 24 24"
                         fill="currentColor"
                         xmlns="http://www.w3.org/2000/svg"
