@@ -37,12 +37,9 @@ export default function RatingForm({ productId }: RatingFormProps) {
     }
   };
 
-  if (loading) return <p className="text-gray-500 text-sm">در حال بارگذاری...</p>;
-  if (error) return <p className="text-red-500 text-sm">{error}</p>;
-
-  if (!ratingData?.canRate) {
-    return <p className="text-gray-500 text-sm">شما هنوز این محصول را خریداری نکرده‌اید.</p>;
-  }
+  if (loading) return null; // don't show anything while loading
+  if (error) return null;   // don't show anything if error
+  if (!ratingData?.canRate) return null; // user cannot rate → render nothing
 
   return (
     <div className="flex items-center justify-center space-x-1 mt-1 relative">

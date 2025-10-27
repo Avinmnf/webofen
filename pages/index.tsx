@@ -349,7 +349,7 @@ export default function Home() {
           <div className="grid md:flex w-full md:h-[344] mb-0 md:mb-10 rounded-3xl bg-[#29b0cb] md:bg-white md:bg-[url(/homepage/bg1.webp)]">
             <div id="first" className="order-2 md:order-1 w-full md:w-2/3">
               <div className="w-full">
-                <div className="flex mr-4 h-26 mb-1 items-center">
+                <div className="flex md:mr-4 h-26 mb-1 items-center">
                   <div className="ml-3">
                     <svg
                       className="w-8"
