@@ -73,7 +73,7 @@ export default function Reservetime() {
           fill
           className="object-cover block sm:hidden"
         />
-        <div className="absolute top-50 md:top-6 right-4 items-start z-10 p-10 md:p-4 pt-10 rounded-xl">
+        <div className="absolute top-25 md:top-6 md:right-4 items-start z-10 p-10 md:p-4 pt-10 rounded-xl">
           <div className="mt-10">
             <p className="text-lg md:text-3xl text-white mb-4">
               قبل از ثبت نوبت می‌توانید از ما
