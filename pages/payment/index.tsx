@@ -225,61 +225,59 @@ export default function CartPage() {
               key={index}
               className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white p-4 border-b border-gray-300 transition"
             >
-              <Link href={`/products/${item.productId}`}>
-                <div className="flex space-y-1">
-                  <div className="w-1/6 ml-6">
-                    {item.imageUrl ? (
-                      <Productvideo product={item.imageUrl} />
-                    ) : (
-                      <Image
-                        width={100}
-                        height={90}
-                        src={item.imageUrl || "/dashboard/backlink.png"}
-                        loader={({ src }) => src}
-                        alt={item.title}
-                        className="rounded-t-2xl"
-                      />
-                    )}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-lg mb-2">{item.title}</p>
-                    <p className="text-sm text-gray-500">
-                      تعداد بسته قرص: {item.quantity}
-                    </p>
-                    {item.variantAttributes && (
-                      <div className="text-sm text-gray-500 mt-1">
-                        {Object.entries(item.variantAttributes ?? {}).map(
-                          ([attr, value], i, arr) => (
-                            <span key={i}>
-                              {attr}: {value}
-                              {i < arr.length - 1 ? ", " : ""}
-                            </span>
-                          )
-                        )}
-                      </div>
-                    )}
+              {/* Link using slug */}
+              <div className="flex space-y-1 sm:space-y-0 sm:space-x-4">
+                <div className="w-1/6 ml-6">
+                  {item.imageUrl ? (
+                    <Productvideo product={item.imageUrl} />
+                  ) : (
+                    <Image
+                      width={100}
+                      height={90}
+                      src={item.imageUrl || "/dashboard/backlink.png"}
+                      loader={({ src }) => src}
+                      alt={item.title}
+                      className="rounded-t-2xl"
+                    />
+                  )}
+                </div>
+                <div>
+                  <p className="font-semibold text-lg mb-2">{item.title}</p>
+                  <p className="text-sm text-gray-500">
+                    تعداد بسته قرص: {item.quantity}
+                  </p>
+                  {item.variantAttributes && (
+                    <div className="text-sm text-gray-500 mt-1">
+                      {Object.entries(item.variantAttributes ?? {}).map(
+                        ([attr, value], i, arr) => (
+                          <span key={i}>
+                            {attr}: {value}
+                            {i < arr.length - 1 ? ", " : ""}
+                          </span>
+                        )
+                      )}
+                    </div>
+                  )}
 
-                    {/* Original Price (with line-through if coupon applied) */}
-                    <p
-                      className={`text-sm text-gray-500 ${
-                        item.couponApplied ? "line-through text-gray-400" : ""
-                      }`}
-                    >
-                      قیمت:{" "}
-                      {item.price ? (item.price / 10).toLocaleString() : 0}{" "}
+                  {/* Original Price (with line-through if coupon applied) */}
+                  <p
+                    className={`text-sm text-gray-500 ${
+                      item.couponApplied ? "line-through text-gray-400" : ""
+                    }`}
+                  >
+                    قیمت: {item.price ? (item.price / 10).toLocaleString() : 0}{" "}
+                    تومان
+                  </p>
+
+                  {/* Show discounted price if coupon applied */}
+                  {item.couponApplied && (
+                    <p className="text-sm text-emerald-600 font-semibold">
+                      بعد از کوپن: {(item.finalUnit / 10).toLocaleString()}{" "}
                       تومان
                     </p>
-
-                    {/* Show discounted price if coupon applied */}
-                    {item.couponApplied && (
-                      <p className="text-sm text-emerald-600 font-semibold">
-                        بعد از کوپن: {(item.finalUnit / 10).toLocaleString()}{" "}
-                        تومان
-                      </p>
-                    )}
-                  </div>
+                  )}
                 </div>
-              </Link>
+              </div>
               <div className="flex gap-3 mt-3 sm:mt-0">
                 <button
                   onClick={() => removeItem(item.productId, item.variantId)}

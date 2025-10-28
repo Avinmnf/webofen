@@ -6,10 +6,12 @@ import { useAuth } from "./AuthContext";
 export type CartItem = {
   title: string;
   productId: string;
+  slug: string; // ← add this
   variantId?: string;
   quantity: number;
   price?: number;
   imageUrl?: string;
+  videoUrl?: string;
   variantAttributes?: Record<string, string>;
 };
 

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React, { useState } from "react";
 import { useForms, FormPayload } from "@/hooks/useform";
 
@@ -10,6 +10,7 @@ export default function FreeConsultationForm() {
   const [domain, setDomain] = useState("");
   const [service, setService] = useState("");
   const [success, setSuccess] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const [fieldErrors, setFieldErrors] = useState({
     name: false,
@@ -19,7 +20,6 @@ export default function FreeConsultationForm() {
   });
 
   const handleSubmit = async () => {
-    // بررسی خالی بودن فیلدها
     const newFieldErrors = {
       name: !name,
       phone: !phone,
@@ -28,10 +28,7 @@ export default function FreeConsultationForm() {
     };
     setFieldErrors(newFieldErrors);
 
-    // اگر فیلدی خالی بود، ارسال نشود
-    if (Object.values(newFieldErrors).some(Boolean)) {
-      return;
-    }
+    if (Object.values(newFieldErrors).some(Boolean)) return;
 
     const payload: FormPayload = {
       title: "درخواست نوبت",
@@ -47,6 +44,7 @@ export default function FreeConsultationForm() {
 
     if (result) {
       setSuccess(true);
+      setShowSuccessModal(true); // show modal
       setName("");
       setPhone("");
       setDomain("");
@@ -67,14 +65,6 @@ export default function FreeConsultationForm() {
 
   return (
     <div>
-      {success && (
-        <div className="mb-6 p-3 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-green-600 text-sm text-center">
-            فرم با موفقیت ارسال شد!
-          </p>
-        </div>
-      )}
-
       <div className="flex flex-col gap-4 lg:flex-row lg:gap-4">
         <input
           type="text"
@@ -124,6 +114,39 @@ export default function FreeConsultationForm() {
           {loading ? "در حال ارسال..." : "درخواست نوبت"}
         </button>
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
+          <div className="bg-white rounded-2xl p-6 w-2/6 max-w-[90%] text-center shadow-xl animate-fadeIn scale-95 transform transition-all duration-300">
+            <div className="mb-4">
+              <svg
+                className="mx-auto h-12 w-12 text-[#6FD6E5]"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <p className="text-gray-700 text-lg mb-5">
+               فرم شما با موفقیت ارسال شد. <br />
+              همکاران ما در اسرع وقت با شما تماس خواهند گرفت.
+            </p>
+            <button
+              onClick={() => setShowSuccessModal(false)}
+              className="px-6 py-2 bg-[#6FD6E5] text-white rounded-full font-medium hover:bg-[#5ac7d7] transition-colors duration-200"
+            >
+              متوجه شدم
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
