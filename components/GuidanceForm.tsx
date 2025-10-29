@@ -8,12 +8,12 @@ export default function GuidanceForm() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
-  const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState({
     name: false,
     phone: false,
     message: false
   });
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleSubmit = async () => {
     // Reset errors
@@ -22,7 +22,6 @@ export default function GuidanceForm() {
       phone: false,
       message: false
     });
-    setSuccess(false);
 
     // Validate fields
     const newErrors = {
@@ -48,23 +47,26 @@ export default function GuidanceForm() {
     const result = await submitForm(payload);
 
     if (result) {
-      setSuccess(true);
+      // Clear fields
       setName("");
       setPhone("");
       setMessage("");
+
+      // Show modal
+      setShowSuccessModal(true);
     }
   };
 
   return (
-    <div className="bg-white w-full lg:w-[30%] rounded-2xl p-6">
+    <div className="bg-white w-full lg:w-[30%] rounded-2xl p-6 relative">
+      {/* Form Header */}
       <div className="flex items-center text-xl mb-4">
         <div className="w-2 h-10 bg-[#6fd6e5] rounded-2xl ml-2"></div>
         <span className="text-gray-700 font-semibold">درخواست</span>
         <span className="text-[#1d546b] mr-1 font-semibold">مشاوره رایگان</span>
       </div>
 
-      {success && <p className="text-green-500 mb-4">فرم با موفقیت ارسال شد!</p>}
-
+      {/* Inputs */}
       <input
         className={`w-full border py-2 rounded-md px-1 text-gray-500 mb-4 ${
           errors.name ? 'border-red-500' : 'border-gray-200'
@@ -73,9 +75,7 @@ export default function GuidanceForm() {
         value={name}
         onChange={(e) => {
           setName(e.target.value);
-          if (errors.name) {
-            setErrors(prev => ({...prev, name: false}));
-          }
+          if (errors.name) setErrors(prev => ({...prev, name: false}));
         }}
       />
       <input
@@ -86,9 +86,7 @@ export default function GuidanceForm() {
         value={phone}
         onChange={(e) => {
           setPhone(e.target.value);
-          if (errors.phone) {
-            setErrors(prev => ({...prev, phone: false}));
-          }
+          if (errors.phone) setErrors(prev => ({...prev, phone: false}));
         }}
       />
       <textarea
@@ -99,9 +97,7 @@ export default function GuidanceForm() {
         value={message}
         onChange={(e) => {
           setMessage(e.target.value);
-          if (errors.message) {
-            setErrors(prev => ({...prev, message: false}));
-          }
+          if (errors.message) setErrors(prev => ({...prev, message: false}));
         }}
       />
 
@@ -112,6 +108,39 @@ export default function GuidanceForm() {
       >
         {loading ? "در حال ارسال..." : "ارسال"}
       </button>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
+          <div className="bg-white rounded-2xl p-6 w-2/6 max-w-[90%] text-center shadow-xl animate-fadeIn scale-95 transform transition-all duration-300">
+            <div className="mb-4">
+              <svg
+                className="mx-auto h-12 w-12 text-[#6FD6E5]"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <p className="text-gray-700 text-lg mb-5">
+               فرم شما با موفقیت ارسال شد. <br />
+              همکاران ما در اسرع وقت با شما تماس خواهند گرفت.
+            </p>
+            <button
+              onClick={() => setShowSuccessModal(false)}
+              className="px-6 py-2 bg-[#6FD6E5] text-white rounded-full font-medium hover:bg-[#5ac7d7] transition-colors duration-200"
+            >
+              متوجه شدم
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

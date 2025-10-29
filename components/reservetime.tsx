@@ -1,32 +1,28 @@
-'use client';
-import { useState } from 'react';
-import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { useForms, FormPayload } from '@/hooks/useform';
+"use client";
+import { useState } from "react";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { useForms, FormPayload } from "@/hooks/useform";
 
 export default function Reservetime() {
   const { submitForm, loading } = useForms();
 
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [success, setSuccess] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false); // modal state
   const [errors, setErrors] = useState({
     name: false,
-    phone: false
+    phone: false,
   });
 
   const handleSubmit = async () => {
-    // Reset errors
-    setErrors({
-      name: false,
-      phone: false
-    });
+    setErrors({ name: false, phone: false });
     setSuccess(false);
 
-    // Validate fields
     const newErrors = {
       name: !name,
-      phone: !phone
+      phone: !phone,
     };
 
     if (newErrors.name || newErrors.phone) {
@@ -35,10 +31,10 @@ export default function Reservetime() {
     }
 
     const payload: FormPayload = {
-      title: 'درخواست مشاوره رایگان',
+      title: "درخواست مشاوره رایگان",
       fields: [
-        { label: 'نام و نام خانوادگی', type: 'text', content: name },
-        { label: 'تلفن همراه', type: 'text', content: phone },
+        { label: "نام و نام خانوادگی", type: "text", content: name },
+        { label: "تلفن همراه", type: "text", content: phone },
       ],
     };
 
@@ -46,8 +42,9 @@ export default function Reservetime() {
 
     if (result) {
       setSuccess(true);
-      setName('');
-      setPhone('');
+      setShowSuccessModal(true); // show modal
+      setName("");
+      setPhone("");
     }
   };
 
@@ -56,7 +53,7 @@ export default function Reservetime() {
       className="relative w-full aspect-[3/4] sm:aspect-[15/3] overflow-hidden flex items-start"
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, ease: 'easeOut' }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
     >
       <div className="relative w-full aspect-[3/4] sm:aspect-[15/3] overflow-hidden flex items-start">
         {/* Desktop Image */}
@@ -90,14 +87,13 @@ export default function Reservetime() {
               value={name}
               onChange={(e) => {
                 setName(e.target.value);
-                if (errors.name) {
-                  setErrors(prev => ({...prev, name: false}));
-                }
+                if (errors.name)
+                  setErrors((prev) => ({ ...prev, name: false }));
               }}
               className={`bg-[#f7f8fc] text-gray-700 rounded-lg p-2 px-4 text-sm border transition-all duration-200 ${
-                errors.name 
-                  ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500' 
-                  : 'border-transparent focus:outline-none focus:border-[#1d546b] focus:ring-2 focus:ring-[#1d546b]'
+                errors.name
+                  ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500"
+                  : "border-transparent focus:outline-none focus:border-[#1d546b] focus:ring-2 focus:ring-[#1d546b]"
               }`}
             />
             <input
@@ -106,14 +102,13 @@ export default function Reservetime() {
               value={phone}
               onChange={(e) => {
                 setPhone(e.target.value);
-                if (errors.phone) {
-                  setErrors(prev => ({...prev, phone: false}));
-                }
+                if (errors.phone)
+                  setErrors((prev) => ({ ...prev, phone: false }));
               }}
               className={`bg-[#f7f8fc] text-gray-700 rounded-lg p-2 px-4 text-sm border transition-all duration-200 ${
-                errors.phone 
-                  ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500' 
-                  : 'border-transparent focus:outline-none focus:border-[#1d546b] focus:ring-2 focus:ring-[#1d546b]'
+                errors.phone
+                  ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500"
+                  : "border-transparent focus:outline-none focus:border-[#1d546b] focus:ring-2 focus:ring-[#1d546b]"
               }`}
             />
             <div className="w-full lg:w-auto flex justify-center">
@@ -121,18 +116,48 @@ export default function Reservetime() {
                 onClick={handleSubmit}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                transition={{ type: 'spring', stiffness: 300 }}
+                transition={{ type: "spring", stiffness: 300 }}
                 className="w-32 h-10 bg-[#1d546b] text-white rounded-xl whitespace-nowrap px-3"
               >
-                {loading ? 'در حال ارسال...' : 'ثبت درخواست'}
+                {loading ? "در حال ارسال..." : "ثبت درخواست"}
               </motion.button>
             </div>
           </div>
-
-          {/* Success message only (error messages removed) */}
-          {success && <p className="text-green-500 mt-4 text-center">فرم با موفقیت ثبت شد!</p>}
         </div>
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
+          <div className="bg-white rounded-2xl p-6 w-2/6 max-w-[90%] text-center shadow-xl animate-fadeIn scale-95 transform transition-all duration-300">
+            <div className="mb-4">
+              <svg
+                className="mx-auto h-12 w-12 text-[#6FD6E5]"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <p className="text-gray-700 text-lg mb-5">
+              فرم شما با موفقیت ارسال شد. <br />
+              همکاران ما در اسرع وقت با شما تماس خواهند گرفت.
+            </p>
+            <button
+              onClick={() => setShowSuccessModal(false)}
+              className="px-6 py-2 bg-[#6FD6E5] text-white rounded-full font-medium hover:bg-[#5ac7d7] transition-colors duration-200"
+            >
+              متوجه شدم
+            </button>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }

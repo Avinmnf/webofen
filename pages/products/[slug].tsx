@@ -200,6 +200,7 @@ export default function ProductDetailPage({ product }: Props) {
     addItem({
       title: product.title,
       productId: product.id,
+      slug: product.slug,
       variantId: matchedVariant.id,
       quantity,
       price: matchedVariant.price,
@@ -214,7 +215,7 @@ export default function ProductDetailPage({ product }: Props) {
     setShowToast(true);
     setTimeout(() => setShowToast(false), 7000);
   }
-
+  console.log(product);
   return (
     <>
       {/* --- SEO Component --- */}
@@ -259,7 +260,7 @@ export default function ProductDetailPage({ product }: Props) {
             <div className="flex md:w-2/3 w-full">
               <div className="md:flex w-full md:ml-2 mx-2 p-2 rounded-3xl border-2 border-[#f7f8fc] bg-[#f7f8fc]">
                 <div className="md:w-1/2 w-full p-6 flex items-center">
-                  <Productvideo product={product.imageUrl} />
+                  <Productvideo product={product.videoUrl} />
                 </div>
                 <div className="md:w-1/2 w-full p-6">
                   <h1 className="font-bold pb-4">خرید قرص {product.title}</h1>

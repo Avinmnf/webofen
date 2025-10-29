@@ -5,6 +5,7 @@ export type Product = {
   description: string;
   content: string;
   imageUrl?: string;
+  videoUrl?: string;
   galleryUrls?: string[];
   createdAt: string;
   category: { id: string; title: string };
