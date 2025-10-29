@@ -2,9 +2,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 const GRAPHQL_URL =
   process.env.NEXT_PUBLIC_GRAPHQL_URL || "http://localhost:3000/api/graphql";
-const ANALYZE_URL = process.env.NEXT_PUBLIC_ANALYZE_URL || "http://localhost:4000";
-
-const processingUrls = new Set<string>();
+const ANALYZE_URL =
+  process.env.NEXT_PUBLIC_ANALYZE_URL || "http://localhost:4000";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { url, id } = req.method === "GET" ? req.query : req.body;
@@ -21,21 +20,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!record)
       return res.status(404).json({ message: "رکورد پیدا نشد." });
 
-    const resultJson = record.result || {};
-    const scores = {
-      performance: record.performance || 0,
-      accessibility: record.accessibility || 0,
-      bestPractices: record.bestPractices || 0,
-      seo: record.seo || 0,
-    };
-
     return res.status(200).json({
       url: record.url,
       status: record.status,
-      scores,
-      metrics: resultJson.metrics || {},
-      issues: resultJson.issues || [],
-      title: resultJson.title || "",
+      scores: {
+        performance: record.performance || 0,
+        accessibility: record.accessibility || 0,
+        bestPractices: record.bestPractices || 0,
+        seo: record.seo || 0,
+      },
+      metrics: record.result?.metrics || {},
+      issues: record.result?.issues || [],
+      title: record.result?.title || "",
       analysisId: record.id,
     });
   }
@@ -49,60 +45,42 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ message: `فرمت URL نامعتبر است: ${url}` });
     const finalUrl = normalized.url;
 
-    // بررسی اگر قبلاً آنالیز کامل شده
+    // بررسی رکورد
     const existing = await findAnalysisByUrl(finalUrl);
-    if (existing && existing.status === "completed") {
-      return res.status(200).json({
-        ...existing.result,
-        analysisId: existing.id,
-        status: existing.status,
-      });
+    const analysisId = existing
+      ? existing.id
+      : await upsertAnalysis(finalUrl);
+
+    // اجرای مستقیم آنالیز
+    await updateAnalysisStatus(analysisId, "running");
+    const analyzeRes = await fetch(`${ANALYZE_URL}/analyze`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: finalUrl }),
+    });
+
+    if (!analyzeRes.ok) {
+      const errorText = await analyzeRes.text();
+      await updateAnalysisStatus(analysisId, "failed");
+      return res.status(500).json({ message: "خطای آنالیز", errorText });
     }
 
-    // بررسی اگر در حال پردازش است → برگرداندن pending
-    const analysisId = existing ? existing.id : await upsertAnalysis(finalUrl);
-    if (processingUrls.has(finalUrl)) {
-      return res.status(200).json({ analysisId, status: "pending" });
-    }
+    const result = await analyzeRes.json();
+    const scores = processScores(result.scores || {});
+    await updateAnalysisWithResults(analysisId, result, scores);
+    await updateAnalysisStatus(analysisId, "completed");
 
-    processingUrls.add(finalUrl);
-
-    // اجرای آنالیز در پس‌زمینه
-    (async () => {
-      try {
-        await updateAnalysisStatus(analysisId, "running");
-
-        const analyzeRes = await fetch(`${ANALYZE_URL}/analyze`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: finalUrl }),
-        });
-
-        if (!analyzeRes.ok) {
-          const errorText = await analyzeRes.text();
-          await updateAnalysisStatus(analysisId, "failed");
-          console.error("خطای آنالیز:", errorText);
-          return;
-        }
-
-        const result = await analyzeRes.json();
-        const scores = processScores(result.scores || {});
-        await updateAnalysisWithResults(analysisId, result, scores);
-        await updateAnalysisStatus(analysisId, "completed");
-      } catch (err: any) {
-        console.error("❌ خطا در آنالیز پس‌زمینه:", err);
-        await updateAnalysisStatus(analysisId, "failed");
-      } finally {
-        processingUrls.delete(finalUrl);
-      }
-    })();
-
-    return res.status(200).json({ analysisId, status: "pending" });
+    return res.status(200).json({
+      analysisId,
+      status: "completed",
+      ...result,
+    });
   }
 
   return res.status(405).json({ message: "Method not allowed" });
 
   // ================= Helper Functions =================
+
   async function findAnalysisById(id: string) {
     const query = `
       query ($id: ID!) {
@@ -110,12 +88,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           id url status result performance accessibility bestPractices seo
         }
       }`;
-    const res = await fetch(GRAPHQL_URL, {
+    const r = await fetch(GRAPHQL_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query, variables: { id } }),
     });
-    const data = await res.json();
+    const data = await r.json();
     return data.data?.analyses?.[0] || null;
   }
 
@@ -126,29 +104,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           id url status result performance accessibility bestPractices seo
         }
       }`;
-    const res = await fetch(GRAPHQL_URL, {
+    const r = await fetch(GRAPHQL_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query, variables: { url } }),
     });
-    const data = await res.json();
+    const data = await r.json();
     return data.data?.analyses?.[0] || null;
   }
 
   async function upsertAnalysis(url: string) {
-    const existing = await findAnalysisByUrl(url);
-    if (existing) return existing.id;
-
     const mutation = `
       mutation CreateAnalysis($url: String!) {
         createAnalysis(data: { url: $url, status: "pending" }) { id }
       }`;
-    const res = await fetch(GRAPHQL_URL, {
+    const r = await fetch(GRAPHQL_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query: mutation, variables: { url } }),
     });
-    const data = await res.json();
+    const data = await r.json();
     return data.data.createAnalysis.id;
   }
 
@@ -194,7 +169,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await fetch(GRAPHQL_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: mutation, variables: { id, status: "completed", result, ...scores } }),
+      body: JSON.stringify({
+        query: mutation,
+        variables: { id, status: "completed", result, ...scores },
+      }),
     });
   }
 
@@ -203,7 +181,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       let url = input.trim();
       if (!url.includes("://")) url = "https://" + url;
       const parsed = new URL(url);
-      const normalized = `https://${parsed.hostname.replace(/^www\./, "")}`;
+      const normalized = `https://${parsed.hostname.replace(/^www\./, "")}${parsed.pathname}`;
       return { isValid: true, url: normalized };
     } catch {
       return { isValid: false, url: "" };
