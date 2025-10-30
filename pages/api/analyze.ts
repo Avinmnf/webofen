@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-const ANALYZER_URL = process.env.ANALYZE_URL || "http://localhost:4000";
+const ANALYZER_URL = process.env.NEXT_PUBLIC_ANALYZE_URL || "http://localhost:4000";
 const GRAPHQL_URL = process.env.GRAPHQL_URL || "http://localhost:3000/api/graphql";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
