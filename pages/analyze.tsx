@@ -19,7 +19,6 @@ import { ProductRecommendations } from "@/components/ProductRecommendations";
 import { WaveBackground } from "@/components/WaveBackground";
 import { HeroSection } from "@/components/HeroSection";
 
-
 // Import types
 import { AnalyzeResult } from "@/lib/models/analyze";
 import { Issue } from "@/lib/models/analyze";
@@ -35,7 +34,8 @@ export default function AnalyzePage() {
   const [animatedScores, setAnimatedScores] = useState<Record<string, number>>({});
   const [error, setError] = useState<string | null>(null);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
-  
+  const [showSuccessAlert, setShowSuccessAlert] = useState<boolean>(false);
+  const [pendingResult, setPendingResult] = useState<AnalyzeResult | null>(null); // اضافه شده
   
   const groupedIssues = result
     ? result.issues.reduce<Record<string, Issue[]>>((acc: Record<string, Issue[]>, issue: Issue) => {
@@ -46,70 +46,162 @@ export default function AnalyzePage() {
       }, {})
     : {};
     console.log(groupedIssues);
+    
 
   const tabs = result ? ["all", ...Object.keys(groupedIssues)] : [];
 
-const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  setLoading(true);
-  setResult(null);
-  setError(null);
-  setProgress(0);
-  setElapsedTime(0);
+  // کامپوننت SuccessAlert
+const SuccessAlert = () => (
+  <div className="fixed inset-0 flex items-center justify-center z-50 bg-blue-50 bg-opacity-50 animate-fade-in">
+    <div className="bg-white rounded-2xl p-6 mx-4 max-w-md w-full animate-scale-in shadow-2xl border border-green-200 relative">
+      <div className="text-center">
 
-  const startTime = Date.now();
-  const timeInterval = setInterval(() => {
-    setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
-  }, 1000);
+        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg 
+            className="w-8 h-8 text-green-500 animate-bounce" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" 
+            />
+          </svg>
+        </div>
 
-  const minLoadingTime = new Promise<void>((resolve) => {
-    const start = Date.now();
-    const interval = setInterval(() => {
-      const elapsed = Date.now() - start;
-      const pct = Math.min(100, Math.floor((elapsed / 30000) * 100));
-      setProgress(pct);
-      if (pct >= 100) {
-        clearInterval(interval);
-        resolve();
+        <h3 className="text-xl font-bold text-gray-800 mb-2">
+          🎉 آنالیز کامل شد!
+        </h3>
+        <p className="text-gray-600 mb-6">
+          نتیجه آنالیز وب‌سایت شما آماده است. برای مشاهده روی دکمه زیر بزنید.
+        </p>
+
+        <button
+          onClick={() => {
+            setShowSuccessAlert(false);
+            if (pendingResult) {
+              setResult(pendingResult);
+              setPendingResult(null);
+            }
+          }}
+          className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 px-4 rounded-lg font-medium hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+        >
+          مشاهده نتایج
+        </button>
+
+        <button
+          onClick={() => setShowSuccessAlert(false)}
+          className="absolute top-3 left-3 text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
+  const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!url) return setError("لطفاً URL را وارد کنید");
+
+    setError(null);
+    setProgress(0);
+    setElapsedTime(0);
+    setLoading(true);
+    setResult(null);
+
+    try {
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || `خطا در آنالیز سایت: ${response.status}`);
       }
-    }, 100);
-  });
-  console.log(minLoadingTime);
-  
-  try {
-    // تغییر آدرس به API داخلی
-    const response = await fetch(`/api/analyze`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({ url }),
-    });
 
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`خطا در آنالیز سایت: ${response.status} - ${text}`);
+      const data = await response.json();
+
+      // اگر آنالیز آماده است
+      if (data.status === "completed" && data.scores) {
+        setResult(data);
+        setProgress(100);
+        setLoading(false);
+        return;
+      }
+
+      // Polling برای وضعیت آنالیز
+      const analysisId = data.analysisId || data.id;
+      if (!analysisId) throw new Error("analysisId معتبر ایجاد نشد");
+
+      const startTime = Date.now();
+      const timeInterval = setInterval(() => {
+        setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+      }, 1000);
+
+      setProgress(10);
+
+      const checkInterval = 3000;
+      const maxRetries = 40;
+      let retries = 0;
+
+      const intervalId = setInterval(async () => {
+        retries++;
+        try {
+          const statusRes = await fetch(`/api/analyze?id=${analysisId}&t=${Date.now()}`, {
+            headers: { "Cache-Control": "no-store" },
+          });
+
+          if (!statusRes.ok) return;
+
+          const statusData = await statusRes.json();
+
+          if (statusData.status === "completed" && statusData.scores) {
+            clearInterval(intervalId);
+            clearInterval(timeInterval);
+            setResult(statusData);
+            setProgress(100);
+            setLoading(false);
+            return;
+          }
+
+          setProgress(Math.min(95, 10 + retries * 3));
+
+          if (retries >= maxRetries) {
+            clearInterval(intervalId);
+            clearInterval(timeInterval);
+            setProgress(100);
+            setLoading(false);
+            setError("زمان آنالیز بیش از حد طول کشید");
+          }
+        } catch (err: any) {
+          console.error(err);
+          clearInterval(intervalId);
+          clearInterval(timeInterval);
+          setProgress(100);
+          setLoading(false);
+          setError(err.message || "خطا در بررسی وضعیت آنالیز");
+        }
+      }, checkInterval);
+    } catch (err: any) {
+      console.error(err);
+      setProgress(100);
+      setLoading(false);
+      setError(err.message || "خطایی در شروع آنالیز رخ داد");
     }
+  };
 
-    const data = await response.json();
-    console.log(data);
-    await minLoadingTime;
-    setResult(data);
-  } catch (err: any) {
-    console.error("Error analyzing site:", err);
-    setError(err.message || "خطایی در ارتباط با سرور آنالایزر رخ داد");
-  } finally {
-    setLoading(false);
-    setProgress(100);
-    clearInterval(timeInterval);
-  }
-};
-  
+  // Animated scores
   useEffect(() => {
     if (!result) return;
     const intervalIds: NodeJS.Timeout[] = [];
-    console.log(intervalIds);
 
     Object.entries(result.scores).forEach(([key, score]) => {
       if (score === undefined) return;
@@ -118,13 +210,13 @@ const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
 
       const id = setInterval(() => {
         current += 1;
-        setAnimatedScores(prev => ({ ...prev, [key]: current }));
+        setAnimatedScores((prev) => ({ ...prev, [key]: current }));
         if (current >= target) clearInterval(id);
       }, 20);
       intervalIds.push(id);
     });
 
-    return () => intervalIds.forEach(id => clearInterval(id));
+    return () => intervalIds.forEach((id) => clearInterval(id));
   }, [result]);
 
   const getImpactColor = (impact: string) => {
@@ -159,16 +251,25 @@ const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30">
+      {/* اعلان موفقیت */}
+      {showSuccessAlert && <SuccessAlert />}
+      
       <div className="w-full">
         <HeroSection url={url} setUrl={setUrl} loading={loading} handleAnalyze={handleAnalyze} />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start animate-shake">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500 mt-0.5 ml-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+            <div className={`mb-6 p-4 border rounded-xl flex items-start animate-shake ${
+              error.includes("🎉") 
+                ? "bg-green-50 border-green-200 text-green-800" 
+                : "bg-red-50 border-red-200 text-red-800"
+            }`}>
+              <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mt-0.5 ml-2 flex-shrink-0 ${
+                error.includes("🎉") ? "text-green-500" : "text-red-500"
+              }`} viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
-              <p className="text-red-700">{error}</p>
+              <p className={error.includes("🎉") ? "text-green-700" : "text-red-700"}>{error}</p>
             </div>
           )}
 
@@ -177,74 +278,75 @@ const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
           {result && (
             <div className="space-y-8 animate-fade-in">
               {/* اطلاعات کلی */}
-              <div className="flex flex-wrap -mx-4">
-                <div className="w-full lg:w-9/12 px-4">
-                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 animate-slide-up">
-                    <h2 className="font-bold text-2xl text-gray-800 mb-6 pb-4 border-b border-gray-100 flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      اطلاعات کلی وبسایت
-                    </h2>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="flex items-center p-4 bg-gradient-to-r from-blue-50 to-blue-50 rounded-xl border border-blue-100 transition-all hover:shadow-md">
-                        <div className="bg-blue-100 p-3 rounded-lg ml-4">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clipRule="evenodd" />
-                          </svg>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-500 font-medium">آدرس وبسایت</p>
-                          <p className="font-semibold text-gray-800 truncate">{result.url}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center p-4 bg-gradient-to-r from-blue-50 to-blue-50 rounded-xl border border-blue-100 transition-all hover:shadow-md">
-                        <div className="bg-blue-100 p-3 rounded-lg ml-4">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H6z" clipRule="evenodd" />
-                          </svg>
-                        </div>
-                        <div className="flex items-center p-4 bg-gradient-to-r from-blue-50 to-blue-50 rounded-xl">
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm text-gray-500 font-medium">عنوان صفحه</p>
-                            <p className="font-semibold text-gray-800 line-clamp-2">{result.title}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+         <div className="flex flex-wrap -mx-4">
+  <div className="w-full lg:w-9/12 px-4">
+    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 animate-slide-up">
+      <h2 className="font-bold text-2xl text-gray-800 mb-6 pb-4 border-b border-gray-100 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        اطلاعات کلی وبسایت
+      </h2>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* کارت اول: آدرس وبسایت */}
+        <div className="flex items-center p-4 bg-gradient-to-r from-blue-50 to-blue-50 rounded-xl border border-blue-100 transition-all hover:shadow-md">
+          <div className="bg-blue-100 p-3 rounded-lg ml-4">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm text-gray-500 font-medium">آدرس وبسایت</p>
+            <p className="font-semibold text-gray-800 truncate">{result.url}</p>
+          </div>
+        </div>
 
-                <div className="w-full lg:w-3/12 px-4 mt-4 lg:mt-0">
-                  <div className="bg-gradient-to-br from-blue-50 to-blue-50 rounded-2xl p-6 h-auto sticky top-6 border border-blue-100 animate-slide-up" style={{animationDelay: '0.1s'}}>
-                    <h3 className="font-semibold text-lg mb-3 text-gray-800 flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      راهنمای امتیاز ها
-                    </h3>
-                    <div className="space-y-3 text-sm text-gray-600">
-                      <div className="flex items-center">
-                        <div className="w-3 h-3 rounded-full bg-green-500 ml-2"></div>
-                        <span>امتیاز بالای 90%: عالی</span>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="w-3 h-3 rounded-full bg-yellow-500 ml-2"></div>
-                        <span>امتیاز 70% تا 90%: خوب</span>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="w-3 h-3 rounded-full bg-orange-500 ml-2"></div>
-                        <span>امتیاز 50% تا 70%: متوسط</span>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="w-3 h-3 rounded-full bg-red-500 ml-2"></div>
-                        <span>امتیاز زیر 50%: نیاز به بهبود</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+        {/* کارت دوم: عنوان صفحه */}
+        <div className="flex items-center p-4 bg-gradient-to-r from-blue-50 to-blue-50 rounded-xl border border-blue-100 transition-all hover:shadow-md">
+          <div className="bg-blue-100 p-3 rounded-lg ml-4">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H6z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm text-gray-500 font-medium">عنوان صفحه</p>
+            <p className="font-semibold text-gray-800 line-clamp-2">{result.title}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="w-full lg:w-3/12 px-4 mt-4 lg:mt-0">
+    <div className="bg-gradient-to-br from-blue-50 to-blue-50 rounded-2xl p-6 h-auto sticky top-6 border border-blue-100 animate-slide-up" style={{animationDelay: '0.1s'}}>
+      <h3 className="font-semibold text-lg mb-3 text-gray-800 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        راهنمای امتیاز ها
+      </h3>
+      <div className="space-y-3 text-sm text-gray-600">
+        <div className="flex items-center">
+          <div className="w-3 h-3 rounded-full bg-green-500 ml-2"></div>
+          <span>امتیاز بالای 90%: عالی</span>
+        </div>
+        <div className="flex items-center">
+          <div className="w-3 h-3 rounded-full bg-yellow-500 ml-2"></div>
+          <span>امتیاز 70% تا 90%: خوب</span>
+        </div>
+        <div className="flex items-center">
+          <div className="w-3 h-3 rounded-full bg-orange-500 ml-2"></div>
+          <span>امتیاز 50% تا 70%: متوسط</span>
+        </div>
+        <div className="flex items-center">
+          <div className="w-3 h-3 rounded-full bg-red-500 ml-2"></div>
+          <span>امتیاز زیر 50%: نیاز به بهبود</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
               {/* کارت‌های امتیاز */}
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 animate-slide-up" style={{animationDelay: '0.2s'}}>
@@ -520,6 +622,20 @@ const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(100%); }
         }
+        @keyframes bounce {
+          0%, 20%, 53%, 80%, 100% {
+            transform: translate3d(0,0,0);
+          }
+          40%, 43% {
+            transform: translate3d(0,-8px,0);
+          }
+          70% {
+            transform: translate3d(0,-4px,0);
+          }
+          90% {
+            transform: translate3d(0,-2px,0);
+          }
+        }
         .animate-fade-in { animation: fade-in 0.6s ease-out; }
         .animate-fade-in-up { animation: fade-in-up 0.6s ease-out; }
         .animate-slide-up { animation: slide-up 0.5s ease-out; }
@@ -530,6 +646,7 @@ const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
         .animate-spin-slow { animation: spin-slow 8s linear infinite; }
         .animate-spin-slow-reverse { animation: spin-slow-reverse 8s linear infinite; }
         .animate-shine { animation: shine 2s infinite; }
+        .animate-bounce { animation: bounce 1s ease-in-out; }
       `}</style>
     </div>
   );

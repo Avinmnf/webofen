@@ -398,7 +398,7 @@ export default function PostsPage({
                 </li>
                 <li className="flex items-center">
                   <svg
-                    className="w-4 h-4 mx-1"
+                    className="w-4 h-4 mx-1 transform rotate-180"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -417,24 +417,7 @@ export default function PostsPage({
                     مقالات
                   </Link>
                 </li>
-                {currentTag && (
-                  <>
-                    <li className="flex items-center">
-                      <svg
-                        className="w-4 h-4 mx-1"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </li>
-                    <li className="text-[#ff5084] font-medium">{currentTag}</li>
-                  </>
-                )}
+
               </ol>
             </nav>
 
@@ -720,7 +703,7 @@ export default function PostsPage({
                 {posts.length > 1 && (
                   <Masonry
                     breakpointCols={breakpointColumnsObj}
-                    className="flex w-auto gap-6 "
+                    className="flex w-auto gap-6 p-4 md:p-0"
                     columnClassName="bg-clip-padding"
                   >
                     {cards.map((card, index) => (
@@ -886,43 +869,43 @@ export default function PostsPage({
                               <div className="flex flex-col justify-between p-8">
                                 <div className="flex items-center justify-between">
                                   <div className="flex items-center">
-                                  {(card as PostWithViews).countview > 10 && (
-                                    <svg
-                                      className="w-5 h-5 ml-2"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        d="M2 9.1371C2 14 6.01943 16.5914 8.96173 18.9109C10 19.7294 11 20.5 12 20.5C13 20.5 14 19.7294 15.0383 18.9109C17.9806 16.5914 22 14 22 9.1371C22 4.27416 16.4998 0.825464 12 5.50063C7.50016 0.825464 2 4.27416 2 9.1371Z"
-                                        fill="#ff5084"
-                                      />
-                                    </svg>
-                                  )}
-                                  <div className="relative group inline-block">
-                                    {isRecommended(card as Post) && (
-                                      <>
-                                        <svg
-                                          className="w-5 h-5 ml-2 text-yellow-400 cursor-pointer"
-                                          fill="#f06330"
-                                          viewBox="0 0 20 20"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.954a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.953c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37-2.448c-.784.57-1.838-.197-1.539-1.118l1.286-3.953a1 1 0 00-.364-1.118L2.073 9.38c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.954z" />
-                                        </svg>
-                                        <div
-                                          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 
+                                    {(card as PostWithViews).countview > 10 && (
+                                      <svg
+                                        className="w-5 h-5 ml-2"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                          d="M2 9.1371C2 14 6.01943 16.5914 8.96173 18.9109C10 19.7294 11 20.5 12 20.5C13 20.5 14 19.7294 15.0383 18.9109C17.9806 16.5914 22 14 22 9.1371C22 4.27416 16.4998 0.825464 12 5.50063C7.50016 0.825464 2 4.27416 2 9.1371Z"
+                                          fill="#ff5084"
+                                        />
+                                      </svg>
+                                    )}
+                                    <div className="relative group inline-block">
+                                      {isRecommended(card as Post) && (
+                                        <>
+                                          <svg
+                                            className="w-5 h-5 ml-2 text-yellow-400 cursor-pointer"
+                                            fill="#f06330"
+                                            viewBox="0 0 20 20"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.954a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.953c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37-2.448c-.784.57-1.838-.197-1.539-1.118l1.286-3.953a1 1 0 00-.364-1.118L2.073 9.38c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.954z" />
+                                          </svg>
+                                          <div
+                                            className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 
                                         hidden group-hover:block px-2 py-1 rounded-md 
                                         bg-gray-800 text-white text-xs shadow-md whitespace-nowrap"
-                                        >
-                                          پیشنهاد ما
-                                        </div>
-                                      </>
-                                    )}
-                                  </div>
-                                  <p className="text-sm text-gray-500">
-                                    {(card as Post).category?.title}
-                                  </p>
+                                          >
+                                            پیشنهاد ما
+                                          </div>
+                                        </>
+                                      )}
+                                    </div>
+                                    <p className="text-sm text-gray-500">
+                                      {(card as Post).category?.title}
+                                    </p>
                                   </div>
                                   <span className="text-gray-400 text-sm">
                                     {(card as Post).createdAt

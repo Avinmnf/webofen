@@ -47,205 +47,222 @@ export default function ProductList() {
   // متادیتاهای داینامیک بر اساس محتوای صفحه
   const getDynamicMetaData = () => {
     const baseTitle = "داروخانه سئو وبوفن";
-    const baseDescription = "درمان تخصصی مشکلات سئو سایت با قرص‌های تخصصی وبوفن";
-    
+    const baseDescription =
+      "درمان تخصصی مشکلات سئو سایت با قرص‌های تخصصی وبوفن";
+
     // اگر محصولات وجود دارند، اطلاعات را از آنها بگیر
     let dynamicTitle = baseTitle;
     let dynamicDescription = baseDescription;
-    let keywords = "سئو سایت, قرص سئو, داروخانه سئو, بهینه سازی سایت, سئو داخلی, سئو خارجی, سئو فنی, وبوفن";
+    let keywords =
+      "سئو سایت, قرص سئو, داروخانه سئو, بهینه سازی سایت, سئو داخلی, سئو خارجی, سئو فنی, وبوفن";
 
     if (products && products.length > 0) {
       const productCount = products.length;
-      const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
-      
+      const categories = [
+        ...new Set(products.map((p) => p.category).filter(Boolean)),
+      ];
+
       dynamicTitle = `${baseTitle} - ${productCount} محصول تخصصی سئو`;
       dynamicDescription = `${baseDescription} ✓ ${productCount} محصول تخصصی ✓ آنالیز رایگان ✓ مشاوره تخصصی`;
-      
+
       if (categories.length > 0) {
-        keywords += `, ${categories.join(', ')}`;
+        keywords += `, ${categories.join(", ")}`;
       }
     }
 
     return {
       title: dynamicTitle,
       description: dynamicDescription,
-      keywords: keywords
+      keywords: keywords,
     };
   };
 
   // ساخت structured data داینامیک مخصوص صفحه محصولات
-const generateDynamicStructuredData = () => {
-  const meta = getDynamicMetaData();
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://webofen.com";
+  const generateDynamicStructuredData = () => {
+    const meta = getDynamicMetaData();
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://webofen.com";
 
-  // 📍 فقط یک ItemList Schema ساده برای کاروسل
-  const itemListSchema = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    "name": "لیست محصولات سئو وبوفن",
-    "description": "محصولات تخصصی سئو و بهینه‌سازی سایت",
-    "url": `${siteUrl}/products`,
-    "numberOfItems": products?.length || 0,
-    "itemListElement": products?.slice(0, 10).map((product: any, index: number) => ({
-      "@type": "ListItem",
-      "position": index + 1,
-      "name": product.title || "محصول سئو", // ✅ اینجا مشکل Unnamed item حل می‌شود
-      "url": `${siteUrl}/products/${product.slug || ""}`,
-      "image": product.imageUrl?.replace('.mp4', '.jpg') || `${siteUrl}/images/default-product.jpg`, // ✅ تصویر باید JPG/PNG باشه نه MP4
-    })) || [],
+    // 📍 فقط یک ItemList Schema ساده برای کاروسل
+    const itemListSchema = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: "لیست محصولات سئو وبوفن",
+      description: "محصولات تخصصی سئو و بهینه‌سازی سایت",
+      url: `${siteUrl}/products`,
+      numberOfItems: products?.length || 0,
+      itemListElement:
+        products?.slice(0, 10).map((product: any, index: number) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: product.title || "محصول سئو", // ✅ اینجا مشکل Unnamed item حل می‌شود
+          url: `${siteUrl}/products/${product.slug || ""}`,
+          image:
+            product.imageUrl?.replace(".mp4", ".jpg") ||
+            `${siteUrl}/images/default-product.jpg`, // ✅ تصویر باید JPG/PNG باشه نه MP4
+        })) || [],
+    };
+
+    // 📍 Breadcrumb Schema
+    const breadcrumbSchema = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "صفحه اصلی",
+          item: `${siteUrl}`,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "محصولات سئو",
+          item: `${siteUrl}/products`,
+        },
+      ],
+    };
+
+    return [breadcrumbSchema, itemListSchema];
   };
-
-  // 📍 Breadcrumb Schema
-  const breadcrumbSchema = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "صفحه اصلی",
-        "item": `${siteUrl}`,
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "محصولات سئو",
-        "item": `${siteUrl}/products`,
-      },
-    ],
-  };
-
-  return [breadcrumbSchema, itemListSchema];
-};
 
   // تابع برای ایجاد اسکیما هر محصول
-const generateProductSchema = (product: any) => {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://webofen.com";
-  const productUrl = `${siteUrl}/products/${product.slug || ""}`;
+  const generateProductSchema = (product: any) => {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://webofen.com";
+    const productUrl = `${siteUrl}/products/${product.slug || ""}`;
 
-  // تاریخ اعتبار قیمت (حداقل یک سال)
-  const priceValidUntil = new Date();
-  priceValidUntil.setFullYear(priceValidUntil.getFullYear() + 1);
+    // تاریخ اعتبار قیمت (حداقل یک سال)
+    const priceValidUntil = new Date();
+    priceValidUntil.setFullYear(priceValidUntil.getFullYear() + 1);
 
-  // ✅ اصلاح تصویر - حذف ویدیوها
-  const getProductImage = () => {
-    if (!product.imageUrl) return `${siteUrl}/images/default-product.jpg`;
-    if (product.imageUrl.includes('.mp4')) {
-      // اگر ویدیو است، از تصویر جایگزین استفاده کن
-      return `${siteUrl}/images/default-product.jpg`;
-    }
-    return product.imageUrl;
-  };
-
-  // ✅ بررسی قیمت معتبر
-  const productPrice = product.variants?.[0]?.price;
-  const isValidPrice = productPrice && productPrice > 0;
-
-  const productSchema: any = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    "name": product.title || "محصول سئو",
-    "description": product.description || "توضیحات محصول سئو وبوفن",
-    "image": getProductImage(), // ✅ تصویر اصلاح شده
-    "url": productUrl,
-    "sku": product.sku || product.id || `product-${product.id}`,
-    "category": product.category?.title || "خدمات سئو",
-    "brand": {
-      "@type": "Brand",
-      "name": product.brand || "وبوفن",
-    },
-  };
-
-  // ✅ فقط اگر قیمت معتبر وجود دارد، offers را اضافه کن
-  if (isValidPrice) {
-    productSchema.offers = {
-      "@type": "Offer",
-      "priceCurrency": "IRR",
-      "price": productPrice,
-      "priceValidUntil": priceValidUntil.toISOString(),
-      "availability": product.variants?.[0]?.stock > 0
-        ? "https://schema.org/InStock"
-        : "https://schema.org/OutOfStock",
-      "seller": {
-        "@type": "Organization",
-        "name": "وبوفن",
-      },
-      "url": productUrl,
+    // ✅ اصلاح تصویر - حذف ویدیوها
+    const getProductImage = () => {
+      if (!product.imageUrl) return `${siteUrl}/images/default-product.jpg`;
+      if (product.imageUrl.includes(".mp4")) {
+        // اگر ویدیو است، از تصویر جایگزین استفاده کن
+        return `${siteUrl}/images/default-product.jpg`;
+      }
+      return product.imageUrl;
     };
-  }
 
-  // ✅ فقط اگر نظرات واقعی وجود دارد، aggregateRating و review اضافه کن
-  if (product.ratings && product.ratings.length > 0) {
-    const ratings = product.ratings;
-    const totalRating = ratings.reduce((sum: number, rating: any) => sum + rating.value, 0);
-    const averageRating = totalRating / ratings.length;
-    const reviewCount = ratings.length;
+    // ✅ بررسی قیمت معتبر
+    const productPrice = product.variants?.[0]?.price;
+    const isValidPrice = productPrice && productPrice > 0;
 
-    // فقط اگر حداقل یک نظر واقعی وجود دارد
-    if (reviewCount > 0) {
-      productSchema.aggregateRating = {
-        "@type": "AggregateRating",
-        "ratingValue": averageRating.toFixed(1),
-        "bestRating": "5",
-        "worstRating": "1",
-        "ratingCount": reviewCount,
-        "reviewCount": reviewCount,
+    const productSchema: any = {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: product.title || "محصول سئو",
+      description: product.description || "توضیحات محصول سئو وبوفن",
+      image: getProductImage(), // ✅ تصویر اصلاح شده
+      url: productUrl,
+      sku: product.sku || product.id || `product-${product.id}`,
+      category: product.category?.title || "خدمات سئو",
+      brand: {
+        "@type": "Brand",
+        name: product.brand || "وبوفن",
+      },
+    };
+
+    // ✅ فقط اگر قیمت معتبر وجود دارد، offers را اضافه کن
+    if (isValidPrice) {
+      productSchema.offers = {
+        "@type": "Offer",
+        priceCurrency: "IRR",
+        price: productPrice,
+        priceValidUntil: priceValidUntil.toISOString(),
+        availability:
+          product.variants?.[0]?.stock > 0
+            ? "https://schema.org/InStock"
+            : "https://schema.org/OutOfStock",
+        seller: {
+          "@type": "Organization",
+          name: "وبوفن",
+        },
+        url: productUrl,
       };
-
-      productSchema.review = ratings.map((rating: any, index: number) => ({
-        "@type": "Review",
-        "author": {
-          "@type": "Person",
-          "name": rating.author || "کاربر وبوفن",
-        },
-        "datePublished": rating.createdAt || new Date().toISOString(),
-        "reviewBody": rating.comment || `نظر درباره ${product.title}`,
-        "name": `نظر درباره ${product.title}`,
-        "reviewRating": {
-          "@type": "Rating",
-          "ratingValue": rating.value,
-          "bestRating": "5",
-          "worstRating": "1",
-        },
-      }));
     }
-  }
 
-  // ❌ حذف کامل بخش نظرات جعلی
-  // هیچگاه نظرات و رتبه‌بندی ساختگی اضافه نکنید
+    // ✅ فقط اگر نظرات واقعی وجود دارد، aggregateRating و review اضافه کن
+    if (product.ratings && product.ratings.length > 0) {
+      const ratings = product.ratings;
+      const totalRating = ratings.reduce(
+        (sum: number, rating: any) => sum + rating.value,
+        0
+      );
+      const averageRating = totalRating / ratings.length;
+      const reviewCount = ratings.length;
 
-  return productSchema;
-};
+      // فقط اگر حداقل یک نظر واقعی وجود دارد
+      if (reviewCount > 0) {
+        productSchema.aggregateRating = {
+          "@type": "AggregateRating",
+          ratingValue: averageRating.toFixed(1),
+          bestRating: "5",
+          worstRating: "1",
+          ratingCount: reviewCount,
+          reviewCount: reviewCount,
+        };
+
+        productSchema.review = ratings.map((rating: any, index: number) => ({
+          "@type": "Review",
+          author: {
+            "@type": "Person",
+            name: rating.author || "کاربر وبوفن",
+          },
+          datePublished: rating.createdAt || new Date().toISOString(),
+          reviewBody: rating.comment || `نظر درباره ${product.title}`,
+          name: `نظر درباره ${product.title}`,
+          reviewRating: {
+            "@type": "Rating",
+            ratingValue: rating.value,
+            bestRating: "5",
+            worstRating: "1",
+          },
+        }));
+      }
+    }
+
+    // ❌ حذف کامل بخش نظرات جعلی
+    // هیچگاه نظرات و رتبه‌بندی ساختگی اضافه نکنید
+
+    return productSchema;
+  };
   const faqs = [
     {
       id: 1,
-      question: "چطور می ‌توانم در سایت ثبت‌ نام کنم؟",
+      question: "چطور می‌ توانم در وبوفن ثبت‌ نام کنم؟",
       answer:
         "برای ثبت‌ نام کافی است روی دکمه ثبت‌ نام کلیک کنید و اطلاعات خواسته شده را وارد نمایید.",
     },
     {
       id: 2,
-      question: "آیا خدمات شما رایگان است؟",
+      question: "آیا استفاده از خدمات وبوفن رایگان است؟",
       answer:
-        "بله، بخشی از خدمات ما کاملاً رایگان ارائه می‌ شود و برای خدمات ویژه می‌ توانید پلن ‌های ما را مشاهده کنید.",
+        "بله، بخشی از خدمات ما رایگان است و برای خدمات ویژه می‌توانید پلن‌های ما را مشاهده کنید.",
     },
     {
       id: 3,
-      question: "چطور می‌ توانم با پشتیبانی تماس بگیرم؟",
+      question: "چطور می‌توانم با تیم پشتیبانی تماس بگیرم؟",
       answer:
-        "می‌ توانید از طریق بخش تماس با ما، ایمیل یا شماره تلفن پشتیبانی با ما در ارتباط باشید.",
+        "می‌توانید از طریق بخش تماس با ما، ایمیل یا شماره تلفن پشتیبانی با ما در ارتباط باشید.",
     },
     {
       id: 4,
-      question: "چطور می ‌توانم با پشتیبانی تماس بگیرم؟",
+      question: "چه روش‌های پرداختی در وبوفن پشتیبانی می‌شود؟",
       answer:
-        "می‌ توانید از طریق بخش تماس با ما، ایمیل یا شماره تلفن پشتیبانی با ما در ارتباط باشید.",
+        "ما روش‌های مختلف پرداخت آنلاین و کارت به کارت را برای راحتی شما ارائه می‌دهیم.",
     },
     {
       id: 5,
-      question: "چطور می‌ توانم با پشتیبانی تماس بگیرم？",
+      question: "چطور می‌توانم خدمات خود را لغو یا تغییر دهم؟",
       answer:
-        "می‌ توانید از طریق بخش تماس با ما، ایمیل یا شماره تلفن پشتیبانی با ما در ارتباط باشید.",
+        "برای تغییر یا لغو خدمات، کافی است وارد حساب کاربری خود شوید و از بخش مدیریت سفارش‌ها اقدام کنید.",
+    },
+    {
+      id: 6,
+      question: "اطلاعات من در وبوفن چقدر امن است؟",
+      answer:
+        "امنیت و حریم خصوصی شما برای ما اهمیت بالایی دارد و تمامی اطلاعات با استانداردهای روز محافظت می‌شوند.",
     },
   ];
 
@@ -256,7 +273,7 @@ const generateProductSchema = (product: any) => {
   // گرفتن متادیتاهای داینامیک
   const dynamicMeta = getDynamicMetaData();
   const structuredDataArray = generateDynamicStructuredData();
-  
+
   return (
     <main>
       {/* کامپوننت SEO با داده‌های داینامیک */}
@@ -274,8 +291,7 @@ const generateProductSchema = (product: any) => {
         locale="fa_IR"
         structuredData={structuredDataArray}
       />
-      
-    
+
       <div className="max-w-[1250px] m-auto p-4">
         <div className="relative w-full aspect-[3/1] md:aspect-[12/2] mt-10 md:rounded-lg overflow-hidden flex items-start">
           <Image
@@ -375,8 +391,7 @@ const generateProductSchema = (product: any) => {
               </h2>
               <div className="pt-3 flex text-sm md:text-sm text-gray-600 leading-relaxed text-justify">
                 <svg
-                  width="24px"
-                  height="24px"
+                  className="w-12 h-6"
                   viewBox="0 0 24 24"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -505,8 +520,7 @@ const generateProductSchema = (product: any) => {
               </div>
               <div className="pt-3 flex text-sm md:text-sm text-gray-600 leading-relaxed text-justify">
                 <svg
-                  width="24px"
-                  height="24px"
+                  className="w-12 h-6"
                   viewBox="0 0 24 24"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -636,8 +650,7 @@ const generateProductSchema = (product: any) => {
               </div>
               <div className="pt-3 flex text-sm md:text-sm text-gray-600 leading-relaxed text-justify">
                 <svg
-                  width="24px"
-                  height="24px"
+                  className="w-12 h-6"
                   viewBox="0 0 24 24"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -765,7 +778,6 @@ const generateProductSchema = (product: any) => {
                   است.)
                 </p>
               </div>
-
             </div>
           </div>
         </section>
@@ -795,10 +807,9 @@ const generateProductSchema = (product: any) => {
                 </div>
               ))}
             </div>
-            
 
             {/* Form Section */}
-        <GuidanceForm/>
+            <GuidanceForm />
           </div>
         </section>
       </div>

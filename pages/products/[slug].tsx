@@ -27,7 +27,6 @@ export default function ProductDetailPage({ product }: Props) {
   const { slug } = router.query;
   const [skip, setSkip] = useState(0);
   const take = 5;
-
   const [orderMessage, setOrderMessage] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [selectedAttributes, setSelectedAttributes] = useState<
@@ -40,12 +39,12 @@ export default function ProductDetailPage({ product }: Props) {
   const [showToast, setShowToast] = useState(false);
   const [orderItemId, setOrderItemId] = useState<string | undefined>();
   const {
-    rating,
-    loading: ratingLoading,
-    error: ratingError,
+    rating: ratingData,
+    loading,
+    error,
     submitRating,
-    refetch,
-  } = useProductRating(product.id, user?.id);
+  } = useProductRating(product.id, user?.id || "");
+
   const products = [
     {
       slug: "reportage",
@@ -201,6 +200,7 @@ export default function ProductDetailPage({ product }: Props) {
     addItem({
       title: product.title,
       productId: product.id,
+      slug: product.slug,
       variantId: matchedVariant.id,
       quantity,
       price: matchedVariant.price,
@@ -215,7 +215,7 @@ export default function ProductDetailPage({ product }: Props) {
     setShowToast(true);
     setTimeout(() => setShowToast(false), 7000);
   }
-
+  console.log(product);
   return (
     <>
       {/* --- SEO Component --- */}
@@ -257,12 +257,12 @@ export default function ProductDetailPage({ product }: Props) {
         <div className="max-w-[1250px] m-auto">
           <div className="flex flex-wrap text-gray-700 pt-10">
             {/* --- تصاویر و توضیحات محصول --- */}
-            <div className="flex w-2/3">
-              <div className="flex ml-2 p-2 rounded-3xl border-2 border-[#f7f8fc] bg-[#f7f8fc]">
-                <div className="w-1/2 p-6 flex items-center">
-                  <Productvideo product={product.imageUrl} />
+            <div className="flex md:w-2/3 w-full">
+              <div className="md:flex w-full md:ml-2 mx-2 p-2 rounded-3xl border-2 border-[#f7f8fc] bg-[#f7f8fc]">
+                <div className="md:w-1/2 w-full p-6 flex items-center">
+                  <Productvideo product={product.videoUrl} />
                 </div>
-                <div className="w-1/2 p-6">
+                <div className="md:w-1/2 w-full p-6">
                   <h1 className="font-bold pb-4">خرید قرص {product.title}</h1>
                   <p className="text-justify text-sm">{product.description}</p>
                   <Backlinkfeatures slug={product.slug} />
@@ -271,7 +271,7 @@ export default function ProductDetailPage({ product }: Props) {
             </div>
 
             {/* --- پنل انتخاب ویژگی‌ها و افزودن به سبد --- */}
-            <div className="w-1/3 p-2 rounded-3xl border-2 border-[#29b0cb] bg-[#fff]">
+            <div className="md:w-1/3 w-full md:m-0 m-2 p-2 rounded-3xl border-2 border-[#29b0cb] bg-[#fff]">
               <div className="space-y-6 p-6">
                 <h2 className="text-xl font-semibold mb-2">انتخاب ویژگی ها</h2>
 
@@ -340,10 +340,10 @@ export default function ProductDetailPage({ product }: Props) {
                   </p>
                 </div>
 
-                <div className="flex items-center gap-3 w-full justify-between bg-gray-100 rounded-4xl px-4 py-4">
+                <div className="flex flex-row items-center gap-2 w-full justify-between bg-gray-100 rounded-3xl px-3 sm:px-4 py-1 sm:py-2">
                   <input
                     type="number"
-                    className="flex-1 mr-4 border-0 bg-gray-100 rounded-lg font-medium text-gray-700 focus:outline-none"
+                    className="w-10 sm:flex border-0 bg-gray-100 rounded-lg font-medium text-gray-700 focus:outline-none py-1 sm:py-2"
                     value={quantity}
                     onChange={(e) => {
                       let val = parseInt(e.target.value);
@@ -353,27 +353,29 @@ export default function ProductDetailPage({ product }: Props) {
                       setQuantity(val);
                     }}
                   />
-                  <button
-                    className="w-5 h-5 flex items-center justify-center bg-white rounded hover:bg-gray-200"
-                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  >
-                    -
-                  </button>
-                  <button
-                    className="w-5 h-5 flex items-center justify-center bg-white rounded hover:bg-gray-200"
-                    onClick={() =>
-                      setQuantity((q) =>
-                        matchedVariant
-                          ? Math.min(q + 1, matchedVariant.stock)
-                          : q + 1
-                      )
-                    }
-                  >
-                    +
-                  </button>
+                  <div className="flex gap-2 sm:gap-3">
+                    <button
+                      className="md:w-8 md:h-8 w-4 h-7 flex items-center justify-center bg-white rounded hover:bg-gray-200"
+                      onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    >
+                      -
+                    </button>
+                    <button
+                      className="md:w-8 md:h-8 w-4 h-7 flex items-center justify-center bg-white rounded hover:bg-gray-200"
+                      onClick={() =>
+                        setQuantity((q) =>
+                          matchedVariant
+                            ? Math.min(q + 1, matchedVariant.stock)
+                            : q + 1
+                        )
+                      }
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
 
-                <AverageRating productId={product?.id} />
+                <AverageRating productId={product.id} userId={user?.id} />
 
                 <div
                   className="relative w-full"
@@ -405,8 +407,8 @@ export default function ProductDetailPage({ product }: Props) {
           </div>
 
           {/* --- توضیحات محصول و نظرات --- */}
-          <section className="flex mt-6 content">
-            <div className="w-4/5 p-2 text-gray-700">
+          <section className="flex flex-col md:flex-row mt-6 content">
+            <div className="md:w-4/5 p-2 text-gray-700 order-2 md:order-1">
               <div
                 dangerouslySetInnerHTML={{
                   __html: product.modifiedContent || "",
@@ -433,18 +435,14 @@ export default function ProductDetailPage({ product }: Props) {
                 </p>
               )}
 
-              <RatingForm
-                contentType="product"
-                contentId={product?.id ?? ""}
-                orderItemId={orderItemId}
-              />
+              <RatingForm productId={product?.id ?? ""} />
             </div>
 
             {/* --- TOC --- */}
-            <div className="w-1/5 mt-6 asidenav">
+            <div className="md:w-1/5 w-full mt-6 asidenav order-1 md:order-2">
               {product.toc && product.toc.length > 0 && (
                 <div className="toc-sidebar top-2 space-y-6  justify-center">
-                  <h3 className="text-gray-600">فهرست مطالب</h3>
+                  <h3 className="text-gray-600 pr-2">فهرست مطالب</h3>
                   <nav className="toc-nav text-sm">
                     <ul>
                       {[...product.toc].reverse().map((item) => (

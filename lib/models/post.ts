@@ -3,6 +3,7 @@ export type Product = {
   title: string;
   slug: string;
   imageUrl?: string;
+  videoUrl?: string;
 };
 
 export type RelatedCategory = {
@@ -20,6 +21,7 @@ export type Post = {
   slug: string;
   content?: string;
   imageUrl?: string;
+  videoUrl?: string;
   imageAlt?: string;
   description?: string;
   createdAt?: string;

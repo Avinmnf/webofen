@@ -46,14 +46,14 @@ export default function Popularpills() {
               className="h-full absolute left-0 w-auto object-cover"
             />
 
-            <div className="absolute top-10 right-10 z-10 flex flex-col gap-2">
-              <h4 className="text-white font-bold text-xl">
+            <div className="absolute md:top-10 md:right-10 top-6 right-4 z-10 flex flex-col gap-2">
+              <h4 className="text-white font-bold md:text-xl">
                 {item.title}
               </h4>
               <span className="text-white text-sm w-2/3">
                 {item.desc}
               </span>
-              <Link className="mt-4
+              <Link className="md:mt-4
                             flex justify-between items-center 
                             bg-white rounded-full py-1 w-[100px]
                             transform transition duration-300 ease-in-out

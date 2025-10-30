@@ -6,6 +6,7 @@ export type Product = {
   title: string;
   slug: string;
   imageUrl?: string;
+  videoUrl?: string;
   description?: string;
   createdAt: string;
   category?: { id: string };

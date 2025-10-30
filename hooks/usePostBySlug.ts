@@ -6,6 +6,7 @@ type Post = {
   slug: string;
   content?: string;
   imageUrl?: string;
+  videoUrl?: string;
   imageAlt?: string;
   description?: string;
   createdAt?: string;

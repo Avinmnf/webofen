@@ -5,7 +5,7 @@ import Image from "next/image";
 export default function Footer() {
   return (
     <footer className="w-full  text-gray-800 pt-10 text-center  bg-[#f7f8fc]">
-<div className="max-w-[1250px] m-auto rounded-t-2xl flex flex-col-reverse lg:flex-row pt-10 items-stretch gap-6">
+      <div className="max-w-[1250px] m-auto rounded-t-2xl flex flex-col-reverse lg:flex-row pt-10 items-stretch gap-6">
         {/* Left Column */}
         <div className="md:w-2/12 flex flex-col items-center md:items-start justify-between">
           <Link href="/" className="mb-15 md:mt-15 md:my-10">
@@ -21,7 +21,9 @@ export default function Footer() {
             <p className="border-b border-gray-200 text-base pb-5">
               7 روز هفته ، 24 ساعت پاسخگوی شما هستیم
             </p>
-            <p className="border-b border-gray-200 text-lg py-2">021-88515914</p>
+            <p className="border-b border-gray-200 text-lg py-2">
+              021-88515914
+            </p>
           </div>
         </div>
         {/* Right Column */}
@@ -30,7 +32,11 @@ export default function Footer() {
             {/* Text */}
             <div className="lg:w-10/12 md:pl-4 flex flex-col  justify-center  md:p-0 p-4">
               <p className="text-sm text-gray-600 md:text-start text-center line-clamp-6">
-              وبوفن (Webofen) یک پلتفرم تحلیلی و هوشمند است که با هدف بهبود عملکرد، سئو و تجربه کاربری وب‌سایت‌ها طراحی شده است. ما در وبوفن تلاش می‌کنیم تا با استفاده از ابزارهای دقیق تحلیل داده، بررسی فنی و گزارش‌های قابل‌فهم، به صاحبان وب‌سایت‌ها کمک کنیم تا نقاط ضعف و قوت وب خود را شناسایی و برطرف کنند.
+                وبوفن (Webofen) یک پلتفرم تحلیلی و هوشمند است که با هدف بهبود
+                عملکرد، سئو و تجربه کاربری وب‌سایت‌ها طراحی شده است. ما در وبوفن
+                تلاش می‌کنیم تا با استفاده از ابزارهای دقیق تحلیل داده، بررسی
+                فنی و گزارش‌های قابل‌فهم، به صاحبان وب‌سایت‌ها کمک کنیم تا نقاط
+                ضعف و قوت وب خود را شناسایی و برطرف کنند.
               </p>
             </div>
 
@@ -180,25 +186,31 @@ export default function Footer() {
               <div className="inline-flex items-center gap-2 cursor-pointer px-3 py-1 rounded-full border border-transparent hover:border-[#1d546b] box-border transition-colors duration-200">
                 <span className="w-3 h-3 rounded-full border border-[#1d546b]"></span>
                 <Link href={"/"}>
-                <span className="text-gray-800 text-sm">خانه</span>
+                  <span className="text-gray-800 text-sm">خانه</span>
                 </Link>
               </div>
 
               <div className="inline-flex items-center gap-2 cursor-pointer px-3 py-1 rounded-full border border-transparent hover:border-[#1d546b] box-border transition-colors duration-200">
                 <span className="w-3 h-3 rounded-full border border-[#1d546b]"></span>
-                <span className="text-gray-800 text-sm">خدمات درمانی</span>
+                <Link href={"/"}>
+                  <span className="text-gray-800 text-sm">خدمات درمانی</span>
+                </Link>
               </div>
             </div>
 
             <div className="flex flex-col gap-4">
               <div className="inline-flex items-center gap-2 cursor-pointer px-3 py-1 rounded-full border border-transparent hover:border-[#1d546b] box-border transition-colors duration-200">
                 <span className="w-3 h-3 rounded-full border border-[#1d546b]"></span>
-                <span className="text-gray-800 text-sm">درباره ما</span>
+                <Link href={"/"}>
+                  <span className="text-gray-800 text-sm">درباره ما</span>
+                </Link>
               </div>
 
               <div className="inline-flex items-center gap-2 cursor-pointer px-3 py-1 rounded-full border border-transparent hover:border-[#1d546b] box-border transition-colors duration-200">
                 <span className="w-3 h-3 rounded-full border border-[#1d546b]"></span>
-                <span className="text-gray-800 text-sm">تیم ما</span>
+                <Link href={"/"}>
+                  <span className="text-gray-800 text-sm">تیم ما</span>
+                </Link>
               </div>
             </div>
 
@@ -206,13 +218,15 @@ export default function Footer() {
               <div className="inline-flex items-center gap-2 cursor-pointer px-3 py-1 rounded-full border border-transparent hover:border-[#1d546b] box-border transition-colors duration-200">
                 <span className="w-3 h-3 rounded-full border border-[#1d546b]"></span>
                 <Link href={"/articles"}>
-                <span className="text-gray-800 text-sm">مقالات</span>
+                  <span className="text-gray-800 text-sm">مقالات</span>
                 </Link>
               </div>
 
               <div className="inline-flex items-center gap-2 cursor-pointer px-3 py-1 rounded-full border border-transparent hover:border-[#1d546b] box-border transition-colors duration-200">
                 <span className="w-3 h-3 rounded-full border border-[#1d546b]"></span>
-                <span className="text-gray-800 text-sm">تماس با ما</span>
+                <Link href={"/"}>
+                  <span className="text-gray-800 text-sm">تماس با ما</span>
+                </Link>
               </div>
             </div>
 
@@ -220,13 +234,15 @@ export default function Footer() {
               <div className="inline-flex items-center gap-2 cursor-pointer px-3 py-1 rounded-full border border-transparent hover:border-[#1d546b] box-border transition-colors duration-200">
                 <span className="w-3 h-3 rounded-full border border-[#1d546b]"></span>
                 <Link href={"/products"}>
-                <span className="text-gray-800 text-sm">داروخانه</span>
+                  <span className="text-gray-800 text-sm">داروخانه</span>
                 </Link>
               </div>
 
               <div className="inline-flex items-center gap-2 cursor-pointer px-3 py-1 rounded-full border border-transparent hover:border-[#1d546b] box-border transition-colors duration-200">
                 <span className="w-3 h-3 rounded-full border border-[#1d546b]"></span>
-                <span className="text-gray-800 text-sm">بیمه وب وفن</span>
+                <Link href={"/"}>
+                  <span className="text-gray-800 text-sm">بیمه وب وفن</span>
+                </Link>
               </div>
             </div>
           </div>

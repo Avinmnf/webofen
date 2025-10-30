@@ -15,6 +15,7 @@ import SEO from "@/components/seo";
 import { InjectRelatedCategories } from "@/lib/functions/injectRelatedCategories";
 import { useRelatedPosts } from "@/hooks/useRelatedPosts";
 import { useReactions } from "@/hooks/useReactions";
+import { article } from "framer-motion/client";
 type Props = {
   post: Post;
   viewCount: number;
@@ -117,12 +118,10 @@ export default function PostPage({ post, viewCount }: Props) {
   const [popupVisible, setPopupVisible] = useState(false);
   const countedRef = useRef(false);
 
-  const { 
-    reactionCounts, 
-    handleReaction, 
-    loading, 
-    hasReacted 
-  } = useReactions("post", post.id);
+  const { reactionCounts, handleReaction, loading, hasReacted } = useReactions(
+    "post",
+    post.id
+  );
 
   const likes = reactionCounts["like"] || 0;
   const dislikes = reactionCounts["dislike"] || 0;
@@ -180,9 +179,64 @@ export default function PostPage({ post, viewCount }: Props) {
         {/*Background Section */}
         <div className="relative pt-20">
           <div className="w-full m-auto">
+            {/* Breadcrumb Navigation */}
+            <nav className="mb-6 px-4 text-gray-500 " aria-label="breadcrumb">
+              <ol className="flex items-center space-x-2 space-x-reverse text-sm text-gray-500 ">
+                <li>
+                  <Link
+                    href="/"
+                    className="hover:text-[#ff5084] transition-colors bread"
+                  >
+                    خانه
+                  </Link>
+                </li>
+                <li className="flex items-center bread">
+                  <svg
+                    className="w-4 h-4 mx-1 transform rotate-180"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </li>
+                <li>
+                  <Link
+                    href="/articles"
+                    className="hover:text-[#ff5084] transition-colors bread"
+                  >
+                    مقالات
+                  </Link>
+                </li>
+                <li className="flex items-center bread">
+                  <svg
+                    className="w-4 h-4 mx-1 transform rotate-180"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </li>
+                <li>
+                  <Link
+                    href={`/articles/${post.slug}`}
+                    className="hover:text-[#ff5084] transition-colors bread"
+                  >
+                    {post.title}
+                  </Link>
+                </li>
+              </ol>
+            </nav>
             {/* Hero Section */}
             {post.imageUrl && (
-              <div className="relative w-full h-[500px]">
+              <div className="relative w-full md:h-[500px] h-[200px]">
                 <Image
                   src={`${post.imageUrl}`}
                   alt={post.imageAlt || post.title}
@@ -344,11 +398,10 @@ export default function PostPage({ post, viewCount }: Props) {
                       }
                     >
                       <svg
-                        className="w-6 h-7 mt-2 hover:text-red-400 cursor-pointer"
                         viewBox="0 0 24 24"
                         fill="currentColor"
                         xmlns="http://www.w3.org/2000/svg"
-                        transform="matrix(-1, 0, 0, 1, 0, 0)"
+                        className="scale-x-[-1] w-6 h-6"
                       >
                         <path
                           d="M16.52 5.65002L13.42 3.25002C13.02 2.85002 12.12 2.65002 11.52 2.65002H7.71998C6.51998 2.65002 5.21998 3.55002 4.91998 4.75002L2.51998 12.05C2.01998 13.45 2.91998 14.65 4.41998 14.65H8.41998C9.01998 14.65 9.51998 15.15 9.41998 15.85L8.91998 19.05C8.71998 19.95 9.31998 20.95 10.22 21.25C11.02 21.55 12.02 21.15 12.42 20.55L16.52 14.45"
