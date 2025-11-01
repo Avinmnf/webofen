@@ -7,7 +7,9 @@ import Reservetime from "@/components/reservetime";
 import FreeConsultationForm from "@/components/FreeConsultationForm";
 import SEO from "@/components/seo";
 import Link from "next/link";
-
+import HomepageResume from "@/components/resume/homepageresume";
+import { useState } from "react";
+import { useRef } from "react";
 // اسکیما Organization برای وبوفن
 const organizationSchema = {
   "@context": "https://schema.org",
@@ -67,6 +69,22 @@ const websiteSchema = {
 };
 
 export default function Home() {
+  const [activeDiv, setActiveDiv] = useState<string | null>("first");
+  const firstRef = useRef<HTMLDivElement | null>(null);
+  const secondRef = useRef<HTMLDivElement | null>(null);
+  const thirdRef = useRef<HTMLDivElement | null>(null);
+
+  const handleClick = (divName: string) => {
+    setActiveDiv(divName);
+
+    // Scroll to the selected section
+    let ref: React.RefObject<HTMLDivElement | null> | null = null;
+    if (divName === "first") ref = firstRef;
+    if (divName === "second") ref = secondRef;
+    if (divName === "third") ref = thirdRef;
+
+    ref?.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
   return (
     <>
       <SEO
@@ -182,33 +200,32 @@ export default function Home() {
               </div>
               {/* Side Image - Mobile Version */}
               <div className="relative flex w-[90%] mx-auto aspect-[3/1] mt-2 rounded-lg md:hidden">
-                              <Link href="/analyze">
+                <Link href="/analyze">
+                  <Image
+                    src="/homepage/sideslidemobile.png"
+                    alt="خدمات سئو وبوفن - نسخه موبایل"
+                    fill
+                    className="object-contain"
+                    priority
+                  />
 
-                <Image
-                  src="/homepage/sideslidemobile.png"
-                  alt="خدمات سئو وبوفن - نسخه موبایل"
-                  fill
-                  className="object-contain"
-                  priority
-                />
-
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 71.21 71.21"
-                  className="absolute md:rounded-r-3xl md:rounded-tl-3xl rounded-r-xl rounded-tl-xl"
-                  style={{
-                    left: "0%",
-                    bottom: "2%",
-                    width: "11%",
-                    height: "auto",
-                    backgroundColor: "#1d546b",
-                    padding: "1.9%",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                  }}
-                >
-                  <path
-                    fill="#fff"
-                    d="M62.31,56.48v-17.91c0-14.73-11.98-26.7-26.7-26.7s-26.7,11.98-26.7,26.7v17.91C3.88,57.21,0,61.54,0,66.76
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 71.21 71.21"
+                    className="absolute md:rounded-r-3xl md:rounded-tl-3xl rounded-r-xl rounded-tl-xl"
+                    style={{
+                      left: "0%",
+                      bottom: "2%",
+                      width: "11%",
+                      height: "auto",
+                      backgroundColor: "#1d546b",
+                      padding: "1.9%",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                    }}
+                  >
+                    <path
+                      fill="#fff"
+                      d="M62.31,56.48v-17.91c0-14.73-11.98-26.7-26.7-26.7s-26.7,11.98-26.7,26.7v17.91C3.88,57.21,0,61.54,0,66.76
     c0,2.45,2,4.45,4.45,4.45h62.31c2.45,0,4.45-2,4.45-4.45c0-5.22-3.88-9.56-8.9-10.28ZM11.87,38.57
     c0-13.09,10.65-23.74,23.74-23.74s23.74,10.65,23.74,23.74v17.8H11.87v-17.8ZM66.76,68.25H4.45c-.82,0-1.48-.67-1.48-1.48
     c0-4.09,3.33-7.42,7.42-7.42h50.44c4.09,0,7.42,3.33,7.42,7.42C68.24,67.58,67.57,68.25,66.76,68.25ZM50.6,6.75l2.97-5.93
@@ -219,10 +236,9 @@ export default function Home() {
     s1.52-.58,2.1,0l5.93,5.93c.58.58.58,1.52,0,2.1c-.29.29-.67.43-1.05.43s-.76-.15-1.05-.43L.43,11.44ZM35.61,28.19
     c0,.82-.66,1.48-1.48,1.48c-4.09,0-7.42,3.33-7.42,7.42c0,.82-.66,1.48-1.48,1.48s-1.48-.66-1.48-1.48
     c0-5.73,4.66-10.39,10.39-10.39c.82,0,1.48.66,1.48,1.48Z"
-                  />
-                </svg>
-                                </Link>
-
+                    />
+                  </svg>
+                </Link>
               </div>
             </div>
           </div>
@@ -1259,42 +1275,6 @@ export default function Home() {
         </section>
         <section className="max-w-[1250px] m-auto ">
           <Pathsection />
-          <div className="w-full">
-            <div className="relative py-10 md:py-20 md:block hidden">
-              <div className="relative w-full aspect-[13/5] md:aspect-[13/2] rounded-lg overflow-hidden flex items-start">
-                <Image
-                  src="/homepage/ourteam.png"
-                  alt="تیم متخصصان سئو وبوفن"
-                  fill
-                  className="object-cover"
-                />
-
-                {/* Overlay Content */}
-                <div className="absolute top-2 md:top-4 right-2 md:right-4 z-10 p-3 md:p-4 rounded-xl max-w-full md:max-w-[70%]">
-                  <div className="mr-2 md:mr-4 w-full md:w-64">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-6">
-                      <p className="text-white text-lg md:text-xl whitespace-nowrap">
-                        تیم ما
-                      </p>
-                      <button className="bg-[#6FD6E5] hover:bg-[#1d546b] py-2 px-4 md:px-6 rounded-4xl text-white hover:scale-105 transition-all cursor-pointer text-sm md:text-base">
-                        مشاهده اعضا
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="w-full md:w-[70%] mt-3 md:mt-4 text-sm md:text-base text-white">
-                    <p>
-                      تیم ما متشکل از افرادی خلاق و متعهد است که هر روز با شور و
-                      اشتیاق کار می‌کنند تا بهترین تجربه را برای شما فراهم کنند.
-                      ما به یادگیری مستمر و همکاری نزدیک باور داریم و با تخصص و
-                      دقت، تلاش می‌کنیم تا هر پروژه با کیفیت و اعتماد کامل به
-                      انجام برسد.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </section>
 
         <section className="bg-[#f7f8fc] w-full">
@@ -1325,6 +1305,59 @@ export default function Home() {
           <div className=" relative py-10">
             <Reservetime />
           </div>
+        </section>
+                <section className="bg-[#f7f8fc] w-full pt-4">
+
+        <div className="max-w-[1250px] m-auto mt-5">
+          <div className="text-center mb-10">
+            <p className="text-[#29b0cb] text-2xl">
+              <span className="text-[#253e5f]">نمونه کار </span>درمان سایت
+            </p>
+
+            {/* Buttons wrapper */}
+            <div className="flex justify-center items-center mt-6">
+              <div className="md:flex w-2/4 justify-center border rounded-2xl md:rounded-full p-2">
+                <div className="relative flex gap-4 rounded-full h-10 md:w-full md:mt-0 mt-2 overflow-hidden">
+                  {/* Active highlight */}
+                  <div
+                    className="absolute top-0 left-0 h-full bg-[#1d546b] rounded-full transition-all duration-300"
+                    style={{
+                      width: "50%",
+                      transform:
+                        activeDiv === "second"
+                          ? "translateX(0%)"
+                          : "translateX(100%)",
+                    }}
+                  ></div>
+
+                  {/* Buttons */}
+                  <button
+                    onClick={() => handleClick("first")}
+                    className={`flex-1 z-10 text-sm md:text-md py-1 rounded-full h-10 transition-all duration-200 ${
+                      activeDiv === "first"
+                        ? "text-white"
+                        : "text-[#1d546b] hover:text-[#1d546b]"
+                    }`}
+                  >
+                    طراحی سایت
+                  </button>
+
+                  <button
+                    onClick={() => handleClick("second")}
+                    className={`flex-1 z-10 text-sm md:text-md py-1 rounded-full h-10 transition-all duration-200 ${
+                      activeDiv === "second"
+                        ? "text-white"
+                        : "text-[#1d546b] hover:text-[#1d546b]"
+                    }`}
+                  >
+                    سئو سایت
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <HomepageResume />
+        </div>
         </section>
       </main>
     </>
