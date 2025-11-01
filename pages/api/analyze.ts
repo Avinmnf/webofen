@@ -1,8 +1,8 @@
 // pages/api/analyze.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 
-const ANALYZER_URL = process.env.NEXT_PUBLIC_ANALYZE_URL|| "http://localhost:4000";
-const GRAPHQL_URL = process.env.NEXT_PUBLIC_GRAPHQL_URL || "http://localhost:3000/api/graphql";
+const ANALYZER_URL = process.env.ANALYZE_URL|| "http://localhost:4000";
+const GRAPHQL_URL = process.env.GRAPHQL_URL || "http://localhost:3000/api/graphql";
 
 interface AnalysisResult {
   id: string;
@@ -62,12 +62,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       throw new Error(`Analyzer failed with status: ${response.status}`);
     }
 
-    const contentType = response.headers.get("content-type");
-    if (!contentType || !contentType.includes("application/json")) {
-      const text = await response.text();
-      console.error("❌ Analyzer returned non-JSON:", text);
-      throw new Error("Analyzer returned non-JSON response");
-    }
 
     const analyzerResult = await response.json();
 
