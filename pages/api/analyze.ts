@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 const ANALYZER_URL = process.env.NEXT_PUBLIC_ANALYZE_URL || "http://localhost:4000";
-const GRAPHQL_URL = process.env.GRAPHQL_URL || "http://localhost:3000/api/graphql";
+const GRAPHQL_URL = process.env.NEXT_PUBLIC_GRAPHQL_URL || "http://localhost:3000/api/graphql";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -46,7 +46,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 seo
                 createdAt
                 result
-                privateData
+                
               }
             }
           `;
@@ -99,7 +99,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               seo
               createdAt
               result
-              privateData
+              
             }
           }
         `;
