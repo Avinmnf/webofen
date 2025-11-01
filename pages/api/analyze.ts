@@ -1,8 +1,8 @@
 // pages/api/analyze.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 
-const ANALYZER_URL = process.env.ANALYZE_URL|| "http://localhost:4000";
-const GRAPHQL_URL = process.env.GRAPHQL_URL || "http://localhost:3000/api/graphql";
+const ANALYZER_URL = process.env.NEXT_PUBLIC_ANALYZE_URL|| "http://localhost:4000";
+const GRAPHQL_URL = process.env.NEXT_PUBLIC_GRAPHQL_URL || "http://localhost:3000/api/graphql";
 
 interface AnalysisResult {
   id: string;
