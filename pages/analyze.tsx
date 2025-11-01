@@ -25,6 +25,20 @@ import { Issue } from "@/lib/models/analyze";
 import { tabLabels } from "@/lib/models/analyze";
 import { scoreDescriptions } from "@/lib/models/analyze";
 
+// تعریف interface برای response API
+interface ApiAnalysisResult {
+  id: string;
+  url: string;
+  status: string;
+  performance: number;
+  accessibility: number;
+  bestPractices: number;
+  seo: number;
+  createdAt: string;
+  result?: any;
+  privateData?: any;
+}
+
 export default function AnalyzePage() {
   const [url, setUrl] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -35,19 +49,18 @@ export default function AnalyzePage() {
   const [error, setError] = useState<string | null>(null);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [showSuccessAlert, setShowSuccessAlert] = useState<boolean>(false);
-  const [pendingResult, setPendingResult] = useState<AnalyzeResult | null>(null); // اضافه شده
-  const [analysisStatus, setAnalysisStatus] = useState<string>(""); // اضافه شده
+  const [pendingResult, setPendingResult] = useState<AnalyzeResult | null>(null);
+  const [analysisStatus, setAnalysisStatus] = useState<string>("");
+  const [checkingExisting, setCheckingExisting] = useState<boolean>(false);
 
   const groupedIssues = result
-    ? result.issues.reduce<Record<string, Issue[]>>((acc: Record<string, Issue[]>, issue: Issue) => {
-      const key = issue.impact || "other";
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(issue);
-      return acc;
-    }, {})
+    ? (result.issues || []).reduce<Record<string, Issue[]>>((acc: Record<string, Issue[]>, issue: Issue) => {
+        const key = issue.impact || "other";
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(issue);
+        return acc;
+      }, {})
     : {};
-  console.log(groupedIssues);
-
 
   const tabs = result ? ["all", ...Object.keys(groupedIssues)] : [];
 
@@ -56,7 +69,6 @@ export default function AnalyzePage() {
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-blue-50 bg-opacity-50 animate-fade-in">
       <div className="bg-white rounded-2xl p-6 mx-4 max-w-md w-full animate-scale-in shadow-2xl border border-green-200 relative">
         <div className="text-center">
-
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg
               className="w-8 h-8 text-green-500 animate-bounce"
@@ -106,6 +118,45 @@ export default function AnalyzePage() {
     </div>
   );
 
+  // تابع برای تبدیل ApiAnalysisResult به AnalyzeResult
+  const convertApiResultToAnalyzeResult = (apiResult: ApiAnalysisResult): AnalyzeResult => {
+    return {
+      url: apiResult.url,
+      title: apiResult.result?.title || apiResult.result?.metaTitle || "بدون عنوان",
+      scores: {
+        performance: apiResult.performance / 100,
+        accessibility: apiResult.accessibility / 100,
+        bestPractices: apiResult.bestPractices / 100,
+        seo: apiResult.seo / 100,
+      },
+      issues: apiResult.privateData || apiResult.result?.issues || [],
+      metrics: apiResult.result?.metrics || {},
+    };
+  };
+
+  // تابع برای بررسی وجود آنالیز قبلی
+  const checkExistingAnalysis = async (url: string): Promise<ApiAnalysisResult | null> => {
+    try {
+      const response = await fetch(`/api/analyze?t=${Date.now()}`, {
+        headers: { "Cache-Control": "no-store" },
+      });
+
+      if (!response.ok) return null;
+
+      const analyses: ApiAnalysisResult[] = await response.json();
+      
+      // پیدا کردن آنالیز مربوط به این URL (جدیدترین)
+      const existingAnalysis = analyses
+        .filter(analysis => analysis.url === url && analysis.status === "completed")
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+
+      return existingAnalysis || null;
+    } catch (error) {
+      console.error("Error checking existing analysis:", error);
+      return null;
+    }
+  };
+
   const handleAnalyze = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!url) return setError("لطفاً URL را وارد کنید");
@@ -115,9 +166,34 @@ export default function AnalyzePage() {
     setElapsedTime(0);
     setLoading(true);
     setResult(null);
-    setAnalysisStatus("در حال ارسال درخواست..."); // اضافه شده
+    setCheckingExisting(true);
+    setAnalysisStatus("🔍 در حال بررسی آنالیزهای قبلی...");
 
     try {
+      // اول بررسی می‌کنیم که آنالیز قبلی وجود دارد یا نه
+      const existingAnalysis = await checkExistingAnalysis(url);
+      
+      if (existingAnalysis) {
+        // اگر آنالیز قبلی وجود دارد، مستقیماً نتیجه را نمایش می‌دهیم
+        setCheckingExisting(false);
+        setAnalysisStatus("✅ آنالیز قبلی یافت شد!");
+        
+        // انیمیشن کوتاه برای نمایش وضعیت
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setProgress(100);
+        
+        const analyzeResult = convertApiResultToAnalyzeResult(existingAnalysis);
+        setResult(analyzeResult);
+        setLoading(false);
+        setAnalysisStatus("");
+        return;
+      }
+
+      // اگر آنالیز قبلی وجود ندارد، آنالیز جدید شروع می‌شود
+      setCheckingExisting(false);
+      setAnalysisStatus("در حال ارسال درخواست آنالیز جدید...");
+      setProgress(10);
+
       const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -125,94 +201,115 @@ export default function AnalyzePage() {
       });
 
       if (!response.ok) {
-        const text = await response.text();
-        throw new Error(text || `خطا در آنالیز سایت: ${response.status}`);
+        const errorText = await response.text();
+        let errorMessage = errorText || `خطا در آنالیز سایت: ${response.status}`;
+        
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMessage = errorJson.error || errorJson.details || errorMessage;
+        } catch {
+          // اگر JSON نبود، از متن خطا استفاده کن
+        }
+        
+        throw new Error(errorMessage);
       }
 
-      const data = await response.json();
+      const data: ApiAnalysisResult = await response.json();
+      
+      // بررسی وضعیت آنالیز
+      if (data.status === "completed") {
+        // اگر آنالیز بلافاصله کامل شد
+        setAnalysisStatus("✅ آنالیز کامل شد!");
+        setProgress(100);
+        
+        const analyzeResult = convertApiResultToAnalyzeResult(data);
+        setPendingResult(analyzeResult);
+        setLoading(false);
+        setAnalysisStatus("");
+        setShowSuccessAlert(true);
+      } else {
+        // اگر نیاز به polling داریم
+        setAnalysisStatus("✅ آدرس وبسایت دریافت شد. در حال آنالیز...");
+        setProgress(20);
 
-      // اگر آنالیز آماده است
-      setAnalysisStatus("✅ آدرس وبسایت دریافت شد. در حال آنالیز...");
-      setProgress(20);
+        const startTime = Date.now();
+        const timeInterval = setInterval(() => {
+          setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+        }, 1000);
 
-      // Polling برای وضعیت آنالیز
-      const analysisId = data.analysisId || data.id;
-      if (!analysisId) throw new Error("analysisId معتبر ایجاد نشد");
+        setProgress(30);
+        setAnalysisStatus("🔍 در حال بررسی عملکرد وبسایت...");
 
-      const startTime = Date.now();
-      const timeInterval = setInterval(() => {
-        setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
-      }, 1000);
+        const checkInterval = 5000;
+        const maxRetries = 30;
+        let retries = 0;
 
-      setProgress(30);
-      setAnalysisStatus("🔍 در حال بررسی عملکرد وبسایت...");
+        const intervalId = setInterval(async () => {
+          retries++;
+          try {
+            const statusRes = await fetch(`/api/analyze?id=${data.id}&t=${Date.now()}`, {
+              headers: { "Cache-Control": "no-store" },
+            });
 
-      const checkInterval = 5000; // هر 5 ثانیه چک کن
-      const maxRetries = 30; // حداکثر 2.5 دقیقه
-      let retries = 0;
+            if (!statusRes.ok) {
+              if (retries >= maxRetries) {
+                throw new Error("زمان آنالیز بیش از حد طول کشید");
+              }
+              return;
+            }
 
-      const intervalId = setInterval(async () => {
-        retries++;
-        try {
-          const statusRes = await fetch(`/api/analyze?id=${analysisId}&t=${Date.now()}`, {
-            headers: { "Cache-Control": "no-store" },
-          });
+            const statusData: ApiAnalysisResult = await statusRes.json();
 
-          if (!statusRes.ok) return;
+            // به روزرسانی وضعیت بر اساس progress
+            if (retries === 1) {
+              setAnalysisStatus("📊 در حال بررسی سئو و دسترسی...");
+              setProgress(50);
+            } else if (retries === 2) {
+              setAnalysisStatus("⚡ در حال بررسی سرعت و امنیت...");
+              setProgress(70);
+            } else if (retries === 3) {
+              setAnalysisStatus("📋 در حال تهیه گزارش نهایی...");
+              setProgress(85);
+            }
 
-          const statusData = await statusRes.json();
+            if (statusData.status === "completed") {
+              clearInterval(intervalId);
+              clearInterval(timeInterval);
+              
+              const analyzeResult = convertApiResultToAnalyzeResult(statusData);
+              setPendingResult(analyzeResult);
+              setProgress(100);
+              setLoading(false);
+              setAnalysisStatus("");
+              setShowSuccessAlert(true);
+              return;
+            }
 
-          // به روزرسانی وضعیت بر اساس progress
-          if (retries === 1) {
-            setAnalysisStatus("📊 در حال بررسی سئو و دسترسی...");
-            setProgress(50);
-          } else if (retries === 2) {
-            setAnalysisStatus("⚡ در حال بررسی سرعت و امنیت...");
-            setProgress(70);
-          } else if (retries === 3) {
-            setAnalysisStatus("📋 در حال تهیه گزارش نهایی...");
-            setProgress(85);
-          }
-
-          if (statusData.status === "completed" && statusData.scores) {
+            if (retries >= maxRetries) {
+              clearInterval(intervalId);
+              clearInterval(timeInterval);
+              setProgress(100);
+              setLoading(false);
+              setAnalysisStatus("");
+              setError("زمان آنالیز بیش از حد طول کشید");
+            }
+          } catch (err: any) {
+            console.error(err);
             clearInterval(intervalId);
             clearInterval(timeInterval);
-            setPendingResult(statusData);
             setProgress(100);
             setLoading(false);
             setAnalysisStatus("");
-            setShowSuccessAlert(true);
-            return;
+            setError(err.message || "خطا در بررسی وضعیت آنالیز");
           }
-
-          // اگر هنوز در حال پردازش است
-          if (statusData.status === "processing") {
-            setProgress(Math.min(95, 30 + retries * 3));
-          }
-
-          if (retries >= maxRetries) {
-            clearInterval(intervalId);
-            clearInterval(timeInterval);
-            setProgress(100);
-            setLoading(false);
-            setAnalysisStatus("");
-            setError("زمان آنالیز بیش از حد طول کشید");
-          }
-        } catch (err: any) {
-          console.error(err);
-          clearInterval(intervalId);
-          clearInterval(timeInterval);
-          setProgress(100);
-          setLoading(false);
-          setAnalysisStatus("");
-          setError(err.message || "خطا در بررسی وضعیت آنالیز");
-        }
-      }, checkInterval);
+        }, checkInterval);
+      }
     } catch (err: any) {
       console.error(err);
       setProgress(100);
       setLoading(false);
       setAnalysisStatus("");
+      setCheckingExisting(false);
       setError(err.message || "خطایی در شروع آنالیز رخ داد");
     }
   };
@@ -274,21 +371,24 @@ export default function AnalyzePage() {
       {showSuccessAlert && <SuccessAlert />}
 
       <div className="w-full">
-        <HeroSection url={url} setUrl={setUrl} loading={loading} handleAnalyze={handleAnalyze} />
+        <HeroSection url={url} setUrl={setUrl} loading={loading || checkingExisting} handleAnalyze={handleAnalyze} />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {error && (
-            <div className={`mb-6 p-4 border rounded-xl flex items-start animate-shake ${error.includes("🎉")
-              ? "bg-green-50 border-green-200 text-green-800"
-              : "bg-red-50 border-red-200 text-red-800"
-              }`}>
-              <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mt-0.5 ml-2 flex-shrink-0 ${error.includes("🎉") ? "text-green-500" : "text-red-500"
-                }`} viewBox="0 0 20 20" fill="currentColor">
+            <div className={`mb-6 p-4 border rounded-xl flex items-start animate-shake ${
+              error.includes("🎉")
+                ? "bg-green-50 border-green-200 text-green-800"
+                : "bg-red-50 border-red-200 text-red-800"
+            }`}>
+              <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mt-0.5 ml-2 flex-shrink-0 ${
+                error.includes("🎉") ? "text-green-500" : "text-red-500"
+              }`} viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
               <p className={error.includes("🎉") ? "text-green-700" : "text-red-700"}>{error}</p>
             </div>
           )}
+          
           {analysisStatus && (
             <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl animate-fade-in">
               <div className="flex items-center">
@@ -299,7 +399,12 @@ export default function AnalyzePage() {
               </div>
             </div>
           )}
-          {loading && <AnimatedLoading progress={progress} elapsedTime={elapsedTime} />}
+          
+          {(loading || checkingExisting) && (
+            <div className="space-y-6 animate-fade-in">
+              <AnimatedLoading progress={progress} elapsedTime={elapsedTime} />
+            </div>
+          )}
 
           {result && (
             <div className="space-y-8 animate-fade-in">
@@ -432,8 +537,6 @@ export default function AnalyzePage() {
                         SI: "سرعت نشانگر"
                       };
 
-
-
                       return (
                         <div
                           key={key}
@@ -470,14 +573,17 @@ export default function AnalyzePage() {
                           <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
-                            className={`px-4 py-2 rounded-lg flex items-center transition-all ${activeTab === tab
-                              ? "bg-red-100 text-red-700 font-medium shadow-sm transform scale-105"
-                              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                              } animate-fade-in`}
+                            className={`px-4 py-2 rounded-lg flex items-center transition-all ${
+                              activeTab === tab
+                                ? "bg-red-100 text-red-700 font-medium shadow-sm transform scale-105"
+                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            } animate-fade-in`}
                             style={{ animationDelay: `${index * 0.05}s` }}
                           >
                             {tabLabels[tab] || tab}
-                            <span className={`mr-1 text-xs px-1.5 py-0.5 rounded-full ${activeTab === tab ? "bg-red-200" : "bg-gray-300"}`}>
+                            <span className={`mr-1 text-xs px-1.5 py-0.5 rounded-full ${
+                              activeTab === tab ? "bg-red-200" : "bg-gray-300"
+                            }`}>
                               {count}
                             </span>
                           </button>
@@ -493,7 +599,9 @@ export default function AnalyzePage() {
                     ).map((issue: Issue, idx: number) => (
                       <div
                         key={idx}
-                        className={`p-5 rounded-xl border-l-4 ${getImpactColor(issue.impact)} transition-all hover:shadow-sm animate-fade-in-up`}
+                        className={`p-5 rounded-xl border-l-4 ${
+                          getImpactColor(issue.impact)
+                        } transition-all hover:shadow-sm animate-fade-in-up`}
                         style={{ animationDelay: `${idx * 0.05}s` }}
                       >
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
@@ -506,7 +614,9 @@ export default function AnalyzePage() {
                             </div>
                             <p className="text-gray-700 mt-2 pr-7">{issue.description}</p>
                           </div>
-                          <div className={`px-3 py-1 rounded-full text-sm font-medium ${getImpactBadgeColor(issue.impact)} transform transition-transform hover:scale-105`}>
+                          <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            getImpactBadgeColor(issue.impact)
+                          } transform transition-transform hover:scale-105`}>
                             {issue.impact}
                           </div>
                         </div>
@@ -530,7 +640,7 @@ export default function AnalyzePage() {
             </div>
           )}
 
-          {!result && !loading && (
+          {!result && !loading && !checkingExisting && (
             <div className="max-w-4xl mx-auto py-12">
               <div className="text-center mb-12 animate-fade-in">
                 <h2 className="text-3xl font-bold text-gray-800 mb-4">چگونه آنالیز کار می‌ کند؟</h2>
