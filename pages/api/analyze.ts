@@ -1,221 +1,139 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-const GRAPHQL_URL =
-  process.env.NEXT_PUBLIC_GRAPHQL_URL || "http://localhost:3000/api/graphql";
-const ANALYZE_URL = process.env.ANALYZE_URL || "http://localhost:4000";
-
-const processingUrls = new Set<string>();
+const ANALYZER_URL = process.env.NEXT_PUBLIC_ANALYZE_URL || "http://localhost:4000";
+const GRAPHQL_URL = process.env.NEXT_PUBLIC_GRAPHQL_URL || "http://localhost:3000/api/graphql";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { url, id } = req.method === "GET" ? req.query : req.body;
-
-  // ================= GET =================
-  if (req.method === "GET") {
-    if (!id && !url)
-      return res.status(400).json({ message: "ID یا URL الزامی است." });
-
-    const record = id
-      ? await findAnalysisById(id as string)
-      : await findAnalysisByUrl(url as string);
-
-    if (!record)
-      return res.status(404).json({ message: "رکورد پیدا نشد." });
-
-    const resultJson = record.result || {};
-    const scores = {
-      performance: record.performance || 0,
-      accessibility: record.accessibility || 0,
-      bestPractices: record.bestPractices || 0,
-      seo: record.seo || 0,
-    };
-
-    return res.status(200).json({
-      url: record.url,
-      status: record.status,
-      scores,
-      metrics: resultJson.metrics || {},
-      issues: resultJson.issues || [],
-      title: resultJson.title || "",
-      analysisId: record.id,
-    });
-  }
-
-  // ================= POST =================
-  if (req.method === "POST") {
-    if (!url) return res.status(400).json({ message: "URL الزامی است." });
-
-    const normalized = normalizeAndValidateUrl(url);
-    if (!normalized.isValid)
-      return res.status(400).json({ message: `فرمت URL نامعتبر است: ${url}` });
-    const finalUrl = normalized.url;
-
-    // بررسی اگر قبلاً آنالیز کامل شده
-    const existing = await findAnalysisByUrl(finalUrl);
-    if (existing && existing.status === "completed") {
-      return res.status(200).json({
-        ...existing.result,
-        analysisId: existing.id,
-        status: existing.status,
-      });
-    }
-
-    // بررسی اگر در حال پردازش است → برگرداندن pending
-    const analysisId = existing ? existing.id : await upsertAnalysis(finalUrl);
-    if (processingUrls.has(finalUrl)) {
-      return res.status(200).json({ analysisId, status: "pending" });
-    }
-
-    processingUrls.add(finalUrl);
-
-    // اجرای آنالیز در پس‌زمینه
-    (async () => {
+  try {
+    if (req.method === "POST") {
       try {
-        await updateAnalysisStatus(analysisId, "running");
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 30000);
 
-        const analyzeRes = await fetch(`${ANALYZE_URL}/analyze`, {
+        // ---------- سعی می‌کنیم Analyzer را فراخوانی کنیم ----------
+        try {
+          const response = await fetch(`${ANALYZER_URL}/analyze`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(req.body),
+            signal: controller.signal,
+          });
+
+          clearTimeout(timeout);
+
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            const data = await response.json();
+            return res.status(response.status).json(data);
+          } else {
+            const text = await response.text();
+            console.error("❌ Analyzer returned non-JSON:", text);
+            throw new Error("Analyzer returned non-JSON");
+          }
+        } catch (err: any) {
+          console.warn("⚠️ Analyzer not reachable, fetching last saved result from GraphQL", err.message);
+
+          // ---------- fallback: دریافت آخرین تحلیل ذخیره شده ----------
+          const query = `
+            query {
+              analyses {
+                id
+                url
+                status
+                performance
+                accessibility
+                bestPractices
+                seo
+                createdAt
+                result
+                
+              }
+            }
+          `;
+
+          const graphqlResponse = await fetch(GRAPHQL_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ query }),
+          });
+
+          const contentType = graphqlResponse.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            const json = await graphqlResponse.json();
+            if (json.errors) {
+              console.error("❌ GraphQL returned errors:", json.errors);
+              return res.status(500).json({ error: "GraphQL errors", details: json.errors });
+            }
+
+            const analyses = json.data.analyses;
+            if (!analyses || analyses.length === 0) {
+              return res.status(404).json({ error: "No analysis found in DB" });
+            }
+
+            const lastAnalysis = analyses[analyses.length - 1]; // آخرین رکورد
+            return res.status(200).json(lastAnalysis);
+          } else {
+            const text = await graphqlResponse.text();
+            console.error("❌ GraphQL returned non-JSON:", text);
+            return res.status(500).json({ error: "GraphQL returned non-JSON", body: text });
+          }
+        }
+      } catch (err: any) {
+        console.error("❌ Failed POST to Analyzer or fallback:", err);
+        return res.status(500).json({ error: "Failed to perform analysis", details: err.message });
+      }
+    }
+
+    // ---------- GET: دریافت همه analyses ----------
+    if (req.method === "GET") {
+      try {
+        const query = `
+          query {
+            analyses {
+              id
+              url
+              status
+              performance
+              accessibility
+              bestPractices
+              seo
+              createdAt
+              result
+              
+            }
+          }
+        `;
+
+        const graphqlResponse = await fetch(GRAPHQL_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: finalUrl }),
+          body: JSON.stringify({ query }),
         });
 
-        if (!analyzeRes.ok) {
-          const errorText = await analyzeRes.text();
-          await updateAnalysisStatus(analysisId, "failed");
-          console.error("خطای آنالیز:", errorText);
-          return;
-        }
-
-        const result = await analyzeRes.json();
-        const scores = processScores(result.scores || {});
-        await updateAnalysisWithResults(analysisId, result, scores);
-        await updateAnalysisStatus(analysisId, "completed");
-      } catch (err: any) {
-        console.error("❌ خطا در آنالیز پس‌زمینه:", err);
-        await updateAnalysisStatus(analysisId, "failed");
-      } finally {
-        processingUrls.delete(finalUrl);
-      }
-    })();
-
-    return res.status(200).json({ analysisId, status: "pending" });
-  }
-
-  return res.status(405).json({ message: "Method not allowed" });
-
-  // ================= Helper Functions =================
-  async function findAnalysisById(id: string) {
-    const query = `
-      query ($id: ID!) {
-        analyses(where: { id: { equals: $id } }) {
-          id url status result performance accessibility bestPractices seo
-        }
-      }`;
-    const res = await fetch(GRAPHQL_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query, variables: { id } }),
-    });
-    const data = await res.json();
-    return data.data?.analyses?.[0] || null;
-  }
-
-  async function findAnalysisByUrl(url: string) {
-    const query = `
-      query ($url: String!) {
-        analyses(where: { url: { equals: $url } }) {
-          id url status result performance accessibility bestPractices seo
-        }
-      }`;
-    const res = await fetch(GRAPHQL_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query, variables: { url } }),
-    });
-    const data = await res.json();
-    return data.data?.analyses?.[0] || null;
-  }
-
-  async function upsertAnalysis(url: string) {
-    const existing = await findAnalysisByUrl(url);
-    if (existing) return existing.id;
-
-    const mutation = `
-      mutation CreateAnalysis($url: String!) {
-        createAnalysis(data: { url: $url, status: "pending" }) { id }
-      }`;
-    const res = await fetch(GRAPHQL_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: mutation, variables: { url } }),
-    });
-    const data = await res.json();
-    return data.data.createAnalysis.id;
-  }
-
-  async function updateAnalysisStatus(id: string, status: string) {
-    const mutation = `
-      mutation UpdateStatus($id: ID!, $status: String!) {
-        updateAnalysis(where: { id: $id }, data: { status: $status }) { id status }
-      }`;
-    await fetch(GRAPHQL_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: mutation, variables: { id, status } }),
-    });
-  }
-
-  async function updateAnalysisWithResults(
-    id: string,
-    result: any,
-    scores: Record<string, number>
-  ) {
-    const mutation = `
-      mutation UpdateResults(
-        $id: ID!,
-        $status: String!,
-        $result: JSON!,
-        $performance: Float!,
-        $accessibility: Float!,
-        $bestPractices: Float!,
-        $seo: Float!
-      ) {
-        updateAnalysis(
-          where: { id: $id },
-          data: {
-            status: $status,
-            result: $result,
-            performance: $performance,
-            accessibility: $accessibility,
-            bestPractices: $bestPractices,
-            seo: $seo
+        const contentType = graphqlResponse.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const json = await graphqlResponse.json();
+          if (json.errors) {
+            console.error("❌ GraphQL returned errors:", json.errors);
+            return res.status(500).json({ error: "GraphQL errors", details: json.errors });
           }
-        ) { id }
-      }`;
-    await fetch(GRAPHQL_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: mutation, variables: { id, status: "completed", result, ...scores } }),
-    });
-  }
 
-  function normalizeAndValidateUrl(input: string): { isValid: boolean; url: string } {
-    try {
-      let url = input.trim();
-      if (!url.includes("://")) url = "https://" + url;
-      const parsed = new URL(url);
-      const normalized = `https://${parsed.hostname.replace(/^www\./, "")}`;
-      return { isValid: true, url: normalized };
-    } catch {
-      return { isValid: false, url: "" };
+          return res.status(200).json(json.data.analyses);
+        } else {
+          const text = await graphqlResponse.text();
+          console.error("❌ GraphQL returned non-JSON:", text);
+          return res.status(500).json({ error: "GraphQL returned non-JSON", body: text });
+        }
+      } catch (err: any) {
+        console.error("❌ Failed GET from GraphQL:", err);
+        return res.status(500).json({ error: "Failed to reach GraphQL", details: err.message });
+      }
     }
-  }
 
-  function processScores(scores: any): Record<string, number> {
-    return {
-      performance: scores?.performance || 0,
-      accessibility: scores?.accessibility || 0,
-      bestPractices: scores?.bestPractices || 0,
-      seo: scores?.seo || 0,
-    };
+    res.setHeader("Allow", ["GET", "POST"]);
+    return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
+  } catch (err: any) {
+    console.error("❌ Unexpected API error:", err);
+    return res.status(500).json({ error: "Internal Server Error", details: err.message });
   }
 }
