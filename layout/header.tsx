@@ -36,6 +36,7 @@ export default function Header() {
   const menuItems = [
     { label: "وبوفن", href: "/" },
     { label: " داروخانه", href: "/products" },
+    { label: "طراحی سایت", href: "#" },
     { label: "وبلاگ", href: "/articles" },
     { label: "درباره ما", href: "#" },
     { label: "بیمه وب و فن", href: "#" },
