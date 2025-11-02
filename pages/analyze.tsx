@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 interface AnalysisResult {
   id: string;
@@ -11,7 +11,6 @@ interface AnalysisResult {
   result?: any;
   createdAt?: string;
   updatedAt?: string;
-  _timestamp?: number;
 }
 
 const ANALYZE_URL = process.env.NEXT_PUBLIC_ANALYZE_URL || 'http://localhost:4000';
@@ -22,25 +21,25 @@ export default function WebsiteAnalyzer() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const startAnalysis = async (e: React.FormEvent) => {
+  const pollRef = useRef<NodeJS.Timeout | null>(null);
+
+  // شروع تحلیل
+  const startAnalysis = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      console.log('Starting analysis for:', url);
       const response = await fetch(`${ANALYZE_URL}/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url }),
+        credentials: 'include', // مهم برای CORS
       });
-
-      console.log('Response status:', response.status);
 
       if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
 
       const data = await response.json();
-      console.log('Analysis started:', data);
 
       if (data.success) {
         setAnalysis({
@@ -61,22 +60,22 @@ export default function WebsiteAnalyzer() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [url]);
 
+  // چک وضعیت تحلیل
   const checkAnalysisStatus = useCallback(async () => {
     if (!analysis) return false;
 
     try {
       const timestamp = Date.now();
-      const response = await fetch(`${ANALYZE_URL}/analysis/${analysis.id}?t=${timestamp}`);
-      console.log(`Status check for ${analysis.id}:`, response.status);
+      const response = await fetch(`${ANALYZE_URL}/analysis/${analysis.id}?t=${timestamp}`, {
+        credentials: 'include',
+      });
 
       if (!response.ok) throw new Error(`Status check failed: ${response.status}`);
 
       const result: AnalysisResult = await response.json();
-      console.log('Status result:', result);
 
-      // اگر float ها null هستند، صفر ست کن
       setAnalysis({
         ...result,
         performance: result.performance ?? 0,
@@ -92,24 +91,29 @@ export default function WebsiteAnalyzer() {
     }
   }, [analysis]);
 
+  // Polling امن با useRef
   useEffect(() => {
     if (!analysis) return;
 
-    console.log('Starting polling for analysis:', analysis.id);
-    const pollInterval = setInterval(async () => {
+    pollRef.current = setInterval(async () => {
       const shouldContinue = await checkAnalysisStatus();
-      if (!shouldContinue) {
-        console.log('Polling completed for:', analysis.id);
-        clearInterval(pollInterval);
+      if (!shouldContinue && pollRef.current) {
+        clearInterval(pollRef.current);
+        pollRef.current = null;
       }
     }, 3000);
 
-    return () => clearInterval(pollInterval);
+    return () => {
+      if (pollRef.current) {
+        clearInterval(pollRef.current);
+        pollRef.current = null;
+      }
+    };
   }, [analysis, checkAnalysisStatus]);
 
   return (
     <div className="max-w-4xl mx-auto p-6 text-black">
-      <h1 className="text-3xl font-bold mb-6 text-black">Website Analysis</h1>
+      <h1 className="text-3xl font-bold mb-6">Website Analysis</h1>
 
       <form onSubmit={startAnalysis} className="mb-8">
         <div className="flex gap-4 mb-4">
@@ -136,12 +140,12 @@ export default function WebsiteAnalyzer() {
         <div className="border rounded-lg p-6 bg-white shadow">
           <h2 className="text-xl font-semibold mb-4">Analysis Results</h2>
 
-          <div className="mb-4 grid grid-cols-2 text-black gap-4">
+          <div className="mb-4 grid grid-cols-2 gap-4">
             <div>
               <p><strong>URL:</strong> {analysis.url}</p>
               <p><strong>ID:</strong> {analysis.id}</p>
             </div>
-            <div className='text-black'>
+            <div>
               <p><strong>Status:</strong>
                 <span className={`ml-2 px-2 py-1 rounded text-sm ${
                   analysis.status === 'completed' ? 'bg-green-100 text-green-800' :
@@ -149,7 +153,7 @@ export default function WebsiteAnalyzer() {
                   analysis.status === 'running' ? 'bg-blue-100 text-blue-800' :
                   'bg-yellow-100 text-yellow-800'
                 }`}>
-                  {analysis.status?.toUpperCase()}
+                  {analysis.status.toUpperCase()}
                 </span>
               </p>
               <p><strong>Last Check:</strong> {new Date().toLocaleTimeString()}</p>
