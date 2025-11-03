@@ -39,7 +39,7 @@ export default function Pathsection() {
     );
 
     return (
-        <div className="w-full mt-8 md:mt-16 lg:mt-22 md:flex hidden">
+        <div className="w-full mt-8 md:mt-16 mb-15 lg:mt-22 md:flex hidden">
             <div className="mx-auto">
                 <div className="text-right mb-6 md:mb-10">
                     <h2 className="text-[#1d546b]  text-3xl md:text-base mb-1">مراحل درمان</h2>

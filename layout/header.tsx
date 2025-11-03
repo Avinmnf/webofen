@@ -38,7 +38,7 @@ export default function Header() {
     { label: " داروخانه", href: "/products" },
     { label: "طراحی سایت", href: "/web-design" },
     { label: "وبلاگ", href: "/articles" },
-    { label: "درباره ما", href: "#" },
+    { label: "درباره ما", href: "/about-us" },
     { label: "بیمه وب و فن", href: "#" },
   ];
 
