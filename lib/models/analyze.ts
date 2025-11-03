@@ -54,3 +54,15 @@ export const scoreDescriptions: Record<string, string> = {
   bestPractices: "رعایت استانداردهای توسعه وب",
   seo: "بهینه‌سازی برای موتورهای جستجو"
 };
+
+export interface ApiAnalysisResult {
+  id: string;
+  url: string;
+  status: string;
+  performance: number;
+  accessibility: number;
+  bestPractices: number;
+  seo: number;
+  createdAt: string;
+  result?: any;
+}

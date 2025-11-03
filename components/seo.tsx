@@ -79,9 +79,13 @@ const SEO: React.FC<SEOProps> = ({
   additionalScripts,
 }) => {
   const router = useRouter();
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://example.com";
+const baseUrl = (process.env.NEXT_PUBLIC_WEBOFEN || "https://webofen.com/").replace(/\/+$/, "");
+  const cdnUrl = process.env.NEXT_PUBLIC_CDN_URL ;
   const currentUrl = canonical || `${baseUrl}${router.asPath}`;
-  const defaultImage = ogImage || `${baseUrl}/images/og-default.jpg`;
+  const defaultImage = ogImage
+  ? `${cdnUrl}${ogImage.replace(/^\/+/, "")}`
+  : `${cdnUrl}images/og-default.jpg`;
+
 
   const defaultStructuredData = {
     "@context": "https://schema.org",

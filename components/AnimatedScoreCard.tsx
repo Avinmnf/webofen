@@ -30,13 +30,13 @@ export const AnimatedScoreCard = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="relative mb-4">
+      <div className="relative mb-4 w-32 h-32">
         <div 
-          className={`transition-transform duration-300 ${isHovered ? 'scale-110' : 'scale-100'}`}
+          className={`transition-transform duration-300  ${isHovered ? 'scale-110' : 'scale-100'}`}
         >
           <CircularProgressbar
             value={animatedValue}
-            text={`${animatedValue}%`}
+            text={""} // متن پیش‌فرض را خالی می‌کنیم
             strokeWidth={8}
             styles={buildStyles({
               textSize: "16px",
@@ -46,8 +46,13 @@ export const AnimatedScoreCard = ({
               pathTransitionDuration: 0.5,
               strokeLinecap: "round",
             })}
-            className="w-32 h-32"
+            className="w-full h-full"
           />
+        </div>
+        
+        {/* نمایش عدد در وسط با موقعیت مطلق */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-2xl font-bold text-gray-800">{animatedValue}%</span>
         </div>
         
         {isHovered && (

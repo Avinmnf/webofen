@@ -1,203 +1,404 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+"use client";
 
-interface AnalysisResult {
+import { useState, useEffect } from "react";
+import { useProducts } from "@/hooks/useproduct";
+
+// Import components
+import { HeroSection } from "@/components/HeroSection";
+import { SuccessAlert } from "@/components/SuccessAlert";
+import { ErrorDisplay } from "@/components/ErrorDisplay";
+import { AnimatedLoading } from "@/components/AnimatedLoading";
+import { AnalysisScores } from "@/components/AnalysisScores";
+import { CoreMetrics } from "@/components/CoreMetrics";
+import { IssuesList } from "@/components/IssuesList";
+import { ProductRecommendations } from "@/components/ProductRecommendations";
+import { HowItWorks } from "@/components/HowItWorks";
+import { GlobalStyles } from "@/components/GlobalStyles";
+import { WebsiteOverview } from "@/components/WebsiteOverview";
+import { ScoreGuide } from "@/components/ScoreGuide";
+import { AnalysisModal } from "@/components/AnalysisModal";
+import { ExistingAnalysisChecker } from "@/components/ExistingAnalysisChecker";
+
+// Import types
+import { AnalyzeResult } from "@/lib/models/analyze";
+import { Issue } from "@/lib/models/analyze";
+
+// تعریف interface برای response API
+interface ApiAnalysisResult {
   id: string;
   url: string;
-  status: 'pending' | 'running' | 'completed' | 'failed';
-  performance?: number | null;
-  accessibility?: number | null;
-  bestPractices?: number | null;
-  seo?: number | null;
+  status: string;
+  performance: number;
+  accessibility: number;
+  bestPractices: number;
+  seo: number;
+  createdAt: string;
   result?: any;
-  createdAt?: string;
-  updatedAt?: string;
+  privateData?: any;
 }
 
-const ANALYZE_URL = process.env.NEXT_PUBLIC_ANALYZE_URL || 'http://localhost:4000';
+// base URL برای سرویس آنالیز
+const ANALYZE_URL = process.env.ANALYZE_URL || 'http://localhost:4000';
 
-export default function WebsiteAnalyzer() {
-  const [url, setUrl] = useState('');
-  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+export default function AnalyzePage() {
+  const [url, setUrl] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [progress, setProgress] = useState<number>(0);
+  const [result, setResult] = useState<AnalyzeResult | null>(null);
+  const [animatedScores, setAnimatedScores] = useState<Record<string, number>>({});
+  const [error, setError] = useState<string | null>(null);
+  const [elapsedTime, setElapsedTime] = useState<number>(0);
+  const [showSuccessAlert, setShowSuccessAlert] = useState<boolean>(false);
+  const [pendingResult, setPendingResult] = useState<AnalyzeResult | null>(null);
+  const [analysisStatus, setAnalysisStatus] = useState<string>("");
+  
+  // حالت‌های جدید برای مدیریت مودال
+  const [showAnalysisModal, setShowAnalysisModal] = useState<boolean>(false);
+  const [userInfo, setUserInfo] = useState<{ name: string; phoneNumber: string } | null>(null);
+  const [analysisStarted, setAnalysisStarted] = useState<boolean>(false);
+  const [shouldCheckExisting, setShouldCheckExisting] = useState<boolean>(false);
 
-  const pollRef = useRef<NodeJS.Timeout | null>(null);
+  // تابع برای تبدیل ApiAnalysisResult به AnalyzeResult
+  const convertApiResultToAnalyzeResult = (apiResult: ApiAnalysisResult): AnalyzeResult => {
+    return {
+      url: apiResult.url,
+      title: apiResult.result?.title || apiResult.result?.metaTitle || "بدون عنوان",
+      scores: {
+        performance: apiResult.performance / 100,
+        accessibility: apiResult.accessibility / 100,
+        bestPractices: apiResult.bestPractices / 100,
+        seo: apiResult.seo / 100,
+      },
+      issues: apiResult.privateData || apiResult.result?.issues || [],
+      metrics: apiResult.result?.metrics || {},
+    };
+  };
 
-  // شروع تحلیل
-  const startAnalysis = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
+  // تابع fetch با مدیریت خطا
+  const fetchWithTimeout = async (url: string, options: RequestInit = {}, timeout = 10000) => {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers,
+        }
+      });
+      clearTimeout(id);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`);
+      }
+      
+      return response;
+    } catch (error) {
+      clearTimeout(id);
+      throw error;
+    }
+  };
+
+  // تابع اصلی برای شروع آنالیز
+  const startAnalysis = async (userData: { name: string; phoneNumber: string }) => {
+    if (!url) return setError("لطفاً URL را وارد کنید");
+
+    // اعتبارسنجی URL
+    try {
+      new URL(url);
+    } catch {
+      return setError("لطفاً یک URL معتبر وارد کنید");
+    }
+
+    console.log('🔍 Debug - Starting analysis with:', {
+      url,
+      userData,
+      ANALYZE_URL
+    });
+
+    setUserInfo(userData);
+    setError(null);
+    setProgress(0);
+    setElapsedTime(0);
     setLoading(true);
-    setError('');
+    setResult(null);
+    setAnalysisStatus("🔄 در حال ارسال درخواست آنالیز...");
+    setAnalysisStarted(true);
 
     try {
-      const response = await fetch(`${ANALYZE_URL}/analyze`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url }),
-        credentials: 'include', // مهم برای CORS
+      // ارسال درخواست به سرویس آنالیز همراه با اطلاعات کاربر
+      setProgress(20);
+      
+      const requestBody = {
+        url,
+        userInfo: userData
+      };
+
+      console.log('📤 Debug - Request body:', JSON.stringify(requestBody, null, 2));
+
+      const response = await fetchWithTimeout(`${ANALYZE_URL}/analyze`, {
+        method: "POST",
+        body: JSON.stringify(requestBody),
       });
 
-      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+      console.log('📥 Debug - Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Debug - Server error response:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, details: ${errorText}`);
+      }
 
       const data = await response.json();
-
-      if (data.success) {
-        setAnalysis({
-          id: data.analysisId,
-          url,
-          status: 'pending',
-          performance: 0,
-          accessibility: 0,
-          bestPractices: 0,
-          seo: 0,
-        });
-      } else {
-        setError(data.error || 'Failed to start analysis');
+      console.log('✅ Debug - Success response:', data);
+      
+      if (!data.success) {
+        throw new Error(data.error || "خطا در شروع آنالیز");
       }
-    } catch (err) {
-      console.error('Analysis error:', err);
-      setError('Failed to start analysis. Make sure the service is running.');
-    } finally {
+
+      const analysisId = data.analysisId;
+      
+      setAnalysisStatus("✅ درخواست آنالیز ثبت شد. در حال پردازش...");
+      setProgress(40);
+
+      const startTime = Date.now();
+      const timeInterval = setInterval(() => {
+        setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+      }, 1000);
+
+      // شروع polling برای بررسی وضعیت
+      const checkInterval = 3000;
+      const maxRetries = 60;
+      let retries = 0;
+
+      const pollAnalysisStatus = async () => {
+        try {
+          retries++;
+          
+          const statusResponse = await fetchWithTimeout(
+            `${ANALYZE_URL}/analysis/${analysisId}?t=${Date.now()}`
+          );
+          
+          if (!statusResponse.ok) {
+            throw new Error(`Status check failed: ${statusResponse.status}`);
+          }
+          
+          const statusData: ApiAnalysisResult = await statusResponse.json();
+          console.log('🔄 Debug - Polling status:', statusData.status);
+
+          if (statusData.status === "running") {
+            setAnalysisStatus("📊 در حال آنالیز وبسایت...");
+            setProgress(60);
+          } else if (statusData.status === "completed") {
+            clearInterval(intervalId);
+            clearInterval(timeInterval);
+            
+            setAnalysisStatus("✅ آنالیز کامل شد!");
+            setProgress(100);
+            
+            const analyzeResult = convertApiResultToAnalyzeResult(statusData);
+            
+            // ذخیره نتیجه و نمایش SuccessAlert
+            setPendingResult(analyzeResult);
+            setLoading(false);
+            setAnalysisStatus("");
+            setAnalysisStarted(false);
+            setShowSuccessAlert(true);
+            
+            return;
+          } else if (statusData.status === "failed") {
+            clearInterval(intervalId);
+            clearInterval(timeInterval);
+            throw new Error("آنالیز با خطا مواجه شد");
+          }
+
+          if (retries >= maxRetries) {
+            clearInterval(intervalId);
+            clearInterval(timeInterval);
+            throw new Error("زمان آنالیز بیش از حد طول کشید");
+          }
+
+        } catch (error) {
+          console.error('Error polling analysis status:', error);
+        }
+      };
+
+      const intervalId = setInterval(pollAnalysisStatus, checkInterval);
+      pollAnalysisStatus();
+
+    } catch (err: any) {
+      console.error('❌ Analysis error:', err);
       setLoading(false);
+      setAnalysisStatus("");
+      setAnalysisStarted(false);
+      
+      if (err.name === 'AbortError') {
+        setError("اتصال به سرور آنالیز timeout خورد");
+      } else {
+        setError(err.message || "خطایی در ارتباط با سرور آنالیز رخ داد");
+      }
     }
-  }, [url]);
+  };
 
-  // چک وضعیت تحلیل
-  const checkAnalysisStatus = useCallback(async () => {
-    if (!analysis) return false;
+  // تابع جدید برای مدیریت کلیک روی دکمه شروع آنالیز
+  const handleAnalyzeClick = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!url) {
+      setError("لطفاً URL را وارد کنید");
+      return;
+    }
 
+    // اعتبارسنجی URL
     try {
-      const timestamp = Date.now();
-      const response = await fetch(`${ANALYZE_URL}/analysis/${analysis.id}?t=${timestamp}`, {
-        credentials: 'include',
-      });
-
-      if (!response.ok) throw new Error(`Status check failed: ${response.status}`);
-
-      const result: AnalysisResult = await response.json();
-
-      setAnalysis({
-        ...result,
-        performance: result.performance ?? 0,
-        accessibility: result.accessibility ?? 0,
-        bestPractices: result.bestPractices ?? 0,
-        seo: result.seo ?? 0,
-      });
-
-      return result.status === 'pending' || result.status === 'running';
-    } catch (err) {
-      console.error('Status check error:', err);
-      return false;
+      new URL(url);
+    } catch {
+      setError("لطفاً یک URL معتبر وارد کنید");
+      return;
     }
-  }, [analysis]);
 
-  // Polling امن با useRef
+    // فعال کردن بررسی آنالیزهای موجود
+    setShouldCheckExisting(true);
+  };
+
+  // تابع برای بستن مودال
+  const handleCloseModal = () => {
+    if (!loading) {
+      setShowAnalysisModal(false);
+    }
+  };
+
+  // تابع برای زمانی که آنالیز موجود پیدا شود
+  const handleExistingResultFound = (existingResult: AnalyzeResult) => {
+    console.log('✅ Showing existing analysis result');
+    setResult(existingResult);
+    setShouldCheckExisting(false);
+  };
+
+  // تابع برای زمانی که آنالیز موجود پیدا نشود
+  const handleNoExistingResult = () => {
+    console.log('📝 No existing analysis found, showing modal');
+    setShowAnalysisModal(true);
+    setShouldCheckExisting(false);
+  };
+
+  // تابع برای مدیریت خطاها
+  const handleCheckError = (error: string) => {
+    setError(error);
+    setShouldCheckExisting(false);
+  };
+
+  // بستن مودال وقتی آنالیز شروع می‌شود
   useEffect(() => {
-    if (!analysis) return;
+    if (analysisStarted && showAnalysisModal) {
+      setShowAnalysisModal(false);
+    }
+  }, [analysisStarted, showAnalysisModal]);
 
-    pollRef.current = setInterval(async () => {
-      const shouldContinue = await checkAnalysisStatus();
-      if (!shouldContinue && pollRef.current) {
-        clearInterval(pollRef.current);
-        pollRef.current = null;
-      }
-    }, 3000);
+  // Animated scores
+  useEffect(() => {
+    if (!result) return;
+    const intervalIds: NodeJS.Timeout[] = [];
 
-    return () => {
-      if (pollRef.current) {
-        clearInterval(pollRef.current);
-        pollRef.current = null;
-      }
-    };
-  }, [analysis, checkAnalysisStatus]);
+    Object.entries(result.scores).forEach(([key, score]) => {
+      if (score === undefined) return;
+      let current = 0;
+      const target = Math.round((score || 0) * 100);
+
+      const id = setInterval(() => {
+        current += 1;
+        setAnimatedScores((prev) => ({ ...prev, [key]: current }));
+        if (current >= target) clearInterval(id);
+      }, 20);
+      intervalIds.push(id);
+    });
+
+    return () => intervalIds.forEach((id) => clearInterval(id));
+  }, [result]);
 
   return (
-    <div className="max-w-4xl mx-auto p-6 text-black">
-      <h1 className="text-3xl font-bold mb-6">Website Analysis</h1>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30">
+      {/* SuccessAlert - نمایش پیام موفقیت */}
+      <SuccessAlert
+        isOpen={showSuccessAlert}
+        onClose={() => setShowSuccessAlert(false)}
+        onViewResults={() => {
+          setShowSuccessAlert(false);
+          if (pendingResult) {
+            setResult(pendingResult);
+            setPendingResult(null);
+          }
+        }}
+      />
 
-      <form onSubmit={startAnalysis} className="mb-8">
-        <div className="flex gap-4 mb-4">
-          <input
-            type="url"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://example.com"
-            className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
-          >
-            {loading ? 'Analyzing...' : 'Analyze'}
-          </button>
-        </div>
-        {error && <div className="p-3 bg-red-100 text-red-800 rounded">{error}</div>}
-      </form>
-
-      {analysis && (
-        <div className="border rounded-lg p-6 bg-white shadow">
-          <h2 className="text-xl font-semibold mb-4">Analysis Results</h2>
-
-          <div className="mb-4 grid grid-cols-2 gap-4">
-            <div>
-              <p><strong>URL:</strong> {analysis.url}</p>
-              <p><strong>ID:</strong> {analysis.id}</p>
-            </div>
-            <div>
-              <p><strong>Status:</strong>
-                <span className={`ml-2 px-2 py-1 rounded text-sm ${
-                  analysis.status === 'completed' ? 'bg-green-100 text-green-800' :
-                  analysis.status === 'failed' ? 'bg-red-100 text-red-800' :
-                  analysis.status === 'running' ? 'bg-blue-100 text-blue-800' :
-                  'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {analysis.status.toUpperCase()}
-                </span>
-              </p>
-              <p><strong>Last Check:</strong> {new Date().toLocaleTimeString()}</p>
-            </div>
-          </div>
-
-          {analysis.status === 'completed' && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-gray-50 p-4 rounded text-center">
-                <h3 className="font-semibold text-gray-700">Performance</h3>
-                <div className="text-2xl font-bold text-blue-600">{analysis.performance}/100</div>
-              </div>
-              <div className="bg-gray-50 p-4 rounded text-center">
-                <h3 className="font-semibold text-gray-700">Accessibility</h3>
-                <div className="text-2xl font-bold text-green-600">{analysis.accessibility}/100</div>
-              </div>
-              <div className="bg-gray-50 p-4 rounded text-center">
-                <h3 className="font-semibold text-gray-700">Best Practices</h3>
-                <div className="text-2xl font-bold text-purple-600">{analysis.bestPractices}/100</div>
-              </div>
-              <div className="bg-gray-50 p-4 rounded text-center">
-                <h3 className="font-semibold text-gray-700">SEO</h3>
-                <div className="text-2xl font-bold text-orange-600">{analysis.seo}/100</div>
-              </div>
-            </div>
-          )}
-
-          {(analysis.status === 'pending' || analysis.status === 'running') && (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-lg">Analysis in progress...</p>
-              <p className="text-gray-600">Auto-refreshing every 3 seconds</p>
-            </div>
-          )}
-
-          {analysis.status === 'failed' && (
-            <div className="text-center py-8">
-              <div className="text-red-500 text-4xl mb-4">❌</div>
-              <p className="text-red-600 font-semibold text-lg">Analysis Failed</p>
-              <p className="text-gray-600">Please try again with a different URL</p>
-            </div>
-          )}
-        </div>
+      {/* کامپوننت بررسی آنالیزهای موجود */}
+      {shouldCheckExisting && (
+        <ExistingAnalysisChecker
+          url={url}
+          onExistingResultFound={handleExistingResultFound}
+          onNoExistingResult={handleNoExistingResult}
+          onError={handleCheckError}
+        />
       )}
+
+      {/* مودال دریافت اطلاعات کاربر */}
+      <AnalysisModal
+        isOpen={showAnalysisModal && !analysisStarted}
+        onClose={handleCloseModal}
+        onStartAnalysis={startAnalysis}
+        loading={loading}
+      />
+
+      <div className="w-full">
+        <HeroSection 
+          url={url} 
+          setUrl={setUrl} 
+          loading={loading} 
+          handleAnalyze={handleAnalyzeClick} 
+        />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <ErrorDisplay error={error} />
+          
+          {loading && (
+            <div className="space-y-6 animate-fade-in">
+              <AnimatedLoading progress={progress} elapsedTime={elapsedTime} />
+              {analysisStatus && (
+                <div className="text-center text-lg text-gray-700">
+                  {analysisStatus}
+                </div>
+              )}
+            </div>
+          )}
+
+          {result && (
+            <div className="space-y-8 animate-fade-in">
+              <div className="flex flex-wrap -mx-4">
+                <div className="w-full lg:w-9/12 px-4 mt-4 lg:mt-0">
+                  <WebsiteOverview result={result} />
+                </div>
+                <div className="w-full lg:w-3/12 px-4">
+                  <ScoreGuide />
+                </div>
+              </div>
+
+              <AnalysisScores result={result} animatedScores={animatedScores} />
+              <ProductRecommendations scores={result.scores} />
+              <CoreMetrics result={result} />
+              <IssuesList result={result} />
+            </div>
+          )}
+
+          {!result && !loading && !shouldCheckExisting && (
+            <HowItWorks />
+          )}
+        </div>
+      </div>
+
+      <GlobalStyles />
     </div>
   );
 }
