@@ -140,26 +140,27 @@ export default function Home() {
                 </Link>
               </div>
               {/* Side Image - Desktop Version */}
-              <div className="relative w-full hidden md:flex lg:w-[38%] aspect-auto rounded-lg">
-                <Link href="/analyze">
-                  <Image
-                    src="/homepage/sideslide.webp"
-                    alt="خدمات تخصصی سئو و طراحی سایت وبوفن"
-                    fill
-                    className="object-contain"
-                    priority
-                  />
-                  <div
-                    className="absolute p-6 rounded-r-3xl cursor-pointer rounded-tl-3xl"
-                    style={{
-                      left: "0",
-                      bottom: "0",
-                      width: "18.5%",
-                      backgroundColor: "#1d546b",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                    }}
-                  >
-                    <svg
+<div className="relative w-full hidden md:flex lg:w-[38%] aspect-auto rounded-2xl overflow-hidden">
+  <Link href="/analyze">
+    <video
+      src="/homepage/ajir.mp4"
+      autoPlay
+      muted
+      loop
+      playsInline
+      className="object-cover w-full h-full"
+    />
+
+    {/* 🟧 Text Overlay */}
+    <div className="absolute inset-0 flex flex-col top-18 text-white text-center px-4">
+      <p className="text-3xl font-semibold drop-shadow-md">آنالیز کن، <span className="font-medium">سایتت رو از مرگ</span></p>
+      <p className="text-6xl font-semibold mt-8 drop-shadow-md">نجات بـــــــــــده </p>
+    </div>
+
+    {/* 🟦 Icon container (unchanged) */}
+    <div className="absolute left-0 w-[20%] bottom-0 pt-3 px-3 rounded-tr-3xl cursor-pointer bg-[#f7f8fc]">
+      <div className="bg-[#1d546b] w-20 p-4 rounded-t-2xl rounded-br-2xl">
+<svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 71.21 71.21"
                       className="w-[40px] m-auto pulse-icon"
@@ -179,25 +180,12 @@ export default function Home() {
                     c0-5.73,4.66-10.39,10.39-10.39c.82,0,1.48.66,1.48,1.48Z"
                       />
                     </svg>
-                  </div>
-                </Link>
-                <style jsx>{`
-                  @keyframes pulse {
-                    0% {
-                      transform: scale(1);
-                    }
-                    50% {
-                      transform: scale(1.1);
-                    }
-                    100% {
-                      transform: scale(1);
-                    }
-                  }
-                  .pulse-icon {
-                    animation: pulse 2s infinite;
-                  }
-                `}</style>
-              </div>
+      </div>
+    </div>
+  </Link>
+</div>
+
+
               {/* Side Image - Mobile Version */}
               <div className="relative flex w-[90%] mx-auto aspect-[3/1] mt-2 rounded-lg md:hidden">
                 <Link href="/analyze">
@@ -1306,58 +1294,57 @@ export default function Home() {
             <Reservetime />
           </div>
         </section>
-                <section className="bg-[#f7f8fc] w-full pt-4">
+        <section className="bg-[#f7f8fc] w-full pt-4">
+          <div className="max-w-[1250px] m-auto mt-5">
+            <div className="text-center mb-10">
+              <p className="text-[#29b0cb] text-2xl">
+                <span className="text-[#253e5f]">نمونه کار </span>درمان سایت
+              </p>
 
-        <div className="max-w-[1250px] m-auto mt-5">
-          <div className="text-center mb-10">
-            <p className="text-[#29b0cb] text-2xl">
-              <span className="text-[#253e5f]">نمونه کار </span>درمان سایت
-            </p>
+              {/* Buttons wrapper */}
+              <div className="flex justify-center items-center mt-6">
+                <div className="md:flex w-2/4 justify-center border rounded-2xl md:rounded-full p-2">
+                  <div className="relative flex gap-4 rounded-full h-10 md:w-full md:mt-0 mt-2 overflow-hidden">
+                    {/* Active highlight */}
+                    <div
+                      className="absolute top-0 left-0 h-full bg-[#1d546b] rounded-full transition-all duration-300"
+                      style={{
+                        width: "50%",
+                        transform:
+                          activeDiv === "second"
+                            ? "translateX(0%)"
+                            : "translateX(100%)",
+                      }}
+                    ></div>
 
-            {/* Buttons wrapper */}
-            <div className="flex justify-center items-center mt-6">
-              <div className="md:flex w-2/4 justify-center border rounded-2xl md:rounded-full p-2">
-                <div className="relative flex gap-4 rounded-full h-10 md:w-full md:mt-0 mt-2 overflow-hidden">
-                  {/* Active highlight */}
-                  <div
-                    className="absolute top-0 left-0 h-full bg-[#1d546b] rounded-full transition-all duration-300"
-                    style={{
-                      width: "50%",
-                      transform:
+                    {/* Buttons */}
+                    <button
+                      onClick={() => handleClick("first")}
+                      className={`flex-1 z-10 text-sm md:text-md py-1 rounded-full h-10 transition-all duration-200 ${
+                        activeDiv === "first"
+                          ? "text-white"
+                          : "text-[#1d546b] hover:text-[#1d546b]"
+                      }`}
+                    >
+                      طراحی سایت
+                    </button>
+
+                    <button
+                      onClick={() => handleClick("second")}
+                      className={`flex-1 z-10 text-sm md:text-md py-1 rounded-full h-10 transition-all duration-200 ${
                         activeDiv === "second"
-                          ? "translateX(0%)"
-                          : "translateX(100%)",
-                    }}
-                  ></div>
-
-                  {/* Buttons */}
-                  <button
-                    onClick={() => handleClick("first")}
-                    className={`flex-1 z-10 text-sm md:text-md py-1 rounded-full h-10 transition-all duration-200 ${
-                      activeDiv === "first"
-                        ? "text-white"
-                        : "text-[#1d546b] hover:text-[#1d546b]"
-                    }`}
-                  >
-                    طراحی سایت
-                  </button>
-
-                  <button
-                    onClick={() => handleClick("second")}
-                    className={`flex-1 z-10 text-sm md:text-md py-1 rounded-full h-10 transition-all duration-200 ${
-                      activeDiv === "second"
-                        ? "text-white"
-                        : "text-[#1d546b] hover:text-[#1d546b]"
-                    }`}
-                  >
-                    سئو سایت
-                  </button>
+                          ? "text-white"
+                          : "text-[#1d546b] hover:text-[#1d546b]"
+                      }`}
+                    >
+                      سئو سایت
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
+            <HomepageResume />
           </div>
-          <HomepageResume />
-        </div>
         </section>
       </main>
     </>
