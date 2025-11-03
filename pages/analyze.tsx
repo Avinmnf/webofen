@@ -38,7 +38,7 @@ interface ApiAnalysisResult {
 }
 
 // base URL برای سرویس آنالیز
-const ANALYZE_URL = process.env.ANALYZE_URL || 'http://localhost:4000';
+const ANALYZE_URL = process.env.NEXT_PUBLIC_ANALYZE_URL|| 'http://localhost:4000';
 
 export default function AnalyzePage() {
   const [url, setUrl] = useState<string>("");
