@@ -4,7 +4,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { useForms, FormPayload } from "@/hooks/useform";
 
-export default function UserNumberForm() {
+export default function WebDesignForm() {
   const { submitForm, loading } = useForms();
 
   const [name, setName] = useState("");
