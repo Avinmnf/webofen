@@ -417,7 +417,6 @@ export default function PostsPage({
                     مقالات
                   </Link>
                 </li>
-
               </ol>
             </nav>
 
@@ -640,59 +639,49 @@ export default function PostsPage({
                   {/* ✅ Right Sidebar */}
                   <div className="md:w-[35%] md:mr-4 md:p-0 p-4">
                     <div className="flex flex-col items-center justify-between h-full pb-3">
-                      <div className="flex bg-[#fbb2bd] py-2 px-5 mb-5 w-full rounded-2xl border-3 border-white">
-                        <div className="w-1/2 flex justify-center items-center">
-                          <div>
-                            <p className="text-lg text-gray-600">آموزش</p>
-                            <p className="text-xl text-gray-700 font-semibold">
-                              کسب درآمد آنلاین
-                            </p>
-                          </div>
-                        </div>
-                        <div className="w-1/2 flex justify-end">
-                          <Image
-                            width={150}
-                            height={100}
-                            src="/blog/blog-digital-marketing-icon.jpg"
-                            alt="آموزش دیجیتال مارکتینگ و کسب درآمد آنلاین"
-                          />
+                      <div className="relative bg-[#fbb2bd] mb-5 w-full aspect-[16/8] rounded-2xl border-3 border-white overflow-hidden">
+                        <Image
+                          src="/blog/programming-learn (1).png"
+                          alt="متخصصان سئو وبوفن - دکتر مجتبی خداخواه"
+                          fill
+                          className="object-cover"
+                          priority
+                        />
+                        <div className="absolute text-white top-18 right-5">
+                          <p className="text-lg">آموزش</p>
+                          <p className="text-2xl font-semibold">
+                            کسب درآمد آنلاین
+                          </p>
                         </div>
                       </div>
-
-                      <div className="flex bg-[#a0e1fd] py-2 px-5 mb-5 w-full rounded-2xl border-3 border-white">
-                        <div className="w-1/2 flex justify-center items-center">
-                          <div>
-                            <p className="text-lg text-gray-600">آموزش</p>
-                            <p className="text-xl text-gray-700 font-semibold">
-                              سئو و بهینه‌سازی
-                            </p>
-                          </div>
-                        </div>
-                        <div className="w-1/2 flex justify-end">
-                          <Image
-                            width={150}
-                            height={100}
-                            src="/blog/blog-seo-icon.jpg"
-                            alt="آموزش سئو و بهینه‌سازی سایت"
-                          />
+                      <div className="relative bg-[#fbb2bd] mb-5 w-full aspect-[16/8] rounded-2xl border-3 border-white overflow-hidden">
+                        <Image
+                          src="/blog/ui-ux.png"
+                          alt="متخصصان سئو وبوفن - دکتر مجتبی خداخواه"
+                          fill
+                          className="object-cover"
+                          priority
+                        />
+                        <div className="absolute text-white top-18 right-5">
+                          <p className="text-lg">آموزش</p>
+                          <p className="text-2xl font-semibold">
+                            کسب درآمد آنلاین
+                          </p>
                         </div>
                       </div>
-                      <div className="flex bg-[#ffdab0] py-2 px-5 mb-5 w-full rounded-2xl border-3 border-white">
-                        <div className="w-1/2 flex justify-center items-center">
-                          <div>
-                            <p className="text-lg text-gray-600">آموزش</p>
-                            <p className="text-xl text-gray-700 font-semibold">
-                              تولید محتوا
-                            </p>
-                          </div>
-                        </div>
-                        <div className="w-1/2 flex justify-end">
-                          <Image
-                            width={150}
-                            height={100}
-                            src="/blog/blog-content-icon.jpg"
-                            alt="آموزش تولید محتوا حرفه‌ای"
-                          />
+                      <div className="relative bg-[#fbb2bd] mb-5 w-full aspect-[16/8] rounded-2xl border-3 border-white overflow-hidden">
+                        <Image
+                          src="/blog/seo.png"
+                          alt="متخصصان سئو وبوفن - دکتر مجتبی خداخواه"
+                          fill
+                          className="object-cover"
+                          priority
+                        />
+                        <div className="absolute text-white top-18 right-5">
+                          <p className="text-lg">آموزش</p>
+                          <p className="text-2xl font-semibold">
+                            کسب درآمد آنلاین
+                          </p>
                         </div>
                       </div>
                     </div>

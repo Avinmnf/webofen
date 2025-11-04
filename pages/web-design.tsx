@@ -42,7 +42,7 @@ export default function WebDesign() {
   return (
     <main>
       <section className="bg-[#f7f8fc] pb-4 w-full rounded-2xl">
-        <div className="max-w-[1250px] m-auto flex flex-col lg:flex-row justify-center px-4 sm:px-6 md:px-8">
+        <div className="max-w-[1250px] m-auto flex flex-col lg:flex-row justify-center md:p-0 px-4">
           <div className="relative w-full lg:w-1/2 xl:w-[60%] rounded-lg overflow-hidden">
             <div className="mt-8 sm:mt-12 md:mt-20 lg:mt-40">
               <h1 className="text-[#0364af] text-2xl sm:text-3xl md:text-4xl font-semibold">
@@ -93,7 +93,7 @@ export default function WebDesign() {
           <div className="w-full lg:w-7/12 mt-6 lg:mt-0">
             {/* Title + Icon */}
             <div className="flex items-start">
-              <div className="mr-4">
+              <div className="md:mr-4">
                 <h1 className="text-[#0364af] text-base sm:text-lg md:text-lg">
                   طراحی سایت
                 </h1>

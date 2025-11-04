@@ -139,25 +139,40 @@ export default function Home() {
                   </button>
                 </Link>
               </div>
-              {/* Side Image - Desktop Version */}
-<div className="relative w-full hidden md:flex lg:w-[38%] aspect-auto rounded-2xl overflow-hidden">
-  <Link href="/analyze">
+<div className="relative hidden md:flex md:w-[38%] aspect-[4/3] rounded-2xl overflow-hidden">
+  {/* ✅ Cover + Video Layer */}
+  <div className="relative w-full h-full overflow-hidden">
+    {/* Cover image (shows until video loads) */}
+    <Image
+      src="/homepage/IMG_1147.jpeg"
+      alt="Video cover"
+      fill
+      className="object-cover"
+      priority
+    />
+
+    {/* Video */}
     <video
       src="/homepage/ajir.mp4"
       autoPlay
       muted
       loop
       playsInline
-      className="object-cover w-full h-full"
+      className="absolute top-0 left-0 w-full h-full object-cover scale-105"
     />
+  </div>
 
-    {/* 🟧 Text Overlay */}
-    <div className="absolute inset-0 flex flex-col top-18 text-white text-center px-4">
-      <p className="text-3xl font-semibold drop-shadow-md">آنالیز کن، <span className="font-medium">سایتت رو از مرگ</span></p>
-      <p className="text-6xl font-semibold mt-8 drop-shadow-md">نجات بـــــــــــده </p>
-    </div>
+  {/* ✅ Overlay content */}
+  <Link
+    href="/analyze"
+    className="absolute inset-0 top-18 items-center text-white text-center px-4"
+  >
+    <p className="text-3xl font-semibold drop-shadow-md">
+      آنالیز کن، <span className="font-medium">سایتت رو از مرگ</span>
+    </p>
+    <p className="text-6xl font-semibold mt-8 drop-shadow-md">نجات بـــــــــــده</p>
 
-    {/* 🟦 Icon container (unchanged) */}
+    {/* Icon bottom-left */}
     <div className="absolute left-0 w-[20%] bottom-0 pt-3 px-3 rounded-tr-3xl cursor-pointer bg-[#f7f8fc]">
       <div className="bg-[#1d546b] w-20 p-4 rounded-t-2xl rounded-br-2xl">
 <svg
@@ -233,9 +248,9 @@ export default function Home() {
 
           <div className="w-full p-4 mt-4 text-black font-bold">
             <div className="max-w-[1250px] m-auto flex justify-center">
-              <div className="w-full flex flex-col gap-4 lg:flex-row lg:items-center justify-between rounded-2xl bg-white p-4">
+              <div className="w-full rounded-2xl bg-white p-4">
                 {/* Input Fields */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+                <div className="">
                   <FreeConsultationForm />
                 </div>
               </div>

@@ -5,7 +5,6 @@ import Image from "next/image";
 
 // Import Swiper styles
 
-
 export default function HomepageResume() {
   return (
     <div className="w-full mx-auto">
@@ -27,7 +26,7 @@ export default function HomepageResume() {
           "/web-design/home-resume1Asset 14.png",
           "/web-design/home-resume1Asset 15.png",
           "/web-design/home-resume1Asset 16.png",
-                    "/web-design/home-resume1Asset 14.png",
+          "/web-design/home-resume1Asset 14.png",
           "/web-design/home-resume1Asset 15.png",
           "/web-design/home-resume1Asset 16.png",
         ].map((src, i) => (
