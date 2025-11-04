@@ -201,48 +201,43 @@ export default function Home() {
 </div>
 
 
-              {/* Side Image - Mobile Version */}
-              <div className="relative flex w-[90%] mx-auto aspect-[3/1] mt-2 rounded-lg md:hidden">
-                <Link href="/analyze">
-                  <Image
-                    src="/homepage/sideslidemobile.png"
-                    alt="خدمات سئو وبوفن - نسخه موبایل"
-                    fill
-                    className="object-contain"
-                    priority
-                  />
+{/* Side Image - Mobile Version */}
+<div className="relative w-[90%] mx-auto aspect-[3/1] mt-3 rounded-xl md:hidden overflow-hidden">
+  <Link href="/analyze" className="relative block w-full h-full group">
+    {/* Cover image fallback */}
+    <Image
+      src="/homepage/sideslidemobile.png"
+      alt="خدمات سئو وبوفن - نسخه موبایل"
+      fill
+      className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
+      priority
+    />
 
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 71.21 71.21"
-                    className="absolute md:rounded-r-3xl md:rounded-tl-3xl rounded-r-xl rounded-tl-xl"
-                    style={{
-                      left: "0%",
-                      bottom: "2%",
-                      width: "11%",
-                      height: "auto",
-                      backgroundColor: "#1d546b",
-                      padding: "1.9%",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                    }}
-                  >
-                    <path
-                      fill="#fff"
-                      d="M62.31,56.48v-17.91c0-14.73-11.98-26.7-26.7-26.7s-26.7,11.98-26.7,26.7v17.91C3.88,57.21,0,61.54,0,66.76
-    c0,2.45,2,4.45,4.45,4.45h62.31c2.45,0,4.45-2,4.45-4.45c0-5.22-3.88-9.56-8.9-10.28ZM11.87,38.57
-    c0-13.09,10.65-23.74,23.74-23.74s23.74,10.65,23.74,23.74v17.8H11.87v-17.8ZM66.76,68.25H4.45c-.82,0-1.48-.67-1.48-1.48
-    c0-4.09,3.33-7.42,7.42-7.42h50.44c4.09,0,7.42,3.33,7.42,7.42C68.24,67.58,67.57,68.25,66.76,68.25ZM50.6,6.75l2.97-5.93
-    c.37-.73,1.26-1.03,1.99-.66c.73.37,1.03,1.26.66,1.99l-2.97,5.93c-.26.52-.79.82-1.33.82c-.22,0-.45-.05-.66-.16
-    c-.73-.37-1.03-1.26-.66-1.99h0ZM62.75,17.37c-.58-.58-.58-1.52,0-2.1l5.93-5.93c.58-.58,1.52-.58,2.1,0s.58,1.52,0,2.1
-    l-5.93,5.93c-.29.29-.67.43-1.05.43s-.76-.15-1.05-.43h0ZM14.99,2.15c-.36-.73-.07-1.62.66-1.99s1.62-.07,1.99.66l2.97,5.93
-    c.36.73.07,1.62-.66,1.99c-.21.11-.44.16-.66.16c-.54,0-1.07-.3-1.33-.82l-2.97-5.93h0ZM.43,11.44c-.58-.58-.58-1.52,0-2.1
-    s1.52-.58,2.1,0l5.93,5.93c.58.58.58,1.52,0,2.1c-.29.29-.67.43-1.05.43s-.76-.15-1.05-.43L.43,11.44ZM35.61,28.19
-    c0,.82-.66,1.48-1.48,1.48c-4.09,0-7.42,3.33-7.42,7.42c0,.82-.66,1.48-1.48,1.48s-1.48-.66-1.48-1.48
-    c0-5.73,4.66-10.39,10.39-10.39c.82,0,1.48.66,1.48,1.48Z"
-                    />
-                  </svg>
-                </Link>
-              </div>
+    {/* Video background */}
+    <video
+      src="/homepage/ajirmobile.mp4"
+      autoPlay
+      muted
+      loop
+      playsInline
+      poster="/homepage/sideslidemobile.png"
+      className="absolute inset-0 w-full h-full object-cover scale-105"
+    />
+
+
+    {/* ✅ Text overlay — aligned to the right */}
+    <div className="absolute right-7 top-1/2 -translate-y-1/2 text-right text-white space-y-1">
+      <p className="text-xs sm:text-sm font-semibold drop-shadow-md">
+        آنالیز کن، <span className="font-medium">سایتت رو از مرگ</span>
+      </p>
+      <p className="text-2xl font-bold drop-shadow-md leading-tight">
+        نجات بـــــــــــده
+      </p>
+    </div>
+  </Link>
+</div>
+
+
             </div>
           </div>
 

@@ -3,8 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import Resume from "@/components/resume/resume";
+import { motion, AnimatePresence } from "framer-motion";
+
 export default function WebDesign() {
   const [selected, setSelected] = useState<string[]>([]);
+  const [activeOption, setActiveOption] = useState<string | null>(null);
+  const [selectedModules, setSelectedModules] = useState<string[]>([]);
+  const [step, setStep] = useState<1 | 2>(1);
 
   const options = [
     { title: "طراحی سایت فروشگاهی", desc: "امکان فروش محصولات" },
@@ -20,6 +25,31 @@ export default function WebDesign() {
     { title: "طراحی سایت صرافی", desc: "معامله و تبادلات ارزدیجیتال" },
     { title: "طراحی سایت کتابخوان", desc: "ارائه ایبوک و کتابخوان آنلاین" },
   ];
+
+  const modules = [
+    { title: "ماژول تنظیمات", desc: "امکان فروش محصولات", price: 300000 },
+    { title: "ماژول سئو", desc: "پلتفرم خبرگذاری و اشتراک خبر", price: 150000 },
+    { title: "ماژول شبکه اجتماعی", desc: "امکان فروش محصولات", price: 200000 },
+    { title: "ماژول درگاه پرداخت", desc: "امکان فروش محصولات", price: 350000 },
+    { title: "ماژول وبلاگ", desc: "امکان فروش محصولات", price: 350000 },
+    { title: "ماژول پشتیبانی", desc: "امکان فروش محصولات", price: 350000 },
+    { title: "ماژول فرم ساز", desc: "امکان فروش محصولات", price: 350000 },
+    { title: "ماژول نظر و کامنت", desc: "امکان فروش محصولات", price: 350000 },
+    { title: "ماژول ارسال پیامک", desc: "امکان فروش محصولات", price: 350000 },
+    { title: "ماژول آنالیز", desc: "امکان فروش محصولات", price: 350000 },
+  ];
+  const toggleModule = (title: string) => {
+    setSelectedModules((prev) =>
+      prev.includes(title)
+        ? prev.filter((item) => item !== title)
+        : [...prev, title]
+    );
+  };
+
+  const totalPrice = selectedModules.reduce((sum, title) => {
+    const mod = modules.find((m) => m.title === title);
+    return sum + (mod ? mod.price : 0);
+  }, 0);
 
   const packageoptions = [
     { title: "توجه ویژه به (UI و UX)", desc: "طراحی توسط تیم تخصصی" },
@@ -210,48 +240,166 @@ export default function WebDesign() {
                 </p>
               </div>
 
-              <form className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {options.map((item, index) => (
-                  <div
-                    key={index}
-                    onClick={() => toggleSelect(item.title)}
-                    className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg cursor-pointer transition`}
+              <AnimatePresence mode="wait">
+                {step === 1 && (
+                  <motion.div
+                    key="step1"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.4 }}
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-2"
                   >
-                    <div
-                      className={`w-6 h-6 sm:w-7 sm:h-7 rounded-md flex items-center justify-center border transition 
-                  ${
-                    selected.includes(item.title)
-                      ? "bg-[#0364af] border-[#0364af]"
-                      : "border-[#0364af] bg-white"
-                  }`}
-                    >
-                      {selected.includes(item.title) && (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={3}
+                    {options.map((item, index) => {
+                      const isActive = activeOption === item.title;
+                      return (
+                        <motion.div
+                          key={index}
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.97 }}
+                          onClick={() => {
+                            setActiveOption(item.title);
+                            setStep(2); // go to next step
+                          }}
+                          className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer  transition-all duration-300
+            ${
+              isActive
+                ? "border-[#0364af] bg-[#0364af]/5"
+                : "border-[#0364af]/40 hover:border-[#0364af]"
+            }`}
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      )}
+                          <div
+                            className={`w-6 h-6 sm:w-7 sm:h-7 rounded-md flex items-center justify-center border transition-all duration-300
+              ${
+                isActive
+                  ? "bg-[#0364af] border-[#0364af]"
+                  : "border-[#0364af] bg-white"
+              }`}
+                          >
+                            {isActive && (
+                              <motion.svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="w-3 h-3 text-white"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={3}
+                                initial={{ scale: 0, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ duration: 0.2 }}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M5 13l4 4L19 7"
+                                />
+                              </motion.svg>
+                            )}
+                          </div>
+
+                          <div className="leading-tight">
+                            <p className="text-sm text-[#0364af] font-medium">
+                              {item.title}
+                            </p>
+                            <p className="text-xs text-gray-500">{item.desc}</p>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </motion.div>
+                )}
+
+                {step === 2 && (
+                  <motion.div
+                    key="step2"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -30 }}
+                    transition={{ duration: 0.4 }}
+                    className="flex flex-col gap-4"
+                  >
+                    <p className="text-[#0364af] text-sm sm:text-base font-semibold text-center sm:text-start">
+                      ماژول‌های مورد نیاز برای {activeOption}
+                    </p>
+
+                    {/* Modules */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {modules.map((mod, index) => (
+                        <div
+                          key={index}
+                          onClick={() => toggleModule(mod.title)}
+                          className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg cursor-pointer  transition-all duration-300 ${
+                            selectedModules.includes(mod.title)
+                              ? "border-[#0364af] bg-[#0364af]/10"
+                              : "border-[#0364af]/30 hover:border-[#0364af]/50"
+                          }`}
+                        >
+                          <div
+                            className={`w-6 h-6 sm:w-7 sm:h-7 rounded-md flex items-center justify-center border transition ${
+                              selectedModules.includes(mod.title)
+                                ? "bg-[#0364af] border-[#0364af]"
+                                : "border-[#0364af] bg-white"
+                            }`}
+                          >
+                            {selectedModules.includes(mod.title) && (
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={3}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M5 13l4 4L19 7"
+                                />
+                              </svg>
+                            )}
+                          </div>
+
+                          <div className="leading-tight">
+                            <p className="text-sm sm:text-sm text-[#0364af] font-medium">
+                              {mod.title}
+                            </p>
+                            <p className="text-xs sm:text-sm text-[#0364af] font-medium">
+                              {mod.desc}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {mod.price.toLocaleString("fa-IR")} تومان
+                            </p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
 
-                    <div className="leading-tight">
-                      <p className="text-xs sm:text-sm text-[#0364af] font-medium">
-                        {item.title}
+                    {/* Total Price */}
+                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-200">
+                      <p className="text-gray-600 text-sm">جمع کل:</p>
+                      <p className="text-[#0364af] font-semibold text-base">
+                        {totalPrice.toLocaleString("fa-IR")} تومان
                       </p>
-                      <p className="text-xs text-gray-500">{item.desc}</p>
                     </div>
-                  </div>
-                ))}
-              </form>
+
+                    {/* Buttons */}
+                    <div className="flex justify-between gap-3 mt-4">
+                      <button
+                        onClick={() => {
+                          setStep(1);
+                          setSelectedModules([]);
+                        }}
+                        className="bg-gray-200 text-gray-800 rounded-md px-4 py-2 text-sm"
+                      >
+                        بازگشت
+                      </button>
+                      <button className="bg-[#0364af] text-white rounded-md px-4 py-2 text-sm">
+                        ثبت نهایی
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>
@@ -280,7 +428,7 @@ export default function WebDesign() {
               className="object-contain"
               priority
             />
-          </div>        
+          </div>
         </div>
       </section>
     </main>
