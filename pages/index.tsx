@@ -215,7 +215,7 @@ export default function Home() {
 
     {/* Video background */}
     <video
-      src="/homepage/ajirmobile.mp4"
+      src="/homepage/Sequence 02_1 (1).mp4"
       autoPlay
       muted
       loop
