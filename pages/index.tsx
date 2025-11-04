@@ -139,50 +139,46 @@ export default function Home() {
                   </button>
                 </Link>
               </div>
-<div className="relative hidden md:flex md:w-[38%] aspect-[4/3] rounded-2xl overflow-hidden">
-  {/* ✅ Cover + Video Layer */}
-  <div className="relative w-full h-full overflow-hidden">
-    {/* Cover image (shows until video loads) */}
-    <Image
-      src="/homepage/IMG_1147.jpeg"
-      alt="Video cover"
-      fill
-      className="object-cover"
-      priority
-    />
+              <div className="relative hidden md:flex md:w-[38%] aspect-[4/3] rounded-2xl overflow-hidden">
+                {/* ✅ Cover + Video Layer */}
+                <div className="relative w-full h-full overflow-hidden">
+                  {/* Cover image (shows until video loads) */}
 
-    {/* Video */}
-    <video
-      src="/homepage/ajir.mp4"
-      autoPlay
-      muted
-      loop
-      playsInline
-      className="absolute top-0 left-0 w-full h-full object-cover scale-105"
-    />
-  </div>
+                  <video
+                    src="/homepage/ajir.mp4"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    poster="/homepage/IMG_1147.jpeg"
+                    className="absolute top-0 left-0 w-full h-full object-cover scale-105"
+                  />
+                </div>
 
-  {/* ✅ Overlay content */}
-  <Link
-    href="/analyze"
-    className="absolute inset-0 top-18 items-center text-white text-center px-4"
-  >
-    <p className="text-3xl font-semibold drop-shadow-md">
-      آنالیز کن، <span className="font-medium">سایتت رو از مرگ</span>
-    </p>
-    <p className="text-6xl font-semibold mt-8 drop-shadow-md">نجات بـــــــــــده</p>
+                {/* ✅ Overlay content */}
+                <Link
+                  href="/analyze"
+                  className="absolute inset-0 top-18 items-center text-white text-center px-4"
+                >
+                  <p className="text-3xl font-semibold drop-shadow-md">
+                    آنالیز کن،{" "}
+                    <span className="font-medium">سایتت رو از مرگ</span>
+                  </p>
+                  <p className="text-6xl font-semibold mt-8 drop-shadow-md">
+                    نجات بـــــــــــده
+                  </p>
 
-    {/* Icon bottom-left */}
-    <div className="absolute left-0 w-[20%] bottom-0 pt-3 px-3 rounded-tr-3xl cursor-pointer bg-[#f7f8fc]">
-      <div className="bg-[#1d546b] w-20 p-4 rounded-t-2xl rounded-br-2xl">
-<svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 71.21 71.21"
-                      className="w-[40px] m-auto pulse-icon"
-                    >
-                      <path
-                        fill="#fff"
-                        d="M62.31,56.48v-17.91c0-14.73-11.98-26.7-26.7-26.7s-26.7,11.98-26.7,26.7v17.91C3.88,57.21,0,61.54,0,66.76
+                  {/* Icon bottom-left */}
+                  <div className="absolute left-0 w-[20%] bottom-0 pt-3 px-3 rounded-tr-3xl cursor-pointer bg-[#f7f8fc]">
+                    <div className="bg-[#1d546b] w-20 p-4 rounded-t-2xl rounded-br-2xl">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 71.21 71.21"
+                        className="w-[40px] m-auto pulse-icon"
+                      >
+                        <path
+                          fill="#fff"
+                          d="M62.31,56.48v-17.91c0-14.73-11.98-26.7-26.7-26.7s-26.7,11.98-26.7,26.7v17.91C3.88,57.21,0,61.54,0,66.76
                     c0,2.45,2,4.45,4.45,4.45h62.31c2.45,0,4.45-2,4.45-4.45c0-5.22-3.88-9.56-8.9-10.28ZM11.87,38.57
                     c0-13.09,10.65-23.74,23.74-23.74s23.74,10.65,23.74,23.74v17.8H11.87v-17.8ZM66.76,68.25H4.45c-.82,0-1.48-.67-1.48-1.48
                     c0-4.09,3.33-7.42,7.42-7.42h50.44c4.09,0,7.42,3.33,7.42,7.42C68.24,67.58,67.57,68.25,66.76,68.25ZM50.6,6.75l2.97-5.93
@@ -193,51 +189,44 @@ export default function Home() {
                     s1.52-.58,2.1,0l5.93,5.93c.58.58.58,1.52,0,2.1c-.29.29-.67.43-1.05.43s-.76-.15-1.05-.43L.43,11.44ZM35.61,28.19
                     c0,.82-.66,1.48-1.48,1.48c-4.09,0-7.42,3.33-7.42,7.42c0,.82-.66,1.48-1.48,1.48s-1.48-.66-1.48-1.48
                     c0-5.73,4.66-10.39,10.39-10.39c.82,0,1.48.66,1.48,1.48Z"
-                      />
-                    </svg>
-      </div>
-    </div>
-  </Link>
-</div>
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </Link>
+              </div>
 
+              {/* Side Image - Mobile Version */}
+              <div className="relative w-[90%] mx-auto aspect-[3/1] mt-3 rounded-xl md:hidden overflow-hidden">
+                <Link
+                  href="/analyze"
+                  className="relative block w-full h-full group"
+                >
+                  {/* Cover image fallback */}
 
-{/* Side Image - Mobile Version */}
-<div className="relative w-[90%] mx-auto aspect-[3/1] mt-3 rounded-xl md:hidden overflow-hidden">
-  <Link href="/analyze" className="relative block w-full h-full group">
-    {/* Cover image fallback */}
-    <Image
-      src="/homepage/sideslidemobile.png"
-      alt="خدمات سئو وبوفن - نسخه موبایل"
-      fill
-      className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
-      priority
-    />
+                  {/* Video background */}
+                  <video
+                    src="/homepage/Sequence 02_1 (1).mp4"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    poster="/homepage/IMG_1148 (1).jpeg"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
 
-    {/* Video background */}
-    <video
-      src="/homepage/Sequence 02_1 (1).mp4"
-      autoPlay
-      muted
-      loop
-      playsInline
-      poster="/homepage/sideslidemobile.png"
-      className="absolute inset-0 w-full h-full object-cover scale-105"
-    />
-
-
-    {/* ✅ Text overlay — aligned to the right */}
-    <div className="absolute right-7 top-1/2 -translate-y-1/2 text-right text-white space-y-1">
-      <p className="text-xs sm:text-sm font-semibold drop-shadow-md">
-        آنالیز کن، <span className="font-medium">سایتت رو از مرگ</span>
-      </p>
-      <p className="text-2xl font-bold drop-shadow-md leading-tight">
-        نجات بـــــــــــده
-      </p>
-    </div>
-  </Link>
-</div>
-
-
+                  {/* ✅ Text overlay — aligned to the right */}
+                  <div className="absolute right-7 top-1/2 -translate-y-1/2 text-right text-white space-y-1">
+                    <p className="text-xs sm:text-sm font-semibold drop-shadow-md">
+                      آنالیز کن،{" "}
+                      <span className="font-medium">سایتت رو از مرگ</span>
+                    </p>
+                    <p className="text-2xl font-bold drop-shadow-md leading-tight">
+                      نجات بـــــــــــده
+                    </p>
+                  </div>
+                </Link>
+              </div>
             </div>
           </div>
 
@@ -1305,7 +1294,7 @@ export default function Home() {
           </div>
         </section>
         <section className="bg-[#f7f8fc] w-full pt-4">
-          <div className="max-w-[1250px] m-auto mt-5">
+          <div className="md:max-w-[1250px] w-full m-auto mt-5 md:p-0 p-2">
             <div className="text-center mb-10">
               <p className="text-[#29b0cb] text-2xl">
                 <span className="text-[#253e5f]">نمونه کار </span>درمان سایت
@@ -1313,8 +1302,8 @@ export default function Home() {
 
               {/* Buttons wrapper */}
               <div className="flex justify-center items-center mt-6">
-                <div className="md:flex w-2/4 justify-center border rounded-2xl md:rounded-full p-2">
-                  <div className="relative flex gap-4 rounded-full h-10 md:w-full md:mt-0 mt-2 overflow-hidden">
+                <div className="flex w-full md:w-2/4 justify-center border rounded-2xl rounded-full p-2">
+                  <div className="relative flex gap-4 rounded-full h-10 w-full md:mt-0 overflow-hidden">
                     {/* Active highlight */}
                     <div
                       className="absolute top-0 left-0 h-full bg-[#1d546b] rounded-full transition-all duration-300"
@@ -1328,6 +1317,7 @@ export default function Home() {
                     ></div>
 
                     {/* Buttons */}
+
                     <button
                       onClick={() => handleClick("first")}
                       className={`flex-1 z-10 text-sm md:text-md py-1 rounded-full h-10 transition-all duration-200 ${
@@ -1336,9 +1326,8 @@ export default function Home() {
                           : "text-[#1d546b] hover:text-[#1d546b]"
                       }`}
                     >
-                      طراحی سایت
+                      سئو سایت
                     </button>
-
                     <button
                       onClick={() => handleClick("second")}
                       className={`flex-1 z-10 text-sm md:text-md py-1 rounded-full h-10 transition-all duration-200 ${
@@ -1347,7 +1336,7 @@ export default function Home() {
                           : "text-[#1d546b] hover:text-[#1d546b]"
                       }`}
                     >
-                      سئو سایت
+                      طراحی سایت
                     </button>
                   </div>
                 </div>
