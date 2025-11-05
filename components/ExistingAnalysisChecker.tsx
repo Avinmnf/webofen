@@ -24,7 +24,7 @@ interface ExistingAnalysisCheckerProps {
   onError: (error: string) => void;
 }
 
-const ANALYZE_URL = process.env.ANALYZE_URL || 'http://localhost:4000';
+const ANALYZE_URL = process.env.NEXT_PUBLIC_ANALYZE_URL || 'http://localhost:4000';
 
 export function ExistingAnalysisChecker({ 
   url, 
