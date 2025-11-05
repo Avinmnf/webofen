@@ -23,8 +23,9 @@ import { AnalyzeResult } from "@/lib/models/analyze";
 
 // تبدیل API result به AnalyzeResult
 const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => ({
-  url: apiResult.url,
-  title: apiResult.result?.title || apiResult.result?.metaTitle || "بدون عنوان",
+url: apiResult?.url || "",
+title: apiResult?.result?.title || apiResult?.result?.metaTitle || "بدون عنوان",
+
   scores: {
     performance: (apiResult.performance || 0) / 100,
     accessibility: (apiResult.accessibility || 0) / 100,
@@ -86,7 +87,7 @@ export default function AnalyzePage() {
         
     }
   }, [apiAnalysis, convertedResult]);
-  console.log('🔄 Changing analysis status to:', apiAnalysis.status);
+console.log('🔄 Changing analysis status to:', apiAnalysis?.status);
 
 
   // مدیریت زمان سپری شده هنگام آنالیز

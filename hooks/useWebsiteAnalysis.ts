@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const ANALYZE_URL = process.env.NEXT_PUBLIC_ANALYZE_URL || "http://localhost:4000";
+const ANALYZE_URL = process.env.NEXT_PUBLIC_ANALYZE_URL;
 
 export const useWebsiteAnalysis = () => {
   const [analysis, setAnalysis] = useState<any>(null);
