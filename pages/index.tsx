@@ -1233,12 +1233,14 @@ export default function Home() {
                 id="Second"
                 className="order-1 md:order-2 pt-2 md:w-1/3 w-11/12 mx-auto-sm"
               >
-                <div className="relative w-full md:w-2/4 mx-auto h-[220px] md:h-[100%]  rounded-lg">
+                <div className="relative w-full md:w-2/4 mx-auto h-[220px] md:h-[100%] rounded-lg">
                   <Image
                     src="/homepage/hero2.webp"
                     alt="خدمات تخصصی سئو و طراحی سایت وبوفن"
                     fill
                     className="object-contain"
+                    sizes="(max-width: 768px) 90vw, (max-width: 1024px) 50vw, 33vw"
+                    priority
                   />
                 </div>
               </div>
@@ -1302,7 +1304,7 @@ export default function Home() {
 
               {/* Buttons wrapper */}
               <div className="flex justify-center items-center mt-6">
-                <div className="flex w-full md:w-2/4 justify-center border rounded-2xl rounded-full p-2">
+                <div className="flex w-full md:w-2/4 justify-center border rounded-full p-2">
                   <div className="relative flex gap-4 rounded-full h-10 w-full md:mt-0 overflow-hidden">
                     {/* Active highlight */}
                     <div
