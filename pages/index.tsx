@@ -96,7 +96,6 @@ export default function Home() {
         ogImage="https://webofen.com/images/og-home.jpg"
       />
 
-      {/* اسکیماهای JSON-LD */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
@@ -118,10 +117,12 @@ export default function Home() {
               <div className="relative w-[90%] mx-auto md:w-[62%] aspect-[16/9] rounded-lg overflow-hidden">
                 <Image
                   src="/homepage/slider.webp"
-                  alt="کلینیک تخصصی سئو وبوفن - خدمات سئو و بهینه‌سازی سایت"
-                  fill
-                  className="object-contain"
+                  alt="کلینیک تخصصی سئو وبوفن"
+                  width={1200}
+                  height={675}
                   priority
+                  className="object-contain"
+                  sizes="(max-width: 768px) 90vw, 62vw"
                 />
                 <Link href={"/products"}>
                   <button
@@ -140,10 +141,7 @@ export default function Home() {
                 </Link>
               </div>
               <div className="relative hidden md:flex md:w-[38%] aspect-[4/3] rounded-2xl overflow-hidden">
-                {/* ✅ Cover + Video Layer */}
                 <div className="relative w-full h-full overflow-hidden">
-                  {/* Cover image (shows until video loads) */}
-
                   <video
                     src="/homepage/ajir.mp4"
                     autoPlay
@@ -311,8 +309,8 @@ export default function Home() {
                   <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                   <g
                     id="SVGRepo_tracerCarrier"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                     stroke="#CCCCCC"
                     stroke-width="8"
                   ></g>
@@ -323,16 +321,16 @@ export default function Home() {
                       stroke="#1d546b"
                       stroke-opacity="0.9"
                       stroke-width="20"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     ></path>{" "}
                     <path
                       d="M198.744 315.68C198.744 317.274 198.744 319.614 198.744 322.7"
                       stroke="#1d546b"
                       stroke-opacity="0.9"
                       stroke-width="16"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     ></path>{" "}
                   </g>
                 </svg>{" "}
@@ -351,8 +349,8 @@ export default function Home() {
                       <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                       <g
                         id="SVGRepo_tracerCarrier"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       ></g>
                       <g id="SVGRepo_iconCarrier">
                         {" "}
@@ -479,8 +477,8 @@ export default function Home() {
                       <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                       <g
                         id="SVGRepo_tracerCarrier"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       ></g>
                       <g id="SVGRepo_iconCarrier">
                         {" "}
@@ -607,8 +605,8 @@ export default function Home() {
                       <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                       <g
                         id="SVGRepo_tracerCarrier"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       ></g>
                       <g id="SVGRepo_iconCarrier">
                         {" "}
@@ -737,8 +735,8 @@ export default function Home() {
                       <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                       <g
                         id="SVGRepo_tracerCarrier"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       ></g>
                       <g id="SVGRepo_iconCarrier">
                         {" "}
@@ -865,8 +863,8 @@ export default function Home() {
                       <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                       <g
                         id="SVGRepo_tracerCarrier"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       ></g>
                       <g id="SVGRepo_iconCarrier">
                         {" "}
@@ -993,8 +991,8 @@ export default function Home() {
                       <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                       <g
                         id="SVGRepo_tracerCarrier"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       ></g>
                       <g id="SVGRepo_iconCarrier">
                         {" "}

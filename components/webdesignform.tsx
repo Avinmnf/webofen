@@ -43,7 +43,7 @@ export default function WebDesignForm({
       title: "فرم سفارش طراحی سایت",
       fields: [
         { label: "نام کاربر", type: "text", content: name },
-        { label: "شماره تماس", type: "text", content: number },
+        { label: "تلفن همراه", type: "text", content: number },
         { 
           label: "نوع سایت انتخابی", 
           type: "text", 
@@ -335,14 +335,13 @@ export default function WebDesignForm({
               </h3>
               <p className="text-gray-600 text-sm mb-6">
                 کارشناسان ما به زودی با شما تماس خواهند گرفت. 
-                از اعتماد شما متشکریم.
               </p>
               
               <motion.button
                 onClick={() => setShowSuccessModal(false)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-gradient-to-r from-[#0364af] to-[#29b0cb] text-white rounded-lg px-6 py-2 text-sm font-medium"
+                className="bg-[#29b0cb] text-white rounded-lg px-6 py-2 text-sm font-medium"
               >
                 متوجه شدم
               </motion.button>
