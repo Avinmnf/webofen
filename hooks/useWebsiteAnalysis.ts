@@ -13,7 +13,7 @@ export const useWebsiteAnalysis = () => {
     setError(null);
 
     try {
-      const res = await fetch(`${ANALYZE_URL}/analysis/url/${encodeURIComponent(url)}`, {
+        const res = await fetch(`${ANALYZE_URL}/analysis/url/${url}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),

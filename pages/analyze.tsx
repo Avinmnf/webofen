@@ -83,8 +83,11 @@ export default function AnalyzePage() {
         setAnalysisStatus("❌ آنالیز با خطا مواجه شد");
         setAnalysisStarted(false);
         break;
+        
     }
   }, [apiAnalysis, convertedResult]);
+  console.log('🔄 Changing analysis status to:', apiAnalysis.status);
+
 
   // مدیریت زمان سپری شده هنگام آنالیز
   useEffect(() => {
@@ -119,6 +122,7 @@ export default function AnalyzePage() {
 
       intervalIds.push(id);
     });
+    
 
     return () => intervalIds.forEach(clearInterval);
   }, [pendingResult]);
@@ -126,6 +130,8 @@ export default function AnalyzePage() {
   // شروع آنالیز
   const startAnalysis = async (userData: { name: string; phoneNumber: string }) => {
     console.log("🔹 User clicked start analysis:", url, userData);
+    console.log("✅ Analysis request sent successfully");
+
     setAnalysisStarted(true);
     setAnalysisStatus("🔄 در حال ارسال درخواست آنالیز...");
 
@@ -174,7 +180,8 @@ export default function AnalyzePage() {
         <HeroSection url={url} setUrl={setUrl} loading={loading} handleAnalyze={handleAnalyzeClick} />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <ErrorDisplay error={error} />
+          <ErrorDisplay error={error || 'خطایی در پردازش درخواست پیش آمده است.'} />
+
 
           {loading && (
             <div className="space-y-6 animate-fade-in">
