@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useWebsiteAnalysis } from "@/hooks/useWebsiteAnalysis";
-import { useProducts } from "@/hooks/useproduct";
 
 // Import components
 import { HeroSection } from "@/components/HeroSection";
@@ -18,7 +17,6 @@ import { GlobalStyles } from "@/components/GlobalStyles";
 import { WebsiteOverview } from "@/components/WebsiteOverview";
 import { ScoreGuide } from "@/components/ScoreGuide";
 import { AnalysisModal } from "@/components/AnalysisModal";
-import { ExistingAnalysisChecker } from "@/components/ExistingAnalysisChecker";
 
 // Import types
 import { AnalyzeResult } from "@/lib/models/analyze";
@@ -47,12 +45,9 @@ export default function AnalyzePage() {
   const [analysisStatus, setAnalysisStatus] = useState<string>("");
   const [showAnalysisModal, setShowAnalysisModal] = useState<boolean>(false);
   const [analysisStarted, setAnalysisStarted] = useState<boolean>(false);
-  const [shouldCheckExisting, setShouldCheckExisting] = useState<boolean>(false);
 
-  // هوک آنالیز
   const { analysis: apiAnalysis, loading, error, startAnalysis: hookStartAnalysis, resetError } = useWebsiteAnalysis();
 
-  // memo برای جلوگیری از reference جدید آبجکت
   const convertedResult = useMemo(() => (apiAnalysis ? convertApiResultToAnalyzeResult(apiAnalysis) : null), [apiAnalysis]);
 
   // مدیریت وضعیت پیشرفت
@@ -80,7 +75,6 @@ export default function AnalyzePage() {
           setPendingResult(convertedResult);
           setShowSuccessAlert(true);
           setAnalysisStarted(false);
-          setShouldCheckExisting(false);
           setShowAnalysisModal(false);
         }
         break;
@@ -129,23 +123,21 @@ export default function AnalyzePage() {
     return () => intervalIds.forEach(clearInterval);
   }, [pendingResult]);
 
- const ANALYZE_URL  = process.env.NEXT_PUBLIC_ANALYZE_URL || "http://localhost:4000";
+  // شروع آنالیز
+  const startAnalysis = async (userData: { name: string; phoneNumber: string }) => {
+    console.log("🔹 User clicked start analysis:", url, userData);
+    setAnalysisStarted(true);
+    setAnalysisStatus("🔄 در حال ارسال درخواست آنالیز...");
 
-const startAnalysis = async (userData: { name: string; phoneNumber: string }) => {
-  console.log("🔹 User clicked start analysis:", url, userData);
-  setAnalysisStarted(true);
-  setAnalysisStatus("🔄 در حال ارسال درخواست آنالیز...");
-
-  try {
-    await hookStartAnalysis(url, userData);
-    console.log("✅ Analysis request sent successfully");
-  } catch (err) {
-    console.error("❌ Analysis error:", err);
-    setAnalysisStarted(false);
-    setAnalysisStatus("");
-  }
-};
-
+    try {
+      await hookStartAnalysis(url, userData);
+      console.log("✅ Analysis request sent successfully");
+    } catch (err) {
+      console.error("❌ Analysis error:", err);
+      setAnalysisStarted(false);
+      setAnalysisStatus("");
+    }
+  };
 
   // مدیریت دکمه آنالیز
   const handleAnalyzeClick = (e: React.FormEvent<HTMLFormElement>) => {
@@ -156,24 +148,12 @@ const startAnalysis = async (userData: { name: string; phoneNumber: string }) =>
     } catch {
       return resetError();
     }
-    setShouldCheckExisting(true);
+    setShowAnalysisModal(true);
   };
 
   const handleCloseModal = () => {
     if (!loading) setShowAnalysisModal(false);
   };
-
-  const handleExistingResultFound = (existingResult: AnalyzeResult) => {
-    setPendingResult(existingResult);
-    setShouldCheckExisting(false);
-  };
-
-  const handleNoExistingResult = () => {
-    setShowAnalysisModal(true);
-    setShouldCheckExisting(false);
-  };
-
-  const handleCheckError = () => setShouldCheckExisting(false);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30">
@@ -182,15 +162,6 @@ const startAnalysis = async (userData: { name: string; phoneNumber: string }) =>
         onClose={() => setShowSuccessAlert(false)}
         onViewResults={() => setShowSuccessAlert(false)}
       />
-
-      {shouldCheckExisting && (
-        <ExistingAnalysisChecker
-          url={url}
-          onExistingResultFound={handleExistingResultFound}
-          onNoExistingResult={handleNoExistingResult}
-          onError={handleCheckError}
-        />
-      )}
 
       <AnalysisModal
         isOpen={showAnalysisModal && !analysisStarted}
@@ -230,7 +201,7 @@ const startAnalysis = async (userData: { name: string; phoneNumber: string }) =>
             </div>
           )}
 
-          {!pendingResult && !loading && !shouldCheckExisting && <HowItWorks />}
+          {!pendingResult && !loading && <HowItWorks />}
         </div>
       </div>
 
