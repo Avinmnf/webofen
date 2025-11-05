@@ -181,7 +181,7 @@ console.log('🔄 Changing analysis status to:', apiAnalysis?.status);
         <HeroSection url={url} setUrl={setUrl} loading={loading} handleAnalyze={handleAnalyzeClick} />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <ErrorDisplay error={error || 'خطایی در پردازش درخواست پیش آمده است.'} />
+          <ErrorDisplay error={error} />
 
 
           {loading && (
