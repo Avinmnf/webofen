@@ -2,9 +2,8 @@ import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import Image from "next/image";
-
-// Import Swiper styles
-
+import "swiper/css";
+import "swiper/css/pagination";
 
 export default function Resume() {
   return (
@@ -12,9 +11,7 @@ export default function Resume() {
       <Swiper
         slidesPerView={3}
         spaceBetween={20}
-        pagination={{
-          clickable: true,
-        }}
+        pagination={{ clickable: true }}
         modules={[Pagination]}
         className="mySwiper h-80"
         breakpoints={{

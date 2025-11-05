@@ -16,17 +16,20 @@
 
 
 
-body {
-  background-color: white;
-  color: var(--foreground);
-  font-family: 'YekanBakhFaNum-Regular', Arial, Helvetica, sans-serif;
-}
 @font-face {
   font-family: 'YekanBakhFaNum-Regular';
   src: url('/fonts/YekanBakhFaNum-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
+
+body {
+  font-family: 'YekanBakhFaNum-Regular', Arial, Helvetica, sans-serif;
+  background-color: white;
+  color: var(--foreground);
+}
+
 @layer base {
 .content h1{font-size: 1.8rem; padding: 10px 0;}
 .content h2{font-size: 1.7rem;padding: 10px 0;}
