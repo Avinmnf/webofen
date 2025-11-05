@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 const ANALYZE_URL = process.env.NEXT_PUBLIC_ANALYZE_URL;
-console.log("🔹 ANALYZE_URL =", ANALYZE_URL);
+console.log("🔹 ANALYZE_URL =", process.env.NEXT_PUBLIC_ANALYZE_URL);
 
 
 export const useWebsiteAnalysis = () => {
