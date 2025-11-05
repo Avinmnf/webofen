@@ -129,18 +129,23 @@ export default function AnalyzePage() {
     return () => intervalIds.forEach(clearInterval);
   }, [pendingResult]);
 
-  // شروع آنالیز
-  const startAnalysis = async (userData: { name: string; phoneNumber: string }) => {
-    setAnalysisStarted(true);
-    setAnalysisStatus("🔄 در حال ارسال درخواست آنالیز...");
-    try {
-      await hookStartAnalysis(url, userData);
-    } catch (err) {
-      console.error("❌ Analysis error:", err);
-      setAnalysisStarted(false);
-      setAnalysisStatus("");
-    }
-  };
+ const ANALYZE_URL  = process.env.NEXT_PUBLIC_ANALYZE_URL || "http://localhost:4000";
+
+const startAnalysis = async (userData: { name: string; phoneNumber: string }) => {
+  console.log("🔹 User clicked start analysis:", url, userData);
+  setAnalysisStarted(true);
+  setAnalysisStatus("🔄 در حال ارسال درخواست آنالیز...");
+
+  try {
+    await hookStartAnalysis(url, userData);
+    console.log("✅ Analysis request sent successfully");
+  } catch (err) {
+    console.error("❌ Analysis error:", err);
+    setAnalysisStarted(false);
+    setAnalysisStatus("");
+  }
+};
+
 
   // مدیریت دکمه آنالیز
   const handleAnalyzeClick = (e: React.FormEvent<HTMLFormElement>) => {
