@@ -419,27 +419,27 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#FBE07A"
-                              stop-opacity="0.75"
+                              stopOpacity="0.75"
                             ></stop>{" "}
                             <stop
                               offset="0.0803394"
                               stop-color="#FBE387"
-                              stop-opacity="0.6897"
+                              stopOpacity="0.6897"
                             ></stop>{" "}
                             <stop
                               offset="0.5173"
                               stop-color="#FDF2C7"
-                              stop-opacity="0.362"
+                              stopOpacity="0.362"
                             ></stop>{" "}
                             <stop
                               offset="0.8357"
                               stop-color="#FFFBF0"
-                              stop-opacity="0.1233"
+                              stopOpacity="0.1233"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="white"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                           <radialGradient
@@ -453,12 +453,12 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#440063"
-                              stop-opacity="0.25"
+                              stopOpacity="0.25"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="#420061"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                         </defs>{" "}
@@ -547,27 +547,27 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#FBE07A"
-                              stop-opacity="0.75"
+                              stopOpacity="0.75"
                             ></stop>{" "}
                             <stop
                               offset="0.0803394"
                               stop-color="#FBE387"
-                              stop-opacity="0.6897"
+                              stopOpacity="0.6897"
                             ></stop>{" "}
                             <stop
                               offset="0.5173"
                               stop-color="#FDF2C7"
-                              stop-opacity="0.362"
+                              stopOpacity="0.362"
                             ></stop>{" "}
                             <stop
                               offset="0.8357"
                               stop-color="#FFFBF0"
-                              stop-opacity="0.1233"
+                              stopOpacity="0.1233"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="white"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                           <radialGradient
@@ -581,12 +581,12 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#440063"
-                              stop-opacity="0.25"
+                              stopOpacity="0.25"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="#420061"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                         </defs>{" "}
@@ -675,27 +675,27 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#FBE07A"
-                              stop-opacity="0.75"
+                              stopOpacity="0.75"
                             ></stop>{" "}
                             <stop
                               offset="0.0803394"
                               stop-color="#FBE387"
-                              stop-opacity="0.6897"
+                              stopOpacity="0.6897"
                             ></stop>{" "}
                             <stop
                               offset="0.5173"
                               stop-color="#FDF2C7"
-                              stop-opacity="0.362"
+                              stopOpacity="0.362"
                             ></stop>{" "}
                             <stop
                               offset="0.8357"
                               stop-color="#FFFBF0"
-                              stop-opacity="0.1233"
+                              stopOpacity="0.1233"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="white"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                           <radialGradient
@@ -709,12 +709,12 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#440063"
-                              stop-opacity="0.25"
+                              stopOpacity="0.25"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="#420061"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                         </defs>{" "}
@@ -805,27 +805,27 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#FBE07A"
-                              stop-opacity="0.75"
+                              stopOpacity="0.75"
                             ></stop>{" "}
                             <stop
                               offset="0.0803394"
                               stop-color="#FBE387"
-                              stop-opacity="0.6897"
+                              stopOpacity="0.6897"
                             ></stop>{" "}
                             <stop
                               offset="0.5173"
                               stop-color="#FDF2C7"
-                              stop-opacity="0.362"
+                              stopOpacity="0.362"
                             ></stop>{" "}
                             <stop
                               offset="0.8357"
                               stop-color="#FFFBF0"
-                              stop-opacity="0.1233"
+                              stopOpacity="0.1233"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="white"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                           <radialGradient
@@ -839,12 +839,12 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#440063"
-                              stop-opacity="0.25"
+                              stopOpacity="0.25"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="#420061"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                         </defs>{" "}
@@ -933,27 +933,27 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#FBE07A"
-                              stop-opacity="0.75"
+                              stopOpacity="0.75"
                             ></stop>{" "}
                             <stop
                               offset="0.0803394"
                               stop-color="#FBE387"
-                              stop-opacity="0.6897"
+                              stopOpacity="0.6897"
                             ></stop>{" "}
                             <stop
                               offset="0.5173"
                               stop-color="#FDF2C7"
-                              stop-opacity="0.362"
+                              stopOpacity="0.362"
                             ></stop>{" "}
                             <stop
                               offset="0.8357"
                               stop-color="#FFFBF0"
-                              stop-opacity="0.1233"
+                              stopOpacity="0.1233"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="white"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                           <radialGradient
@@ -967,12 +967,12 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#440063"
-                              stop-opacity="0.25"
+                              stopOpacity="0.25"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="#420061"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                         </defs>{" "}
@@ -1061,27 +1061,27 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#FBE07A"
-                              stop-opacity="0.75"
+                              stopOpacity="0.75"
                             ></stop>{" "}
                             <stop
                               offset="0.0803394"
                               stop-color="#FBE387"
-                              stop-opacity="0.6897"
+                              stopOpacity="0.6897"
                             ></stop>{" "}
                             <stop
                               offset="0.5173"
                               stop-color="#FDF2C7"
-                              stop-opacity="0.362"
+                              stopOpacity="0.362"
                             ></stop>{" "}
                             <stop
                               offset="0.8357"
                               stop-color="#FFFBF0"
-                              stop-opacity="0.1233"
+                              stopOpacity="0.1233"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="white"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                           <radialGradient
@@ -1095,12 +1095,12 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#440063"
-                              stop-opacity="0.25"
+                              stopOpacity="0.25"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="#420061"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                         </defs>{" "}
