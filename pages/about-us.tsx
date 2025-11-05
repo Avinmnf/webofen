@@ -1,7 +1,11 @@
 import React from "react";
 import Image from "next/image";
+import { useState } from "react";
+import ConsultationModal from "@/components/ConsultationModal";
 
 export default function AboutUs() {
+    const [open, setOpen] = useState(false);
+  
   const items = [
     {
       src: "/web-design/web-orangecheckAsset 7.png",
@@ -68,10 +72,15 @@ export default function AboutUs() {
                   </p>
                 </div>
               </div>
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="bg-[#29b0cb] cursor-pointer mt-6 py-2 px-2 sm:px-4 rounded-md w-full sm:w-40 text-white text-sm sm:text-md"
+            >
+              دریافت مشاوره
+            </button>
 
-              <button className="bg-[#29b0cb] text-white tex-md rounded-md py-1 px-6 mt-6 hover:bg-[#1e99b2] transition-all">
-                دریافت مشاوره
-              </button>
+            <ConsultationModal isOpen={open} onClose={() => setOpen(false)} />
             </div>
           </div>
 

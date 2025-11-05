@@ -4,12 +4,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import WebDesignForm from "../webdesignform";
 import Link from "next/link";
+import ConsultationModal from "@/components/ConsultationModal";
 
 export default function WebDesignModule() {
   const [selected, setSelected] = useState<string[]>([]);
   const [activeOption, setActiveOption] = useState<string | null>(null);
   const [selectedModules, setSelectedModules] = useState<string[]>([]);
   const [step, setStep] = useState<1 | 2 | 3>(1); // Added step 3 for the form
+  const [open, setOpen] = useState(false);
 
   const options = [
     { title: "طراحی سایت فروشگاهی", desc: "امکان فروش محصولات" },
@@ -133,11 +135,15 @@ export default function WebDesignModule() {
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 sm:mt-8 md:mt-10">
-            <Link href={"/"}>
-              <button className="bg-[#29b0cb] py-2 px-2 cursor-pointer sm:px-4 rounded-md w-full sm:w-40 text-white text-sm sm:text-md">
-                دریافت مشاوره
-              </button>
-            </Link>
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="bg-[#29b0cb] cursor-pointer py-2 px-2 sm:px-4 rounded-md w-full sm:w-40 text-white text-sm sm:text-md"
+            >
+              دریافت مشاوره
+            </button>
+
+            <ConsultationModal isOpen={open} onClose={() => setOpen(false)} />
 
             <Link href={"/about-us"}>
               <button className="bg-[#29b0cb] cursor-pointer py-2 px-2 sm:px-4 rounded-md w-full sm:w-40 text-white text-sm sm:text-md">

@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useState } from "react";
 import Resume from "@/components/resume/resume";
 import WebDesignModule from "@/components/webdesign/webdesignmodule";
+import ConsultationModal from "@/components/ConsultationModal";
 export default function WebDesign() {
-
+  const [open, setOpen] = useState(false);
   return (
     <main>
       <section className="bg-[#f7f8fc] pb-4 w-full rounded-2xl">
@@ -25,9 +26,16 @@ export default function WebDesign() {
                 سیبت
               </p>
 
-              <button className="bg-[#29b0cb] cursor-pointer text-white text-sm sm:text-md rounded-md py-1 sm:py-2 px-4 sm:px-6 mt-4 sm:mt-6 hover:bg-[#1e99b2] transition-all">
-                دریافت مشاوره
-              </button>
+<button
+  type="button"
+  onClick={() => setOpen(true)}
+  className="bg-[#29b0cb] cursor-pointer text-white text-sm sm:text-md rounded-md py-1 sm:py-2 px-4 sm:px-6 mt-4 sm:mt-6 hover:bg-[#1e99b2] transition-all"
+>
+  دریافت مشاوره
+</button>
+
+
+              <ConsultationModal isOpen={open} onClose={() => setOpen(false)} />
             </div>
           </div>
           <div className="relative w-full lg:w-1/2 xl:w-[40%] mx-auto aspect-[12/12] rounded-lg overflow-hidden mt-6 lg:mt-0">
@@ -51,7 +59,6 @@ export default function WebDesign() {
                 alt="متخصصان سئو وبوفن - دکتر مجتبی خداخواه"
                 fill
                 className="object-contain"
-                priority
               />
             </div>
           </div>
@@ -88,7 +95,6 @@ export default function WebDesign() {
                   alt="متخصصان سئو وبوفن - دکتر مجتبی خداخواه"
                   fill
                   className="object-contain"
-                  priority
                 />
               </div>
               <div className="relative mx-auto aspect-[1] rounded-lg overflow-hidden">
@@ -97,7 +103,6 @@ export default function WebDesign() {
                   alt="متخصصان سئو وبوفن - دکتر مجتبی خداخواه"
                   fill
                   className="object-contain"
-                  priority
                 />
               </div>
             </div>
@@ -127,7 +132,6 @@ export default function WebDesign() {
               alt="کلینیک تخصصی سئو وبوفن - خدمات سئو و بهینه‌سازی سایت"
               fill
               className="object-contain"
-              priority
             />
           </div>
         </div>
