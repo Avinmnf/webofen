@@ -9,7 +9,7 @@ export const useWebsiteAnalysis = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
- const startAnalysis = async (
+const startAnalysis = async (
   url: string,
   userData: { name: string; phoneNumber: string }
 ) => {
@@ -25,13 +25,16 @@ export const useWebsiteAnalysis = () => {
   setError(null);
 
   try {
-    // encode URL to safely include in path
-    const encodedUrl = encodeURIComponent(url);
+    // مطمئن شدن از https:// در ابتدای URL
+    const fixedUrl = url.startsWith("http") ? url : `https://${url}`;
 
-    const res = await fetch(`${ANALYZE_URL}/analysis/url/${encodedUrl}`, {
+    const res = await fetch(`${ANALYZE_URL}/analyze`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(userData),
+      body: JSON.stringify({
+        url: fixedUrl,
+        userInfo: userData, // شامل name و phoneNumber
+      }),
     });
 
     if (!res.ok) {
