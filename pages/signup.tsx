@@ -8,7 +8,7 @@ export default function SignupPage() {
     name: "",
     email: "",
     phone: "",
-    password: "",
+    password: "", 
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
