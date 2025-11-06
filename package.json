@@ -9,9 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@apollo/client": "^4.0.9",
     "bidi": "^0.0.1",
     "cookies-next": "^6.1.0",
     "framer-motion": "^12.23.3",
+    "graphql": "^16.12.0",
     "install": "^0.13.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.545.0",
@@ -45,14 +47,14 @@
     "typescript": "^5"
   },
   "browserslist": {
-  "production": [
-    "last 2 Chrome versions",
-    "last 2 Edge versions",
-    "last 2 Firefox versions",
-    "last 2 Safari versions"
-  ],
-  "development": [
-    "last 1 Chrome version"
-  ]
-}
+    "production": [
+      "last 2 Chrome versions",
+      "last 2 Edge versions",
+      "last 2 Firefox versions",
+      "last 2 Safari versions"
+    ],
+    "development": [
+      "last 1 Chrome version"
+    ]
+  }
 }
