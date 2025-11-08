@@ -34,7 +34,7 @@ export default async function handler(
     console.log('🔍 Fetching analyses from backend:', `${backendUrl}/analytics/recent?limit=${limit}`);
     
     const response = await fetch(`${backendUrl}/analytics/recent?limit=${limit}`, {
-      signal: AbortSignal.timeout(10000) // 10 ثانیه timeout
+      signal: AbortSignal.timeout(60000) // 10 ثانیه timeout
     });
 
     console.log('📡 Backend response status:', response.status);

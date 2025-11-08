@@ -46,7 +46,7 @@ export default async function handler(
         url,
         userInfo
       }),
-      signal: AbortSignal.timeout(15000) // 15 ثانیه timeout
+      signal: AbortSignal.timeout(60000) // 15 ثانیه timeout
     });
 
     console.log('📡 Backend response status:', response.status);
