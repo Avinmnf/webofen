@@ -66,3 +66,20 @@ export interface ApiAnalysisResult {
   createdAt: string;
   result?: any;
 }
+
+// lib/models/analyze.ts
+export interface Analysis {
+  id: string;
+  url: string;
+  status: 'pending' | 'running' | 'completed' | 'failed';
+  performance?: number;
+  accessibility?: number;
+  bestPractices?: number;
+  seo?: number;
+  result?: any;
+  name?: string;
+  phoneNumber?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
