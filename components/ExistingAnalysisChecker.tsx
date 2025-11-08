@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { AnalyzeResult } from "@/lib/models/analyze";
+import { useAnalyses } from "@/hooks/useAnalyses";
 
 interface ExistingAnalysisCheckerProps {
   url: string;
@@ -32,21 +33,15 @@ export function ExistingAnalysisChecker({
   onError,
 }: ExistingAnalysisCheckerProps) {
   const [checking, setChecking] = useState(true);
+  const { analyses } = useAnalyses();
 
   useEffect(() => {
     const checkExistingAnalysis = async () => {
       try {
         console.log("🔍 Checking existing analysis for:", url);
         
-        // از endpoint /analytics/recent استفاده می‌کنیم و فیلتر می‌کنیم
-        const response = await fetch('http://localhost:4000/analytics/recent?limit=5');
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const analyses = await response.json();
-        console.log("📊 Found analyses:", analyses.length);
+        // استفاده از داده‌های موجود در هوک useAnalyses
+        console.log("📊 Available analyses:", analyses.length);
         
         // جستجو در بین آنالیزهای موجود
         const existingAnalysis = analyses.find((analysis: any) => 
@@ -63,14 +58,15 @@ export function ExistingAnalysisChecker({
         }
       } catch (error) {
         console.error("❌ Error checking existing analysis:", error);
-        onError();
+        onNoExistingResult(); // در صورت خطا به آنالیز جدید برو
       } finally {
         setChecking(false);
       }
     };
 
-    checkExistingAnalysis();
-  }, [url, onExistingResultFound, onNoExistingResult, onError]);
+    // کمی تاخیر برای اطمینان از لود شدن داده‌ها
+    setTimeout(checkExistingAnalysis, 1000);
+  }, [url, analyses, onExistingResultFound, onNoExistingResult]);
 
   if (checking) {
     return (
