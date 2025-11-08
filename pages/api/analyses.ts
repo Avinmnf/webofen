@@ -29,12 +29,11 @@ export default async function handler(
 
   try {
     const backendUrl = process.env.NEXT_PUBLIC_ANALYZE_URL || 'http://localhost:4000';
-    const limit = typeof req.query.limit === 'string' ? req.query.limit : '100';
     
-    console.log('🔍 Fetching analyses from backend:', `${backendUrl}/analytics/recent?limit=${limit}`);
+    console.log('🔍 Fetching analyses from backend:', `${backendUrl}/analytics/recent`);
     
-    const response = await fetch(`${backendUrl}/analytics/recent?limit=${limit}`, {
-      signal: AbortSignal.timeout(60000) // 10 ثانیه timeout
+    const response = await fetch(`${backendUrl}/analytics/recent`, {
+      signal: AbortSignal.timeout(10000) // 10 ثانیه timeout
     });
 
     console.log('📡 Backend response status:', response.status);

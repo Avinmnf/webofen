@@ -40,7 +40,7 @@ export default async function handler(
     console.log('🔍 Fetching analysis status for:', id);
 
     const response = await fetch(`${backendUrl}/analysis/${id}`, {
-      signal: AbortSignal.timeout(60000) // 10 ثانیه timeout
+      signal: AbortSignal.timeout(10000) // 10 ثانیه timeout
     });
 
     console.log('📡 Backend response status:', response.status);
