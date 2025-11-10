@@ -6,7 +6,7 @@ import { useAuth } from "./AuthContext";
 export type CartItem = {
   title: string;
   productId: string;
-  slug: string;
+  slug: string; // ← add this
   variantId?: string;
   quantity: number;
   price?: number;
@@ -58,7 +58,6 @@ export const useCart = () => {
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [hasClearedForPayment, setHasClearedForPayment] = useState(false);
 
   // Always compute storageKey dynamically
   const storageKey = user ? `cart_${user.id}` : null;
@@ -69,9 +68,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
    * Clears ALL cart keys (guest + user carts).
    */
   useEffect(() => {
-    // Skip if already cleared in this session
-    if (hasClearedForPayment) return;
-
     const urlParams = new URLSearchParams(window.location.search);
     const paymentSuccess = urlParams.get("paymentSuccess");
 
@@ -86,39 +82,37 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       setCart([]);
-      setHasClearedForPayment(true);
 
       // Clean up URL so refresh won't keep clearing
-      const cleanUrl = window.location.pathname;
-      window.history.replaceState({}, "", cleanUrl);
+      window.history.replaceState({}, "", window.location.pathname);
     }
-  }, [hasClearedForPayment]);
+  }, []);
 
   /**
    * ✅ SECOND: Hydrate cart whenever storageKey changes.
    * Will hydrate empty cart if the first effect already cleared storage.
    */
   useEffect(() => {
-    if (!storageKey || hasClearedForPayment) {
-      setCart([]); // reset cart for logged-out users or after payment clearance
+    if (!storageKey) {
+      setCart([]); // reset cart for logged-out users
       return;
     }
 
     const storedCart = localStorage.getItem(storageKey);
     setCart(storedCart ? JSON.parse(storedCart) : []);
-  }, [storageKey, hasClearedForPayment]);
+  }, [storageKey]);
 
   /**
    * ✅ THIRD: Persist to localStorage whenever cart changes.
    */
   useEffect(() => {
-    if (storageKey && !hasClearedForPayment) {
+    if (storageKey) {
       localStorage.setItem(storageKey, JSON.stringify(cart));
     }
-  }, [cart, storageKey, hasClearedForPayment]);
+  }, [cart, storageKey]);
 
   const addItem = (item: CartItem) => {
-    if (!storageKey || hasClearedForPayment) return;
+    if (!storageKey) return;
     setCart((prev) => {
       const existing = prev.find(
         (i) => i.productId === item.productId && i.variantId === item.variantId
@@ -135,7 +129,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const removeItem = (productId: string, variantId?: string) => {
-    if (!storageKey || hasClearedForPayment) return;
+    if (!storageKey) return;
     setCart((prev) =>
       prev.filter((i) => i.productId !== productId || i.variantId !== variantId)
     );
@@ -146,7 +140,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     variantId: string | undefined,
     quantity: number
   ) => {
-    if (!storageKey || hasClearedForPayment) return;
+    if (!storageKey) return;
     setCart((prev) =>
       prev.map((item) =>
         item.productId === productId && item.variantId === variantId
@@ -159,45 +153,64 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const clearCart = () => {
     setCart([]);
     if (storageKey) localStorage.removeItem(storageKey);
-    setHasClearedForPayment(false); // Reset the payment clearance flag
   };
 
-  const placeOrder = async (
-    customerInfo: CustomerInfo,
-    extra?: OrderExtraInfo
-  ) => {
-    if (!user) return { success: false, message: "User not logged in." };
+ const placeOrder = async (
+  customerInfo: CustomerInfo,
+  extra?: OrderExtraInfo
+) => {
+  if (!user) return { success: false, message: "User not logged in." };
 
-    try {
-      const payload = {
-        ...customerInfo,
-        ...extra,
-        status: "not_payed",
-      };
+  try {
+    const payload = {
+      ...customerInfo,
+      ...extra,
+      status: "not_payed",
+    };
 
-      const res = await fetch(`/api/proxy/orders`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(payload),
-      });
+    const res = await fetch(`/api/proxy/orders`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      if (res.ok) {
-        return {
-          success: true,
-          message: "سفارش با موفقیت ثبت شد.",
-          orderId: data.orderId,
-        };
-      } else {
-        return { success: false, message: data.message || "خطا در ثبت سفارش." };
-      }
-    } catch (error) {
-      console.error("placeOrder error:", error);
-      return { success: false, message: "خطای شبکه یا سرور." };
-    }
-  };
+    if (!res.ok) return { success: false, message: data.message || "خطا در ثبت سفارش." };
+
+    // ✅ Call admin SMS API
+    await fetch(`/api/sms/smssend`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        orderId: data.orderId,
+        type: "order_admin",
+      }),
+    }).catch((err) => console.error("Admin SMS error:", err));
+
+    // ✅ Call user SMS API
+    await fetch(`/api/zarinpal/sms/payment-success`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        orderId: data.orderId,
+        customerName: customerInfo.customerName,
+        customerPhone: customerInfo.customerPhone,
+        totalPrice: extra?.totalPrice || 0,
+      }),
+    }).catch((err) => console.error("User SMS error:", err));
+
+    return {
+      success: true,
+      message: "سفارش با موفقیت ثبت شد.",
+      orderId: data.orderId,
+    };
+  } catch (error) {
+    console.error("placeOrder error:", error);
+    return { success: false, message: "خطای شبکه یا سرور." };
+  }
+};
 
   return (
     <CartContext.Provider
