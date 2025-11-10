@@ -1,3 +1,4 @@
+// components/ErrorDisplay.tsx - اگر دارید اصلاح کنید
 interface ErrorDisplayProps {
   error: string | null;
 }
@@ -5,20 +6,41 @@ interface ErrorDisplayProps {
 export function ErrorDisplay({ error }: ErrorDisplayProps) {
   if (!error) return null;
 
-  const isSuccess = error.includes("🎉");
-  
+  const isConnectionError = error.includes('connect') || error.includes('refused') || error.includes('timeout');
+
   return (
-    <div className={`mb-6 p-4 border rounded-xl flex items-start animate-shake ${
-      isSuccess
-        ? "bg-green-50 border-green-200 text-green-800"
-        : "bg-red-50 border-red-200 text-red-800"
+    <div className={`p-4 rounded-lg mb-6 ${
+      isConnectionError ? 'bg-red-50 border border-red-200' : 'bg-yellow-50 border border-yellow-200'
     }`}>
-      <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mt-0.5 ml-2 flex-shrink-0 ${
-        isSuccess ? "text-green-500" : "text-red-500"
-      }`} viewBox="0 0 20 20" fill="currentColor">
-        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-      </svg>
-      <p className={isSuccess ? "text-green-700" : "text-red-700"}>{error}</p>
+      <div className="flex items-start">
+        <div className={`flex-shrink-0 ${
+          isConnectionError ? 'text-red-400' : 'text-yellow-400'
+        }`}>
+          {isConnectionError ? '🔌' : '⚠️'}
+        </div>
+        <div className="ml-3">
+          <h3 className={`text-sm font-medium ${
+            isConnectionError ? 'text-red-800' : 'text-yellow-800'
+          }`}>
+            {isConnectionError ? 'Connection Error' : 'Error'}
+          </h3>
+          <div className={`mt-1 text-sm ${
+            isConnectionError ? 'text-red-700' : 'text-yellow-700'
+          }`}>
+            <p>{error}</p>
+            {isConnectionError && (
+              <div className="mt-2">
+                <p className="font-medium">Please make sure:</p>
+                <ul className="list-disc list-inside mt-1 text-xs">
+                  <li>The analyzer backend is running on port 4000</li>
+                  <li>No other service is using port 4000</li>
+                  <li>The backend service started successfully</li>
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

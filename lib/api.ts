@@ -1,7 +1,7 @@
-const API_BASE = process.env.NEXT_PUBLIC_ANALYZE_URL || "http://localhost:4000";
+const ANALYZE_URL = process.env.NEXT_PUBLIC_ANALYZE_URL || "http://localhost:4000";
 
 export async function startAnalysis(url: string, name: string, phoneNumber: string) {
-  const res = await fetch(`${API_BASE}/analyze`, {
+  const res = await fetch(`${ANALYZE_URL}/analyze`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ url, userInfo: { name, phoneNumber } }),
@@ -10,6 +10,6 @@ export async function startAnalysis(url: string, name: string, phoneNumber: stri
 }
 
 export async function getAnalysis(id: string) {
-  const res = await fetch(`${API_BASE}/analysis/${id}`);
+  const res = await fetch(`${ANALYZE_URL}/analysis/${id}`);
   return res.json();
 }
