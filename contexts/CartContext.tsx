@@ -6,7 +6,7 @@ import { useAuth } from "./AuthContext";
 export type CartItem = {
   title: string;
   productId: string;
-  slug: string; // ← add this
+  slug: string;
   variantId?: string;
   quantity: number;
   price?: number;
@@ -58,6 +58,7 @@ export const useCart = () => {
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [hasClearedForPayment, setHasClearedForPayment] = useState(false);
 
   // Always compute storageKey dynamically
   const storageKey = user ? `cart_${user.id}` : null;
@@ -68,6 +69,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
    * Clears ALL cart keys (guest + user carts).
    */
   useEffect(() => {
+    // Skip if already cleared in this session
+    if (hasClearedForPayment) return;
+
     const urlParams = new URLSearchParams(window.location.search);
     const paymentSuccess = urlParams.get("paymentSuccess");
 
@@ -82,37 +86,39 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       setCart([]);
+      setHasClearedForPayment(true);
 
       // Clean up URL so refresh won't keep clearing
-      window.history.replaceState({}, "", window.location.pathname);
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, "", cleanUrl);
     }
-  }, []);
+  }, [hasClearedForPayment]);
 
   /**
    * ✅ SECOND: Hydrate cart whenever storageKey changes.
    * Will hydrate empty cart if the first effect already cleared storage.
    */
   useEffect(() => {
-    if (!storageKey) {
-      setCart([]); // reset cart for logged-out users
+    if (!storageKey || hasClearedForPayment) {
+      setCart([]); // reset cart for logged-out users or after payment clearance
       return;
     }
 
     const storedCart = localStorage.getItem(storageKey);
     setCart(storedCart ? JSON.parse(storedCart) : []);
-  }, [storageKey]);
+  }, [storageKey, hasClearedForPayment]);
 
   /**
    * ✅ THIRD: Persist to localStorage whenever cart changes.
    */
   useEffect(() => {
-    if (storageKey) {
+    if (storageKey && !hasClearedForPayment) {
       localStorage.setItem(storageKey, JSON.stringify(cart));
     }
-  }, [cart, storageKey]);
+  }, [cart, storageKey, hasClearedForPayment]);
 
   const addItem = (item: CartItem) => {
-    if (!storageKey) return;
+    if (!storageKey || hasClearedForPayment) return;
     setCart((prev) => {
       const existing = prev.find(
         (i) => i.productId === item.productId && i.variantId === item.variantId
@@ -129,7 +135,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const removeItem = (productId: string, variantId?: string) => {
-    if (!storageKey) return;
+    if (!storageKey || hasClearedForPayment) return;
     setCart((prev) =>
       prev.filter((i) => i.productId !== productId || i.variantId !== variantId)
     );
@@ -140,7 +146,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     variantId: string | undefined,
     quantity: number
   ) => {
-    if (!storageKey) return;
+    if (!storageKey || hasClearedForPayment) return;
     setCart((prev) =>
       prev.map((item) =>
         item.productId === productId && item.variantId === variantId
@@ -153,6 +159,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const clearCart = () => {
     setCart([]);
     if (storageKey) localStorage.removeItem(storageKey);
+    setHasClearedForPayment(false); // Reset the payment clearance flag
   };
 
   const placeOrder = async (
