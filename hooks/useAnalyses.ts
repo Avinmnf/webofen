@@ -1,4 +1,3 @@
-// hooks/useAnalyses.ts
 import { useState, useEffect } from 'react';
 import { Analysis } from '@/lib/models/analyze';
 
@@ -10,6 +9,7 @@ export interface UseAnalysesReturn {
   startAnalysis: (url: string, userData: { name: string; phoneNumber: string }) => Promise<void>;
   resetError: () => void;
   refetch: () => Promise<void>;
+  checkExistingAnalysis: (url: string) => Analysis | null;
 }
 
 export function useAnalyses(): UseAnalysesReturn {
@@ -18,127 +18,88 @@ export function useAnalyses(): UseAnalysesReturn {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const resetError = (): void => setError(null);
+  const resetError = () => setError(null);
 
-  // دریافت لیست تمام آنالیزها از API route
-  const fetchAnalyses = async (): Promise<void> => {
+  const fetchAnalyses = async () => {
     try {
       setLoading(true);
-      setError(null);
-      
-      console.log('🔍 Fetching analyses from API route');
-      
-      const response = await fetch('/api/analyses');
-
-      console.log('📡 API response status:', response.status);
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `API responded with status: ${response.status}`);
-      }
-      
-      const data = await response.json();
+      const res = await fetch('/api/analyses');
+      if (!res.ok) throw new Error('Failed to fetch analyses');
+      const data = await res.json();
       setAnalyses(data.analyses || []);
-      console.log('✅ Successfully fetched analyses:', data.analyses?.length || 0);
-      
     } catch (err: any) {
-      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
-      setError(errorMessage);
-      console.error('❌ Error fetching analyses:', err);
-      setAnalyses([]);
+      setError(err.message || 'Unknown error');
     } finally {
       setLoading(false);
     }
   };
 
-  // شروع آنالیز جدید از طریق API route
-  const startAnalysis = async (url: string, userData: { name: string; phoneNumber: string }): Promise<void> => {
+  // تابع sync برای بررسی لینک‌های تکراری
+  const checkExistingAnalysis = (url: string): Analysis | null => {
+    const normalized = url.trim().toLowerCase();
+    const existing = analyses
+      .filter(a => a.status === 'completed')
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) // آخرین آنالیز
+      .find(a => a.url.trim().toLowerCase() === normalized);
+    return existing || null;
+  };
+
+  const startAnalysis = async (url: string, userData: { name: string; phoneNumber: string }) => {
     try {
       setLoading(true);
-      setError(null);
       setAnalysis(null);
 
-      console.log('🎯 Starting analysis for:', { url, userData });
-
-      const response = await fetch('/api/analyze', {
+      const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url, userInfo: userData }),
       });
 
-      console.log('📡 API response status:', response.status);
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `API error: ${response.status}`);
-      }
-
-      const result = await response.json();
-      console.log('✅ Analysis started successfully:', result);
-
+      if (!res.ok) throw new Error('Failed to start analysis');
+      const result = await res.json();
       if (result.success && result.analysisId) {
         await pollAnalysisResult(result.analysisId);
       } else {
-        throw new Error('Failed to start analysis - no analysis ID returned');
+        throw new Error('No analysisId returned');
       }
-
     } catch (err: any) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to start analysis';
-      setError(errorMessage);
-      console.error('🔴 Analysis error:', err);
+      setError(err.message || 'Analysis error');
       throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Polling برای دریافت نتیجه آنالیز
-  const pollAnalysisResult = async (analysisId: string): Promise<void> => {
-    const maxAttempts = 60; // حدود 5 دقیقه
+  const pollAnalysisResult = async (id: string) => {
+    const maxAttempts = 60;
     let attempts = 0;
 
     const poll = async (): Promise<void> => {
       try {
-        const response = await fetch(`/api/analysis/${analysisId}`);
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `API error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const analysisData: Analysis = data.analysis;
-
-        setAnalysis(analysisData);
-
-        if (analysisData.status === 'completed') {
+        const res = await fetch(`/api/analysis/${id}`);
+        if (!res.ok) throw new Error('Failed to fetch analysis status');
+        const data = await res.json();
+        setAnalysis(data.analysis);
+        if (data.analysis.status === 'completed') {
           await fetchAnalyses();
-          setLoading(false);
           return;
-        } else if (analysisData.status === 'failed') {
-          setLoading(false);
-          throw new Error('Analysis failed on the server');
+        } else if (data.analysis.status === 'failed') {
+          throw new Error('Analysis failed');
         } else if (attempts >= maxAttempts) {
-          setLoading(false);
-          throw new Error('Analysis timeout - taking too long');
+          throw new Error('Analysis timeout');
         } else {
           attempts++;
-          setTimeout(poll, 5000); // هر 5 ثانیه polling
+          setTimeout(poll, 5000);
         }
-
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Polling error';
-        setError(errorMessage);
-        console.error('🔴 Polling error:', err);
-        setLoading(false);
-        throw err;
+        setError(err instanceof Error ? err.message : 'Polling error');
       }
     };
 
     await poll();
   };
 
-  useEffect(() => {
-    fetchAnalyses();
-  }, []);
+  useEffect(() => { fetchAnalyses(); }, []);
 
-  return { analyses, analysis, loading, error, startAnalysis, resetError, refetch: fetchAnalyses };
+  return { analyses, analysis, loading, error, startAnalysis, resetError, refetch: fetchAnalyses, checkExistingAnalysis };
 }

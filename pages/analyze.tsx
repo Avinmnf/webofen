@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { useProducts } from "@/hooks/useproduct";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useAnalyses } from "@/hooks/useAnalyses";
 // Import components
 import { HeroSection } from "@/components/HeroSection";
@@ -17,184 +16,59 @@ import { GlobalStyles } from "@/components/GlobalStyles";
 import { WebsiteOverview } from "@/components/WebsiteOverview";
 import { ScoreGuide } from "@/components/ScoreGuide";
 import { AnalysisModal } from "@/components/AnalysisModal";
-import { ExistingAnalysisChecker } from "@/components/ExistingAnalysisChecker";
 
 // Import types
 import { AnalyzeResult, Analysis } from "@/lib/models/analyze";
 
 // تبدیل API result به AnalyzeResult
-const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => ({
-  url: apiResult.url,
-  title: apiResult.result?.title || apiResult.result?.metaTitle || "بدون عنوان",
-  scores: {
-    performance: (apiResult.performance || 0) / 100,
-    accessibility: (apiResult.accessibility || 0) / 100,
-    bestPractices: (apiResult.bestPractices || 0) / 100,
-    seo: (apiResult.seo || 0) / 100,
-  },
-  issues: apiResult.privateData || apiResult.result?.issues || [],
-  metrics: apiResult.result?.metrics || {},
-});
+const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
+  console.log('🔄 Converting API result to AnalyzeResult...', apiResult);
+  
+  // استخراج issues از مسیرهای مختلف برای اطمینان
+  let issues = [];
+  if (apiResult.result?.issues) {
+    issues = apiResult.result.issues;
+  } else if (apiResult.issues) {
+    issues = apiResult.issues;
+  } else if (apiResult.privateData) {
+    issues = apiResult.privateData;
+  }
 
-// کامپوننت برای نمایش تمام آنالیزها
-const AllAnalysesSection: React.FC<{ analyses: Analysis[] }> = ({ analyses }) => {
-  const getScoreColor = (score: number | undefined): string => {
-    if (score === undefined) return 'text-gray-600 bg-gray-100';
-    if (score >= 90) return 'text-green-600 bg-green-100';
-    if (score >= 70) return 'text-yellow-600 bg-yellow-100';
-    if (score >= 50) return 'text-orange-600 bg-orange-100';
-    return 'text-red-600 bg-red-100';
+  const result: AnalyzeResult = {
+    url: apiResult.url,
+    title: apiResult.result?.title || apiResult.result?.metaTitle || apiResult.title || "بدون عنوان",
+    scores: { 
+      performance: (apiResult.performance || 0) / 100,
+      accessibility: (apiResult.accessibility || 0) / 100,
+      bestPractices: (apiResult.bestPractices || 0) / 100,
+      seo: (apiResult.seo || 0) / 100,
+    },
+    issues: issues,
+    metrics: apiResult.result?.metrics || apiResult.metrics || {},
   };
 
-  const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString('fa-IR');
-  };
+  // اضافه کردن extra اگر وجود دارد
+  if (apiResult.result?.extra) {
+    result.extra = apiResult.result.extra;
+  } else if (apiResult.extra) {
+    result.extra = apiResult.extra;
+  }
 
-  const renderScore = (score: number | undefined): string => {
-    return score !== undefined ? `${score}%` : '--';
-  };
+  console.log('✅ Converted result with issues:', result.issues.length);
+  return result;
+};
 
-  const getStatusText = (status: string): string => {
-    const statusMap: { [key: string]: string } = {
-      'pending': 'در انتظار',
-      'running': 'در حال انجام',
-      'completed': 'تکمیل شده',
-      'failed': 'ناموفق'
-    };
-    return statusMap[status] || status;
-  };
-
-  const getStatusColor = (status: string): string => {
-    const colorMap: { [key: string]: string } = {
-      'completed': 'bg-green-100 text-green-800',
-      'running': 'bg-blue-100 text-blue-800',
-      'failed': 'bg-red-100 text-red-800',
-      'pending': 'bg-gray-100 text-gray-800'
-    };
-    return colorMap[status] || 'bg-gray-100 text-gray-800';
-  };
-
-  return (
-    <div className="mt-12">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl lg:text-3xl font-bold text-gray-800">تمامی آنالیزهای انجام شده</h2>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
-        {analyses.map((analysis: Analysis) => (
-          <div key={analysis.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 lg:p-6 hover:shadow-md transition-shadow">
-            {/* اطلاعات اصلی */}
-            <div className="mb-4">
-              <div className="flex justify-between items-start mb-2">
-                <h3 
-                  className="text-base lg:text-lg font-semibold text-gray-800 truncate flex-1"
-                  title={analysis.url}
-                >
-                  {analysis.url}
-                </h3>
-              </div>
-              
-              {(analysis.name || analysis.phoneNumber) && (
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {analysis.name && (
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-purple-100 text-purple-800">
-                      👤 {analysis.name}
-                    </span>
-                  )}
-                  {analysis.phoneNumber && (
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-indigo-100 text-indigo-800">
-                      📞 {analysis.phoneNumber}
-                    </span>
-                  )}
-                </div>
-              )}
-              
-              <div className="flex justify-between items-center text-xs text-gray-500">
-                <span>تاریخ: {formatDate(analysis.createdAt)}</span>
-                <span className={`px-2 py-1 rounded-full ${getStatusColor(analysis.status)}`}>
-                  {getStatusText(analysis.status)}
-                </span>
-              </div>
-            </div>
-
-            {/* امتیازات */}
-            {analysis.status === 'completed' && (
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-700 flex items-center">
-                    <span className="w-2 h-2 bg-blue-500 rounded-full ml-2"></span>
-                    کارایی
-                  </span>
-                  <span className={`px-3 py-1 rounded-full text-sm font-bold ${getScoreColor(analysis.performance)}`}>
-                    {renderScore(analysis.performance)}
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-700 flex items-center">
-                    <span className="w-2 h-2 bg-green-500 rounded-full ml-2"></span>
-                    دسترسی‌پذیری
-                  </span>
-                  <span className={`px-3 py-1 rounded-full text-sm font-bold ${getScoreColor(analysis.accessibility)}`}>
-                    {renderScore(analysis.accessibility)}
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-700 flex items-center">
-                    <span className="w-2 h-2 bg-yellow-500 rounded-full ml-2"></span>
-                    بهترین روش‌ها
-                  </span>
-                  <span className={`px-3 py-1 rounded-full text-sm font-bold ${getScoreColor(analysis.bestPractices)}`}>
-                    {renderScore(analysis.bestPractices)}
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-700 flex items-center">
-                    <span className="w-2 h-2 bg-purple-500 rounded-full ml-2"></span>
-                    سئو
-                  </span>
-                  <span className={`px-3 py-1 rounded-full text-sm font-bold ${getScoreColor(analysis.seo)}`}>
-                    {renderScore(analysis.seo)}
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {analysis.status === 'running' && (
-              <div className="flex justify-center items-center py-4">
-                <div className="flex flex-col items-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"></div>
-                  <span className="text-sm text-gray-600">در حال آنالیز...</span>
-                </div>
-              </div>
-            )}
-
-            {analysis.status === 'pending' && (
-              <div className="flex justify-center items-center py-4">
-                <span className="text-sm text-gray-500">در صف انتظار</span>
-              </div>
-            )}
-
-            {analysis.status === 'failed' && (
-              <div className="flex justify-center items-center py-4">
-                <span className="text-sm text-red-500">آنالیز ناموفق بود</span>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {analyses.length === 0 && (
-        <div className="text-center py-12">
-          <div className="text-gray-400 text-6xl mb-4">📊</div>
-          <p className="text-gray-500 text-lg">هیچ آنالیز یافت نشد.</p>
-          <p className="text-gray-400 text-sm mt-2">اولین آنالیز را ایجاد کنید تا نتایج اینجا نمایش داده شوند.</p>
-        </div>
-      )}
-    </div>
-  );
+// تابع برای نرمالایز کردن URL
+const normalizeUrl = (url: string): string => {
+  try {
+    const urlObj = new URL(url);
+    // حذف پروتکل، www و اسلش انتها
+    let normalized = urlObj.hostname.replace(/^www\./, '') + urlObj.pathname;
+    normalized = normalized.replace(/\/$/, ''); // حذف اسلش انتها
+    return normalized.toLowerCase();
+  } catch {
+    return url.toLowerCase().replace(/^www\./, '').replace(/\/$/, '');
+  }
 };
 
 export default function AnalyzePage() {
@@ -207,13 +81,59 @@ export default function AnalyzePage() {
   const [analysisStatus, setAnalysisStatus] = useState<string>("");
   const [showAnalysisModal, setShowAnalysisModal] = useState<boolean>(false);
   const [analysisStarted, setAnalysisStarted] = useState<boolean>(false);
-  const [shouldCheckExisting, setShouldCheckExisting] = useState<boolean>(false);
+  const [currentAnalysisId, setCurrentAnalysisId] = useState<string | null>(null);
+  const [resultsViewed, setResultsViewed] = useState<boolean>(false);
 
-  // هوک آنالیز - فقط از useAnalyses استفاده می‌کنیم
-  const { analyses: allAnalyses, analysis: apiAnalysis, loading, error, startAnalysis: hookStartAnalysis, resetError } = useAnalyses();
+  const resultsSectionRef = useRef<HTMLDivElement>(null);
 
-  // memo برای جلوگیری از reference جدید آبجکت
-  const convertedResult = useMemo(() => (apiAnalysis ? convertApiResultToAnalyzeResult(apiAnalysis) : null), [apiAnalysis]);
+  const { analyses: allAnalyses, analysis: apiAnalysis, loading, error, startAnalysis: hookStartAnalysis, resetError, checkExistingAnalysis } = useAnalyses();
+
+  const convertedResult = useMemo(() => {
+    if (apiAnalysis) {
+      return convertApiResultToAnalyzeResult(apiAnalysis);
+    }
+    return null;
+  }, [apiAnalysis]);
+
+  // یافتن آنالیز موجود - بهبود یافته
+  const findExistingAnalysis = useMemo(() => {
+    if (!url || !allAnalyses || allAnalyses.length === 0) {
+      console.log('❌ No URL or analyses to check');
+      return null;
+    }
+    
+    const normalizedUrl = normalizeUrl(url);
+    console.log('🔍 Checking for existing analysis for:', normalizedUrl);
+    
+    // بررسی در همه آنالیزها برای URL نرمالایز شده
+    const existing = allAnalyses.find(analysis => {
+      const analysisNormalized = normalizeUrl(analysis.url);
+      const isMatch = analysisNormalized === normalizedUrl;
+      console.log(`   Comparing: ${analysisNormalized} === ${normalizedUrl} -> ${isMatch}`);
+      return isMatch;
+    });
+    
+    if (existing) {
+      console.log('✅ Found existing analysis:', existing.id);
+    } else {
+      console.log('❌ No existing analysis found');
+    }
+    
+    return existing || null;
+  }, [url, allAnalyses]);
+
+  // بررسی وجود آنالیز تکراری
+  const hasExistingAnalysis = useMemo(() => {
+    return !!findExistingAnalysis;
+  }, [findExistingAnalysis]);
+
+  // دیباگ برای ردیابی issues
+  useEffect(() => {
+    if (pendingResult) {
+      console.log('📋 PendingResult issues:', pendingResult.issues);
+      console.log('📊 PendingResult issues count:', pendingResult.issues.length);
+    }
+  }, [pendingResult]);
 
   // مدیریت وضعیت پیشرفت
   useEffect(() => {
@@ -221,6 +141,12 @@ export default function AnalyzePage() {
       setProgress(0);
       setAnalysisStatus("");
       return;
+    }
+
+    if (apiAnalysis.id && apiAnalysis.id !== currentAnalysisId) {
+      setCurrentAnalysisId(apiAnalysis.id);
+      setAnalysisStarted(true);
+      setResultsViewed(false);
     }
 
     switch (apiAnalysis.status) {
@@ -240,22 +166,23 @@ export default function AnalyzePage() {
           setPendingResult(convertedResult);
           setShowSuccessAlert(true);
           setAnalysisStarted(false);
-          setShouldCheckExisting(false);
           setShowAnalysisModal(false);
+          setCurrentAnalysisId(null);
         }
         break;
       case "failed":
         setProgress(0);
         setAnalysisStatus("❌ آنالیز با خطا مواجه شد");
         setAnalysisStarted(false);
+        setCurrentAnalysisId(null);
         break;
     }
-  }, [apiAnalysis, convertedResult]);
+  }, [apiAnalysis, convertedResult, currentAnalysisId]);
 
-  // مدیریت زمان سپری شده هنگام آنالیز
+  // مدیریت زمان سپری شده
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
-    if (loading && analysisStarted) {
+    if (analysisStarted && (apiAnalysis?.status === 'pending' || apiAnalysis?.status === 'running')) {
       const startTime = Date.now();
       intervalId = setInterval(() => {
         setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
@@ -264,14 +191,13 @@ export default function AnalyzePage() {
       setElapsedTime(0);
     }
     return () => intervalId && clearInterval(intervalId);
-  }, [loading, analysisStarted]);
+  }, [analysisStarted, apiAnalysis?.status]);
 
   // انیمیشن نمرات
   useEffect(() => {
     if (!pendingResult) return;
 
     const intervalIds: NodeJS.Timeout[] = [];
-
     Object.entries(pendingResult.scores).forEach(([key, score]) => {
       if (score === undefined) return;
       let current = 0;
@@ -282,73 +208,113 @@ export default function AnalyzePage() {
         setAnimatedScores((prev) => ({ ...prev, [key]: current }));
         if (current >= target) clearInterval(id);
       }, 20);
-
       intervalIds.push(id);
     });
 
     return () => intervalIds.forEach(clearInterval);
   }, [pendingResult]);
 
+  // اسکرول به بخش نتایج وقتی نمایش داده می‌شوند
+  useEffect(() => {
+    if (pendingResult && resultsViewed && resultsSectionRef.current) {
+      setTimeout(() => {
+        resultsSectionRef.current?.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
+    }
+  }, [pendingResult, resultsViewed]);
 
   const startAnalysis = async (userData: { name: string; phoneNumber: string }) => {
-    console.log("🔹 User clicked start analysis:", url, userData);
     setAnalysisStarted(true);
     setAnalysisStatus("🔄 در حال ارسال درخواست آنالیز...");
+    setPendingResult(null);
+    setShowAnalysisModal(false);
+    setResultsViewed(false);
 
     try {
       await hookStartAnalysis(url, userData);
-      console.log("✅ Analysis request sent successfully");
     } catch (err) {
-      console.error("❌ Analysis error:", err);
       setAnalysisStarted(false);
+      setAnalysisStatus("");
+      setCurrentAnalysisId(null);
+    }
+  };
+
+  const handleAnalyzeClick = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!url) {
+      resetError();
+      return;
+    }
+    
+    try { 
+      new URL(url); 
+    } catch { 
+      resetError();
+      return;
+    }
+
+    // بررسی وجود آنالیز قبلی - بهبود یافته
+    const existingAnalysis = findExistingAnalysis;
+    
+    if (existingAnalysis && existingAnalysis.status === 'completed') {
+      console.log("✅ استفاده از آنالیز موجود:", existingAnalysis.id);
+      const convertedExisting = convertApiResultToAnalyzeResult(existingAnalysis);
+      console.log('📦 Converted existing analysis issues:', convertedExisting.issues);
+      
+      setPendingResult(convertedExisting);
+      setShowSuccessAlert(false); // مستقیماً نمایش بده بدون آلرت
+      setAnalysisStarted(false);
+      setShowAnalysisModal(false);
+      setResultsViewed(true);
+      return;
+    }
+    
+    // اگر آنالیز موجود نبود، مدال را نمایش بده
+    console.log('🆕 No existing analysis found, showing modal');
+    setShowAnalysisModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowAnalysisModal(false);
+    if (!analysisStarted) {
       setAnalysisStatus("");
     }
   };
 
-  // مدیریت دکمه آنالیز
-  const handleAnalyzeClick = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!url) return resetError();
-    try {
-      new URL(url);
-    } catch {
-      return resetError();
-    }
-    setShouldCheckExisting(true);
+  // تابع برای مشاهده نتایج
+  const handleViewResults = () => {
+    setShowSuccessAlert(false);
+    setResultsViewed(true);
   };
 
-  const handleCloseModal = () => {
-    if (!loading) setShowAnalysisModal(false);
+  // تابع برای شروع آنالیز جدید
+  const handleNewAnalysis = () => {
+    setPendingResult(null);
+    setAnalysisStarted(false);
+    setAnalysisStatus("");
+    setProgress(0);
+    setElapsedTime(0);
+    setAnimatedScores({});
+    setCurrentAnalysisId(null);
+    setShowAnalysisModal(false);
+    setShowSuccessAlert(false);
+    setResultsViewed(false);
+    setUrl("");
+    resetError();
   };
 
-  const handleExistingResultFound = (existingResult: AnalyzeResult) => {
-    setPendingResult(existingResult);
-    setShouldCheckExisting(false);
-  };
-
-  const handleNoExistingResult = () => {
-    setShowAnalysisModal(true);
-    setShouldCheckExisting(false);
-  };
-
-  const handleCheckError = () => setShouldCheckExisting(false);
+  const showLoading = analysisStarted && !pendingResult;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30">
       <SuccessAlert
         isOpen={showSuccessAlert}
         onClose={() => setShowSuccessAlert(false)}
-        onViewResults={() => setShowSuccessAlert(false)}
+        onViewResults={handleViewResults}
       />
-
-      {shouldCheckExisting && (
-        <ExistingAnalysisChecker
-          url={url}
-          onExistingResultFound={handleExistingResultFound}
-          onNoExistingResult={handleNoExistingResult}
-          onError={handleCheckError}
-        />
-      )}
 
       <AnalysisModal
         isOpen={showAnalysisModal && !analysisStarted}
@@ -358,42 +324,78 @@ export default function AnalyzePage() {
       />
 
       <div className="w-full">
-        <HeroSection url={url} setUrl={setUrl} loading={loading} handleAnalyze={handleAnalyzeClick} />
+        <HeroSection 
+          url={url} 
+          setUrl={setUrl} 
+          loading={loading && analysisStarted} 
+          handleAnalyze={handleAnalyzeClick}
+        />
+
+        {hasExistingAnalysis && !pendingResult && url && (
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+              <span className="text-green-600">✅ آنالیز قبلی برای این آدرس موجود است - نتایج در حال نمایش</span>
+            </div>
+          </div>
+        )}
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <ErrorDisplay error={error} />
 
-          {loading && (
+          {showLoading && (
             <div className="space-y-6 animate-fade-in">
               <AnimatedLoading progress={progress} elapsedTime={elapsedTime} />
-              {analysisStatus && <div className="text-center text-lg text-gray-700">{analysisStatus}</div>}
+              {analysisStatus && (
+                <div className="text-center">
+                  <div className="text-lg text-gray-700 mb-2">{analysisStatus}</div>
+                  {elapsedTime > 0 && (
+                    <div className="text-sm text-gray-500">
+                      زمان سپری شده: {elapsedTime} ثانیه
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
-          {pendingResult && (
-            <div className="space-y-8 animate-fade-in">
-              <div className="flex flex-wrap -mx-4">
-                <div className="w-full lg:w-9/12 px-4 mt-4 lg:mt-0">
-                  <WebsiteOverview result={pendingResult} />
+          {/* بخش نتایج - همیشه نمایش داده شود اگر pendingResult وجود دارد */}
+          <div ref={resultsSectionRef}>
+            {pendingResult && (
+              <div className="space-y-8 animate-fade-in">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-bold text-gray-800">نتایج آنالیز</h2>
+                  {hasExistingAnalysis && (
+                    <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+                      🔄 نمایش از آنالیز قبلی
+                    </div>
+                  )}
                 </div>
-                <div className="w-full lg:w-3/12 px-4">
-                  <ScoreGuide />
+
+                <div className="flex flex-wrap -mx-4">
+                  <div className="w-full lg:w-9/12 px-4 mt-4 lg:mt-0">
+                    <WebsiteOverview result={pendingResult} />
+                  </div>
+                  <div className="w-full lg:w-3/12 px-4">
+                    <ScoreGuide />
+                  </div>
                 </div>
+
+                <AnalysisScores result={pendingResult} animatedScores={animatedScores} />
+                <ProductRecommendations scores={pendingResult.scores} />
+                <CoreMetrics result={pendingResult} />
+                
+                {/* IssuesList همیشه نمایش داده شود */}
+                <div className="mt-8">
+                  <IssuesList result={pendingResult} />
+                </div>
+
+                {/* دکمه برای آنالیز جدید */}
+               
               </div>
+            )}
+          </div>
 
-              <AnalysisScores result={pendingResult} animatedScores={animatedScores} />
-              <ProductRecommendations scores={pendingResult.scores} />
-              <CoreMetrics result={pendingResult} />
-              <IssuesList result={pendingResult} />
-            </div>
-          )}
-
-          {/* نمایش تمام آنالیزها */}
-          {allAnalyses.length > 0 && (
-            <AllAnalysesSection analyses={allAnalyses} />
-          )}
-
-          {!pendingResult && !loading && !shouldCheckExisting && <HowItWorks />}
+          {!pendingResult && !showLoading && !url && <HowItWorks />}
         </div>
       </div>
 

@@ -1,28 +1,50 @@
-export type Issue = {
-  auditId: string;
-  title: string;
-  impact: string;
-  description: string;
-};
+// در فایل @/lib/models/analyze
 
-export type AnalyzeResult = {
-  url: string;
+export interface Issue {
+  id?: string;
+  auditId?: string; // برای سازگاری با AnalyzeResult
   title: string;
+  description: string;
+  impact: string;
+  selector?: string;
+  occurrences?: number;
+  category?: string; // اضافه شده برای دسته‌بندی
+  severity?: 'critical' | 'serious' | 'moderate' | 'minor' | 'opportunity' | 'other'; // اضافه شده
+}
+
+// lib/models/analyze.ts
+export interface AnalyzeResult {
+  url: string;
+  title?: string;
+  meta?: {
+    title?: string;
+    description?: string;
+    keywords?: string;
+  };
   scores: {
-    performance?: number;
-    accessibility?: number;
-    bestPractices?: number;
-    seo?: number;
+    performance: number;
+    accessibility: number;
+    bestPractices: number;
+    seo: number;
   };
-  metrics: {
-    FCP?: string;
-    LCP?: string;
-    TBT?: string;
-    CLS?: string;
-    SI?: string;
+  issues: Array<{
+    auditId: string;
+    title: string;
+    impact: string;
+    description: string;
+    id?: string; // اضافه شده برای سازگاری
+    selector?: string; // اضافه شده برای سازگاری
+    occurrences?: number; // اضافه شده برای سازگاری
+    category?: string; // اضافه شده برای سازگاری
+    severity?: string; // اضافه شده برای سازگاری
+  }>;
+  metrics: Record<string, any>;
+  extra?: {
+    brokenLinks: number;
+    imagesWithoutAlt: number;
+    headingsCount: Record<string, number>;
   };
-  issues: Issue[];
-};
+}
 
 export interface SimpleProduct {
   id: string;
@@ -83,3 +105,33 @@ export interface Analysis {
   updatedAt?: string;
 }
 
+// اینترفیس برای داده‌های آنالیز شده از API
+export interface ApiAnalyzeData {
+  url: string;
+  title?: string;
+  meta?: {
+    title?: string;
+    description?: string;
+    keywords?: string;
+  };
+  scores: {
+    performance: number;
+    accessibility: number;
+    bestPractices: number;
+    seo: number;
+  };
+  issues: Array<{
+    auditId: string;
+    title: string;
+    impact: string;
+    description: string;
+    selector?: string;
+    occurrences?: number;
+  }>;
+  metrics: Record<string, any>;
+  extra?: {
+    brokenLinks: number;
+    imagesWithoutAlt: number;
+    headingsCount: Record<string, number>;
+  };
+}
