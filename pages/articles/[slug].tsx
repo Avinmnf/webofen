@@ -31,8 +31,8 @@ const ArticleSchema = ({ post }: SchemaProps) => {
   const schemaData = {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: post.title,
-    description: post.description,
+    headline: post.seoTitle,
+    description: post.seoDescription,
     image: post.imageUrl ? [post.imageUrl] : [],
     datePublished: post.createdAt,
     dateModified: post.updatedAt || post.createdAt,
@@ -159,8 +159,8 @@ export default function PostPage({ post, viewCount }: Props) {
   return (
     <>
       <SEO
-        title={post?.title || ""}
-        description={post?.description || ""}
+        title={post?.seoTitle || ""}
+        description={post?.seoDescription || ""}
         keywords={post?.tags ? post.tags.map((t) => t.name).join(", ") : ""}
         canonical={typeof window !== "undefined" ? window.location.href : ""}
         ogImage={post?.imageUrl || ""}

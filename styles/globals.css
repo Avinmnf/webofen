@@ -86,6 +86,11 @@ p{
   color: #3db4c6;
 }
 
+.articles .content img{
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
 .stage{
   position: relative;
   width: 600px;

@@ -79,13 +79,14 @@ const SEO: React.FC<SEOProps> = ({
   additionalScripts,
 }) => {
   const router = useRouter();
-const baseUrl = (process.env.NEXT_PUBLIC_WEBOFEN || "https://webofen.com/").replace(/\/+$/, "");
-  const cdnUrl = process.env.NEXT_PUBLIC_CDN_URL ;
+  const baseUrl = (
+    process.env.NEXT_PUBLIC_WEBOFEN || "https://webofen.com/"
+  ).replace(/\/+$/, "");
+  const cdnUrl = process.env.NEXT_PUBLIC_CDN_URL;
   const currentUrl = canonical || `${baseUrl}${router.asPath}`;
   const defaultImage = ogImage
-  ? `${cdnUrl}${ogImage.replace(/^\/+/, "")}`
-  : `${cdnUrl}images/og-default.jpg`;
-
+    ? `${cdnUrl}${ogImage.replace(/^\/+/, "")}`
+    : `${cdnUrl}images/og-default.jpg`;
 
   const defaultStructuredData = {
     "@context": "https://schema.org",
@@ -149,7 +150,9 @@ const baseUrl = (process.env.NEXT_PUBLIC_WEBOFEN || "https://webofen.com/").repl
       "@type": "Product",
       name: product.title,
       description: product.description,
-      image: product.galleryUrls?.length ? product.galleryUrls : [product.imageUrl],
+      image: product.galleryUrls?.length
+        ? product.galleryUrls
+        : [product.imageUrl],
       sku: product.sku,
       brand: { "@type": "Brand", name: product.brand || "وبوفن" },
       offers: product.variants?.map((v) => ({
@@ -185,7 +188,9 @@ const baseUrl = (process.env.NEXT_PUBLIC_WEBOFEN || "https://webofen.com/").repl
       <meta name="keywords" content={keywords} />
       <meta
         name="robots"
-        content={`${noindex ? "noindex" : "index"}, ${nofollow ? "nofollow" : "follow"}`}
+        content={`${noindex ? "noindex" : "index"}, ${
+          nofollow ? "nofollow" : "follow"
+        }`}
       />
       <meta name="author" content={author} />
       <link rel="canonical" href={currentUrl} />
@@ -198,8 +203,12 @@ const baseUrl = (process.env.NEXT_PUBLIC_WEBOFEN || "https://webofen.com/").repl
       <meta property="og:site_name" content="وبوفن" />
       {ogType === "article" && (
         <>
-          {publishedTime && <meta property="article:published_time" content={publishedTime} />}
-          {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+          {publishedTime && (
+            <meta property="article:published_time" content={publishedTime} />
+          )}
+          {modifiedTime && (
+            <meta property="article:modified_time" content={modifiedTime} />
+          )}
           {section && <meta property="article:section" content={section} />}
           {tags.map((tag, i) => (
             <meta key={i} property="article:tag" content={tag} />
@@ -214,32 +223,46 @@ const baseUrl = (process.env.NEXT_PUBLIC_WEBOFEN || "https://webofen.com/").repl
       {finalStructuredData && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(finalStructuredData) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(finalStructuredData),
+          }}
         />
       )}
       {additionalScripts}
-      <link rel="icon" href="/favicon.ico" />
-      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-      <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-      {process.env.NODE_ENV === "production" && process.env.NEXT_PUBLIC_GA_ID && (
-        <>
-          <script
-            async
-            src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
-          />
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
+      <link
+        rel="icon"
+        type="image/png"
+        href="/favicon-96x96.png"
+        sizes="96x96"
+      />
+      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+      <link rel="shortcut icon" href="/favicon.ico" />
+      <link
+        rel="apple-touch-icon"
+        sizes="180x180"
+        href="/apple-touch-icon.png"
+      />
+      <meta name="apple-mobile-web-app-title" content="MyWebSite" />
+      <link rel="manifest" href="/site.webmanifest" />
+      {process.env.NODE_ENV === "production" &&
+        process.env.NEXT_PUBLIC_GA_ID && (
+          <>
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+            />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
                 gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
               `,
-            }}
-          />
-        </>
-      )}
+              }}
+            />
+          </>
+        )}
     </Head>
   );
 };

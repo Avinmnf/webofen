@@ -3,6 +3,8 @@ export type Product = {
   title: string;
   slug: string;
   description: string;
+  seoDescription?: string;
+  seoTitle?: string;
   content: string;
   imageUrl?: string;
   videoUrl?: string;
@@ -17,7 +19,6 @@ export type Product = {
   brand?: string;
   keywords?: string; // ✅ اضافه شد
 };
-
 
 type AttributeValue = { value: string; attribute: { name: string } };
 

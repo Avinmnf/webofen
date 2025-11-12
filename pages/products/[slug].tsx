@@ -220,8 +220,8 @@ export default function ProductDetailPage({ product }: Props) {
     <>
       {/* --- SEO Component --- */}
       <SEO
-        title={product.title}
-        description={product.description}
+        title={product.seoTitle}
+        description={product.seoDescription}
         canonical={`https://webofen.com/products/${product.slug ?? ""}`}
         ogType="product"
         product={{
