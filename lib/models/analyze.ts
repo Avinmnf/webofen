@@ -9,7 +9,6 @@ export interface Issue {
   selector?: string;
   occurrences?: number;
   category?: string; // اضافه شده برای دسته‌بندی
-  severity?: 'critical' | 'serious' | 'moderate' | 'minor' | 'opportunity' | 'other'; // اضافه شده
 }
 
 // lib/models/analyze.ts
