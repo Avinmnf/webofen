@@ -147,6 +147,7 @@ export default function AnalyzePage() {
         keywords: `آنالیز سایت, سئو, عملکرد, دسترسی, بهترین روش‌ها, ${url}, بهینه سازی, وبوفن`,
         canonical: currentUrl,
       
+         
         ogType: "website" as const,
         tags: ["آنالیز سایت", "سئو", "عملکرد", "دسترسی", "بهترین روش‌ها", "بهینه سازی"],
         author: "وبوفن",
