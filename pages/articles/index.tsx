@@ -446,7 +446,7 @@ export default function PostsPage({
             </nav>
 
             {/* بخش تگ‌ها و جستجو */}
-            <div className="mb-8">
+            <div className="mb-8 md:p-0 p-4">
               <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
                 {/* Tags Section */}
                 <div className="flex flex-wrap gap-2 items-center">
@@ -488,7 +488,7 @@ export default function PostsPage({
                   ))}
                 </div>
                 {/* Search Bar */}
-                <div className="pr-2 w-1/3">
+                <div className="md:pr-2 w-full md:w-1/3">
                   <div className="relative">
                     <input
                       type="text"
