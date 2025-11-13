@@ -29,27 +29,43 @@ export default async function handler(
 
   try {
     const backendUrl = process.env.NEXT_PUBLIC_ANALYZE_URL || 'http://localhost:4000';
+    const apiUrl = `${backendUrl}/analytics/recent`;
     
-    console.log('🔍 Fetching analyses from backend:', `${backendUrl}/analytics/recent`);
+    console.log('🔍 Fetching analyses from:', apiUrl);
     
-    const response = await fetch(`${backendUrl}/analytics/recent`, {
-      signal: AbortSignal.timeout(10000) // 10 ثانیه timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      signal: controller.signal
     });
+
+    clearTimeout(timeoutId);
 
     console.log('📡 Backend response status:', response.status);
 
     if (!response.ok) {
-      throw new Error(`Backend responded with status: ${response.status}`);
+      const errorText = await response.text();
+      console.error('❌ Backend error response:', errorText);
+      throw new Error(`Backend error: ${response.status} - ${errorText}`);
     }
 
     const analyses: Analysis[] = await response.json();
     console.log('✅ Successfully fetched analyses:', analyses.length);
     
-    res.status(200).json({ analyses });
-  } catch (error) {
+    return res.status(200).json({ analyses });
+  } catch (error: any) {
     console.error('❌ Error in analyses API:', error);
     
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    res.status(500).json({ error: errorMessage });
+    if (error.name === 'AbortError') {
+      return res.status(408).json({ error: 'Request timeout' });
+    }
+    
+    const errorMessage = error.message || 'Unknown error occurred';
+    return res.status(500).json({ error: errorMessage });
   }
 }

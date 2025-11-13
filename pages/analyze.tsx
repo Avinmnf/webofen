@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useRef } from "react";
+import { useRouter } from "next/router";
 import { useAnalyses } from "@/hooks/useAnalyses";
 // Import components
 import { HeroSection } from "@/components/HeroSection";
@@ -16,6 +17,7 @@ import { GlobalStyles } from "@/components/GlobalStyles";
 import { WebsiteOverview } from "@/components/WebsiteOverview";
 import { ScoreGuide } from "@/components/ScoreGuide";
 import { AnalysisModal } from "@/components/AnalysisModal";
+import SEO from "@/components/seo";
 
 // Import types
 import { AnalyzeResult, Analysis } from "@/lib/models/analyze";
@@ -72,6 +74,7 @@ const normalizeUrl = (url: string): string => {
 };
 
 export default function AnalyzePage() {
+  const router = useRouter();
   const [url, setUrl] = useState<string>("");
   const [progress, setProgress] = useState<number>(0);
   const [animatedScores, setAnimatedScores] = useState<Record<string, number>>({});
@@ -126,6 +129,79 @@ export default function AnalyzePage() {
   const hasExistingAnalysis = useMemo(() => {
     return !!findExistingAnalysis;
   }, [findExistingAnalysis]);
+
+  // SEO Props با useMemo برای بهینه‌سازی
+  const seoProps = useMemo(() => {
+    const baseUrl = process.env.NEXT_PUBLIC_WEBOFEN || "https://webofen.com/";
+    const currentUrl = typeof window !== "undefined" ? window.location.href : `${baseUrl}${router.asPath}`;
+    
+    if (pendingResult) {
+      const seoScore = Math.round((pendingResult.scores.seo || 0) * 100);
+      const performanceScore = Math.round((pendingResult.scores.performance || 0) * 100);
+      const accessibilityScore = Math.round((pendingResult.scores.accessibility || 0) * 100);
+      const bestPracticesScore = Math.round((pendingResult.scores.bestPractices || 0) * 100);
+      
+      return {
+        title: `نتایج آنالیز ${pendingResult.title || url} | وبوفن`,
+        description: `آنالیز کامل سایت ${url} - سئو: ${seoScore}% | عملکرد: ${performanceScore}% | دسترسی: ${accessibilityScore}% | بهترین روش‌ها: ${bestPracticesScore}%`,
+        keywords: `آنالیز سایت, سئو, عملکرد, دسترسی, بهترین روش‌ها, ${url}, بهینه سازی, وبوفن`,
+        canonical: currentUrl,
+      
+        ogType: "website" as const,
+        tags: ["آنالیز سایت", "سئو", "عملکرد", "دسترسی", "بهترین روش‌ها", "بهینه سازی"],
+        author: "وبوفن",
+        structuredData: {
+          "@context": "https://schema.org",
+          "@type": "AnalysisPage",
+          "name": `نتایج آنالیز ${pendingResult.title || url}`,
+          "description": `نتایج کامل آنالیز سئو و عملکرد سایت ${url}`,
+          "url": currentUrl,
+          "mainEntity": {
+            "@type": "WebSite",
+            "name": pendingResult.title || url,
+            "url": url,
+            "review": {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": seoScore,
+                "bestRating": 100,
+                "worstRating": 0
+              },
+              "author": {
+                "@type": "Organization",
+                "name": "وبوفن"
+              }
+            }
+          }
+        }
+      };
+    }
+
+    // حالت پیش‌فرض - وقتی آنالیزی نمایش داده نمی‌شود
+    return {
+      title: "آنالیز رایگان سایت | وبوفن",
+      description: "آنالیز تخصصی سئو و عملکرد وبسایت به صورت رایگان. بررسی مشکلات سئو، سرعت سایت، امنیت و استانداردهای وب. آنالیز کامل سئو، عملکرد، دسترسی و بهترین روش‌های توسعه وب",
+      keywords: "آنالیز سایت, سئو, عملکرد, بهینه سازی, سرعت سایت, امنیت سایت, دسترسی پذیری, بهترین روش‌ها, وبوفن",
+      canonical: currentUrl,
+      ogImage: undefined,
+      ogType: "website" as const,
+      tags: ["آنالیز سایت", "سئو", "عملکرد", "بهینه سازی", "سرعت سایت", "امنیت"],
+      author: "وبوفن",
+      structuredData: {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "آنالیز رایگان سایت | وبوفن",
+        "description": "آنالیز تخصصی سئو و عملکرد وبسایت به صورت رایگان",
+        "url": currentUrl,
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "وبوفن",
+          "url": baseUrl
+        }
+      }
+    };
+  }, [pendingResult, url, router.asPath]);
 
   // دیباگ برای ردیابی issues
   useEffect(() => {
@@ -310,6 +386,9 @@ export default function AnalyzePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30">
+      {/* کامپوننت SEO */}
+      <SEO {...seoProps} />
+
       <SuccessAlert
         isOpen={showSuccessAlert}
         onClose={() => setShowSuccessAlert(false)}
@@ -390,7 +469,14 @@ export default function AnalyzePage() {
                 </div>
 
                 {/* دکمه برای آنالیز جدید */}
-               
+                <div className="text-center mt-8">
+                  <button
+                    onClick={handleNewAnalysis}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200"
+                  >
+                    🔄 آنالیز جدید
+                  </button>
+                </div>
               </div>
             )}
           </div>
