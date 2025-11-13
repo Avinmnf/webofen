@@ -146,6 +146,7 @@ export default function AnalyzePage() {
         description: `آنالیز کامل سایت ${url} - سئو: ${seoScore}% | عملکرد: ${performanceScore}% | دسترسی: ${accessibilityScore}% | بهترین روش‌ها: ${bestPracticesScore}%`,
         keywords: `آنالیز سایت, سئو, عملکرد, دسترسی, بهترین روش‌ها, ${url}, بهینه سازی, وبوفن`,
         canonical: currentUrl,
+      
         ogType: "website" as const,
         tags: ["آنالیز سایت", "سئو", "عملکرد", "دسترسی", "بهترین روش‌ها", "بهینه سازی"],
         author: "وبوفن",
@@ -179,7 +180,7 @@ export default function AnalyzePage() {
 
     // حالت پیش‌فرض - وقتی آنالیزی نمایش داده نمی‌شود
     return {
-      title: "آنالیز وبسایت | وبوفن",
+      title: "آنالیز رایگان سایت | وبوفن",
       description: "آنالیز تخصصی سئو و عملکرد وبسایت به صورت رایگان. بررسی مشکلات سئو، سرعت سایت، امنیت و استانداردهای وب. آنالیز کامل سئو، عملکرد، دسترسی و بهترین روش‌های توسعه وب",
       keywords: "آنالیز سایت, سئو, عملکرد, بهینه سازی, سرعت سایت, امنیت سایت, دسترسی پذیری, بهترین روش‌ها, وبوفن",
       canonical: currentUrl,
