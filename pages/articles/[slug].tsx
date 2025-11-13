@@ -570,7 +570,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 
     // If your route returns { count, slug }
     const viewCount = viewsData.count || 0;
-
+console.log(postData)
     // 3️⃣ Pass both post and view count as props
     return {
       props: {

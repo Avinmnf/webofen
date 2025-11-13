@@ -46,14 +46,17 @@ export function InjectRelatedCategories({
       <h4 className="text-lg text-[#3db4c6] font-semibold mb-4 border-b border-gray-200 pb-2">
         همین حالا بخرید
       </h4>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
         {allProducts.map((prod) => (
           <a
             key={prod.id}
             href={`/products/${prod.slug}`}
-            className="bg-white rounded-xl related border border-gray-200 overflow-hidden shadow-sm transition-shadow duration-200 flex items-center p-2"
+            className="group relative bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm transition-all duration-300 flex items-center p-2 px-6"
           >
-            <div className="w-15 h-15 flex-shrink-0 ml-4">
+            {/* Colored bar behind */}
+            <div className="absolute right-0 top-0 w-0 h-full bg-gradient-to-r from-[#3db4c6] to-[#77d4e3] transition-all duration-300 group-hover:w-2 rounded-r-xl"></div>
+
+            <div className="w-20 h-20 flex-shrink-0 ml-4 relative z-10">
               {prod.videoUrl ||
               prod.imageUrl?.endsWith(".mp4") ||
               prod.imageUrl?.includes(".mp4") ? (
@@ -65,12 +68,20 @@ export function InjectRelatedCategories({
                   className="w-full h-full object-cover rounded-lg"
                 />
               ) : (
-                <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-sm">
+                <div className="w-full h-full bg-gray-100 rounded-md flex items-center justify-center text-gray-400 text-sm">
                   No Image
                 </div>
               )}
             </div>
-            <p className="font-medium text-sm text-gray-600">{prod.title}</p>
+
+            <div className="relative z-10 text-white group-hover:text-white transition-colors duration-300">
+              <p className="text-md text-gray-600 font-semibold">
+                {prod.title}
+              </p>
+              <p className="font-medium text-sm text-gray-600">
+                جهت رفع این مشکل قرص {prod.title} سفارش دهید.
+              </p>
+            </div>
           </a>
         ))}
       </div>
@@ -94,12 +105,12 @@ export function InjectRelatedCategories({
             href={`/articles/${post.slug}`}
             className="bg-white rounded-md border border-gray-200 overflow-hidden transition-shadow duration-200 flex items-center p-4 pr-6"
           >
-            <div className="w-15 h-15 flex-shrink-0 ml-4">
+            <div className="w-1/4 flex-shrink-0 ml-4">
               {post.imageUrl ? (
                 <img
                   src={post.imageUrl}
                   alt={post.title}
-                  className="w-full h-40 object-cover"
+                  className="w-full h-20 object-cover relatedpost"
                 />
               ) : (
                 <div className="w-full h-full bg-gray-100 rounded-lg flex items-center text-center text-sm p-1 justify-center text-gray-400">
