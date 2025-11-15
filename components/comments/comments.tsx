@@ -74,10 +74,10 @@ export default function CommentForm({
       <div>
         <div className="flex items-start justify-between gap-4 text-gray-600">
           <div>
-            <h2 className="text-2xl font-extrabold text-gray-700  flex items-center gap-2">
+            <p className="text-2xl font-extrabold text-gray-700  flex items-center gap-2">
 
               {parentId ? "ارسال پاسخ" : "ارسال نظر"}
-            </h2>
+            </p>
 
           </div>
 

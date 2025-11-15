@@ -43,9 +43,9 @@ export function InjectRelatedCategories({
   //Related Products
   const renderRelatedProducts = (index: number) => (
     <section key={`related-products-${index}`} className="my-8 md:w-full">
-      <h4 className="text-lg text-[#3db4c6] font-semibold mb-4 border-b border-gray-200 pb-2">
+      <p className="text-lg text-[#3db4c6] font-semibold mb-4 border-b border-gray-200 pb-2">
         همین حالا بخرید
-      </h4>
+      </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
         {allProducts.map((prod) => (
           <a
@@ -118,10 +118,10 @@ export function InjectRelatedCategories({
                 </div>
               )}
             </div>
-            <h5 className="font-medium text-base text-gray-600">
+            <p className="font-medium text-base text-gray-600">
               <span className="text-blue-800 ml-2 font-semibold">بخوانید:</span>
               {post.title}
-            </h5>
+            </p>
           </Link>
         </div>
       </section>

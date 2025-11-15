@@ -4,7 +4,7 @@ import Image from "next/image";
 export default function Footer() {
   return (
     <footer className="w-full text-gray-800 pt-10 text-center bg-white md:mb-10">
-<div className="md:max-w-[1250px] m-auto rounded-t-2xl md:rounded-2xl flex flex-col lg:flex-row p-5 md:p-15 items-stretch gap-6 bg-[#1d546b]">
+      <div className="md:max-w-[1250px] m-auto rounded-t-2xl md:rounded-2xl flex flex-col lg:flex-row p-5 md:p-15 items-stretch gap-6 bg-[#1d546b]">
         <div className="md:w-[60%] w-full">
           <Link href="/">
             <Image
@@ -60,17 +60,30 @@ export default function Footer() {
                 { label: "درباره ما", href: "/about-us" },
                 { label: "تماس با ما", href: "/contact-us" },
                 { label: "سوالات متداول", href: "/" },
-                { label: "نقشه سایت", href: "/sitemap.xml" },
-              ].map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className="text-start relative pr-4 text-gray-200 text-xs md:text-sm cursor-pointer before:absolute before:right-0 before:top-1/2 before:-translate-y-1/2 before:w-2 before:h-2 before:rounded-full before:bg-gray-200 hover:text-[#f78c0a] hover:before:bg-[#f78c0a] transition-all duration-200"
-                >
-                  {item.label}
-                </Link>
-              ))}
+                { label: "نقشه سایت", href: "/sitemap.xml", isExternal: true },
+              ].map((item) =>
+                item.isExternal ? (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    className="text-start relative pr-4 text-gray-200 text-xs md:text-sm cursor-pointer before:absolute before:right-0 before:top-1/2 before:-translate-y-1/2 before:w-2 before:h-2 before:rounded-full before:bg-gray-200 hover:text-[#f78c0a] hover:before:bg-[#f78c0a] transition-all duration-200"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {item.label}
+                  </a>
+                ) : (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className="text-start relative pr-4 text-gray-200 text-xs md:text-sm cursor-pointer before:absolute before:right-0 before:top-1/2 before:-translate-y-1/2 before:w-2 before:h-2 before:rounded-full before:bg-gray-200 hover:text-[#f78c0a] hover:before:bg-[#f78c0a] transition-all duration-200"
+                  >
+                    {item.label}
+                  </Link>
+                )
+              )}
             </div>
+
             <div className="w-0.5 h-48 rounded-2xl mr-5 md:mr-10 bg-[#153e4c]"></div>
             <div className="flex flex-col gap-3 mr-5 md:mr-10">
               <p className="text-gray-50 text-xs md:text-base">دسته بندی</p>

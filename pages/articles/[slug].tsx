@@ -253,7 +253,7 @@ export default function PostPage({ post, viewCount }: Props) {
           <div className="flex flex-col-reverse md:flex-row w-full gap-8 mt-8">
             {/* Post Content */}
             <article className="w-full">
-              <div className="w-full text-gray-700 m-auto">
+              <div className="w-full text-gray-700 m-auto mb-4">
                 <div className="flex items-center mt-8">
                   <svg
                     viewBox="0 -0.5 21 21"
@@ -312,6 +312,9 @@ export default function PostPage({ post, viewCount }: Props) {
                     </span>
                   </div>
                 </div>
+                <div className="bg-gray-100 rounded-md p-2 mt-4 text-gray-500">
+                  <p> {post.description}</p>
+                </div>
               </div>
             </article>
           </div>
@@ -336,7 +339,7 @@ export default function PostPage({ post, viewCount }: Props) {
                 <div>
                   {post.toc && post.toc.length > 0 && (
                     <div>
-                      <h3 className="text-gray-600">فهرست مطالب</h3>
+                      <div className="text-gray-600 text-2xl mb-2">فهرست مطالب</div>
                       <nav className="toc-nav text-sm">
                         <ul>
                           {[...post.toc].reverse().map((item) => (
@@ -570,7 +573,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 
     // If your route returns { count, slug }
     const viewCount = viewsData.count || 0;
-console.log(postData)
+    console.log(postData);
     // 3️⃣ Pass both post and view count as props
     return {
       props: {
