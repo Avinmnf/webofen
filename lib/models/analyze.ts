@@ -1,5 +1,4 @@
-// در فایل @/lib/models/analyze
-
+// lib/models/analyze.ts
 export interface Issue {
   id?: string;
   auditId?: string; // برای سازگاری با AnalyzeResult
@@ -9,9 +8,11 @@ export interface Issue {
   selector?: string;
   occurrences?: number;
   category?: string; // اضافه شده برای دسته‌بندی
+  severity?: string; // اضافه شده برای سطح اهمیت
+    solution?: string; // اضافه کردن فیلد راه حل
+
 }
 
-// lib/models/analyze.ts
 export interface AnalyzeResult {
   url: string;
   title?: string;
@@ -31,18 +32,61 @@ export interface AnalyzeResult {
     title: string;
     impact: string;
     description: string;
-    id?: string; // اضافه شده برای سازگاری
-    selector?: string; // اضافه شده برای سازگاری
-    occurrences?: number; // اضافه شده برای سازگاری
-    category?: string; // اضافه شده برای سازگاری
-    severity?: string; // اضافه شده برای سازگاری
+    id?: string;
+    selector?: string;
+    occurrences?: number;
+    category?: string;
+    severity?: string;
   }>;
   metrics: Record<string, any>;
-  extra?: {
-    brokenLinks: number;
-    imagesWithoutAlt: number;
-    headingsCount: Record<string, number>;
+  headings?: {
+    h1: number;
+    h2: number;
+    h3: number;
+    h4: number;
+    h5: number;
+    h6: number;
+    total: number;
   };
+  extra?: {
+    brokenLinks: string[];
+    imagesWithoutAlt: number;
+    externalLinks: number;
+    headingsCount?: {
+      h1: number;
+      h2: number;
+      h3: number;
+      h4: number;
+      h5: number;
+      h6: number;
+      total: number;
+    };
+    issues?: Issue[]; // اضافه کردن issues به extra
+  };
+  // اضافه کردن فیلد result برای داده‌های nested
+  result?: {
+    issues?: Issue[];
+    comprehensiveData?: {
+      issues?: Issue[];
+      headings?: {
+        h1: number;
+        h2: number;
+        h3: number;
+        h4: number;
+        h5: number;
+        h6: number;
+        total: number;
+      };
+      brokenLinks?: string[];
+      imagesWithoutAlt?: number;
+      externalLinks?: number;
+    };
+    categories?: any;
+    audits?: any;
+    metrics?: any;
+  };
+  // اضافه کردن فیلد translations برای دیکشنری فارسی
+  translations?: Record<string, { title: string; description: string }>;
 }
 
 export interface SimpleProduct {
@@ -86,9 +130,10 @@ export interface ApiAnalysisResult {
   seo: number;
   createdAt: string;
   result?: any;
+  name?: string;
+  phoneNumber?: string;
 }
 
-// lib/models/analyze.ts
 export interface Analysis {
   id: string;
   url: string;
@@ -104,7 +149,6 @@ export interface Analysis {
   updatedAt?: string;
 }
 
-// اینترفیس برای داده‌های آنالیز شده از API
 export interface ApiAnalyzeData {
   url: string;
   title?: string;
@@ -126,11 +170,98 @@ export interface ApiAnalyzeData {
     description: string;
     selector?: string;
     occurrences?: number;
+    category?: string;
+    severity?: string;
   }>;
   metrics: Record<string, any>;
+  headings?: {
+    h1: number;
+    h2: number;
+    h3: number;
+    h4: number;
+    h5: number;
+    h6: number;
+    total: number;
+  };
   extra?: {
-    brokenLinks: number;
+    brokenLinks: string[];
     imagesWithoutAlt: number;
-    headingsCount: Record<string, number>;
+    externalLinks: number;
+    headingsCount?: {
+      h1: number;
+      h2: number;
+      h3: number;
+      h4: number;
+      h5: number;
+      h6: number;
+      total: number;
+    };
+  };
+  // اضافه کردن translations به ApiAnalyzeData
+  translations?: Record<string, { title: string; description: string }>;
+}
+
+// انواع جدید برای داده‌های Lighthouse
+export interface LighthouseResults {
+  performance: number;
+  accessibility: number;
+  bestPractices: number;
+  seo: number;
+  result: any;
+  headings?: HeadingAnalysis;
+}
+
+export interface HeadingAnalysis {
+  h1: number;
+  h2: number;
+  h3: number;
+  h4: number;
+  h5: number;
+  h6: number;
+  total: number;
+}
+
+export interface JobData {
+  analysisId: string;
+  url: string;
+  name?: string;
+  phoneNumber?: string;
+}
+
+// انواع برای کامپوننت‌ها
+export interface AnalysisScoresProps {
+  result: AnalyzeResult;
+  animatedScores: Record<string, number>;
+}
+
+export interface IssuesListProps {
+  result: AnalyzeResult;
+  issues?: Array<{
+    auditId: string;
+    title: string;
+    impact: string;
+    description: string;
+    id?: string;
+    selector?: string;
+    occurrences?: number;
+    category?: string;
+    severity?: string;
+  }>;
+}
+
+export interface CoreMetricsProps {
+  result: AnalyzeResult;
+}
+
+export interface WebsiteOverviewProps {
+  result: AnalyzeResult;
+}
+
+export interface ProductRecommendationsProps {
+  scores: {
+    performance: number;
+    accessibility: number;
+    bestPractices: number;
+    seo: number;
   };
 }

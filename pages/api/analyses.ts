@@ -51,6 +51,12 @@ export default async function handler(
     if (!response.ok) {
       const errorText = await response.text();
       console.error('❌ Backend error response:', errorText);
+      
+      // اگر سرور خطای 404 یا 5xx داد
+      if (response.status === 404) {
+        return res.status(200).json({ analyses: [] }); // آرایه خالی برگردان
+      }
+      
       throw new Error(`Backend error: ${response.status} - ${errorText}`);
     }
 
@@ -58,14 +64,24 @@ export default async function handler(
     console.log('✅ Successfully fetched analyses:', analyses.length);
     
     return res.status(200).json({ analyses });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('❌ Error in analyses API:', error);
     
-    if (error.name === 'AbortError') {
-      return res.status(408).json({ error: 'Request timeout' });
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        return res.status(408).json({ error: 'Request timeout' });
+      }
+      
+      // اگر سرور آنالیز در دسترس نیست، آرایه خالی برگردان
+      if (error.message.includes('fetch failed') || error.message.includes('ECONNREFUSED')) {
+        console.log('⚠️ Analysis service not available, returning empty array');
+        return res.status(200).json({ analyses: [] });
+      }
+      
+      const errorMessage = error.message || 'Unknown error occurred';
+      return res.status(500).json({ error: errorMessage });
     }
     
-    const errorMessage = error.message || 'Unknown error occurred';
-    return res.status(500).json({ error: errorMessage });
+    return res.status(500).json({ error: 'Unknown error occurred' });
   }
 }
