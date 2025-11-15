@@ -40,16 +40,16 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     ];
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls
-      .map(
-        (u) => `  <url>
-    <loc>${BASE_URL}/${u.slug}</loc>
-    <lastmod>${u.lastmod}</lastmod>
-  </url>`
-      )
-      .join("\n")}
-</urlset>`;
+    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    ${urls
+          .map(
+            (u) => `  <url>
+        <loc>${BASE_URL}/${u.slug}</loc>
+        <lastmod>${u.lastmod}</lastmod>
+      </url>`
+          )
+          .join("\n")}
+    </urlset>`;
 
     res!.setHeader("Content-Type", "application/xml");
     res!.write(sitemap);
