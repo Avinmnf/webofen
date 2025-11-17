@@ -7,31 +7,35 @@ interface WebsiteOverviewProps {
 }
 
 export function WebsiteOverview({ result }: WebsiteOverviewProps) {
-  // استخراج عنوان از منابع مختلف با اولویت‌بندی بهتر
+  // تابع ساده‌تر برای استخراج عنوان
   const getPageTitle = () => {
-  // اولویت 1: متا تگ عنوان
-  if (result.meta?.title && result.meta.title.trim() && result.meta.title !== "بدون عنوان") {
-    return result.meta.title;
-  }
-
-  // اولویت 2: عنوان اصلی صفحه
-  if (result.title && result.title.trim() && result.title !== "بدون عنوان") {
-    return result.title;
-  }
-
-  // اولویت 3: استفاده از hostname URL
-  if (result.url) {
-    try {
-      const urlObj = new URL(result.url);
-      return urlObj.hostname.replace(/^www\./, ''); // حذف www با regex
-    } catch {
-      return result.url;
+    // اگر عنوان مستقیماً در result وجود دارد و معتبر است
+    if (result.title && result.title.trim() && result.title !== "بدون عنوان") {
+      return result.title;
     }
-  }
-
-  return "عنوان یافت نشد";
-};
-
+    
+    // اگر عنوان در meta وجود دارد
+    if (result.meta?.title && result.meta.title.trim() && result.meta.title !== "بدون عنوان") {
+      return result.meta.title;
+    }
+    
+    // اگر عنوان در ogTitle وجود دارد
+    if (result.meta?.ogTitle && result.meta.ogTitle.trim()) {
+      return result.meta.ogTitle;
+    }
+    
+    // اگر هیچکدام نبود، از URL استفاده کنیم
+    if (result.url) {
+      try {
+        const urlObj = new URL(result.url);
+        return urlObj.hostname.replace(/^www\./, '');
+      } catch {
+        return result.url;
+      }
+    }
+    
+    return "عنوان یافت نشد";
+  };
 
   const pageTitle = getPageTitle();
   
@@ -58,7 +62,7 @@ export function WebsiteOverview({ result }: WebsiteOverviewProps) {
           </div>
         </div>
 
-        {/* عنوان صفحه - اصلاح شده */}
+        {/* عنوان صفحه */}
         <div className="flex items-start p-4 bg-gradient-to-r from-blue-50 to-blue-50 rounded-xl border border-blue-100 transition-all hover:shadow-md hover:scale-105">
           <div className="flex-shrink-0 p-3 bg-blue-100 rounded-lg ml-4">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -67,9 +71,8 @@ export function WebsiteOverview({ result }: WebsiteOverviewProps) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm text-gray-500 font-medium mb-2">عنوان صفحه</p>
-            <p className="font-semibold text-gray-800 text-sm break-words leading-6">
-              {pageTitle}
-            </p>
+            <p className="font-semibold text-gray-800 line-clamp-2">{result.title}</p>
+
           </div>
         </div>
 
