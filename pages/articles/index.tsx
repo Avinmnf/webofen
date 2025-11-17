@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { GetStaticProps } from "next";
 import Link from "next/link";
 import Image from "next/image";
@@ -169,28 +169,135 @@ export default function PostsPage({
 
   const [allPosts, setAllPosts] = useState<Post[]>(initialPosts);
   const [loading, setLoading] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [page, setPage] = useState(initialPage);
   const [hasMore, setHasMore] = useState(initialPosts.length < total);
   const [currentTag, setCurrentTag] = useState<string | undefined>(
     (queryTag as string) || undefined
   );
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [allTags, setAllTags] = useState<{ name: string }[]>([]);
+
   const breakpointColumnsObj = {
     default: 3,
     1100: 2,
     700: 1,
   };
 
-  // فیلتر پست‌ها بر اساس تگ (سمت کلاینت)
-  const filteredPosts = useMemo(() => {
-    if (!currentTag) return allPosts;
-    return allPosts.filter((post) =>
-      post.tags?.some((tag) => tag.name === currentTag)
-    );
-  }, [allPosts, currentTag]);
-
-  const posts = currentTag ? filteredPosts : allPosts;
   const limit = 10;
+
+  // Reset to initial posts function
+  const resetToInitialPosts = useCallback(async () => {
+    setIsTransitioning(true);
+    setSearchLoading(true);
+    try {
+      const postsData = await fetchPosts({
+        page: 1,
+        limit: 14,
+        status: "published",
+        sort: "createdAt",
+        order: "desc",
+      });
+
+      setAllPosts(postsData.posts);
+      setPage(1);
+      setHasMore(postsData.posts.length < postsData.total);
+      setCurrentTag(undefined);
+    } catch (error) {
+      console.error("خطا در بازنشانی:", error);
+    } finally {
+      setSearchLoading(false);
+      setTimeout(() => setIsTransitioning(false), 300);
+    }
+  }, []);
+
+  // Search function
+  const handleSearch = useCallback(
+    async (query: string) => {
+      setSearchQuery(query);
+
+      if (query.trim() === "") {
+        await resetToInitialPosts();
+        return;
+      }
+
+      setIsTransitioning(true);
+      setSearchLoading(true);
+
+      try {
+        const postsData = await fetchPosts({
+          page: 1,
+          limit: 50,
+          status: "published",
+          sort: "createdAt",
+          order: "desc",
+          search: query.trim(),
+        });
+
+        setAllPosts(postsData.posts);
+        setPage(1);
+        setHasMore(false);
+        setCurrentTag(undefined);
+      } catch (error) {
+        console.error("خطا در جستجو:", error);
+      } finally {
+        setSearchLoading(false);
+        setTimeout(() => setIsTransitioning(false), 300);
+      }
+    },
+    [resetToInitialPosts]
+  );
+
+  // Clear search function
+  const handleClearSearch = useCallback(async () => {
+    await resetToInitialPosts();
+    setSearchQuery("");
+  }, [resetToInitialPosts]);
+
+  // Tag click handler - Now handled by backend
+  const handleTagClick = useCallback(
+    async (tagName: string) => {
+      // Don't do anything if clicking the same tag
+      if (currentTag === tagName) return;
+
+      setIsTransitioning(true);
+      setCurrentTag(tagName);
+      setSearchLoading(true);
+
+      try {
+        const postsData = await fetchPosts({
+          page: 1,
+          limit: 50,
+          status: "published",
+          sort: "createdAt",
+          order: "desc",
+          tag: tagName, // Backend handles the tag filtering
+        });
+
+        setAllPosts(postsData.posts);
+        setPage(1);
+        setHasMore(false);
+        setSearchQuery("");
+      } catch (error) {
+        console.error("خطا در فیلتر تگ:", error);
+      } finally {
+        setSearchLoading(false);
+        setTimeout(() => setIsTransitioning(false), 300);
+      }
+    },
+    [currentTag]
+  );
+
+  // Clear tag filter
+  const handleClearTagFilter = useCallback(async () => {
+    await resetToInitialPosts();
+    setCurrentTag(undefined);
+    setSearchQuery("");
+  }, [resetToInitialPosts]);
+
+  // Use allPosts directly for display
+  const posts = allPosts;
 
   // تولید اسکیما برای مقالات و صفحه بلاگ
   const articleSchemas = generateArticleSchema(posts);
@@ -219,6 +326,77 @@ export default function PostsPage({
       extractAllTags();
     }
   }, [allPosts]);
+
+  // Debounced search effect
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchQuery.trim() !== "") {
+        handleSearch(searchQuery);
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, handleSearch]);
+
+  // Update URL when currentTag changes
+  useEffect(() => {
+    const updateUrl = async () => {
+      if (currentTag) {
+        await router.push(
+          {
+            pathname: "/articles",
+            query: { tag: currentTag },
+          },
+          undefined,
+          { shallow: true }
+        );
+      } else {
+        await router.push(
+          {
+            pathname: "/articles",
+          },
+          undefined,
+          { shallow: true }
+        );
+      }
+    };
+
+    updateUrl();
+  }, [currentTag, router]);
+
+  // Initialize tag from URL query parameter - FIXED: Remove handleTagClick dependency
+  useEffect(() => {
+    if (queryTag && queryTag !== currentTag) {
+      const applyTagFromUrl = async () => {
+        setIsTransitioning(true);
+        setSearchLoading(true);
+
+        try {
+          const postsData = await fetchPosts({
+            page: 1,
+            limit: 50,
+            status: "published",
+            sort: "createdAt",
+            order: "desc",
+            tag: queryTag as string,
+          });
+
+          setAllPosts(postsData.posts);
+          setPage(1);
+          setHasMore(false);
+          setCurrentTag(queryTag as string);
+          setSearchQuery("");
+        } catch (error) {
+          console.error("خطا در فیلتر تگ از URL:", error);
+        } finally {
+          setSearchLoading(false);
+          setTimeout(() => setIsTransitioning(false), 300);
+        }
+      };
+
+      applyTagFromUrl();
+    }
+  }, [queryTag]); // Removed currentTag and handleTagClick dependencies
 
   const socialCards = [
     {
@@ -254,40 +432,9 @@ export default function PostsPage({
     cards.push(postsWithViews[i]);
   }
 
-  // ✅ تابع ساده برای تغییر تگ
-  const handleTagClick = (tagName: string) => {
-    setCurrentTag(tagName);
-  };
-
-  // ✅ حذف فیلتر تگ
-  const handleClearTagFilter = () => {
-    setCurrentTag(undefined);
-  };
-
-  // ✅ به‌روزرسانی URL وقتی currentTag تغییر کند
-  useEffect(() => {
-    if (currentTag) {
-      router.push(
-        {
-          pathname: "/articles",
-        },
-        undefined,
-        { shallow: true }
-      );
-    } else {
-      router.push(
-        {
-          pathname: "/articles",
-        },
-        undefined,
-        { shallow: true }
-      );
-    }
-  }, [currentTag]);
-
   // لود پست‌های بیشتر
   const handleLoadMore = async () => {
-    if (loading || !hasMore) return;
+    if (loading || !hasMore || currentTag || searchQuery) return;
 
     setLoading(true);
     const nextPage = page + 1;
@@ -329,28 +476,41 @@ export default function PostsPage({
     handleTagClick(tagName);
   };
 
+  const activeFilters = Boolean(currentTag || searchQuery);
+  const showLoadMore = hasMore && !currentTag && !searchQuery && !searchLoading;
+
   return (
     <>
       <SEO
         title={
           currentTag
             ? `مقالات با تگ ${currentTag} | وبوفن`
-            : "مقالات وبوفن | بلاگ وبوفن"
+            : searchQuery
+            ? `نتایج جستجو برای "${searchQuery}" | وبوفن`
+            : "مقالات سئو | بلاگ وبوفن"
         }
         description={
           currentTag
             ? `مقالات و آموزش‌های مرتبط با ${currentTag} در وبوفن`
+            : searchQuery
+            ? `نتایج جستجو برای "${searchQuery}" در وبوفن`
             : "آخرین مقالات وبوفن درباره دیجیتال مارکتینگ، کسب درآمد آنلاین و آموزش‌های کاربردی."
         }
         keywords={
           currentTag
             ? `${currentTag}, مقالات ${currentTag}, آموزش ${currentTag}`
-            : "مقالات وبوفن, بلاگ, آموزش دیجیتال مارکتینگ, کسب درآمد آنلاین"
+            : searchQuery
+            ? `${searchQuery}, جستجو مقالات`
+            : "مقالات وبوفن, بلاگ, آموزش دیجیتال مارкетینگ, کسب درآمد آنلاین"
         }
         canonical={
           currentTag
             ? `https://webofen.com/articles?tag=${encodeURIComponent(
                 currentTag
+              )}`
+            : searchQuery
+            ? `https://webofen.com/articles?search=${encodeURIComponent(
+                searchQuery
               )}`
             : "https://webofen.com/articles"
         }
@@ -417,84 +577,200 @@ export default function PostsPage({
                     مقالات
                   </Link>
                 </li>
-
+                {currentTag && (
+                  <>
+                    <li className="flex items-center">
+                      <svg
+                        className="w-4 h-4 mx-1 transform rotate-180"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </li>
+                    <li className="text-[#ff5084] font-medium">{currentTag}</li>
+                  </>
+                )}
               </ol>
             </nav>
 
-            {/* بخش تگ‌ها */}
-            <div className="mb-8 px-4">
-              <div className="flex flex-wrap gap-2 items-center">
-                <span className="text-gray-600 text-sm ml-2">
-                  فیلتر بر اساس تگ:
-                </span>
+            {/* بخش تگ‌ها و جستجو */}
+            <div className="mb-8 md:p-0 p-4">
+              <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                {/* Tags Section */}
+                <div className="flex flex-wrap gap-2 items-center">
+                  <span className="text-gray-600 text-sm ml-2">
+                    فیلتر بر اساس تگ:
+                  </span>
 
-                {/* دکمه نمایش همه */}
-                <button
-                  onClick={handleClearTagFilter}
-                  className={`px-4 py-2 rounded-full text-sm border-2 transition-colors ${
-                    !currentTag
-                      ? "bg-[#ff5084] text-white border-[#ff5084] font-medium"
-                      : "bg-white text-gray-600 border-gray-300 hover:border-[#ff5084] hover:text-[#ff5084]"
-                  }`}
-                >
-                  همه مقالات
-                </button>
-
-                {/* لیست تگ‌ها - نمایش تمام تگ‌های موجود در پست‌ها */}
-                {allTags.map((tag, index) => (
+                  {/* دکمه نمایش همه */}
                   <button
-                    key={index}
-                    onClick={() => handleTagClick(tag.name)}
+                    onClick={() => {
+                      handleClearTagFilter();
+                      handleClearSearch();
+                    }}
                     className={`px-4 py-2 rounded-full text-sm border-2 transition-colors ${
-                      currentTag === tag.name
+                      !currentTag && !searchQuery
                         ? "bg-[#ff5084] text-white border-[#ff5084] font-medium"
                         : "bg-white text-gray-600 border-gray-300 hover:border-[#ff5084] hover:text-[#ff5084]"
                     }`}
                   >
-                    {tag.name}
+                    همه مقالات
                   </button>
-                ))}
+
+                  {/* لیست تگ‌ها */}
+                  {allTags.map((tag, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        handleTagClick(tag.name);
+                        setSearchQuery("");
+                      }}
+                      className={`px-4 py-2 rounded-full text-sm border-2 transition-colors ${
+                        currentTag === tag.name
+                          ? "bg-[#ff5084] text-white border-[#ff5084] font-medium"
+                          : "bg-white text-gray-600 border-gray-300 hover:border-[#ff5084] hover:text-[#ff5084]"
+                      }`}
+                    >
+                      {tag.name}
+                    </button>
+                  ))}
+                </div>
+                {/* Search Bar */}
+                <div className="md:pr-2 w-full md:w-1/3">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="جستجو در مقالات بر اساس عنوان، دسته‌بندی..."
+                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:border-[#ff5084] focus:ring-2 focus:ring-[#ff5084]/20 transition-all duration-200 bg-white text-gray-700 placeholder-gray-400 text-sm"
+                      disabled={searchLoading}
+                    />
+                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                      {searchLoading ? (
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#ff5084]"></div>
+                      ) : searchQuery ? (
+                        <button
+                          onClick={handleClearSearch}
+                          className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+                        >
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      ) : (
+                        <svg
+                          className="w-5 h-5 text-gray-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                          />
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {/* نمایش تگ انتخاب شده */}
-              {currentTag && (
-                <div className="mt-4 flex items-center bg-blue-50 p-3 rounded-lg">
+              {activeFilters && (
+                <div className="mt-4 flex flex-wrap items-center gap-2 bg-blue-50 p-3 rounded-lg transition-all duration-200">
                   <span className="text-gray-700 text-sm font-medium">
-                    در حال نمایش مقالات با تگ:
+                    فیلترهای فعال:
                   </span>
-                  <span className="mr-2 px-3 py-1 bg-[#ff5084] text-white rounded-full text-sm font-medium">
-                    {currentTag}
-                  </span>
-                  <span className="text-gray-500 text-sm mr-2">
-                    ({filteredPosts.length} مقاله)
-                  </span>
+
+                  {currentTag && (
+                    <span className="px-3 py-1 bg-[#ff5084] text-white rounded-full text-sm font-medium flex items-center transition-all duration-200">
+                      {currentTag}
+                      <button
+                        onClick={handleClearTagFilter}
+                        className="mr-1 hover:text-gray-200 text-xs transition-colors"
+                        disabled={searchLoading}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  )}
+
+                  {searchQuery && (
+                    <span className="px-3 py-1 bg-blue-500 text-white rounded-full text-sm font-medium flex items-center transition-all duration-200">
+                      جستجو: {searchQuery}
+                      <button
+                        onClick={handleClearSearch}
+                        className="mr-1 hover:text-gray-200 text-xs transition-colors"
+                        disabled={searchLoading}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  )}
+
                   <button
-                    onClick={handleClearTagFilter}
-                    className="text-gray-500 hover:text-gray-700 text-sm flex items-center bg-white px-3 py-1 rounded-lg border hover:border-gray-300 transition-colors"
+                    onClick={() => {
+                      handleClearTagFilter();
+                      handleClearSearch();
+                    }}
+                    disabled={searchLoading}
+                    className="text-gray-500 hover:text-gray-700 text-sm flex items-center bg-white px-3 py-1 rounded-lg border hover:border-gray-300 transition-all duration-200 disabled:opacity-50"
                   >
-                    <span className="ml-1">×</span>
-                    حذف فیلتر
+                    حذف همه فیلترها
                   </button>
+
+                  <span className="text-gray-500 text-sm mr-2">
+                    ({posts.length} مقاله یافت شد)
+                  </span>
                 </div>
               )}
             </div>
 
-            {/* نمایش پیام وقتی مقاله‌ای با تگ انتخاب شده وجود ندارد */}
-            {currentTag && filteredPosts.length === 0 && (
+            {/* نمایش پیام وقتی مقاله‌ای با فیلترهای انتخاب شده وجود ندارد */}
+            {activeFilters && posts.length === 0 && !searchLoading && (
               <div className="text-center py-12 bg-white rounded-2xl shadow">
                 <div className="text-6xl mb-4">🔍</div>
                 <p className="text-gray-500 text-lg mb-2">
-                  مقاله‌ای با تگ "
-                  <span className="text-[#ff5084] font-medium">
-                    {currentTag}
-                  </span>
-                  " یافت نشد.
+                  مقاله‌ای با فیلترهای انتخاب شده یافت نشد.
                 </p>
-                <p className="text-gray-400 text-sm mb-4">
-                  سعی کنید تگ دیگری انتخاب کنید یا فیلتر را حذف کنید.
-                </p>
+                {currentTag && (
+                  <p className="text-gray-400 text-sm mb-1">
+                    تگ:
+                    <span className="text-[#ff5084] font-medium">
+                      {currentTag}
+                    </span>
+                  </p>
+                )}
+                {searchQuery && (
+                  <p className="text-gray-400 text-sm mb-4">
+                    جستجو:
+                    <span className="text-[#ff5084] font-medium">
+                      {searchQuery}
+                    </span>
+                  </p>
+                )}
                 <button
-                  onClick={handleClearTagFilter}
+                  onClick={() => {
+                    handleClearTagFilter();
+                    handleClearSearch();
+                  }}
                   className="px-6 py-2 bg-[#ff5084] text-white rounded-lg hover:bg-[#e04475] transition-colors font-medium"
                 >
                   مشاهده همه مقالات
@@ -502,7 +778,7 @@ export default function PostsPage({
               </div>
             )}
 
-            {(currentTag && filteredPosts.length === 0) || (
+            {!activeFilters || posts.length > 0 ? (
               <>
                 <div className="md:flex justify-between">
                   {/* ✅ Left (Main Content) */}
@@ -522,10 +798,10 @@ export default function PostsPage({
                             />
                           )}
                           <div className="w-full mt-6 p-6">
-                            <div className="flex items-center justify-between relative group">
+                            <div className="flex items-center justify-between">
                               <div className="flex items-center">
                                 {postsWithViews[0].views > 10 && (
-                                  <>
+                                  <div className="relative group inline-block">
                                     <svg
                                       className="w-5 h-5 ml-2"
                                       viewBox="0 0 24 24"
@@ -539,37 +815,52 @@ export default function PostsPage({
                                     </svg>
                                     <div
                                       className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 
-                                  hidden group-hover:block px-2 py-1 rounded-md 
-                                  bg-gray-800 text-white text-xs shadow-md whitespace-nowrap"
+                      hidden group-hover:block px-2 py-1 rounded-md 
+                      bg-gray-800 text-white text-xs shadow-md whitespace-nowrap
+                      z-50"
                                     >
                                       پربازدید
                                     </div>
-                                  </>
+                                  </div>
                                 )}
 
-                                <div className="relative group inline-block">
-                                  {isRecommended(posts[0]) && (
-                                    <>
-                                      <svg
-                                        className="w-5 h-5 ml-2 text-yellow-400 cursor-pointer"
-                                        fill="#f06330"
-                                        viewBox="0 0 20 20"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                      >
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.954a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.953c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37-2.448c-.784.57-1.838-.197-1.539-1.118l1.286-3.953a1 1 0 00-.364-1.118L2.073 9.38c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.954z" />
-                                      </svg>
-
-                                      {/* Tooltip */}
-                                      <div
-                                        className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 
-                                  hidden group-hover:block px-2 py-1 rounded-md 
-                                  bg-gray-800 text-white text-xs shadow-md whitespace-nowrap"
-                                      >
-                                        پیشنهاد ما
-                                      </div>
-                                    </>
-                                  )}
-                                </div>
+                                {isRecommended(posts[0]) && (
+                                  <div className="relative group inline-block">
+                                    <svg
+                                      className="w-5 h-5 ml-2"
+                                      viewBox="0 0 36 36"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      aria-hidden="true"
+                                      role="img"
+                                      preserveAspectRatio="xMidYMid meet"
+                                      fill="#000000"
+                                    >
+                                      <g
+                                        id="SVGRepo_bgCarrier"
+                                        stroke-width="0"
+                                      ></g>
+                                      <g
+                                        id="SVGRepo_tracerCarrier"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                      ></g>
+                                      <g id="SVGRepo_iconCarrier">
+                                        <path
+                                          fill="#FFAC33"
+                                          d="M27.287 34.627c-.404 0-.806-.124-1.152-.371L18 28.422l-8.135 5.834a1.97 1.97 0 0 1-2.312-.008a1.971 1.971 0 0 1-.721-2.194l3.034-9.792l-8.062-5.681a1.98 1.98 0 0 1-.708-2.203a1.978 1.978 0 0 1 1.866-1.363L12.947 13l3.179-9.549a1.976 1.976 0 0 1 3.749 0L23 13l10.036.015a1.975 1.975 0 0 1 1.159 3.566l-8.062 5.681l3.034 9.792a1.97 1.97 0 0 1-.72 2.194a1.957 1.957 0 0 1-1.16.379z"
+                                        ></path>
+                                      </g>
+                                    </svg>
+                                    <div
+                                      className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 
+                      hidden group-hover:block px-2 py-1 rounded-md 
+                      bg-gray-800 text-white text-xs shadow-md whitespace-nowrap
+                      z-50"
+                                    >
+                                      پیشنهاد ما
+                                    </div>
+                                  </div>
+                                )}
 
                                 <p className="text-sm text-gray-500">
                                   {posts[0].category?.title}
@@ -640,59 +931,45 @@ export default function PostsPage({
                   {/* ✅ Right Sidebar */}
                   <div className="md:w-[35%] md:mr-4 md:p-0 p-4">
                     <div className="flex flex-col items-center justify-between h-full pb-3">
-                      <div className="flex bg-[#fbb2bd] py-2 px-5 mb-5 w-full rounded-2xl border-3 border-white">
-                        <div className="w-1/2 flex justify-center items-center">
-                          <div>
-                            <p className="text-lg text-gray-600">آموزش</p>
-                            <p className="text-xl text-gray-700 font-semibold">
-                              کسب درآمد آنلاین
-                            </p>
-                          </div>
-                        </div>
-                        <div className="w-1/2 flex justify-end">
-                          <Image
-                            width={150}
-                            height={100}
-                            src="/blog/blog-digital-marketing-icon.jpg"
-                            alt="آموزش دیجیتال مارکتینگ و کسب درآمد آنلاین"
-                          />
+                      <div className="relative bg-[#fbb2bd] mb-5 w-full aspect-[16/8] rounded-2xl border-3 border-white overflow-hidden">
+                        <Image
+                          src="/blog/programming-learn (1).png"
+                          alt="متخصصان سئو وبوفن - دکتر مجتبی خداخواه"
+                          fill
+                          className="object-cover"
+                          priority
+                        />
+                        <div className="absolute text-white top-18 right-5">
+                          <p className="text-lg">آموزش</p>
+                          <p className="text-2xl font-semibold">برنامه نویسی</p>
                         </div>
                       </div>
-
-                      <div className="flex bg-[#a0e1fd] py-2 px-5 mb-5 w-full rounded-2xl border-3 border-white">
-                        <div className="w-1/2 flex justify-center items-center">
-                          <div>
-                            <p className="text-lg text-gray-600">آموزش</p>
-                            <p className="text-xl text-gray-700 font-semibold">
-                              سئو و بهینه‌سازی
-                            </p>
-                          </div>
-                        </div>
-                        <div className="w-1/2 flex justify-end">
-                          <Image
-                            width={150}
-                            height={100}
-                            src="/blog/blog-seo-icon.jpg"
-                            alt="آموزش سئو و بهینه‌سازی سایت"
-                          />
+                      <div className="relative bg-[#fbb2bd] mb-5 w-full aspect-[16/8] rounded-2xl border-3 border-white overflow-hidden">
+                        <Image
+                          src="/blog/ui-ux.png"
+                          alt="متخصصان سئو وبوفن - دکتر مجتبی خداخواه"
+                          fill
+                          className="object-cover"
+                          priority
+                        />
+                        <div className="absolute text-white top-18 right-5">
+                          <p className="text-lg">آموزش</p>
+                          <p className="text-2xl font-semibold">
+                            طراحی UI / UX{" "}
+                          </p>
                         </div>
                       </div>
-                      <div className="flex bg-[#ffdab0] py-2 px-5 mb-5 w-full rounded-2xl border-3 border-white">
-                        <div className="w-1/2 flex justify-center items-center">
-                          <div>
-                            <p className="text-lg text-gray-600">آموزش</p>
-                            <p className="text-xl text-gray-700 font-semibold">
-                              تولید محتوا
-                            </p>
-                          </div>
-                        </div>
-                        <div className="w-1/2 flex justify-end">
-                          <Image
-                            width={150}
-                            height={100}
-                            src="/blog/blog-content-icon.jpg"
-                            alt="آموزش تولید محتوا حرفه‌ای"
-                          />
+                      <div className="relative bg-[#fbb2bd] mb-5 w-full aspect-[16/8] rounded-2xl border-3 border-white overflow-hidden">
+                        <Image
+                          src="/blog/seo.png"
+                          alt="متخصصان سئو وبوفن - دکتر مجتبی خداخواه"
+                          fill
+                          className="object-cover"
+                          priority
+                        />
+                        <div className="absolute text-white top-18 right-5">
+                          <p className="text-lg">آموزش</p>
+                          <p className="text-2xl font-semibold">سئو سایت </p>
                         </div>
                       </div>
                     </div>
@@ -751,10 +1028,15 @@ export default function PostsPage({
                                       <div className="w-full">
                                         <p className="text-gray-500">
                                           <span className="block">
-                                            در{" "}
-                                            <span className="text-[#5ebae8] text-lg">
+                                            در
+                                            <a
+                                              href="https://t.me/webofenlearn"
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="text-[#5ebae8] text-lg hover:underline"
+                                            >
                                               تلگرام
-                                            </span>
+                                            </a>
                                           </span>
                                           <span>وبوفن عضو شوید!</span>
                                         </p>
@@ -977,7 +1259,7 @@ export default function PostsPage({
                   </Masonry>
                 )}
               </>
-            )}
+            ) : null}
 
             {loading && (
               <div className="flex justify-center my-8">
@@ -985,7 +1267,7 @@ export default function PostsPage({
               </div>
             )}
 
-            {hasMore && !currentTag && (
+            {showLoadMore && (
               <div className="mt-12 flex justify-center">
                 <button
                   onClick={handleLoadMore}

@@ -96,7 +96,6 @@ export default function Home() {
         ogImage="https://webofen.com/images/og-home.jpg"
       />
 
-      {/* اسکیماهای JSON-LD */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
@@ -118,10 +117,12 @@ export default function Home() {
               <div className="relative w-[90%] mx-auto md:w-[62%] aspect-[16/9] rounded-lg overflow-hidden">
                 <Image
                   src="/homepage/slider.webp"
-                  alt="کلینیک تخصصی سئو وبوفن - خدمات سئو و بهینه‌سازی سایت"
-                  fill
-                  className="object-contain"
+                  alt="کلینیک تخصصی سئو وبوفن"
+                  width={1200}
+                  height={675}
                   priority
+                  className="object-contain"
+                  sizes="(max-width: 768px) 90vw, 62vw"
                 />
                 <Link href={"/products"}>
                   <button
@@ -139,34 +140,43 @@ export default function Home() {
                   </button>
                 </Link>
               </div>
-              {/* Side Image - Desktop Version */}
-              <div className="relative w-full hidden md:flex lg:w-[38%] aspect-auto rounded-lg">
-                <Link href="/analyze">
-                  <Image
-                    src="/homepage/sideslide.webp"
-                    alt="خدمات تخصصی سئو و طراحی سایت وبوفن"
-                    fill
-                    className="object-contain"
-                    priority
+              <div className="relative hidden md:flex md:w-[38%] aspect-[4/3] rounded-2xl overflow-hidden">
+                <div className="relative w-full h-full overflow-hidden">
+                  <video
+                    src="/homepage/ajir.mp4"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    poster="/homepage/IMG_1147.jpeg"
+                    className="absolute top-0 left-0 w-full h-full object-cover scale-105"
                   />
-                  <div
-                    className="absolute p-6 rounded-r-3xl cursor-pointer rounded-tl-3xl"
-                    style={{
-                      left: "0",
-                      bottom: "0",
-                      width: "18.5%",
-                      backgroundColor: "#1d546b",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                    }}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 71.21 71.21"
-                      className="w-[40px] m-auto pulse-icon"
-                    >
-                      <path
-                        fill="#fff"
-                        d="M62.31,56.48v-17.91c0-14.73-11.98-26.7-26.7-26.7s-26.7,11.98-26.7,26.7v17.91C3.88,57.21,0,61.54,0,66.76
+                </div>
+
+                {/* ✅ Overlay content */}
+                <Link
+                  href="/analyze"
+                  className="absolute inset-0 top-18 items-center text-white text-center px-4"
+                >
+                  <p className="text-3xl font-semibold drop-shadow-md">
+                    آنالیز کن،{" "}
+                    <span className="font-medium">سایتت رو از مرگ</span>
+                  </p>
+                  <p className="text-6xl font-semibold mt-8 drop-shadow-md">
+                    نجات بـــــــــــده
+                  </p>
+
+                  {/* Icon bottom-left */}
+                  <div className="absolute left-0 w-[20%] bottom-0 pt-3 px-3 rounded-tr-3xl cursor-pointer bg-[#f7f8fc]">
+                    <div className="bg-[#1d546b] w-20 p-4 rounded-t-2xl rounded-br-2xl">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 71.21 71.21"
+                        className="w-[40px] m-auto pulse-icon"
+                      >
+                        <path
+                          fill="#fff"
+                          d="M62.31,56.48v-17.91c0-14.73-11.98-26.7-26.7-26.7s-26.7,11.98-26.7,26.7v17.91C3.88,57.21,0,61.54,0,66.76
                     c0,2.45,2,4.45,4.45,4.45h62.31c2.45,0,4.45-2,4.45-4.45c0-5.22-3.88-9.56-8.9-10.28ZM11.87,38.57
                     c0-13.09,10.65-23.74,23.74-23.74s23.74,10.65,23.74,23.74v17.8H11.87v-17.8ZM66.76,68.25H4.45c-.82,0-1.48-.67-1.48-1.48
                     c0-4.09,3.33-7.42,7.42-7.42h50.44c4.09,0,7.42,3.33,7.42,7.42C68.24,67.58,67.57,68.25,66.76,68.25ZM50.6,6.75l2.97-5.93
@@ -177,67 +187,42 @@ export default function Home() {
                     s1.52-.58,2.1,0l5.93,5.93c.58.58.58,1.52,0,2.1c-.29.29-.67.43-1.05.43s-.76-.15-1.05-.43L.43,11.44ZM35.61,28.19
                     c0,.82-.66,1.48-1.48,1.48c-4.09,0-7.42,3.33-7.42,7.42c0,.82-.66,1.48-1.48,1.48s-1.48-.66-1.48-1.48
                     c0-5.73,4.66-10.39,10.39-10.39c.82,0,1.48.66,1.48,1.48Z"
-                      />
-                    </svg>
+                        />
+                      </svg>  
+                    </div>
                   </div>
                 </Link>
-                <style jsx>{`
-                  @keyframes pulse {
-                    0% {
-                      transform: scale(1);
-                    }
-                    50% {
-                      transform: scale(1.1);
-                    }
-                    100% {
-                      transform: scale(1);
-                    }
-                  }
-                  .pulse-icon {
-                    animation: pulse 2s infinite;
-                  }
-                `}</style>
               </div>
+
               {/* Side Image - Mobile Version */}
-              <div className="relative flex w-[90%] mx-auto aspect-[3/1] mt-2 rounded-lg md:hidden">
-                <Link href="/analyze">
-                  <Image
-                    src="/homepage/sideslidemobile.png"
-                    alt="خدمات سئو وبوفن - نسخه موبایل"
-                    fill
-                    className="object-contain"
-                    priority
+              <div className="relative w-[90%] mx-auto aspect-[3/1] mt-3 rounded-xl md:hidden overflow-hidden">
+                <Link
+                  href="/analyze"
+                  className="relative block w-full h-full group"
+                >
+                  {/* Cover image fallback */}
+
+                  {/* Video background */}
+                  <video
+                    src="/homepage/Sequence 02_1 (1).mp4"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    poster="/homepage/IMG_1148 (1).jpeg"
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
 
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 71.21 71.21"
-                    className="absolute md:rounded-r-3xl md:rounded-tl-3xl rounded-r-xl rounded-tl-xl"
-                    style={{
-                      left: "0%",
-                      bottom: "2%",
-                      width: "11%",
-                      height: "auto",
-                      backgroundColor: "#1d546b",
-                      padding: "1.9%",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                    }}
-                  >
-                    <path
-                      fill="#fff"
-                      d="M62.31,56.48v-17.91c0-14.73-11.98-26.7-26.7-26.7s-26.7,11.98-26.7,26.7v17.91C3.88,57.21,0,61.54,0,66.76
-    c0,2.45,2,4.45,4.45,4.45h62.31c2.45,0,4.45-2,4.45-4.45c0-5.22-3.88-9.56-8.9-10.28ZM11.87,38.57
-    c0-13.09,10.65-23.74,23.74-23.74s23.74,10.65,23.74,23.74v17.8H11.87v-17.8ZM66.76,68.25H4.45c-.82,0-1.48-.67-1.48-1.48
-    c0-4.09,3.33-7.42,7.42-7.42h50.44c4.09,0,7.42,3.33,7.42,7.42C68.24,67.58,67.57,68.25,66.76,68.25ZM50.6,6.75l2.97-5.93
-    c.37-.73,1.26-1.03,1.99-.66c.73.37,1.03,1.26.66,1.99l-2.97,5.93c-.26.52-.79.82-1.33.82c-.22,0-.45-.05-.66-.16
-    c-.73-.37-1.03-1.26-.66-1.99h0ZM62.75,17.37c-.58-.58-.58-1.52,0-2.1l5.93-5.93c.58-.58,1.52-.58,2.1,0s.58,1.52,0,2.1
-    l-5.93,5.93c-.29.29-.67.43-1.05.43s-.76-.15-1.05-.43h0ZM14.99,2.15c-.36-.73-.07-1.62.66-1.99s1.62-.07,1.99.66l2.97,5.93
-    c.36.73.07,1.62-.66,1.99c-.21.11-.44.16-.66.16c-.54,0-1.07-.3-1.33-.82l-2.97-5.93h0ZM.43,11.44c-.58-.58-.58-1.52,0-2.1
-    s1.52-.58,2.1,0l5.93,5.93c.58.58.58,1.52,0,2.1c-.29.29-.67.43-1.05.43s-.76-.15-1.05-.43L.43,11.44ZM35.61,28.19
-    c0,.82-.66,1.48-1.48,1.48c-4.09,0-7.42,3.33-7.42,7.42c0,.82-.66,1.48-1.48,1.48s-1.48-.66-1.48-1.48
-    c0-5.73,4.66-10.39,10.39-10.39c.82,0,1.48.66,1.48,1.48Z"
-                    />
-                  </svg>
+                  {/* ✅ Text overlay — aligned to the right */}
+                  <div className="absolute right-7 top-1/2 -translate-y-1/2 text-right text-white space-y-1">
+                    <p className="text-xs sm:text-sm font-semibold drop-shadow-md">
+                      آنالیز کن،{" "}
+                      <span className="font-medium">سایتت رو از مرگ</span>
+                    </p>
+                    <p className="text-2xl font-bold drop-shadow-md leading-tight">
+                      نجات بـــــــــــده
+                    </p>
+                  </div>
                 </Link>
               </div>
             </div>
@@ -245,9 +230,9 @@ export default function Home() {
 
           <div className="w-full p-4 mt-4 text-black font-bold">
             <div className="max-w-[1250px] m-auto flex justify-center">
-              <div className="w-full flex flex-col gap-4 lg:flex-row lg:items-center justify-between rounded-2xl bg-white p-4">
+              <div className="w-full rounded-2xl bg-white p-4">
                 {/* Input Fields */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+                <div className="">
                   <FreeConsultationForm />
                 </div>
               </div>
@@ -324,8 +309,8 @@ export default function Home() {
                   <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                   <g
                     id="SVGRepo_tracerCarrier"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                     stroke="#CCCCCC"
                     stroke-width="8"
                   ></g>
@@ -336,16 +321,16 @@ export default function Home() {
                       stroke="#1d546b"
                       stroke-opacity="0.9"
                       stroke-width="20"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     ></path>{" "}
                     <path
                       d="M198.744 315.68C198.744 317.274 198.744 319.614 198.744 322.7"
                       stroke="#1d546b"
                       stroke-opacity="0.9"
                       stroke-width="16"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     ></path>{" "}
                   </g>
                 </svg>{" "}
@@ -364,8 +349,8 @@ export default function Home() {
                       <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                       <g
                         id="SVGRepo_tracerCarrier"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       ></g>
                       <g id="SVGRepo_iconCarrier">
                         {" "}
@@ -434,27 +419,27 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#FBE07A"
-                              stop-opacity="0.75"
+                              stopOpacity="0.75"
                             ></stop>{" "}
                             <stop
                               offset="0.0803394"
                               stop-color="#FBE387"
-                              stop-opacity="0.6897"
+                              stopOpacity="0.6897"
                             ></stop>{" "}
                             <stop
                               offset="0.5173"
                               stop-color="#FDF2C7"
-                              stop-opacity="0.362"
+                              stopOpacity="0.362"
                             ></stop>{" "}
                             <stop
                               offset="0.8357"
                               stop-color="#FFFBF0"
-                              stop-opacity="0.1233"
+                              stopOpacity="0.1233"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="white"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                           <radialGradient
@@ -468,12 +453,12 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#440063"
-                              stop-opacity="0.25"
+                              stopOpacity="0.25"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="#420061"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                         </defs>{" "}
@@ -492,8 +477,8 @@ export default function Home() {
                       <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                       <g
                         id="SVGRepo_tracerCarrier"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       ></g>
                       <g id="SVGRepo_iconCarrier">
                         {" "}
@@ -562,27 +547,27 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#FBE07A"
-                              stop-opacity="0.75"
+                              stopOpacity="0.75"
                             ></stop>{" "}
                             <stop
                               offset="0.0803394"
                               stop-color="#FBE387"
-                              stop-opacity="0.6897"
+                              stopOpacity="0.6897"
                             ></stop>{" "}
                             <stop
                               offset="0.5173"
                               stop-color="#FDF2C7"
-                              stop-opacity="0.362"
+                              stopOpacity="0.362"
                             ></stop>{" "}
                             <stop
                               offset="0.8357"
                               stop-color="#FFFBF0"
-                              stop-opacity="0.1233"
+                              stopOpacity="0.1233"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="white"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                           <radialGradient
@@ -596,12 +581,12 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#440063"
-                              stop-opacity="0.25"
+                              stopOpacity="0.25"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="#420061"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                         </defs>{" "}
@@ -620,8 +605,8 @@ export default function Home() {
                       <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                       <g
                         id="SVGRepo_tracerCarrier"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       ></g>
                       <g id="SVGRepo_iconCarrier">
                         {" "}
@@ -690,27 +675,27 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#FBE07A"
-                              stop-opacity="0.75"
+                              stopOpacity="0.75"
                             ></stop>{" "}
                             <stop
                               offset="0.0803394"
                               stop-color="#FBE387"
-                              stop-opacity="0.6897"
+                              stopOpacity="0.6897"
                             ></stop>{" "}
                             <stop
                               offset="0.5173"
                               stop-color="#FDF2C7"
-                              stop-opacity="0.362"
+                              stopOpacity="0.362"
                             ></stop>{" "}
                             <stop
                               offset="0.8357"
                               stop-color="#FFFBF0"
-                              stop-opacity="0.1233"
+                              stopOpacity="0.1233"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="white"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                           <radialGradient
@@ -724,12 +709,12 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#440063"
-                              stop-opacity="0.25"
+                              stopOpacity="0.25"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="#420061"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                         </defs>{" "}
@@ -750,8 +735,8 @@ export default function Home() {
                       <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                       <g
                         id="SVGRepo_tracerCarrier"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       ></g>
                       <g id="SVGRepo_iconCarrier">
                         {" "}
@@ -820,27 +805,27 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#FBE07A"
-                              stop-opacity="0.75"
+                              stopOpacity="0.75"
                             ></stop>{" "}
                             <stop
                               offset="0.0803394"
                               stop-color="#FBE387"
-                              stop-opacity="0.6897"
+                              stopOpacity="0.6897"
                             ></stop>{" "}
                             <stop
                               offset="0.5173"
                               stop-color="#FDF2C7"
-                              stop-opacity="0.362"
+                              stopOpacity="0.362"
                             ></stop>{" "}
                             <stop
                               offset="0.8357"
                               stop-color="#FFFBF0"
-                              stop-opacity="0.1233"
+                              stopOpacity="0.1233"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="white"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                           <radialGradient
@@ -854,12 +839,12 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#440063"
-                              stop-opacity="0.25"
+                              stopOpacity="0.25"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="#420061"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                         </defs>{" "}
@@ -878,8 +863,8 @@ export default function Home() {
                       <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                       <g
                         id="SVGRepo_tracerCarrier"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       ></g>
                       <g id="SVGRepo_iconCarrier">
                         {" "}
@@ -948,27 +933,27 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#FBE07A"
-                              stop-opacity="0.75"
+                              stopOpacity="0.75"
                             ></stop>{" "}
                             <stop
                               offset="0.0803394"
                               stop-color="#FBE387"
-                              stop-opacity="0.6897"
+                              stopOpacity="0.6897"
                             ></stop>{" "}
                             <stop
                               offset="0.5173"
                               stop-color="#FDF2C7"
-                              stop-opacity="0.362"
+                              stopOpacity="0.362"
                             ></stop>{" "}
                             <stop
                               offset="0.8357"
                               stop-color="#FFFBF0"
-                              stop-opacity="0.1233"
+                              stopOpacity="0.1233"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="white"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                           <radialGradient
@@ -982,12 +967,12 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#440063"
-                              stop-opacity="0.25"
+                              stopOpacity="0.25"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="#420061"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                         </defs>{" "}
@@ -1006,8 +991,8 @@ export default function Home() {
                       <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                       <g
                         id="SVGRepo_tracerCarrier"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       ></g>
                       <g id="SVGRepo_iconCarrier">
                         {" "}
@@ -1076,27 +1061,27 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#FBE07A"
-                              stop-opacity="0.75"
+                              stopOpacity="0.75"
                             ></stop>{" "}
                             <stop
                               offset="0.0803394"
                               stop-color="#FBE387"
-                              stop-opacity="0.6897"
+                              stopOpacity="0.6897"
                             ></stop>{" "}
                             <stop
                               offset="0.5173"
                               stop-color="#FDF2C7"
-                              stop-opacity="0.362"
+                              stopOpacity="0.362"
                             ></stop>{" "}
                             <stop
                               offset="0.8357"
                               stop-color="#FFFBF0"
-                              stop-opacity="0.1233"
+                              stopOpacity="0.1233"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="white"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                           <radialGradient
@@ -1110,12 +1095,12 @@ export default function Home() {
                             {" "}
                             <stop
                               stop-color="#440063"
-                              stop-opacity="0.25"
+                              stopOpacity="0.25"
                             ></stop>{" "}
                             <stop
                               offset="1"
                               stop-color="#420061"
-                              stop-opacity="0"
+                              stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
                         </defs>{" "}
@@ -1246,12 +1231,14 @@ export default function Home() {
                 id="Second"
                 className="order-1 md:order-2 pt-2 md:w-1/3 w-11/12 mx-auto-sm"
               >
-                <div className="relative w-full md:w-2/4 mx-auto h-[220px] md:h-[100%]  rounded-lg">
+                <div className="relative w-full md:w-2/4 mx-auto h-[220px] md:h-[100%] rounded-lg">
                   <Image
                     src="/homepage/hero2.webp"
                     alt="خدمات تخصصی سئو و طراحی سایت وبوفن"
                     fill
                     className="object-contain"
+                    sizes="(max-width: 768px) 90vw, (max-width: 1024px) 50vw, 33vw"
+                    priority
                   />
                 </div>
               </div>
@@ -1306,58 +1293,57 @@ export default function Home() {
             <Reservetime />
           </div>
         </section>
-                <section className="bg-[#f7f8fc] w-full pt-4">
+        <section className="bg-[#f7f8fc] w-full pt-4">
+          <div className="md:max-w-[1250px] w-full m-auto mt-5 md:p-0 p-2">
+            <div className="text-center mb-10">
+              <p className="text-[#29b0cb] text-2xl">
+                <span className="text-[#253e5f]">نمونه کار </span>درمان سایت
+              </p>
 
-        <div className="max-w-[1250px] m-auto mt-5">
-          <div className="text-center mb-10">
-            <p className="text-[#29b0cb] text-2xl">
-              <span className="text-[#253e5f]">نمونه کار </span>درمان سایت
-            </p>
+              {/* Buttons wrapper */}
+              <div className="flex justify-center items-center mt-6">
+                <div className="flex w-full md:w-2/4 justify-center border rounded-full p-2">
+                  <div className="relative flex gap-4 rounded-full h-10 w-full md:mt-0 overflow-hidden">
+                    {/* Active highlight */}
+                    <div
+                      className="absolute top-0 left-0 h-full bg-[#1d546b] rounded-full transition-all duration-300"
+                      style={{
+                        width: "50%",
+                        transform:
+                          activeDiv === "second"
+                            ? "translateX(0%)"
+                            : "translateX(100%)",
+                      }}
+                    ></div>
 
-            {/* Buttons wrapper */}
-            <div className="flex justify-center items-center mt-6">
-              <div className="md:flex w-2/4 justify-center border rounded-2xl md:rounded-full p-2">
-                <div className="relative flex gap-4 rounded-full h-10 md:w-full md:mt-0 mt-2 overflow-hidden">
-                  {/* Active highlight */}
-                  <div
-                    className="absolute top-0 left-0 h-full bg-[#1d546b] rounded-full transition-all duration-300"
-                    style={{
-                      width: "50%",
-                      transform:
+                    {/* Buttons */}
+
+                    <button
+                      onClick={() => handleClick("first")}
+                      className={`flex-1 z-10 text-sm md:text-md py-1 rounded-full h-10 transition-all duration-200 ${
+                        activeDiv === "first"
+                          ? "text-white"
+                          : "text-[#1d546b] hover:text-[#1d546b]"
+                      }`}
+                    >
+                      سئو سایت
+                    </button>
+                    <button
+                      onClick={() => handleClick("second")}
+                      className={`flex-1 z-10 text-sm md:text-md py-1 rounded-full h-10 transition-all duration-200 ${
                         activeDiv === "second"
-                          ? "translateX(0%)"
-                          : "translateX(100%)",
-                    }}
-                  ></div>
-
-                  {/* Buttons */}
-                  <button
-                    onClick={() => handleClick("first")}
-                    className={`flex-1 z-10 text-sm md:text-md py-1 rounded-full h-10 transition-all duration-200 ${
-                      activeDiv === "first"
-                        ? "text-white"
-                        : "text-[#1d546b] hover:text-[#1d546b]"
-                    }`}
-                  >
-                    طراحی سایت
-                  </button>
-
-                  <button
-                    onClick={() => handleClick("second")}
-                    className={`flex-1 z-10 text-sm md:text-md py-1 rounded-full h-10 transition-all duration-200 ${
-                      activeDiv === "second"
-                        ? "text-white"
-                        : "text-[#1d546b] hover:text-[#1d546b]"
-                    }`}
-                  >
-                    سئو سایت
-                  </button>
+                          ? "text-white"
+                          : "text-[#1d546b] hover:text-[#1d546b]"
+                      }`}
+                    >
+                      طراحی سایت
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
+            <HomepageResume />
           </div>
-          <HomepageResume />
-        </div>
         </section>
       </main>
     </>

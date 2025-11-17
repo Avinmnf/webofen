@@ -16,33 +16,61 @@
 
 
 
-body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: 'YekanBakhFaNum-Regular', Arial, Helvetica, sans-serif;
-}
 @font-face {
   font-family: 'YekanBakhFaNum-Regular';
   src: url('/fonts/YekanBakhFaNum-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
+}
+
+body {
+  font-family: 'YekanBakhFaNum-Regular', Arial, Helvetica, sans-serif;
+  background-color: white;
+  color: var(--foreground);
+}
+code{
+text-align: left;
+display: block;
+padding: 5px 10px;
+background-color: #f8f8f8;
+border-radius: 10px;
+margin: 5px;
+}
+table {
+text-indent: 0;
+border-color: inherit;
+border-collapse: collapse;
+width: 100%;
+text-align: center;
+margin-bottom: 10px;
+} 
+table td {
+border: 1px solid cadetblue;
+padding: 5px;
+}
+table th {
+border: 1px solid;
+background: #0366b4;
+color: white;
 }
 @layer base {
 .content h1{font-size: 1.8rem; padding: 10px 0;}
 .content h2{font-size: 1.7rem;padding: 10px 0;}
 .content h3{font-size: 1.5rem;padding: 10px 0;}
 .content h4{font-size: 1.3rem;padding: 10px 0;}
-.content ul{padding: 15px; background-color: #f8f8f8;border-radius: 10px;margin:5px}
-.content ol{padding: 15px; background-color: #f8f8f8;border-radius: 10px;margin:5px}
+.content ul{padding: 15px; padding-right: 25px; background-color: #f8f8f8;border-radius: 10px;margin:5px; }
+.content ol{padding: 15px; padding-right: 25px; background-color: #f8f8f8;border-radius: 10px;margin:5px; }
+
 .content ol li{list-style-type:decimal; line-height: 2.5rem; }
 .content ul li{list-style-type: disc;}
 .content ul li a{color: #3db4c6;}
 .related {
   color: black;
 }
-.toc-level-1{margin-right: 1px;}
-.toc-level-2{margin-right: 5px;}
-.toc-level-3{margin-right: 10px;}
+.toc-level-1{margin-right: 2px; font-size: 1.2rem;}
+.toc-level-2{margin-right: 5px; font-size: 1rem;}
+.toc-level-3{margin-right: 10px; font-size: 0.9rem;}
 }
 .toc-sidebar {
   position: sticky;
@@ -61,8 +89,7 @@ body {
 }
 
 .toc-sidebar ul li a:hover {
-  text-decoration: underline;
-  color: #6fd6e5;
+  color: #1d546b;
 }
 
 /* برای responsive design */
@@ -81,6 +108,13 @@ p{
 
 .articles a{
   color: #3db4c6;
+}
+.relatedpost{
+  padding: 0px !important;
+}
+.articles .content img{
+  margin: 0 auto;
+  padding: 1.5rem;
 }
 
 .stage{

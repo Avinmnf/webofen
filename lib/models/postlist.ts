@@ -1,4 +1,3 @@
-
 export type Post = {
   id: string;
   title: string;
@@ -28,4 +27,5 @@ export type UsePostsOptions = {
   tag?: string;
   sort?: string;
   order?: "asc" | "desc";
+  search?: string;
 };

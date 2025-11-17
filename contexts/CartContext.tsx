@@ -155,42 +155,62 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     if (storageKey) localStorage.removeItem(storageKey);
   };
 
-  const placeOrder = async (
-    customerInfo: CustomerInfo,
-    extra?: OrderExtraInfo
-  ) => {
-    if (!user) return { success: false, message: "User not logged in." };
+ const placeOrder = async (
+  customerInfo: CustomerInfo,
+  extra?: OrderExtraInfo
+) => {
+  if (!user) return { success: false, message: "User not logged in." };
 
-    try {
-      const payload = {
-        ...customerInfo,
-        ...extra,
-        status: "not_payed",
-      };
+  try {
+    const payload = {
+      ...customerInfo,
+      ...extra,
+      status: "not_payed",
+    };
 
-      const res = await fetch(`/api/proxy/orders`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(payload),
-      });
+    const res = await fetch(`/api/proxy/orders`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      if (res.ok) {
-        return {
-          success: true,
-          message: "سفارش با موفقیت ثبت شد.",
-          orderId: data.orderId,
-        };
-      } else {
-        return { success: false, message: data.message || "خطا در ثبت سفارش." };
-      }
-    } catch (error) {
-      console.error("placeOrder error:", error);
-      return { success: false, message: "خطای شبکه یا سرور." };
-    }
-  };
+    if (!res.ok) return { success: false, message: data.message || "خطا در ثبت سفارش." };
+
+    // ✅ Call admin SMS API
+    await fetch(`/api/sms/smssend`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        orderId: data.orderId,
+        type: "order_admin",
+      }),
+    }).catch((err) => console.error("Admin SMS error:", err));
+
+    // ✅ Call user SMS API
+    await fetch(`/api/zarinpal/sms/payment-success`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        orderId: data.orderId,
+        customerName: customerInfo.customerName,
+        customerPhone: customerInfo.customerPhone,
+        totalPrice: extra?.totalPrice || 0,
+      }),
+    }).catch((err) => console.error("User SMS error:", err));
+
+    return {
+      success: true,
+      message: "سفارش با موفقیت ثبت شد.",
+      orderId: data.orderId,
+    };
+  } catch (error) {
+    console.error("placeOrder error:", error);
+    return { success: false, message: "خطای شبکه یا سرور." };
+  }
+};
 
   return (
     <CartContext.Provider

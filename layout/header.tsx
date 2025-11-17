@@ -38,8 +38,8 @@ export default function Header() {
     { label: " داروخانه", href: "/products" },
     { label: "طراحی سایت", href: "/web-design" },
     { label: "وبلاگ", href: "/articles" },
-    { label: "درباره ما", href: "#" },
-    { label: "بیمه وب و فن", href: "#" },
+    { label: "آنالیز وبسایت", href: "/analyze" },
+    { label: "درباره ما", href: "/about-us" },
   ];
 
   // Logout called from modal, no redirect

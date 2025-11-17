@@ -31,8 +31,8 @@ const ArticleSchema = ({ post }: SchemaProps) => {
   const schemaData = {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: post.title,
-    description: post.description,
+    headline: post.seoTitle,
+    description: post.seoDescription,
     image: post.imageUrl ? [post.imageUrl] : [],
     datePublished: post.createdAt,
     dateModified: post.updatedAt || post.createdAt,
@@ -117,6 +117,7 @@ export default function PostPage({ post, viewCount }: Props) {
   const [popupMessage, setPopupMessage] = useState("");
   const [popupVisible, setPopupVisible] = useState(false);
   const countedRef = useRef(false);
+  const shareUrl = "https://webofen.com/-";
 
   const { reactionCounts, handleReaction, loading, hasReacted } = useReactions(
     "post",
@@ -158,8 +159,8 @@ export default function PostPage({ post, viewCount }: Props) {
   return (
     <>
       <SEO
-        title={post?.title || ""}
-        description={post?.description || ""}
+        title={post?.seoTitle || ""}
+        description={post?.seoDescription || ""}
         keywords={post?.tags ? post.tags.map((t) => t.name).join(", ") : ""}
         canonical={typeof window !== "undefined" ? window.location.href : ""}
         ogImage={post?.imageUrl || ""}
@@ -252,7 +253,7 @@ export default function PostPage({ post, viewCount }: Props) {
           <div className="flex flex-col-reverse md:flex-row w-full gap-8 mt-8">
             {/* Post Content */}
             <article className="w-full">
-              <div className="w-full text-gray-700 m-auto">
+              <div className="w-full text-gray-700 m-auto mb-4">
                 <div className="flex items-center mt-8">
                   <svg
                     viewBox="0 -0.5 21 21"
@@ -311,6 +312,9 @@ export default function PostPage({ post, viewCount }: Props) {
                     </span>
                   </div>
                 </div>
+                <div className="bg-gray-100 rounded-md p-2 mt-4 text-gray-500">
+                  <p> {post.description}</p>
+                </div>
               </div>
             </article>
           </div>
@@ -335,7 +339,7 @@ export default function PostPage({ post, viewCount }: Props) {
                 <div>
                   {post.toc && post.toc.length > 0 && (
                     <div>
-                      <h3 className="text-gray-600">فهرست مطالب</h3>
+                      <div className="text-gray-600 text-2xl mb-2">فهرست مطالب</div>
                       <nav className="toc-nav text-sm">
                         <ul>
                           {[...post.toc].reverse().map((item) => (
@@ -443,57 +447,91 @@ export default function PostPage({ post, viewCount }: Props) {
                         />{" "}
                       </svg>{" "}
                     </Link>{" "}
-                    <Link href={"/twitter"} className="pt-2">
-                      {" "}
+                    <span
+                      className="fake-link icon-twitter cursor-pointer"
+                      onClick={() => {
+                        const url = `https://twitter.com/share?text=${encodeURIComponent(
+                          post.title
+                        )}&url=${encodeURIComponent(shareUrl)}`;
+                        window.open(url, "_blank", "noopener,noreferrer");
+                      }}
+                    >
                       <svg
                         className="w-6 h-6 text-gray-400 hover:text-blue-300"
                         viewBox="0 0 24 24"
                         fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
                       >
-                        {" "}
                         <path
                           d="M23 3a10.9 10.9 0 01-3.14 1.53A4.48 4.48 0 0022.4 1.6a9.04 9.04 0 01-2.88 1.1A4.52 4.52 0 0016 0c-2.48 0-4.5 2.02-4.5 4.5 0 .35.04.7.11 1.03A12.86 12.86 0 013 2.1s-4 9 5 13a13 13 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"
                           fill="currentColor"
-                        />{" "}
-                      </svg>{" "}
-                    </Link>{" "}
-                    <Link href="/linkedin">
-                      {" "}
+                        />
+                      </svg>
+                    </span>
+                    <span
+                      className="fake-link icon-linkedin cursor-pointer"
+                      onClick={() => {
+                        const url = `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(
+                          shareUrl
+                        )}&title=${encodeURIComponent(
+                          post.title
+                        )}&summary=&source=`;
+                        window.open(url, "_blank", "noopener,noreferrer");
+                      }}
+                    >
                       <svg
                         className="w-6 h-6 text-gray-400 hover:text-blue-800"
                         viewBox="0 0 24 24"
                         fill="currentColor"
                         xmlns="http://www.w3.org/2000/svg"
                       >
-                        {" "}
-                        <path d="M4.98 3.5C4.98 4.88 3.88 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5zM0 8.5h5v15H0v-15zm7.5 0h4.78v2.07h.07c.66-1.24 2.28-2.55 4.7-2.55 5.02 0 5.95 3.31 5.95 7.61v8.87h-5v-7.85c0-1.87-.03-4.27-2.6-4.27-2.6 0-3 2.03-3 4.13v7.99h-5v-15z" />{" "}
-                      </svg>{" "}
-                    </Link>{" "}
-                    <Link href="/telegram">
-                      {" "}
+                        <path d="M4.98 3.5C4.98 4.88 3.88 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5zM0 8.5h5v15H0v-15zm7.5 0h4.78v2.07h.07c.66-1.24 2.28-2.55 4.7-2.55 5.02 0 5.95 3.31 5.95 7.61v8.87h-5v-7.85c0-1.87-.03-4.27-2.6-4.27-2.6 0-3 2.03-3 4.13v7.99h-5v-15z" />
+                      </svg>
+                    </span>
+                    <span
+                      className="fake-link icon-telegram cursor-pointer"
+                      onClick={() => {
+                        const url = `https://t.me/share/url?url=${encodeURIComponent(
+                          shareUrl
+                        )}&text=${encodeURIComponent(post.title)}`;
+                        window.open(url, "_blank", "noopener,noreferrer");
+                      }}
+                    >
                       <svg
                         className="w-6 h-6 text-gray-400 hover:text-blue-500"
                         viewBox="0 0 48 48"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
                       >
-                        {" "}
                         <path
                           d="M41.4193 7.30899C41.4193 7.30899 45.3046 5.79399 44.9808 9.47328C44.8729 10.9883 43.9016 16.2908 43.1461 22.0262L40.5559 39.0159C40.5559 39.0159 40.3401 41.5048 38.3974 41.9377C36.4547 42.3705 33.5408 40.4227 33.0011 39.9898C32.5694 39.6652 24.9068 34.7955 22.2086 32.4148C21.4531 31.7655 20.5897 30.4669 22.3165 28.9519L33.6487 18.1305C34.9438 16.8319 36.2389 13.8019 30.8426 17.4812L15.7331 27.7616C15.7331 27.7616 14.0063 28.8437 10.7686 27.8698L3.75342 25.7055C3.75342 25.7055 1.16321 24.0823 5.58815 22.459C16.3807 17.3729 29.6555 12.1786 41.4193 7.30899Z"
                           fill="currentColor"
                         />
                       </svg>
-                    </Link>
-                    <Link href="/facebook">
+                    </span>
+                    <span
+                      className="fake-link icon-facebook cursor-pointer"
+                      onClick={() => {
+                        const facebookShareUrl = `https://www.facebook.com/sharer.php?u=${encodeURIComponent(
+                          `https://webofen.com/articles/${post.slug}/`
+                        )}&title=${encodeURIComponent(post.title)}`;
+
+                        window.open(
+                          facebookShareUrl,
+                          "_blank",
+                          "noopener,noreferrer"
+                        );
+                      }}
+                    >
                       <svg
                         className="w-6 h-6 text-gray-400 hover:text-blue-900"
                         viewBox="0 0 290 290"
                         fill="currentColor"
                         xmlns="http://www.w3.org/2000/svg"
                       >
-                        <path d="M205.807,0h-15.694c-43.62,0-79.107,35.488-79.107,79.108v33.386H84.193c-2.761,0-5,2.239-5,5v40c0,2.761,2.239,5,5,5 h26.811V285c0,2.761,2.239,5,5,5h40c2.761,0,5-2.239,5-5V162.494h39.786c2.761,0,5-2.239,5-5v-40c0-2.761-2.239-5-5-5h-39.786 V79.108c0-16.05,13.058-29.108,29.107-29.108h15.694c2.761,0,5-2.239,5-5V5C210.807,2.239,208.568,0,205.807,0z" />{" "}
+                        <path d="M205.807,0h-15.694c-43.62,0-79.107,35.488-79.107,79.108v33.386H84.193c-2.761,0-5,2.239-5,5v40c0,2.761,2.239,5,5,5 h26.811V285c0,2.761,2.239,5,5,5h40c2.761,0,5-2.239,5-5V162.494h39.786c2.761,0,5-2.239,5-5v-40c0-2.761-2.239-5-5-5h-39.786 V79.108c0-16.05,13.058-29.108,29.107-29.108h15.694c2.761,0,5-2.239,5-5V5C210.807,2.239,208.568,0,205.807,0z" />
                       </svg>
-                    </Link>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -535,6 +573,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 
     // If your route returns { count, slug }
     const viewCount = viewsData.count || 0;
+    console.log(postData);
     // 3️⃣ Pass both post and view count as props
     return {
       props: {

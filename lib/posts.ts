@@ -1,6 +1,8 @@
 import { Post, UsePostsOptions } from '@/lib/models/postlist';
 import { calculateReadTime } from './readTime';
+
 const website = process.env.NEXT_PUBLIC_WEBOFEN || 'https://webofen.com'
+
 export async function fetchPosts(options: UsePostsOptions = {}) {
     try {
         const params = new URLSearchParams();
@@ -14,6 +16,7 @@ export async function fetchPosts(options: UsePostsOptions = {}) {
         if (options.tag) params.append("tag", options.tag);
         if (options.sort) params.append("sort", options.sort);
         if (options.order) params.append("order", options.order);
+        if (options.search) params.append("search", options.search);
 
         const res = await fetch(`${website}/api/proxy/posts?${params.toString()}`);
 
@@ -22,6 +25,7 @@ export async function fetchPosts(options: UsePostsOptions = {}) {
         }
 
         const data = await res.json();
+        
         // محاسبه readtime برای هر پست
         const postsWithReadtime = await Promise.all(
             data.posts.map(async (post: any) => {

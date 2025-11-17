@@ -24,6 +24,8 @@ export type Post = {
   videoUrl?: string;
   imageAlt?: string;
   description?: string;
+  seoDescription?: string;
+  seoTitle?: string;
   createdAt?: string;
   updatedAt?: string; // ✅ اضافه شد
   category?: { id: string; title: string; slug: string };
