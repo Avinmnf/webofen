@@ -79,7 +79,7 @@ const SEO: React.FC<SEOProps> = ({
   additionalScripts,
 }) => {
   const router = useRouter();
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://example.com";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://webofen.com";
   const currentUrl = canonical || `${baseUrl}${router.asPath}`;
   const defaultImage = ogImage || `${baseUrl}/images/og-default.jpg`;
 
