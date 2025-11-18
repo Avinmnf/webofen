@@ -70,17 +70,14 @@ export default function CommentForm({
     bodyCount > bodyLimit;
 
   return (
-    <div className="w-full mt-2 mx-auto">
+    <div className="w-full mt-6 mx-auto">
       <div>
         <div className="flex items-start justify-between gap-4 text-gray-600">
-          <div>
-            <p className="text-2xl font-extrabold text-gray-700  flex items-center gap-2">
-
+          <div className="mb-8 border-r-4 border-blue-500 pr-4">
+            <p className="text-2xl font-bold text-gray-800 mb-2">
               {parentId ? "ارسال پاسخ" : "ارسال نظر"}
             </p>
-
           </div>
-
           {contentType === "product" && !productId && (
             <span className="text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">
               شناسه محصول موجود نیست
