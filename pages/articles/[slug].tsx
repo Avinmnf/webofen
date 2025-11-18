@@ -312,7 +312,7 @@ export default function PostPage({ post, viewCount }: Props) {
                     </span>
                   </div>
                 </div>
-                <div className="bg-gray-100 rounded-md p-4 text-sm mt-4 text-gray-400">
+                <div className="bg-[#0364af] rounded-md p-2 text-sm mt-4 text-white w-full md:w-4/5">
                   <p> {post.description}</p>
                 </div>
               </div>
@@ -327,6 +327,53 @@ export default function PostPage({ post, viewCount }: Props) {
                 relatedPosts={relatedPosts}
               />
               <div className="bg-gray-100 mt-6 w-full h-1"></div>
+              {post.faqs && post.faqs.length > 0 && (
+                <div className="faq-section my-8">
+                  <div className="mb-4">
+                      <p className="text-2xl font-bold text-gray-700">
+                        سوالات متداول
+                      </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    {post.faqs.map((faq) => (
+                      <details
+                        key={faq.id}
+                        className="group  rounded-2xl bg-gray-50 transition-all duration-300 overflow-hidden"
+                      >
+                        <summary className="px-6 py-5 cursor-pointer flex items-center justify-between list-none hover:bg-gray-50 transition-colors duration-200">
+                          <div className="flex items-center gap-4 flex-1">
+                            <p className="text-md font-semibold text-gray-800 text-right leading-7">
+                              {faq.question}
+                            </p>
+                          </div>
+                          <div className="flex items-center justify-center w-8 h-8 rounded-lg group-open:bg-blue-100 transition-colors duration-200">
+                            <svg
+                              className="w-4 h-4 text-[#0364af] transition-transform duration-300 group-open:rotate-90"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </div>
+                        </summary>
+
+                        <div className="px-6 pb-5 ">
+                          <div className="pr-2">
+                            <p className="text-gray-600 leading-8 text-justify text-[15px]">
+                              {faq.answer}
+                            </p>
+                          </div>
+                        </div>
+                      </details>
+                    ))}
+                  </div>
+                </div>
+              )}
               <CommentForm
                 contentType="post"
                 pageSlug={typeof slug === "string" ? slug : ""}
@@ -339,7 +386,9 @@ export default function PostPage({ post, viewCount }: Props) {
                 <div>
                   {post.toc && post.toc.length > 0 && (
                     <div>
-                      <div className="text-gray-600 text-2xl mb-2">فهرست مطالب</div>
+                      <div className="text-gray-600 text-2xl mb-2">
+                        فهرست مطالب
+                      </div>
                       <nav className="toc-nav text-sm">
                         <ul>
                           {[...post.toc].reverse().map((item) => (
