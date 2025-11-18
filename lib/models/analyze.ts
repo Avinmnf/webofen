@@ -18,8 +18,8 @@ export interface AnalyzeResult {
   title?: string;
   meta?: {
     title?: string;
+    ogTitle?: string;
     description?: string;
-    keywords?: string;
   };
   scores: {
     performance: number;
@@ -48,10 +48,53 @@ export interface AnalyzeResult {
     h6: number;
     total: number;
   };
+    analysisIssues?: Issue[];
+
+extra?: {
+  brokenLinks: string[];
+  imagesWithoutAlt: number;
+  externalLinks: number;
+  headingsCount?: {
+    h1: number;
+    h2: number;
+    h3: number;
+    h4: number;
+    h5: number;
+    h6: number;
+    total: number;
+  };
+  issues?: Issue[]; // برای سازگاری با قبلی
+  analysisIssues?: Issue[]; // اضافه کردن این خط
+};
+  // اضافه کردن فیلد result برای داده‌های nested
+result?: {
+  issues?: Issue[];
+      analysisIssues?: Issue[]; // اضافه کردن این خط
+
+  comprehensiveData?: {
+    issues?: Issue[];
+    headings?: {
+      h1: number;
+      h2: number;
+      h3: number;
+      h4: number;
+      h5: number;
+      h6: number;
+      total: number;
+    };
+    brokenLinks?: string[];
+    imagesWithoutAlt?: number;
+    externalLinks?: number;
+  };
+  categories?: any;
+  audits?: any;
+  metrics?: any;
+  // اضافه کردن extra درون result
   extra?: {
-    brokenLinks: string[];
-    imagesWithoutAlt: number;
-    externalLinks: number;
+    analysisIssues?: Issue[];
+    brokenLinks?: string[];
+    imagesWithoutAlt?: number;
+    externalLinks?: number;
     headingsCount?: {
       h1: number;
       h2: number;
@@ -61,30 +104,9 @@ export interface AnalyzeResult {
       h6: number;
       total: number;
     };
-    issues?: Issue[]; // اضافه کردن issues به extra
-  };
-  // اضافه کردن فیلد result برای داده‌های nested
-  result?: {
     issues?: Issue[];
-    comprehensiveData?: {
-      issues?: Issue[];
-      headings?: {
-        h1: number;
-        h2: number;
-        h3: number;
-        h4: number;
-        h5: number;
-        h6: number;
-        total: number;
-      };
-      brokenLinks?: string[];
-      imagesWithoutAlt?: number;
-      externalLinks?: number;
-    };
-    categories?: any;
-    audits?: any;
-    metrics?: any;
   };
+};
   // اضافه کردن فیلد translations برای دیکشنری فارسی
   translations?: Record<string, { title: string; description: string }>;
 }

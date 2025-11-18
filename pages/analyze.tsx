@@ -1,3 +1,4 @@
+// pages/index.tsx (یا صفحه اصلی آنالیز)
 "use client";
 
 import { useState, useEffect, useMemo, useRef } from "react";
@@ -22,23 +23,93 @@ import SEO from "@/components/seo";
 // Import types
 import { AnalyzeResult, Analysis } from "@/lib/models/analyze";
 
-// تبدیل API result به AnalyzeResult
+// تبدیل API result به AnalyzeResult - نسخه کاملاً بهبود یافته
 const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
   console.log('🔄 Converting API result to AnalyzeResult...', apiResult);
   
+  // استخراج عنوان از مسیرهای مختلف با اولویت‌بندی
+  let pageTitle = "بدون عنوان";
+  let titleSource = "default";
+  
+  // اولویت ۱: عنوان از result.meta.title
+  if (apiResult.result?.meta?.title && apiResult.result.meta.title.trim() && apiResult.result.meta.title !== "بدون عنوان") {
+    pageTitle = apiResult.result.meta.title;
+    titleSource = "result.meta.title";
+  }
+  // اولویت ۲: عنوان از result.title
+  else if (apiResult.result?.title && apiResult.result.title.trim() && apiResult.result.title !== "بدون عنوان") {
+    pageTitle = apiResult.result.title;
+    titleSource = "result.title";
+  }
+  // اولویت ۳: عنوان از result.meta.ogTitle
+  else if (apiResult.result?.meta?.ogTitle && apiResult.result.meta.ogTitle.trim()) {
+    pageTitle = apiResult.result.meta.ogTitle;
+    titleSource = "result.meta.ogTitle";
+  }
+  // اولویت ۴: عنوان مستقیم از apiResult.title
+  else if (apiResult.title && apiResult.title.trim() && apiResult.title !== "بدون عنوان") {
+    pageTitle = apiResult.title;
+    titleSource = "apiResult.title";
+  }
+  // اولویت ۵: عنوان از result.metaTitle
+  else if (apiResult.result?.metaTitle && apiResult.result.metaTitle.trim() && apiResult.result.metaTitle !== "بدون عنوان") {
+    pageTitle = apiResult.result.metaTitle;
+    titleSource = "result.metaTitle";
+  }
+  
+  console.log(`🏷️ Title extracted from ${titleSource}: ${pageTitle}`);
+  
   // استخراج issues از مسیرهای مختلف برای اطمینان
   let issues = [];
-  if (apiResult.result?.issues) {
+  let source = 'unknown';
+  
+  // اولویت ۱: مسیر اصلی سرور - analysisIssues در extra
+  if (apiResult.result?.extra?.analysisIssues) {
+    issues = apiResult.result.extra.analysisIssues;
+    source = 'result.extra.analysisIssues';
+    console.log('✅ Found issues in result.extra.analysisIssues:', issues.length);
+  } 
+  // اولویت ۲: مسیر مستقیم analysisIssues
+  else if (apiResult.analysisIssues) {
+    issues = apiResult.analysisIssues;
+    source = 'analysisIssues';
+    console.log('✅ Found issues in analysisIssues:', issues.length);
+  }
+  // اولویت ۳: مسیر مستقیم issues
+  else if (apiResult.result?.issues) {
     issues = apiResult.result.issues;
-  } else if (apiResult.issues) {
+    source = 'result.issues';
+    console.log('✅ Found issues in result.issues:', issues.length);
+  } 
+  // اولویت ۴: مسیر ریشه issues
+  else if (apiResult.issues) {
     issues = apiResult.issues;
-  } else if (apiResult.privateData) {
+    source = 'issues';
+    console.log('✅ Found issues in apiResult.issues:', issues.length);
+  } 
+  // اولویت ۵: privateData (برای سازگاری با backward)
+  else if (apiResult.privateData) {
     issues = apiResult.privateData;
+    source = 'privateData';
+    console.log('✅ Found issues in privateData:', issues.length);
+  } 
+  else {
+    console.log('❌ No issues found in any path');
+    console.log('🔍 Available paths:', {
+      'result.extra.analysisIssues': apiResult.result?.extra?.analysisIssues,
+      'analysisIssues': apiResult.analysisIssues,
+      'result.issues': apiResult.result?.issues,
+      'issues': apiResult.issues,
+      'privateData': apiResult.privateData
+    });
   }
 
+  console.log(`📦 Conversion source: ${source}, issues count: ${issues.length}`);
+
+  // ساخت result نهایی
   const result: AnalyzeResult = {
     url: apiResult.url,
-    title: apiResult.result?.title || apiResult.result?.metaTitle || apiResult.title || "بدون عنوان",
+    title: pageTitle, // استفاده از عنوان استخراج شده
     scores: { 
       performance: (apiResult.performance || 0) / 100,
       accessibility: (apiResult.accessibility || 0) / 100,
@@ -49,6 +120,13 @@ const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
     metrics: apiResult.result?.metrics || apiResult.metrics || {},
   };
 
+  // اضافه کردن meta data اگر وجود دارد
+  if (apiResult.result?.meta) {
+    result.meta = apiResult.result.meta;
+  } else if (apiResult.meta) {
+    result.meta = apiResult.meta;
+  }
+
   // اضافه کردن extra اگر وجود دارد
   if (apiResult.result?.extra) {
     result.extra = apiResult.result.extra;
@@ -56,10 +134,29 @@ const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
     result.extra = apiResult.extra;
   }
 
-  console.log('✅ Converted result with issues:', result.issues.length);
+  // اضافه کردن result اگر وجود دارد
+  if (apiResult.result) {
+    result.result = apiResult.result;
+  }
+
+  // اضافه کردن translations اگر وجود دارد
+  if (apiResult.translations) {
+    result.translations = apiResult.translations;
+  }
+
+  console.log('✅ Final converted result:', {
+    title: result.title,
+    titleSource: titleSource,
+    issuesCount: result.issues.length,
+    scores: result.scores,
+    hasMeta: !!result.meta,
+    hasExtra: !!result.extra,
+    hasResult: !!result.result,
+    hasTranslations: !!result.translations
+  });
+
   return result;
 };
-
 // تابع برای نرمالایز کردن URL
 const normalizeUrl = (url: string): string => {
   try {
@@ -146,8 +243,6 @@ export default function AnalyzePage() {
         description: `آنالیز کامل سایت ${url} - سئو: ${seoScore}% | عملکرد: ${performanceScore}% | دسترسی: ${accessibilityScore}% | بهترین روش‌ها: ${bestPracticesScore}%`,
         keywords: `آنالیز سایت, سئو, عملکرد, دسترسی, بهترین روش‌ها, ${url}, بهینه سازی, وبوفن`,
         canonical: currentUrl,
-      
-         
         ogType: "website" as const,
         tags: ["آنالیز سایت", "سئو", "عملکرد", "دسترسی", "بهترین روش‌ها", "بهینه سازی"],
         author: "وبوفن",
@@ -185,7 +280,6 @@ export default function AnalyzePage() {
       description: "آنالیز تخصصی سئو و عملکرد وبسایت به صورت رایگان. بررسی مشکلات سئو، سرعت سایت، امنیت و استانداردهای وب. آنالیز کامل سئو، عملکرد، دسترسی و بهترین روش‌های توسعه وب",
       keywords: "آنالیز سایت, سئو, عملکرد, بهینه سازی, سرعت سایت, امنیت سایت, دسترسی پذیری, بهترین روش‌ها, وبوفن",
       canonical: currentUrl,
-      ogImage: undefined,
       ogType: "website" as const,
       tags: ["آنالیز سایت", "سئو", "عملکرد", "بهینه سازی", "سرعت سایت", "امنیت"],
       author: "وبوفن",
@@ -209,8 +303,26 @@ export default function AnalyzePage() {
     if (pendingResult) {
       console.log('📋 PendingResult issues:', pendingResult.issues);
       console.log('📊 PendingResult issues count:', pendingResult.issues.length);
+      console.log('🔍 PendingResult structure:', {
+        hasExtra: !!pendingResult.extra,
+        hasResult: !!pendingResult.result,
+        extraKeys: pendingResult.extra ? Object.keys(pendingResult.extra) : [],
+        resultKeys: pendingResult.result ? Object.keys(pendingResult.result) : []
+      });
     }
   }, [pendingResult]);
+
+  // لاگ برای apiAnalysis
+  useEffect(() => {
+    if (apiAnalysis) {
+      console.log('🔍 API Analysis structure:', {
+        hasResult: !!apiAnalysis.result,
+        hasExtra: !!apiAnalysis.result?.extra,
+        hasAnalysisIssues: !!apiAnalysis.result?.extra?.analysisIssues,
+        analysisIssuesCount: apiAnalysis.result?.extra?.analysisIssues?.length || 0
+      });
+    }
+  }, [apiAnalysis]);
 
   // مدیریت وضعیت پیشرفت
   useEffect(() => {
@@ -465,18 +577,16 @@ export default function AnalyzePage() {
                 <CoreMetrics result={pendingResult} />
                 
                 {/* IssuesList همیشه نمایش داده شود */}
-                <div className="mt-8">
-                  <IssuesList result={pendingResult} />
-                </div>
+             <div className="mt-8">
+  <IssuesList 
+    result={pendingResult} 
+    isDuplicate={hasExistingAnalysis && !!pendingResult} 
+  />
+</div>
 
                 {/* دکمه برای آنالیز جدید */}
                 <div className="text-center mt-8">
-                  <button
-                    onClick={handleNewAnalysis}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200"
-                  >
-                    🔄 آنالیز جدید
-                  </button>
+                  
                 </div>
               </div>
             )}
