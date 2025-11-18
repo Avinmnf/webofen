@@ -42,7 +42,7 @@ export function InjectRelatedCategories({
 
   //Related Products
   const renderRelatedProducts = (index: number) => (
-    <section key={`related-products-${index}`} className="my-8 md:w-full">
+    <section key={`related-products-${index}`} className="my-8 md:w-full article-body">
       <p className="text-lg text-[#3db4c6] font-semibold mb-4 border-b border-gray-200 pb-2">
         همین حالا بخرید
       </p>

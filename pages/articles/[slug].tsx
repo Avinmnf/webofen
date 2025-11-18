@@ -312,7 +312,7 @@ export default function PostPage({ post, viewCount }: Props) {
                     </span>
                   </div>
                 </div>
-                <div className="bg-gray-100 rounded-md p-2 mt-4 text-gray-500">
+                <div className="bg-gray-100 rounded-md p-4 text-sm mt-4 text-gray-400">
                   <p> {post.description}</p>
                 </div>
               </div>
