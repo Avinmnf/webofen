@@ -5,6 +5,7 @@ import { useCart } from "@/contexts/CartContext";
 import { Download, Mail, Copy, Check, ArrowLeft, Sparkles } from "lucide-react";
 import { useUserOrders } from "@/hooks/useUserOrders";
 import SuccessAnimation from "@/components/animations/SuccessAnimation";
+import Link from "next/link";
 
 export default function PaymentSuccessPage() {
   const { clearCart } = useCart();
@@ -52,7 +53,7 @@ export default function PaymentSuccessPage() {
         <div className="absolute bottom-20 right-20 w-5 h-5 bg-gray-900 rounded-full"></div>
       </div>
 
-      <div className="relative z-10 max-w-[1250px] m-auto mx-auto py-12 px-4">
+      <div className="relative z-10 max-w-[1250px] m-auto mx-auto py-12">
         {/* Success Animation Container */}
         <div className="relative mb-12">
           <div className="absolute inset-0 flex items-center justify-center">
@@ -67,15 +68,9 @@ export default function PaymentSuccessPage() {
         <div className="flex justify-between">
           <div className="bg-white/70 w-2/3 backdrop-blur-xl rounded-3xl shadow-sm border border-white/60 p-8 mb-8 relative overflow-hidden">
             {/* Accent Border */}
-            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-green-400 to-blue-400 rounded-b-full"></div>
 
             <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500/10 to-blue-500/10 rounded-full px-4 py-2 mb-4">
-                <Sparkles className="w-4 h-4 text-green-600" />
-                <span className="text-green-700 text-sm font-medium">
-                  پرداخت موفق
-                </span>
-              </div>
+
               <h1 className="text-2xl font-bold text-gray-900 mb-3">
                 سفارش شما ثبت شد
               </h1>
@@ -115,35 +110,40 @@ export default function PaymentSuccessPage() {
 
             {/* Action Buttons - Minimal Style */}
             <div className="flex gap-3">
-              <button className="flex-1 bg-[#ff894f] hover:bg-orange-800 text-white py-3.5 px-4 rounded-2xl font-medium transition-all duration-200 hover:shadow-lg flex items-center justify-center gap-2 group">
+              <button className="flex-1 bg-[#29b0cb] hover:bg-blue-950 text-white py-3 rounded-md font-medium transition-all duration-200 hover:shadow-lg flex items-center justify-center gap-2 group">
                 <Download className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                دریافت فاکتور
+                <span className="text-white">دریافت فاکتور</span>
               </button>
-              <button className="flex-1 bg-white border-2 border-gray-200 hover:border-gray-300 text-gray-700 hover:text-gray-900 py-3.5 px-4 rounded-2xl font-medium transition-all duration-200 flex items-center justify-center gap-2 group">
-                <svg
-                  className="w-4 h-4 group-hover:scale-110 transition-transform"
-                  viewBox="0 0 24 24"
-                  id="meteor-icon-kit__regular-dashboard"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                  <g
-                    id="SVGRepo_tracerCarrier"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  ></g>
-                  <g id="SVGRepo_iconCarrier">
-                    <path
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                      d="M3 2C2.44772 2 2 2.44772 2 3V6C2 6.55228 2.44772 7 3 7H6C6.55228 7 7 6.55228 7 6V3C7 2.44772 6.55228 2 6 2H3ZM3 0H6C7.65685 0 9 1.34315 9 3V6C9 7.65685 7.65685 9 6 9H3C1.34315 9 0 7.65685 0 6V3C0 1.34315 1.34315 0 3 0ZM14 16H21C22.6569 16 24 17.3431 24 19V21C24 22.6569 22.6569 24 21 24H14C12.3431 24 11 22.6569 11 21V19C11 17.3431 12.3431 16 14 16ZM14 18C13.4477 18 13 18.4477 13 19V21C13 21.5523 13.4477 22 14 22H21C21.5523 22 22 21.5523 22 21V19C22 18.4477 21.5523 18 21 18H14ZM3 11H6C7.65685 11 9 12.3431 9 14V21C9 22.6569 7.65685 24 6 24H3C1.34315 24 0 22.6569 0 21V14C0 12.3431 1.34315 11 3 11ZM3 13C2.44772 13 2 13.4477 2 14V21C2 21.5523 2.44772 22 3 22H6C6.55228 22 7 21.5523 7 21V14C7 13.4477 6.55228 13 6 13H3ZM21 0C22.6569 0 24 1.34315 24 3V11C24 12.6569 22.6569 14 21 14H14C12.3431 14 11 12.6569 11 11V3C11 1.34315 12.3431 0 14 0H21ZM13 3V11C13 11.5523 13.4477 12 14 12H21C21.5523 12 22 11.5523 22 11V3C22 2.44772 21.5523 2 21 2H14C13.4477 2 13 2.44772 13 3Z"
-                      fill="#545454"
-                    ></path>
-                  </g>
-                </svg>
-                داشبورد
-              </button>
+              <Link
+                href={"/dashboard"}
+                className="flex-1 bg-white border-2 border-gray-200 hover:border-gray-300 text-gray-700 hover:text-gray-900 py-3 rounded-md font-medium transition-all duration-200 flex items-center justify-center gap-2 group"
+              >
+                <div className="flex items-center gap-2 group-hover:scale-110 transition-transform">
+                  <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    id="meteor-icon-kit__regular-dashboard"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                    <g
+                      id="SVGRepo_tracerCarrier"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    ></g>
+                    <g id="SVGRepo_iconCarrier">
+                      <path
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M3 2C2.44772 2 2 2.44772 2 3V6C2 6.55228 2.44772 7 3 7H6C6.55228 7 7 6.55228 7 6V3C7 2.44772 6.55228 2 6 2H3ZM3 0H6C7.65685 0 9 1.34315 9 3V6C9 7.65685 7.65685 9 6 9H3C1.34315 9 0 7.65685 0 6V3C0 1.34315 1.34315 0 3 0ZM14 16H21C22.6569 16 24 17.3431 24 19V21C24 22.6569 22.6569 24 21 24H14C12.3431 24 11 22.6569 11 21V19C11 17.3431 12.3431 16 14 16ZM14 18C13.4477 18 13 18.4477 13 19V21C13 21.5523 13.4477 22 14 22H21C21.5523 22 22 21.5523 22 21V19C22 18.4477 21.5523 18 21 18H14ZM3 11H6C7.65685 11 9 12.3431 9 14V21C9 22.6569 7.65685 24 6 24H3C1.34315 24 0 22.6569 0 21V14C0 12.3431 1.34315 11 3 11ZM3 13C2.44772 13 2 13.4477 2 14V21C2 21.5523 2.44772 22 3 22H6C6.55228 22 7 21.5523 7 21V14C7 13.4477 6.55228 13 6 13H3ZM21 0C22.6569 0 24 1.34315 24 3V11C24 12.6569 22.6569 14 21 14H14C12.3431 14 11 12.6569 11 11V3C11 1.34315 12.3431 0 14 0H21ZM13 3V11C13 11.5523 13.4477 12 14 12H21C21.5523 12 22 11.5523 22 11V3C22 2.44772 21.5523 2 21 2H14C13.4477 2 13 2.44772 13 3Z"
+                        fill="#545454"
+                      ></path>
+                    </g>
+                  </svg>
+                  <span className="text-gray-600">داشبورد</span>
+                </div>
+              </Link>
             </div>
           </div>
 
@@ -176,14 +176,12 @@ export default function PaymentSuccessPage() {
         </div>
         {/* Support Info - Minimal */}
         <div className="text-center">
-          <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-sm border border-white/60 p-6">
-            <p className="text-gray-600 text-sm mb-3">
-              در صورت وجود هرگونه سوال
-            </p>
+          <div className="bg-[#0364af] backdrop-blur-xl rounded-2xl shadow-sm border border-white/60 p-6">
+            <p className="text-white text-sm mb-3">در صورت وجود هرگونه سوال</p>
             <div className="font-mono text-gray-800 text-lg font-medium bg-gray-50/50 rounded-xl py-2 px-4 inline-block">
               ۱۴ ۵۹ ۵۱ ۸۸ - ۰۲۱
             </div>
-            <p className="text-gray-500 text-xs mt-3">پشتیبانی ۲۴ ساعته</p>
+            <p className="text-white text-xs mt-3">پشتیبانی ۲۴ ساعته</p>
           </div>
         </div>
 
