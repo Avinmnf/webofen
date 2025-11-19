@@ -9,8 +9,18 @@ export interface Issue {
   occurrences?: number;
   category?: string; // اضافه شده برای دسته‌بندی
   severity?: string; // اضافه شده برای سطح اهمیت
-    solution?: string; // اضافه کردن فیلد راه حل
+  solution?: string; // اضافه کردن فیلد راه حل
+}
 
+// رابط جدید برای داده‌های سایت‌مپ
+export interface SitemapAnalysis {
+  sitemapExists: boolean;
+  sitemapUrls: string[];
+  totalLinks: number;
+  sitemapLinks: Array<{
+    url: string;
+    sitemap: string;
+  }>;
 }
 
 export interface AnalyzeResult {
@@ -48,53 +58,15 @@ export interface AnalyzeResult {
     h6: number;
     total: number;
   };
-    analysisIssues?: Issue[];
+  analysisIssues?: Issue[];
+  
+  // اضافه کردن sitemapAnalysis به AnalyzeResult
+  sitemapAnalysis?: SitemapAnalysis;
 
-extra?: {
-  brokenLinks: string[];
-  imagesWithoutAlt: number;
-  externalLinks: number;
-  headingsCount?: {
-    h1: number;
-    h2: number;
-    h3: number;
-    h4: number;
-    h5: number;
-    h6: number;
-    total: number;
-  };
-  issues?: Issue[]; // برای سازگاری با قبلی
-  analysisIssues?: Issue[]; // اضافه کردن این خط
-};
-  // اضافه کردن فیلد result برای داده‌های nested
-result?: {
-  issues?: Issue[];
-      analysisIssues?: Issue[]; // اضافه کردن این خط
-
-  comprehensiveData?: {
-    issues?: Issue[];
-    headings?: {
-      h1: number;
-      h2: number;
-      h3: number;
-      h4: number;
-      h5: number;
-      h6: number;
-      total: number;
-    };
-    brokenLinks?: string[];
-    imagesWithoutAlt?: number;
-    externalLinks?: number;
-  };
-  categories?: any;
-  audits?: any;
-  metrics?: any;
-  // اضافه کردن extra درون result
   extra?: {
-    analysisIssues?: Issue[];
-    brokenLinks?: string[];
-    imagesWithoutAlt?: number;
-    externalLinks?: number;
+    brokenLinks: string[];
+    imagesWithoutAlt: number;
+    externalLinks: number;
     headingsCount?: {
       h1: number;
       h2: number;
@@ -104,9 +76,62 @@ result?: {
       h6: number;
       total: number;
     };
-    issues?: Issue[];
+    issues?: Issue[]; // برای سازگاری با قبلی
+    analysisIssues?: Issue[];
+    // اضافه کردن sitemapAnalysis در extra برای سازگاری
+    sitemapAnalysis?: SitemapAnalysis;
   };
-};
+  
+  // اضافه کردن فیلد result برای داده‌های nested
+  result?: {
+    issues?: Issue[];
+    analysisIssues?: Issue[];
+    
+    // اضافه کردن sitemapAnalysis در result
+    sitemapAnalysis?: SitemapAnalysis;
+
+    comprehensiveData?: {
+      issues?: Issue[];
+      headings?: {
+        h1: number;
+        h2: number;
+        h3: number;
+        h4: number;
+        h5: number;
+        h6: number;
+        total: number;
+      };
+      brokenLinks?: string[];
+      imagesWithoutAlt?: number;
+      externalLinks?: number;
+      // اضافه کردن sitemapAnalysis در comprehensiveData
+      sitemapAnalysis?: SitemapAnalysis;
+    };
+    categories?: any;
+    audits?: any;
+    metrics?: any;
+    
+    // اضافه کردن extra درون result
+    extra?: {
+      analysisIssues?: Issue[];
+      brokenLinks?: string[];
+      imagesWithoutAlt?: number;
+      externalLinks?: number;
+      headingsCount?: {
+        h1: number;
+        h2: number;
+        h3: number;
+        h4: number;
+        h5: number;
+        h6: number;
+        total: number;
+      };
+      issues?: Issue[];
+      // اضافه کردن sitemapAnalysis در extra درون result
+      sitemapAnalysis?: SitemapAnalysis;
+    };
+  };
+  
   // اضافه کردن فیلد translations برای دیکشنری فارسی
   translations?: Record<string, { title: string; description: string }>;
 }
@@ -154,6 +179,8 @@ export interface ApiAnalysisResult {
   result?: any;
   name?: string;
   phoneNumber?: string;
+  // اضافه کردن sitemapAnalysis به ApiAnalysisResult
+  sitemapAnalysis?: SitemapAnalysis;
 }
 
 export interface Analysis {
@@ -169,6 +196,8 @@ export interface Analysis {
   phoneNumber?: string;
   createdAt: string;
   updatedAt?: string;
+  // اضافه کردن sitemapAnalysis به Analysis
+  sitemapAnalysis?: SitemapAnalysis;
 }
 
 export interface ApiAnalyzeData {
@@ -205,6 +234,9 @@ export interface ApiAnalyzeData {
     h6: number;
     total: number;
   };
+  // اضافه کردن sitemapAnalysis به ApiAnalyzeData
+  sitemapAnalysis?: SitemapAnalysis;
+  
   extra?: {
     brokenLinks: string[];
     imagesWithoutAlt: number;
@@ -218,7 +250,10 @@ export interface ApiAnalyzeData {
       h6: number;
       total: number;
     };
+    // اضافه کردن sitemapAnalysis در extra
+    sitemapAnalysis?: SitemapAnalysis;
   };
+  
   // اضافه کردن translations به ApiAnalyzeData
   translations?: Record<string, { title: string; description: string }>;
 }
@@ -231,6 +266,8 @@ export interface LighthouseResults {
   seo: number;
   result: any;
   headings?: HeadingAnalysis;
+  // اضافه کردن sitemapAnalysis به LighthouseResults
+  sitemapAnalysis?: SitemapAnalysis;
 }
 
 export interface HeadingAnalysis {
@@ -279,6 +316,7 @@ export interface WebsiteOverviewProps {
   result: AnalyzeResult;
 }
 
+// به روزرسانی ProductRecommendationsProps برای دریافت sitemapData
 export interface ProductRecommendationsProps {
   scores: {
     performance: number;
@@ -286,4 +324,30 @@ export interface ProductRecommendationsProps {
     bestPractices: number;
     seo: number;
   };
+  sitemapData?: SitemapAnalysis;
+}
+
+// اضافه کردن انواع جدید برای تحلیل سایت‌مپ
+export interface SitemapLink {
+  url: string;
+  sitemap: string;
+  lastmod?: string;
+  priority?: number;
+  changefreq?: string;
+}
+
+// نوع برای کامپوننت‌های مرتبط با سایت‌مپ
+export interface SitemapAnalysisProps {
+  sitemapData?: SitemapAnalysis;
+  className?: string;
+}
+
+// نوع برای پیشنهادات تولید محتوا
+export interface ContentProductionSuggestionProps {
+  currentLinks: number;
+  targetLinks?: number;
+  analysisId?: string;
+  userName?: string;
+  userPhone?: string;
+  className?: string;
 }
