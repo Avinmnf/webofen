@@ -23,7 +23,7 @@ import SEO from "@/components/seo";
 // Import types
 import { AnalyzeResult, Analysis } from "@/lib/models/analyze";
 
-// تبدیل API result به AnalyzeResult - نسخه کاملاً بهبود یافته
+// تبدیل API result به AnalyzeResult - نسخه بهبود یافته با پشتیبانی از سایت‌مپ
 const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
   console.log('🔄 Converting API result to AnalyzeResult...', apiResult);
   
@@ -104,7 +104,46 @@ const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
     });
   }
 
+  // استخراج اطلاعات سایت‌مپ از مسیرهای مختلف
+  let sitemapData = null;
+  let sitemapSource = 'unknown';
+  
+  // اولویت ۱: مسیر اصلی سرور - sitemapAnalysis در extra
+  if (apiResult.result?.extra?.sitemapAnalysis) {
+    sitemapData = apiResult.result.extra.sitemapAnalysis;
+    sitemapSource = 'result.extra.sitemapAnalysis';
+    console.log('✅ Found sitemap data in result.extra.sitemapAnalysis:', {
+      totalLinks: sitemapData.totalLinks,
+      sitemapExists: sitemapData.sitemapExists,
+      sitemapUrls: sitemapData.sitemapUrls?.length || 0
+    });
+  }
+  // اولویت ۲: مسیر مستقیم sitemapAnalysis
+  else if (apiResult.sitemapAnalysis) {
+    sitemapData = apiResult.sitemapAnalysis;
+    sitemapSource = 'sitemapAnalysis';
+    console.log('✅ Found sitemap data in sitemapAnalysis:', {
+      totalLinks: sitemapData.totalLinks,
+      sitemapExists: sitemapData.sitemapExists,
+      sitemapUrls: sitemapData.sitemapUrls?.length || 0
+    });
+  }
+  // اولویت ۳: مسیر result.sitemapAnalysis
+  else if (apiResult.result?.sitemapAnalysis) {
+    sitemapData = apiResult.result.sitemapAnalysis;
+    sitemapSource = 'result.sitemapAnalysis';
+    console.log('✅ Found sitemap data in result.sitemapAnalysis:', {
+      totalLinks: sitemapData.totalLinks,
+      sitemapExists: sitemapData.sitemapExists,
+      sitemapUrls: sitemapData.sitemapUrls?.length || 0
+    });
+  }
+  else {
+    console.log('❌ No sitemap data found in any path');
+  }
+
   console.log(`📦 Conversion source: ${source}, issues count: ${issues.length}`);
+  console.log(`🗺️ Sitemap source: ${sitemapSource}, total links: ${sitemapData?.totalLinks || 0}`);
 
   // ساخت result نهایی
   const result: AnalyzeResult = {
@@ -144,6 +183,11 @@ const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
     result.translations = apiResult.translations;
   }
 
+  // اضافه کردن sitemap data اگر وجود دارد
+  if (sitemapData) {
+    result.sitemapAnalysis = sitemapData;
+  }
+
   console.log('✅ Final converted result:', {
     title: result.title,
     titleSource: titleSource,
@@ -152,11 +196,14 @@ const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
     hasMeta: !!result.meta,
     hasExtra: !!result.extra,
     hasResult: !!result.result,
-    hasTranslations: !!result.translations
+    hasTranslations: !!result.translations,
+    hasSitemapAnalysis: !!result.sitemapAnalysis,
+    sitemapLinks: result.sitemapAnalysis?.totalLinks || 0
   });
 
   return result;
 };
+
 // تابع برای نرمالایز کردن URL
 const normalizeUrl = (url: string): string => {
   try {
@@ -183,6 +230,7 @@ export default function AnalyzePage() {
   const [analysisStarted, setAnalysisStarted] = useState<boolean>(false);
   const [currentAnalysisId, setCurrentAnalysisId] = useState<string | null>(null);
   const [resultsViewed, setResultsViewed] = useState<boolean>(false);
+  const [isDuplicateAnalysis, setIsDuplicateAnalysis] = useState<boolean>(false); // 🔥 اضافه شده
 
   const resultsSectionRef = useRef<HTMLDivElement>(null);
 
@@ -238,13 +286,17 @@ export default function AnalyzePage() {
       const accessibilityScore = Math.round((pendingResult.scores.accessibility || 0) * 100);
       const bestPracticesScore = Math.round((pendingResult.scores.bestPractices || 0) * 100);
       
+      // اطلاعات سایت‌مپ برای SEO
+      const sitemapInfo = pendingResult.sitemapAnalysis ? 
+        ` | لینک‌های سایت‌مپ: ${pendingResult.sitemapAnalysis.totalLinks}` : '';
+      
       return {
         title: `نتایج آنالیز ${pendingResult.title || url} | وبوفن`,
-        description: `آنالیز کامل سایت ${url} - سئو: ${seoScore}% | عملکرد: ${performanceScore}% | دسترسی: ${accessibilityScore}% | بهترین روش‌ها: ${bestPracticesScore}%`,
-        keywords: `آنالیز سایت, سئو, عملکرد, دسترسی, بهترین روش‌ها, ${url}, بهینه سازی, وبوفن`,
+        description: `آنالیز کامل سایت ${url} - سئو: ${seoScore}% | عملکرد: ${performanceScore}% | دسترسی: ${accessibilityScore}% | بهترین روش‌ها: ${bestPracticesScore}%${sitemapInfo}`,
+        keywords: `آنالیز سایت, سئو, عملکرد, دسترسی, بهترین روش‌ها, ${url}, بهینه سازی, وبوفن, سایت‌مپ, تولید محتوا`,
         canonical: currentUrl,
         ogType: "website" as const,
-        tags: ["آنالیز سایت", "سئو", "عملکرد", "دسترسی", "بهترین روش‌ها", "بهینه سازی"],
+        tags: ["آنالیز سایت", "سئو", "عملکرد", "دسترسی", "بهترین روش‌ها", "بهینه سازی", "سایت‌مپ", "تولید محتوا"],
         author: "وبوفن",
         structuredData: {
           "@context": "https://schema.org",
@@ -278,10 +330,10 @@ export default function AnalyzePage() {
     return {
       title: "آنالیز رایگان سایت | وبوفن",
       description: "آنالیز تخصصی سئو و عملکرد وبسایت به صورت رایگان. بررسی مشکلات سئو، سرعت سایت، امنیت و استانداردهای وب. آنالیز کامل سئو، عملکرد، دسترسی و بهترین روش‌های توسعه وب",
-      keywords: "آنالیز سایت, سئو, عملکرد, بهینه سازی, سرعت سایت, امنیت سایت, دسترسی پذیری, بهترین روش‌ها, وبوفن",
+      keywords: "آنالیز سایت, سئو, عملکرد, بهینه سازی, سرعت سایت, امنیت سایت, دسترسی پذیری, بهترین روش‌ها, وبوفن, سایت‌مپ, تولید محتوا",
       canonical: currentUrl,
       ogType: "website" as const,
-      tags: ["آنالیز سایت", "سئو", "عملکرد", "بهینه سازی", "سرعت سایت", "امنیت"],
+      tags: ["آنالیز سایت", "سئو", "عملکرد", "بهینه سازی", "سرعت سایت", "امنیت", "سایت‌مپ", "تولید محتوا"],
       author: "وبوفن",
       structuredData: {
         "@context": "https://schema.org",
@@ -298,16 +350,19 @@ export default function AnalyzePage() {
     };
   }, [pendingResult, url, router.asPath]);
 
-  // دیباگ برای ردیابی issues
+  // دیباگ برای ردیابی issues و سایت‌مپ
   useEffect(() => {
     if (pendingResult) {
       console.log('📋 PendingResult issues:', pendingResult.issues);
       console.log('📊 PendingResult issues count:', pendingResult.issues.length);
+      console.log('🗺️ PendingResult sitemap analysis:', pendingResult.sitemapAnalysis);
       console.log('🔍 PendingResult structure:', {
         hasExtra: !!pendingResult.extra,
         hasResult: !!pendingResult.result,
+        hasSitemapAnalysis: !!pendingResult.sitemapAnalysis,
         extraKeys: pendingResult.extra ? Object.keys(pendingResult.extra) : [],
-        resultKeys: pendingResult.result ? Object.keys(pendingResult.result) : []
+        resultKeys: pendingResult.result ? Object.keys(pendingResult.result) : [],
+        sitemapLinks: pendingResult.sitemapAnalysis?.totalLinks || 0
       });
     }
   }, [pendingResult]);
@@ -319,7 +374,9 @@ export default function AnalyzePage() {
         hasResult: !!apiAnalysis.result,
         hasExtra: !!apiAnalysis.result?.extra,
         hasAnalysisIssues: !!apiAnalysis.result?.extra?.analysisIssues,
-        analysisIssuesCount: apiAnalysis.result?.extra?.analysisIssues?.length || 0
+        analysisIssuesCount: apiAnalysis.result?.extra?.analysisIssues?.length || 0,
+        hasSitemapAnalysis: !!apiAnalysis.result?.extra?.sitemapAnalysis,
+        sitemapLinks: apiAnalysis.result?.extra?.sitemapAnalysis?.totalLinks || 0
       });
     }
   }, [apiAnalysis]);
@@ -336,6 +393,7 @@ export default function AnalyzePage() {
       setCurrentAnalysisId(apiAnalysis.id);
       setAnalysisStarted(true);
       setResultsViewed(false);
+      setIsDuplicateAnalysis(false); // 🔥 آنالیز جدید، تکراری نیست
     }
 
     switch (apiAnalysis.status) {
@@ -357,6 +415,7 @@ export default function AnalyzePage() {
           setAnalysisStarted(false);
           setShowAnalysisModal(false);
           setCurrentAnalysisId(null);
+          setIsDuplicateAnalysis(false); // 🔥 آنالیز جدید، تکراری نیست
         }
         break;
       case "failed":
@@ -364,6 +423,7 @@ export default function AnalyzePage() {
         setAnalysisStatus("❌ آنالیز با خطا مواجه شد");
         setAnalysisStarted(false);
         setCurrentAnalysisId(null);
+        setIsDuplicateAnalysis(false); // 🔥 آنالیز جدید، تکراری نیست
         break;
     }
   }, [apiAnalysis, convertedResult, currentAnalysisId]);
@@ -421,6 +481,7 @@ export default function AnalyzePage() {
     setPendingResult(null);
     setShowAnalysisModal(false);
     setResultsViewed(false);
+    setIsDuplicateAnalysis(false); // 🔥 آنالیز جدید، تکراری نیست
 
     try {
       await hookStartAnalysis(url, userData);
@@ -452,18 +513,21 @@ export default function AnalyzePage() {
       console.log("✅ استفاده از آنالیز موجود:", existingAnalysis.id);
       const convertedExisting = convertApiResultToAnalyzeResult(existingAnalysis);
       console.log('📦 Converted existing analysis issues:', convertedExisting.issues);
+      console.log('🗺️ Converted existing sitemap data:', convertedExisting.sitemapAnalysis);
       
       setPendingResult(convertedExisting);
       setShowSuccessAlert(false); // مستقیماً نمایش بده بدون آلرت
       setAnalysisStarted(false);
       setShowAnalysisModal(false);
       setResultsViewed(true);
+      setIsDuplicateAnalysis(true); // 🔥 علامتگذاری به عنوان آنالیز تکراری
       return;
     }
     
     // اگر آنالیز موجود نبود، مدال را نمایش بده
     console.log('🆕 No existing analysis found, showing modal');
     setShowAnalysisModal(true);
+    setIsDuplicateAnalysis(false); // 🔥 آنالیز جدید، تکراری نیست
   };
 
   const handleCloseModal = () => {
@@ -491,6 +555,7 @@ export default function AnalyzePage() {
     setShowAnalysisModal(false);
     setShowSuccessAlert(false);
     setResultsViewed(false);
+    setIsDuplicateAnalysis(false); // 🔥 ریست کردن وضعیت تکراری
     setUrl("");
     resetError();
   };
@@ -556,7 +621,7 @@ export default function AnalyzePage() {
               <div className="space-y-8 animate-fade-in">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-2xl font-bold text-gray-800">نتایج آنالیز</h2>
-                  {hasExistingAnalysis && (
+                  {isDuplicateAnalysis && ( // 🔥 استفاده از state جدید
                     <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
                       🔄 نمایش از آنالیز قبلی
                     </div>
@@ -573,20 +638,27 @@ export default function AnalyzePage() {
                 </div>
 
                 <AnalysisScores result={pendingResult} animatedScores={animatedScores} />
-                <ProductRecommendations scores={pendingResult.scores} />
+                
+                {/* ProductRecommendations با اطلاعات سایت‌مپ و وضعیت تکراری بودن */}
+                <ProductRecommendations 
+  scores={pendingResult.scores} 
+  sitemapData={pendingResult.sitemapAnalysis}
+  isDuplicate={isDuplicateAnalysis} // 🔥 این خط مهم است
+/>
+                
                 <CoreMetrics result={pendingResult} />
                 
                 {/* IssuesList همیشه نمایش داده شود */}
-             <div className="mt-8">
-  <IssuesList 
-    result={pendingResult} 
-    isDuplicate={hasExistingAnalysis && !!pendingResult} 
-  />
-</div>
+                <div className="mt-8">
+                  <IssuesList 
+                    result={pendingResult} 
+                    isDuplicate={isDuplicateAnalysis} // 🔥 ارسال وضعیت تکراری بودن
+                  />
+                </div>
 
                 {/* دکمه برای آنالیز جدید */}
                 <div className="text-center mt-8">
-                  
+                 
                 </div>
               </div>
             )}

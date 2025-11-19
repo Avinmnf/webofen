@@ -12,6 +12,12 @@ type Analysis = {
   name?: string;
   phoneNumber?: string;
   createdAt: string;
+  sitemapAnalysis?: {
+    totalLinks: number;
+    sitemapExists: boolean;
+    sitemapUrls: string[];
+    sitemapLinks: Array<{ url: string; sitemap: string }>;
+  };
 };
 
 type ResponseData = {
@@ -52,16 +58,60 @@ export default async function handler(
       const errorText = await response.text();
       console.error('❌ Backend error response:', errorText);
       
-      // اگر سرور خطای 404 یا 5xx داد
       if (response.status === 404) {
-        return res.status(200).json({ analyses: [] }); // آرایه خالی برگردان
+        return res.status(200).json({ analyses: [] });
       }
       
       throw new Error(`Backend error: ${response.status} - ${errorText}`);
     }
 
     const analyses: Analysis[] = await response.json();
+    
+    // 🔥 لاگ‌های مفصل برای دیباگ مشکل سایت‌مپ
     console.log('✅ Successfully fetched analyses:', analyses.length);
+    
+    if (analyses.length > 0) {
+      console.log('📊 Sitemap Analysis Debug Info:');
+      analyses.forEach((analysis, index) => {
+        console.log(`  Analysis ${index + 1}:`, {
+          id: analysis.id,
+          url: analysis.url,
+          status: analysis.status,
+          hasSitemapAnalysis: !!analysis.sitemapAnalysis,
+          sitemapExists: analysis.sitemapAnalysis?.sitemapExists,
+          totalLinks: analysis.sitemapAnalysis?.totalLinks,
+          sitemapUrlsCount: analysis.sitemapAnalysis?.sitemapUrls?.length,
+          sitemapLinksCount: analysis.sitemapAnalysis?.sitemapLinks?.length
+        });
+        
+        // 🔥 اگر سایت‌مپ وجود داره اما لینک‌ها 0 هستن
+        if (analysis.sitemapAnalysis?.sitemapExists && analysis.sitemapAnalysis.totalLinks === 0) {
+          console.log('🚨 PROBLEM: Sitemap exists but totalLinks is 0!', {
+            url: analysis.url,
+            sitemapUrls: analysis.sitemapAnalysis.sitemapUrls
+          });
+        }
+        
+        // 🔥 اگر سایت‌مپ داده‌ها پر هستن
+        if (analysis.sitemapAnalysis?.totalLinks && analysis.sitemapAnalysis.totalLinks > 0) {
+          console.log('🎉 GOOD: Sitemap data is properly saved!', {
+            url: analysis.url,
+            totalLinks: analysis.sitemapAnalysis.totalLinks
+          });
+        }
+      });
+      
+      // آمار کلی
+      const analysesWithSitemap = analyses.filter(a => a.sitemapAnalysis?.sitemapExists);
+      const analysesWithLinks = analyses.filter(a => a.sitemapAnalysis?.totalLinks && a.sitemapAnalysis.totalLinks > 0);
+      
+      console.log('📈 Sitemap Statistics:', {
+        totalAnalyses: analyses.length,
+        analysesWithSitemap: analysesWithSitemap.length,
+        analysesWithLinks: analysesWithLinks.length,
+        analysesWithZeroLinks: analysesWithSitemap.length - analysesWithLinks.length
+      });
+    }
     
     return res.status(200).json({ analyses });
   } catch (error: unknown) {
@@ -72,7 +122,6 @@ export default async function handler(
         return res.status(408).json({ error: 'Request timeout' });
       }
       
-      // اگر سرور آنالیز در دسترس نیست، آرایه خالی برگردان
       if (error.message.includes('fetch failed') || error.message.includes('ECONNREFUSED')) {
         console.log('⚠️ Analysis service not available, returning empty array');
         return res.status(200).json({ analyses: [] });
