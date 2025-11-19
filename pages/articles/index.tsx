@@ -338,31 +338,7 @@ export default function PostsPage({
     return () => clearTimeout(timeoutId);
   }, [searchQuery, handleSearch]);
 
-  // Update URL when currentTag changes
-  useEffect(() => {
-    const updateUrl = async () => {
-      if (currentTag) {
-        await router.push(
-          {
-            pathname: "/articles",
-            query: { tag: currentTag },
-          },
-          undefined,
-          { shallow: true }
-        );
-      } else {
-        await router.push(
-          {
-            pathname: "/articles",
-          },
-          undefined,
-          { shallow: true }
-        );
-      }
-    };
 
-    updateUrl();
-  }, [currentTag, router]);
 
   // Initialize tag from URL query parameter - FIXED: Remove handleTagClick dependency
   useEffect(() => {
