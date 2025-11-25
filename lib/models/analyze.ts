@@ -1,4 +1,23 @@
 // lib/models/analyze.ts
+
+// 🔥 اضافه کردن رابط‌های امنیتی جدید
+export interface SecurityIssue {
+  type: 'https' | 'ssl' | 'headers' | 'csp' | 'mixed-content' | 'other';
+  severity: 'high' | 'medium' | 'low';
+  title: string;
+  description: string;
+  recommendation: string;
+}
+
+export interface SecurityAnalysis {
+  isHttps: boolean;
+  hasValidSSL: boolean;
+  securityScore: number;
+  securityIssues: SecurityIssue[];
+  recommendations: string[];
+  productRecommendations?: string[]; // 🔥 اضافه شده برای توصیه‌های محصولات
+}
+
 export interface Issue {
   id?: string;
   auditId?: string; // برای سازگاری با AnalyzeResult
@@ -63,6 +82,12 @@ export interface AnalyzeResult {
   // اضافه کردن sitemapAnalysis به AnalyzeResult
   sitemapAnalysis?: SitemapAnalysis;
 
+  // 🔥 اضافه کردن brokenLinksCount به AnalyzeResult
+  brokenLinksCount?: number;
+
+  // 🔥 اضافه کردن securityAnalysis به AnalyzeResult
+  securityAnalysis?: SecurityAnalysis;
+
   extra?: {
     brokenLinks: string[];
     imagesWithoutAlt: number;
@@ -80,6 +105,10 @@ export interface AnalyzeResult {
     analysisIssues?: Issue[];
     // اضافه کردن sitemapAnalysis در extra برای سازگاری
     sitemapAnalysis?: SitemapAnalysis;
+    // 🔥 اضافه کردن brokenLinksCount در extra
+    brokenLinksCount?: number;
+    // 🔥 اضافه کردن securityAnalysis در extra
+    securityAnalysis?: SecurityAnalysis;
   };
   
   // اضافه کردن فیلد result برای داده‌های nested
@@ -89,6 +118,12 @@ export interface AnalyzeResult {
     
     // اضافه کردن sitemapAnalysis در result
     sitemapAnalysis?: SitemapAnalysis;
+
+    // 🔥 اضافه کردن brokenLinksCount در result
+    brokenLinksCount?: number;
+
+    // 🔥 اضافه کردن securityAnalysis در result
+    securityAnalysis?: SecurityAnalysis;
 
     comprehensiveData?: {
       issues?: Issue[];
@@ -106,6 +141,10 @@ export interface AnalyzeResult {
       externalLinks?: number;
       // اضافه کردن sitemapAnalysis در comprehensiveData
       sitemapAnalysis?: SitemapAnalysis;
+      // 🔥 اضافه کردن brokenLinksCount در comprehensiveData
+      brokenLinksCount?: number;
+      // 🔥 اضافه کردن securityAnalysis در comprehensiveData
+      securityAnalysis?: SecurityAnalysis;
     };
     categories?: any;
     audits?: any;
@@ -129,6 +168,10 @@ export interface AnalyzeResult {
       issues?: Issue[];
       // اضافه کردن sitemapAnalysis در extra درون result
       sitemapAnalysis?: SitemapAnalysis;
+      // 🔥 اضافه کردن brokenLinksCount در extra درون result
+      brokenLinksCount?: number;
+      // 🔥 اضافه کردن securityAnalysis در extra درون result
+      securityAnalysis?: SecurityAnalysis;
     };
   };
   
@@ -157,14 +200,16 @@ export const tabLabels: Record<string, string> = {
   table: "جدول",
   list: "لیست",
   opportunity: "فرصت بهبود",
-  other: "سایر"
+  other: "سایر",
+  security: "امنیت" // 🔥 اضافه شده برای دسته‌بندی امنیت
 };
 
 export const scoreDescriptions: Record<string, string> = {
   performance: "سرعت و عملکرد وبسایت",
   accessibility: "دسترسی‌پذیری برای همه کاربران",
   bestPractices: "رعایت استانداردهای توسعه وب",
-  seo: "بهینه‌سازی برای موتورهای جستجو"
+  seo: "بهینه‌سازی برای موتورهای جستجو",
+  security: "امنیت و محافظت از داده‌ها" // 🔥 اضافه شده برای امنیت
 };
 
 export interface ApiAnalysisResult {
@@ -181,6 +226,10 @@ export interface ApiAnalysisResult {
   phoneNumber?: string;
   // اضافه کردن sitemapAnalysis به ApiAnalysisResult
   sitemapAnalysis?: SitemapAnalysis;
+  // 🔥 اضافه کردن brokenLinksCount به ApiAnalysisResult
+  brokenLinksCount?: number;
+  // 🔥 اضافه کردن securityAnalysis به ApiAnalysisResult
+  securityAnalysis?: SecurityAnalysis;
 }
 
 export interface Analysis {
@@ -198,6 +247,10 @@ export interface Analysis {
   updatedAt?: string;
   // اضافه کردن sitemapAnalysis به Analysis
   sitemapAnalysis?: SitemapAnalysis;
+  // 🔥 اضافه کردن brokenLinksCount به Analysis
+  brokenLinksCount?: number;
+  // 🔥 اضافه کردن securityAnalysis به Analysis
+  securityAnalysis?: SecurityAnalysis;
 }
 
 export interface ApiAnalyzeData {
@@ -236,6 +289,10 @@ export interface ApiAnalyzeData {
   };
   // اضافه کردن sitemapAnalysis به ApiAnalyzeData
   sitemapAnalysis?: SitemapAnalysis;
+  // 🔥 اضافه کردن brokenLinksCount به ApiAnalyzeData
+  brokenLinksCount?: number;
+  // 🔥 اضافه کردن securityAnalysis به ApiAnalyzeData
+  securityAnalysis?: SecurityAnalysis;
   
   extra?: {
     brokenLinks: string[];
@@ -252,6 +309,10 @@ export interface ApiAnalyzeData {
     };
     // اضافه کردن sitemapAnalysis در extra
     sitemapAnalysis?: SitemapAnalysis;
+    // 🔥 اضافه کردن brokenLinksCount در extra
+    brokenLinksCount?: number;
+    // 🔥 اضافه کردن securityAnalysis در extra
+    securityAnalysis?: SecurityAnalysis;
   };
   
   // اضافه کردن translations به ApiAnalyzeData
@@ -268,6 +329,10 @@ export interface LighthouseResults {
   headings?: HeadingAnalysis;
   // اضافه کردن sitemapAnalysis به LighthouseResults
   sitemapAnalysis?: SitemapAnalysis;
+  // 🔥 اضافه کردن brokenLinksCount به LighthouseResults
+  brokenLinksCount?: number;
+  // 🔥 اضافه کردن securityAnalysis به LighthouseResults
+  securityAnalysis?: SecurityAnalysis;
 }
 
 export interface HeadingAnalysis {
@@ -316,7 +381,7 @@ export interface WebsiteOverviewProps {
   result: AnalyzeResult;
 }
 
-// به روزرسانی ProductRecommendationsProps برای دریافت sitemapData
+// به روزرسانی ProductRecommendationsProps برای دریافت sitemapData، brokenLinksCount و securityAnalysis
 export interface ProductRecommendationsProps {
   scores: {
     performance: number;
@@ -325,6 +390,11 @@ export interface ProductRecommendationsProps {
     seo: number;
   };
   sitemapData?: SitemapAnalysis;
+  // 🔥 اضافه کردن brokenLinksCount به ProductRecommendationsProps
+  brokenLinksCount?: number;
+  // 🔥 اضافه کردن securityAnalysis به ProductRecommendationsProps
+  securityAnalysis?: SecurityAnalysis;
+  isDuplicate?: boolean;
 }
 
 // اضافه کردن انواع جدید برای تحلیل سایت‌مپ
@@ -351,3 +421,72 @@ export interface ContentProductionSuggestionProps {
   userPhone?: string;
   className?: string;
 }
+
+// 🔥 اضافه کردن انواع جدید برای تحلیل امنیتی
+export interface SecurityAnalysisProps {
+  securityAnalysis?: SecurityAnalysis;
+  className?: string;
+}
+
+export interface SecurityIssuesListProps {
+  securityIssues: SecurityIssue[];
+  className?: string;
+}
+
+// 🔥 اضافه کردن نوع برای کامپوننت نمایش امتیاز امنیتی
+export interface SecurityScoreProps {
+  securityScore: number;
+  isHttps: boolean;
+  hasValidSSL: boolean;
+  className?: string;
+}
+
+// 🔥 اضافه کردن نوع برای کامپوننت توصیه‌های امنیتی
+export interface SecurityRecommendationsProps {
+  securityAnalysis: SecurityAnalysis;
+  className?: string;
+}
+
+// 🔥 اضافه کردن نوع برای کامپوننت محصولات امنیتی
+export interface SecurityProductsProps {
+  securityAnalysis: SecurityAnalysis;
+  className?: string;
+}
+
+// 🔥 اضافه کردن ثابت‌های مربوط به امنیت
+export const securityImpactLabels: Record<string, string> = {
+  high: "بحرانی",
+  medium: "متوسط", 
+  low: "کم"
+};
+
+export const securityIssueTypes: Record<string, string> = {
+  https: "پروتکل HTTPS",
+  ssl: "گواهی SSL",
+  headers: "هدرهای امنیتی",
+  csp: "سیاست امنیت محتوا",
+  'mixed-content': "محتوای مختلط",
+  other: "سایر مشکلات امنیتی"
+};
+
+// 🔥 اضافه کردن تابع کمکی برای رنگ‌بندی امتیاز امنیتی
+export const getSecurityScoreColor = (score: number): string => {
+  if (score >= 90) return 'text-green-600';
+  if (score >= 70) return 'text-yellow-600';
+  if (score >= 50) return 'text-orange-600';
+  return 'text-red-600';
+};
+
+// 🔥 اضافه کردن تابع کمکی برای رنگ‌بندی شدت مشکل امنیتی
+export const getSecuritySeverityColor = (severity: 'high' | 'medium' | 'low'): string => {
+  switch (severity) {
+    case 'high':
+      return 'text-red-600 bg-red-50 border-red-200';
+    case 'medium':
+      return 'text-orange-600 bg-orange-50 border-orange-200';
+    case 'low':
+      return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+    default:
+      return 'text-gray-600 bg-gray-50 border-gray-200';
+  }
+};

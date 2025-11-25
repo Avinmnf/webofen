@@ -9,6 +9,7 @@ type Analysis = {
   accessibility?: number;
   bestPractices?: number;
   seo?: number;
+  brokenLinksCount?: number;
   name?: string;
   phoneNumber?: string;
   createdAt: string;
@@ -67,16 +68,21 @@ export default async function handler(
 
     const analyses: Analysis[] = await response.json();
     
-    // 🔥 لاگ‌های مفصل برای دیباگ مشکل سایت‌مپ
+    // 🔥 لاگ‌های مفصل برای دیباگ مشکل سایت‌مپ و لینک‌های شکسته
     console.log('✅ Successfully fetched analyses:', analyses.length);
     
     if (analyses.length > 0) {
-      console.log('📊 Sitemap Analysis Debug Info:');
+      console.log('📊 Analysis Debug Info:');
       analyses.forEach((analysis, index) => {
         console.log(`  Analysis ${index + 1}:`, {
           id: analysis.id,
           url: analysis.url,
           status: analysis.status,
+          performance: analysis.performance,
+          accessibility: analysis.accessibility,
+          seo: analysis.seo,
+          bestPractices: analysis.bestPractices,
+          brokenLinksCount: analysis.brokenLinksCount,
           hasSitemapAnalysis: !!analysis.sitemapAnalysis,
           sitemapExists: analysis.sitemapAnalysis?.sitemapExists,
           totalLinks: analysis.sitemapAnalysis?.totalLinks,
@@ -99,18 +105,46 @@ export default async function handler(
             totalLinks: analysis.sitemapAnalysis.totalLinks
           });
         }
+        
+        // 🔥 اطلاعات لینک‌های شکسته
+        if (analysis.brokenLinksCount && analysis.brokenLinksCount > 0) {
+          console.log('🔗 BROKEN LINKS: Analysis has broken links!', {
+            url: analysis.url,
+            brokenLinksCount: analysis.brokenLinksCount
+          });
+        } else if (analysis.brokenLinksCount === 0) {
+          console.log('✅ GOOD: No broken links found', {
+            url: analysis.url
+          });
+        }
       });
       
       // آمار کلی
       const analysesWithSitemap = analyses.filter(a => a.sitemapAnalysis?.sitemapExists);
       const analysesWithLinks = analyses.filter(a => a.sitemapAnalysis?.totalLinks && a.sitemapAnalysis.totalLinks > 0);
+      const analysesWithBrokenLinks = analyses.filter(a => a.brokenLinksCount && a.brokenLinksCount > 0);
       
-      console.log('📈 Sitemap Statistics:', {
+      console.log('📈 Analysis Statistics:', {
         totalAnalyses: analyses.length,
         analysesWithSitemap: analysesWithSitemap.length,
         analysesWithLinks: analysesWithLinks.length,
+        analysesWithBrokenLinks: analysesWithBrokenLinks.length,
+        totalBrokenLinks: analyses.reduce((sum, a) => sum + (a.brokenLinksCount || 0), 0),
         analysesWithZeroLinks: analysesWithSitemap.length - analysesWithLinks.length
       });
+
+      // نمایش آنالیزهایی که بیشترین لینک شکسته را دارند
+      const topBrokenLinks = analyses
+        .filter(a => a.brokenLinksCount && a.brokenLinksCount > 0)
+        .sort((a, b) => (b.brokenLinksCount || 0) - (a.brokenLinksCount || 0))
+        .slice(0, 5);
+
+      if (topBrokenLinks.length > 0) {
+        console.log('🏆 Top analyses with broken links:');
+        topBrokenLinks.forEach((analysis, index) => {
+          console.log(`  ${index + 1}. ${analysis.url}: ${analysis.brokenLinksCount} broken links`);
+        });
+      }
     }
     
     return res.status(200).json({ analyses });
