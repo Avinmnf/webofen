@@ -4,28 +4,28 @@ import { useState } from "react";
 import ConsultationModal from "@/components/ConsultationModal";
 
 export default function AboutUs() {
-    const [open, setOpen] = useState(false);
-  
+  const [open, setOpen] = useState(false);
+
   const items = [
     {
       src: "/web-design/web-orangecheckAsset 7.png",
       title: "بیشترین رضایت مشتریان",
-      text: " تخصصی وب‌سایت شما پشتیبانی کامل و ارائه گزارش‌های دقیق و یشسی سی سی سیسیس بهینه‌سازی تخصصی وب‌سایت شما برای رشد واقعی در گوگل",
+      text: "ما به کیفیت متعهدیم. پروژه‌ها تا زمان کسب رضایت کامل شما ادامه پیدا می‌کند و در تمام مراحل، گزارش‌های دقیق و شفاف ارائه می‌دهیم.",
     },
     {
       src: "/web-design/web-orangecheckAsset 7.png",
       title: "نیروهای مجرب و متخصص",
-      text: " تخصصی وب‌سایت شما پشتیبانی کامل و ارائه گزارش‌های دقیق و یشسی سی سی سیسیس بهینه‌سازی تخصصی وب‌سایت شما برای رشد واقعی در گوگل",
+      text: "تیم وبوفن ترکیبی از طراحان، برنامه‌نویسان و متخصصان سئو است که هرکدام سال‌ها تجربه عملی در پروژه‌های مختلف دارند.",
     },
     {
       src: "/web-design/web-orangecheckAsset 7.png",
       title: "ارائه کد نویسی",
-      text: " تخصصی وب‌سایت شما پشتیبانی کامل و ارائه گزارش‌های دقیق و یشسی سی سی سیسیس بهینه‌سازی تخصصی وب‌سایت شما برای رشد واقعی در گوگل",
+      text: " تمام پروژه‌های ما با کدنویسی استاندارد، قابل توسعه و بدون وابستگی به قالب‌های آماده تحویل داده می‌شود تا بتوانید در آینده هر امکاناتی را به سایت خود اضافه کنید.",
     },
     {
       src: "/web-design/web-orangecheckAsset 7.png",
       title: "پشتیبانی خدمات",
-      text: " تخصصی وب‌سایت شما پشتیبانی کامل و ارائه گزارش‌های دقیق و یشسی سی سی سیسیس بهینه‌سازی تخصصی وب‌سایت شما برای رشد واقعی در گوگل",
+      text: " بعد از تحویل سایت تنها نیستید. ما پشتیبانی کامل، رفع مشکلات احتمالی، به‌روزرسانی‌ها و مشاوره‌های تخصصی را در تمام طول همکاری ارائه می‌دهیم.",
     },
   ];
 
@@ -65,22 +65,22 @@ export default function AboutUs() {
                 {/* Gray box */}
                 <div className="bg-[#e8e8e8] rounded-2xl p-8 relative">
                   <p className="text-gray-600 leading-8">
-                    لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و
-                    با استفاده از طراحان گرافیک است، چاپگرها و متون بلکه روزنامه
-                    و مجله کتاب‌های زیادی در شصت و سه درصد گذشته حال و آینده،
-                    شناخت.
+                    وبوفن یک تیم متخصص در طراحی سایت، توسعه سیستم‌های اختصاصی و
+                    ارائه راهکارهای دیجیتال است. هدف ما ایجاد وب‌سایت‌هایی است
+                    که علاوه بر ظاهر حرفه‌ای، از نظر سرعت، امنیت، بهینه‌سازی و
+                    تجربه کاربری در بهترین سطح ممکن باشند.
                   </p>
                 </div>
               </div>
-            <button
-              type="button"
-              onClick={() => setOpen(true)}
-              className="bg-[#29b0cb] cursor-pointer mt-6 py-2 px-2 sm:px-4 rounded-md w-full sm:w-40 text-white text-sm sm:text-md"
-            >
-              دریافت مشاوره
-            </button>
+              <button
+                type="button"
+                onClick={() => setOpen(true)}
+                className="bg-[#29b0cb] cursor-pointer mt-6 py-2 px-2 sm:px-4 rounded-md w-full sm:w-40 text-white text-sm sm:text-md"
+              >
+                دریافت مشاوره
+              </button>
 
-            <ConsultationModal isOpen={open} onClose={() => setOpen(false)} />
+              <ConsultationModal isOpen={open} onClose={() => setOpen(false)} />
             </div>
           </div>
 
@@ -152,30 +152,30 @@ export default function AboutUs() {
           </div>
         </div>
       </section>
-<section>
-  <div className="w-11/12 m-auto">
-    <div className="relative mx-auto aspect-[22/10] rounded-lg overflow-hidden">
-      <Image
-        src="/about-us/about-us-costumersAsset 27.png"
-        alt="کلینیک تخصصی سئو وبوفن - خدمات سئو و بهینه‌سازی سایت"
-        fill
-        className="object-contain"
-        priority
-      />
-      <p className="absolute inset-0 flex top-20 justify-center text-white text-2xl font-bold">
-         مشتریان <span className="text-[#29b0cb] mr-1"> وبوفن </span>
-      </p>
-    </div>
-  </div>
-</section>
+      <section>
+        <div className="w-11/12 m-auto">
+          <div className="relative mx-auto aspect-[22/10] rounded-lg overflow-hidden">
+            <Image
+              src="/about-us/about-us-costumersAsset 27.png"
+              alt="کلینیک تخصصی سئو وبوفن - خدمات سئو و بهینه‌سازی سایت"
+              fill
+              className="object-contain"
+              priority
+            />
+            <p className="absolute inset-0 flex top-20 justify-center text-white text-2xl font-bold">
+              مشتریان <span className="text-[#29b0cb] mr-1"> وبوفن </span>
+            </p>
+          </div>
+        </div>
+      </section>
 
       {/* Responsibility Section */}
       <section className="pb-4 w-full">
-        <div className="max-w-[1250px] m-auto flex flex-col md:flex-row justify-center py-20 px-4 gap-10">
+        <div className="max-w-[1250px] m-auto flex flex-col md:flex-row justify-center md:py-20 px-4 gap-10">
           {/* Left content */}
           <div className="relative w-full md:w-[60%] rounded-lg overflow-visible mt-2">
             <div className="relative">
-              <div className="mb-2">
+              <div className="md:my-2 mt-10 mb-4">
                 <p className="text-[#0364af] text-lg ">وبوفن</p>
                 <h2 className="text-[#6fd6e5] text-xl  mt-2">
                   مسئولیت اجتمایی
@@ -185,10 +185,12 @@ export default function AboutUs() {
               <div className="relative w-full md:w-5/6">
                 <div>
                   <p className="text-gray-600 leading-8">
-                    لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و
-                    با استفاده از طراحان گرافیک است، چاپگرها و متون بلکه روزنامه
-                    و مجله در ستون و سطرآنچنان که لازم است، و برای شرایط فعلی
-                    تکنولوژی مورد نیاز، و کاربردهای متنوع با هدف بهبود ابزارهای
+                    وبوفن تنها به رشد دیجیتال کسب‌وکارها فکر نمی‌کند. ما خود را
+                    نسبت به جامعه و محیطی که در آن زندگی می‌کنیم مسئول می‌دانیم.
+                    بخشی از فعالیت‌های ما در زمینه کمک‌های انسان‌دوستانه، حمایت
+                    از کودکان و مشارکت در برنامه‌های خیریه انجام می‌شود. ما باور
+                    داریم که تاثیرگذاری واقعی فقط در موفقیت شغلی نیست؛ بلکه در
+                    بهبود زندگی دیگران معنا پیدا می‌کند.
                   </p>
                 </div>
               </div>
