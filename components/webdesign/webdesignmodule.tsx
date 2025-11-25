@@ -344,6 +344,7 @@ export default function WebDesignModule() {
                       onClick={() => {
                         setStep(1);
                         setSelectedModules([]);
+                        setActiveOption(null);
                       }}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}

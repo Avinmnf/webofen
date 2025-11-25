@@ -10,10 +10,10 @@ interface WebDesignFormProps {
   totalPrice: number;
 }
 
-export default function WebDesignForm({ 
-  selectedModules, 
-  activeOption, 
-  totalPrice 
+export default function WebDesignForm({
+  selectedModules,
+  activeOption,
+  totalPrice,
 }: WebDesignFormProps) {
   const { submitForm, loading } = useForms();
 
@@ -44,27 +44,28 @@ export default function WebDesignForm({
       fields: [
         { label: "نام کاربر", type: "text", content: name },
         { label: "تلفن همراه", type: "text", content: number },
-        { 
-          label: "نوع سایت انتخابی", 
-          type: "text", 
-          content: activeOption || "تعیین نشده" 
+        {
+          label: "نوع سایت انتخابی",
+          type: "text",
+          content: activeOption || "تعیین نشده",
         },
-        { 
-          label: "ماژول‌های انتخابی", 
-          type: "textarea", 
-          content: selectedModules.length > 0 
-            ? selectedModules.join(", ")
-            : "هیچ ماژولی انتخاب نشده"
+        {
+          label: "ماژول‌های انتخابی",
+          type: "textarea",
+          content:
+            selectedModules.length > 0
+              ? selectedModules.join(", ")
+              : "هیچ ماژولی انتخاب نشده",
         },
-        { 
-          label: "مبلغ کل", 
-          type: "text", 
-          content: `${totalPrice.toLocaleString("fa-IR")} تومان` 
+        {
+          label: "مبلغ کل",
+          type: "text",
+          content: `${totalPrice.toLocaleString("fa-IR")} تومان`,
         },
-        { 
-          label: "تعداد ماژول‌ها", 
-          type: "text", 
-          content: selectedModules.length.toString() 
+        {
+          label: "تعداد ماژول‌ها",
+          type: "text",
+          content: selectedModules.length.toString(),
         },
       ],
     };
@@ -96,59 +97,70 @@ export default function WebDesignForm({
           تکمیل اطلاعات سفارش
         </p>
         <p className="text-gray-600 text-xs sm:text-sm mt-1">
-          پس از ثبت اطلاعات، کارشناسان ما در سریع‌ترین زمان با شما تماس خواهند گرفت
+          پس از ثبت اطلاعات، کارشناسان ما در سریع‌ترین زمان با شما تماس خواهند
+          گرفت
         </p>
       </motion.div>
 
       {/* Selection Summary */}
-<motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ delay: 0.3 }}
-  className="mb-6 p-4 bg-gradient-to-br from-white to-blue-50/30 rounded-xl border border-[#0364af]/15"
->
-  <div className="flex items-center justify-between mb-3">
-    <p className="text-[#0364af] font-semibold text-sm">سفارش شما</p>
-    <div className="w-6 h-6 bg-[#0364af]/10 rounded-full flex items-center justify-center">
-      <svg className="w-3 h-3 text-[#0364af]" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
-      </svg>
-    </div>
-  </div>
-  
-  <div className="space-y-2 text-sm">
-    <div className="flex justify-between">
-      <span className="text-gray-600">{activeOption}</span>
-      <span className="text-[#0364af] font-medium">{selectedModules.length} ماژول</span>
-    </div>
-    
-    <div className="flex justify-between items-center pt-2 border-t border-[#0364af]/10">
-      <span className="text-gray-700 font-medium">جمع کل</span>
-      <span className="text-[#29b0cb] font-semibold text-base">
-        {totalPrice.toLocaleString("fa-IR")} تومان
-      </span>
-    </div>
-  </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="mb-6 p-4 bg-gradient-to-br from-white to-blue-50/30 rounded-xl border border-[#0364af]/15"
+      >
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-[#0364af] font-semibold text-sm">سفارش شما</p>
+          <div className="w-6 h-6 bg-[#0364af]/10 rounded-full flex items-center justify-center">
+            <svg
+              className="w-3 h-3 text-[#0364af]"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+        </div>
 
-  {selectedModules.length > 0 && (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="mt-3 pt-3 border-t border-[#0364af]/10"
-    >
-      <div className="flex flex-wrap gap-1">
-        {selectedModules.map((module, index) => (
-          <span
-            key={index}
-            className="inline-block bg-white text-[#0364af] text-xs px-2 py-1 rounded-md border border-[#0364af]/20"
+        <div className="space-y-2 text-sm">
+          <div className="flex justify-between">
+            <span className="text-gray-600">{activeOption}</span>
+            <span className="text-[#0364af] font-medium">
+              {selectedModules.length} ماژول
+            </span>
+          </div>
+
+          <div className="flex justify-between items-center pt-2 border-t border-[#0364af]/10">
+            <span className="text-gray-700 font-medium">جمع کل</span>
+            <span className="text-[#29b0cb] font-semibold text-base">
+              {totalPrice.toLocaleString("fa-IR")} تومان
+            </span>
+          </div>
+        </div>
+
+        {selectedModules.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mt-3 pt-3 border-t border-[#0364af]/10"
           >
-            {module}
-          </span>
-        ))}
-      </div>
-    </motion.div>
-  )}
-</motion.div>
+            <div className="flex flex-wrap gap-1">
+              {selectedModules.map((module, index) => (
+                <span
+                  key={index}
+                  className="inline-block bg-white text-[#0364af] text-xs px-2 py-1 rounded-md border border-[#0364af]/20"
+                >
+                  {module}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </motion.div>
 
       {/* Form Container */}
       <motion.div
@@ -174,7 +186,8 @@ export default function WebDesignForm({
               value={name}
               onChange={(e) => {
                 setName(e.target.value);
-                if (errors.name) setErrors((prev) => ({ ...prev, name: false }));
+                if (errors.name)
+                  setErrors((prev) => ({ ...prev, name: false }));
               }}
               whileFocus={{ scale: 1.02 }}
               className={`w-full bg-white text-gray-700 rounded-lg p-3 text-sm border transition-all duration-300 ${
@@ -219,11 +232,12 @@ export default function WebDesignForm({
             </label>
             <motion.input
               type="tel"
-              placeholder="09xxxxxxxxx"
+              placeholder="09012345678"
               value={number}
               onChange={(e) => {
                 setNumber(e.target.value);
-                if (errors.number) setErrors((prev) => ({ ...prev, number: false }));
+                if (errors.number)
+                  setErrors((prev) => ({ ...prev, number: false }));
               }}
               whileFocus={{ scale: 1.02 }}
               className={`w-full bg-white text-gray-700 rounded-lg p-3 text-sm border transition-all duration-300 ${
@@ -267,9 +281,9 @@ export default function WebDesignForm({
         >
           <motion.button
             onClick={handleSubmit}
-            whileHover={{ 
+            whileHover={{
               scale: 1.05,
-              boxShadow: "0 8px 20px rgba(3, 100, 175, 0.3)"
+              boxShadow: "0 8px 20px rgba(3, 100, 175, 0.3)",
             }}
             whileTap={{ scale: 0.95 }}
             disabled={loading}
@@ -285,9 +299,7 @@ export default function WebDesignForm({
                 در حال ارسال...
               </>
             ) : (
-              <>
-                ارسال اطلاعات
-              </>
+              <>ارسال اطلاعات</>
             )}
           </motion.button>
         </motion.div>
@@ -329,14 +341,14 @@ export default function WebDesignForm({
                   />
                 </svg>
               </motion.div>
-              
+
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
                 اطلاعات شما با موفقیت ثبت شد
               </h3>
               <p className="text-gray-600 text-sm mb-6">
-                کارشناسان ما به زودی با شما تماس خواهند گرفت. 
+                کارشناسان ما به زودی با شما تماس خواهند گرفت.
               </p>
-              
+
               <motion.button
                 onClick={() => setShowSuccessModal(false)}
                 whileHover={{ scale: 1.05 }}

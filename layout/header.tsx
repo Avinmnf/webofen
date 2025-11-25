@@ -5,15 +5,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
+import { usePathname } from "next/navigation"; // Add this import
 
 export default function Header() {
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const { cart } = useCart();
   const { user, isLoggedIn, logout } = useAuth();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname(); // Get current path
 
   // Close profile dropdown if clicked outside
   useEffect(() => {
@@ -41,6 +42,13 @@ export default function Header() {
     { label: "آنالیز وبسایت", href: "/analyze" },
     { label: "درباره ما", href: "/about-us" },
   ];
+
+  // Find active index based on current path
+  const getActiveIndex = () => {
+    return menuItems.findIndex(item => pathname === item.href);
+  };
+
+  const activeIndex = getActiveIndex();
 
   // Logout called from modal, no redirect
   const handleLogout = async () => {
@@ -112,10 +120,7 @@ export default function Header() {
               {menuItems.map((item, index) => (
                 <li
                   key={index}
-                  onClick={() => {
-                    setActiveIndex(index);
-                    setMenuOpen(false);
-                  }}
+                  onClick={() => setMenuOpen(false)}
                   className={`cursor-pointer select-none ${
                     activeIndex === index
                       ? "text-[#6fd6e5] font-bold"
