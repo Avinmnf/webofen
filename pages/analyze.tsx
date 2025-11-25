@@ -172,7 +172,7 @@ const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
 
   console.log(`🔗 Broken links count from ${brokenLinksSource}: ${brokenLinksCount}`);
 
-  // 🔥 استخراج securityAnalysis از مسیرهای مختلف
+  // 🔥 استخراج securityAnalysis از مسیرهای مختلف - بهبود یافته
   let securityAnalysis = null;
   let securitySource = 'unknown';
   
@@ -184,7 +184,8 @@ const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
       securityScore: securityAnalysis.securityScore,
       isHttps: securityAnalysis.isHttps,
       hasValidSSL: securityAnalysis.hasValidSSL,
-      securityIssuesCount: securityAnalysis.securityIssues?.length || 0
+      securityIssuesCount: securityAnalysis.securityIssues?.length || 0,
+      productRecommendations: securityAnalysis.productRecommendations?.length || 0
     });
   }
   // اولویت ۲: مسیر مستقیم securityAnalysis
@@ -195,7 +196,8 @@ const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
       securityScore: securityAnalysis.securityScore,
       isHttps: securityAnalysis.isHttps,
       hasValidSSL: securityAnalysis.hasValidSSL,
-      securityIssuesCount: securityAnalysis.securityIssues?.length || 0
+      securityIssuesCount: securityAnalysis.securityIssues?.length || 0,
+      productRecommendations: securityAnalysis.productRecommendations?.length || 0
     });
   }
   // اولویت ۳: مسیر result.securityAnalysis
@@ -206,11 +208,45 @@ const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
       securityScore: securityAnalysis.securityScore,
       isHttps: securityAnalysis.isHttps,
       hasValidSSL: securityAnalysis.hasValidSSL,
-      securityIssuesCount: securityAnalysis.securityIssues?.length || 0
+      securityIssuesCount: securityAnalysis.securityIssues?.length || 0,
+      productRecommendations: securityAnalysis.productRecommendations?.length || 0
     });
   }
+  // اولویت ۴: بررسی دستی پروتکل اگر securityAnalysis وجود ندارد
   else {
-    console.log('❌ No security analysis found in any path');
+    console.log('❌ No security analysis found in any path, checking protocol manually...');
+    try {
+      const urlObj = new URL(apiResult.url);
+      const isHttps = urlObj.protocol === 'https:';
+      
+      securityAnalysis = {
+        isHttps: isHttps,
+        hasValidSSL: false,
+        securityScore: isHttps ? 60 : 0,
+        securityIssues: isHttps ? [] : [{
+          type: 'https',
+          severity: 'high',
+          title: 'استفاده از پروتکل ناامن HTTP',
+          description: 'وبسایت از پروتکل HTTP به جای HTTPS استفاده می‌کند که ارتباط را ناامن می‌سازد.',
+          recommendation: 'فوراً به HTTPS مهاجرت کنید و از گواهی SSL معتبر استفاده نمایید.'
+        }],
+        recommendations: isHttps ? ['✅ وبسایت از پروتکل امن HTTPS استفاده می‌کند.'] : ['🛡️ نیاز فوری به مهاجرت به HTTPS دارید.'],
+        productRecommendations: isHttps ? [] : [
+          "🛡️ **محصول امنیتی پیشنهادی: مهاجرت به HTTPS**",
+          "   - نصب گواهی SSL رایگان از Let's Encrypt",
+          "   - پیکربندی هدر HSTS",
+          "   - ریدایرکت تمام ترافیک HTTP به HTTPS"
+        ]
+      };
+      securitySource = 'manual protocol check';
+      console.log('✅ Manual security analysis created:', {
+        isHttps: securityAnalysis.isHttps,
+        securityScore: securityAnalysis.securityScore,
+        securityIssuesCount: securityAnalysis.securityIssues.length
+      });
+    } catch (error) {
+      console.log('❌ Could not create manual security analysis:', error);
+    }
   }
 
   console.log(`📦 Conversion source: ${source}, issues count: ${issues.length}`);
@@ -282,7 +318,8 @@ const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
     hasSecurityAnalysis: !!result.securityAnalysis, // 🔥 اضافه شده
     securityScore: result.securityAnalysis?.securityScore || 'N/A', // 🔥 اضافه شده
     isHttps: result.securityAnalysis?.isHttps || 'N/A', // 🔥 اضافه شده
-    securityIssuesCount: result.securityAnalysis?.securityIssues?.length || 0 // 🔥 اضافه شده
+    securityIssuesCount: result.securityAnalysis?.securityIssues?.length || 0, // 🔥 اضافه شده
+    productRecommendations: result.securityAnalysis?.productRecommendations?.length || 0 // 🔥 اضافه شده
   });
 
   return result;
@@ -380,15 +417,15 @@ export default function AnalyzePage() {
       
       // 🔥 اطلاعات امنیتی برای SEO
       const securityInfo = pendingResult.securityAnalysis ? 
-        ` | امنیت: ${pendingResult.securityAnalysis.securityScore}%` : '';
+        ` | امنیت: ${pendingResult.securityAnalysis.securityScore}% | HTTPS: ${pendingResult.securityAnalysis.isHttps ? 'بله' : 'خیر'}` : '';
       
       return {
         title: `نتایج آنالیز ${pendingResult.title || url} | وبوفن`,
         description: `آنالیز کامل سایت ${url} - سئو: ${seoScore}% | عملکرد: ${performanceScore}% | دسترسی: ${accessibilityScore}% | بهترین روش‌ها: ${bestPracticesScore}%${sitemapInfo}${brokenLinksInfo}${securityInfo}`,
-        keywords: `آنالیز سایت, سئو, عملکرد, دسترسی, بهترین روش‌ها, ${url}, بهینه سازی, وبوفن, سایت‌مپ, تولید محتوا, لینک‌های شکسته, امنیت سایت, HTTPS, SSL`,
+        keywords: `آنالیز سایت, سئو, عملکرد, دسترسی, بهترین روش‌ها, ${url}, بهینه سازی, وبوفن, سایت‌مپ, تولید محتوا, لینک‌های شکسته, امنیت سایت, HTTPS, SSL, محصول امنیتی`,
         canonical: currentUrl,
         ogType: "website" as const,
-        tags: ["آنالیز سایت", "سئو", "عملکرد", "دسترسی", "بهترین روش‌ها", "بهینه سازی", "سایت‌مپ", "تولید محتوا", "لینک‌های شکسته", "امنیت سایت", "HTTPS", "SSL"],
+        tags: ["آنالیز سایت", "سئو", "عملکرد", "دسترسی", "بهترین روش‌ها", "بهینه سازی", "سایت‌مپ", "تولید محتوا", "لینک‌های شکسته", "امنیت سایت", "HTTPS", "SSL", "محصول امنیتی"],
         author: "وبوفن",
         structuredData: {
           "@context": "https://schema.org",
@@ -422,10 +459,10 @@ export default function AnalyzePage() {
     return {
       title: "آنالیز رایگان سایت | وبوفن",
       description: "آنالیز تخصصی سئو و عملکرد وبسایت به صورت رایگان. بررسی مشکلات سئو، سرعت سایت، امنیت و استانداردهای وب. آنالیز کامل سئو، عملکرد، دسترسی و بهترین روش‌های توسعه وب",
-      keywords: "آنالیز سایت, سئو, عملکرد, بهینه سازی, سرعت سایت, امنیت سایت, دسترسی پذیری, بهترین روش‌ها, وبوفن, سایت‌مپ, تولید محتوا, لینک‌های شکسته, HTTPS, SSL",
+      keywords: "آنالیز سایت, سئو, عملکرد, بهینه سازی, سرعت سایت, امنیت سایت, دسترسی پذیری, بهترین روش‌ها, وبوفن, سایت‌مپ, تولید محتوا, لینک‌های شکسته, HTTPS, SSL, محصول امنیتی",
       canonical: currentUrl,
       ogType: "website" as const,
-      tags: ["آنالیز سایت", "سئو", "عملکرد", "بهینه سازی", "سرعت سایت", "امنیت", "سایت‌مپ", "تولید محتوا", "لینک‌های شکسته", "HTTPS", "SSL"],
+      tags: ["آنالیز سایت", "سئو", "عملکرد", "بهینه سازی", "سرعت سایت", "امنیت", "سایت‌مپ", "تولید محتوا", "لینک‌های شکسته", "HTTPS", "SSL", "محصول امنیتی"],
       author: "وبوفن",
       structuredData: {
         "@context": "https://schema.org",
@@ -458,6 +495,8 @@ export default function AnalyzePage() {
         brokenLinksCount: pendingResult.brokenLinksCount,
         securityScore: pendingResult.securityAnalysis?.securityScore || 'N/A',
         isHttps: pendingResult.securityAnalysis?.isHttps || 'N/A',
+        securityIssuesCount: pendingResult.securityAnalysis?.securityIssues?.length || 0,
+        productRecommendations: pendingResult.securityAnalysis?.productRecommendations?.length || 0,
         extraKeys: pendingResult.extra ? Object.keys(pendingResult.extra) : [],
         resultKeys: pendingResult.result ? Object.keys(pendingResult.result) : [],
         sitemapLinks: pendingResult.sitemapAnalysis?.totalLinks || 0
@@ -477,6 +516,7 @@ export default function AnalyzePage() {
         sitemapLinks: apiAnalysis.result?.extra?.sitemapAnalysis?.totalLinks || 0,
         hasSecurityAnalysis: !!apiAnalysis.result?.extra?.securityAnalysis,
         securityScore: apiAnalysis.result?.extra?.securityAnalysis?.securityScore || 'N/A',
+        isHttps: apiAnalysis.result?.extra?.securityAnalysis?.isHttps || 'N/A',
         brokenLinksCount: apiAnalysis.brokenLinksCount,
         hasBrokenLinksCount: typeof apiAnalysis.brokenLinksCount === 'number'
       });

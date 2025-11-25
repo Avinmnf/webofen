@@ -32,6 +32,7 @@ interface ProductRecommendationsProps {
       recommendation: string;
     }>;
     recommendations: string[];
+    productRecommendations?: string[];
   };
 }
 
@@ -161,37 +162,34 @@ export const ProductRecommendations = ({
       }
     }
 
-    // 🔥 منطق بسیار ساده و مستقیم برای امنیت
+    // 🔥 منطق فوق العاده ساده برای امنیت
     let shouldSuggestSecurity = false;
     let securitySev: 'low' | 'medium' | 'high' = 'high';
 
     if (securityAnalysis) {
-      // شرایط ساده‌تر برای نمایش محصول امنیتی
-      shouldSuggestSecurity = 
-        !securityAnalysis.isHttps || 
-        !securityAnalysis.hasValidSSL || 
-        securityAnalysis.securityIssues.length > 0 ||
-        securityAnalysis.securityScore < 80;
+      // 🔥 شرط اصلی: اگر HTTPS نیست، حتما محصول امنیتی پیشنهاد شود
+      shouldSuggestSecurity = !securityAnalysis.isHttps;
+      
+      console.log("🔒 ULTRA SIMPLIFIED SECURITY CHECK:", {
+        url: window.location.href,
+        hasSecurityAnalysis: !!securityAnalysis,
+        isHttps: securityAnalysis.isHttps,
+        shouldSuggestSecurity
+      });
 
       // تعیین شدت بر اساس شرایط
-      if (!securityAnalysis.isHttps || !securityAnalysis.hasValidSSL) {
+      if (!securityAnalysis.isHttps) {
         securitySev = 'high';
-      } else if (securityAnalysis.securityIssues.length > 0) {
-        securitySev = securityAnalysis.securityIssues.some(issue => issue.severity === 'high') ? 'high' : 'medium';
+        console.log("🚨 HIGH PRIORITY: Website is using HTTP instead of HTTPS");
+      } else if (!securityAnalysis.hasValidSSL) {
+        securitySev = 'high';
+      } else if (securityAnalysis.securityIssues.some(issue => issue.severity === 'high')) {
+        securitySev = 'high';
+      } else if (securityAnalysis.securityIssues.length > 0 || securityAnalysis.securityScore < 70) {
+        securitySev = 'medium';
       } else if (securityAnalysis.securityScore < 80) {
-        securitySev = securityAnalysis.securityScore < 60 ? 'high' : 'medium';
+        securitySev = 'low';
       }
-
-      console.log("🔒 SIMPLIFIED SECURITY PRODUCT DECISION:", {
-        shouldSuggestSecurity,
-        reasons: {
-          noHttps: !securityAnalysis.isHttps,
-          invalidSSL: !securityAnalysis.hasValidSSL,
-          hasIssues: securityAnalysis.securityIssues.length > 0,
-          lowScore: securityAnalysis.securityScore < 80
-        },
-        severity: securitySev
-      });
     }
 
     setNeedsContentProduction(!!shouldSuggestContent || !!wasSuggestingContentPreviously);
@@ -232,38 +230,22 @@ export const ProductRecommendations = ({
       recommended.push(mockProducts[4]);
     }
 
-    // 4. 🔥 محصولات امنیتی - منطق بسیار ساده و مستقیم
-    console.log("🛡️ FINAL SECURITY PRODUCT CHECK - SIMPLIFIED:", {
+    // 4. 🔥 محصولات امنیتی - منطق فوق العاده ساده
+    console.log("🛡️ ULTRA SIMPLE SECURITY PRODUCT CHECK:", {
       securityAnalysisExists: !!securityAnalysis,
-      shouldSuggestSecurity,
-      conditions: securityAnalysis ? {
-        noHttps: !securityAnalysis.isHttps,
-        invalidSSL: !securityAnalysis.hasValidSSL,
-        hasIssues: securityAnalysis.securityIssues.length > 0,
-        lowScore: securityAnalysis.securityScore < 80
-      } : null
+      isHttps: securityAnalysis?.isHttps,
+      shouldSuggestSecurity
     });
 
-    // 🔥 منطق بسیار ساده: اگر securityAnalysis وجود دارد و باید پیشنهاد شود، محصول را اضافه کن
-    if (securityAnalysis && shouldSuggestSecurity) {
-      console.log("✅ ADDING SECURITY PRODUCT - Conditions met");
+    // 🔥 شرط نهایی: اگر securityAnalysis وجود دارد و HTTPS نیست، محصول را اضافه کن
+    if (securityAnalysis && !securityAnalysis.isHttps) {
+      console.log("✅ ✅ ✅ ADDING SECURITY PRODUCT - Website is using HTTP");
       if (!recommended.some(p => p.id === "6")) {
         recommended.push(mockProducts[5]);
-        console.log("✅ ✅ ✅ SECURITY PRODUCT SUCCESSFULLY ADDED");
-      } else {
-        console.log("ℹ️ Security product already in recommendations");
+        console.log("✅ ✅ ✅ SECURITY PRODUCT SUCCESSFULLY ADDED FOR HTTP SITE");
       }
     } else {
-      console.log("❌ Security product NOT added - reasons:", {
-        hasSecurityAnalysis: !!securityAnalysis,
-        shouldSuggestSecurity,
-        conditions: securityAnalysis ? {
-          noHttps: !securityAnalysis.isHttps,
-          invalidSSL: !securityAnalysis.hasValidSSL,
-          hasIssues: securityAnalysis.securityIssues.length > 0,
-          lowScore: securityAnalysis.securityScore < 80
-        } : 'no security analysis'
-      });
+      console.log("❌ Security product NOT added - Website is using HTTPS or no security analysis");
     }
 
     console.log("📦 FINAL RECOMMENDED PRODUCTS:", recommended.map(p => `${p.title} (${p.id})`));
@@ -445,7 +427,7 @@ export const ProductRecommendations = ({
         )}
 
         {brokenLinksCount > 0 && brokenLinksCount <= 10 && (
-          <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="font-bold text-green-800 text-sm mb-1">وضعیت لینک‌ های شکسته</h4>
@@ -489,31 +471,6 @@ export const ProductRecommendations = ({
             </div>
           </div>
         )}
-      </div>
-
-      {/* 🔥 پیام دیباگ برای ردیابی مشکل */}
-      <div className="mb-6 p-4 bg-gray-100 border border-gray-300 rounded-xl">
-        <div className="flex items-start">
-          <div className="flex-shrink-0 w-6 h-6 text-gray-600 mt-0.5">🐛</div>
-          <div className="mr-3">
-            <h4 className="font-bold text-gray-800 text-sm mb-1">اطلاعات دیباگ محصول امنیتی</h4>
-            <p className="text-gray-700 text-sm">
-              وضعیت محصول امنیتی: <strong>{hasSecurityProduct ? "✅ نمایش داده می‌شود" : "❌ نمایش داده نمی‌شود"}</strong>
-            </p>
-            {securityAnalysis && (
-              <div className="mt-2 text-xs text-gray-600">
-                <strong>داده‌های امنیتی دریافتی:</strong>
-                <ul className="mt-1 space-y-1">
-                  <li>• HTTPS: {securityAnalysis.isHttps ? "✅" : "❌"}</li>
-                  <li>• SSL معتبر: {securityAnalysis.hasValidSSL ? "✅" : "❌"}</li>
-                  <li>• امتیاز امنیتی: {securityAnalysis.securityScore}/100</li>
-                  <li>• مشکلات امنیتی: {securityAnalysis.securityIssues.length} مورد</li>
-                  <li>• نیاز به امنیت: {needsSecurity ? "✅ بله" : "❌ خیر"}</li>
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
       </div>
 
       {/* 🔥 پیام هشدار اگر مشکلات امنیتی داریم اما محصول امنیتی نمایش داده نمی‌شود */}

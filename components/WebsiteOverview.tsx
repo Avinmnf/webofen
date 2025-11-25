@@ -9,77 +9,35 @@ interface WebsiteOverviewProps {
 export function WebsiteOverview({ result }: WebsiteOverviewProps) {
   // --- انتخاب بهترین عنوان موجود ---
   const getBestTitle = () => {
-    let domainName = "";
+    // 1) اول meta title را چک کن
+    if (result.meta?.title && result.meta.title.trim() && result.meta.title.trim() !== "بدون عنوان") {
+      return result.meta.title.trim();
+    }
+
+    // 2) سپس og:title
+    if (result.meta?.ogTitle && result.meta.ogTitle.trim() && result.meta.ogTitle.trim() !== "بدون عنوان") {
+      return result.meta.ogTitle.trim();
+    }
+
+    // 3) سپس title اصلی
+    if (result.title && result.title.trim() && result.title.trim() !== "بدون عنوان") {
+      return result.title.trim();
+    }
+
+    // 4) اگر هیچکدام نبود، دامنه را برگردان
     if (result.url) {
       try {
         const urlObj = new URL(result.url);
-        domainName = urlObj.hostname.replace(/^www\./, "");
+        return urlObj.hostname.replace(/^www\./, "");
       } catch {
-        domainName = result.url;
+        return result.url;
       }
     }
 
-    // 1) og:title
-    if (result.meta?.ogTitle &&
-        result.meta.ogTitle.trim() &&
-        result.meta.ogTitle !== "بدون عنوان" &&
-        result.meta.ogTitle !== domainName) {
-      return result.meta.ogTitle;
-    }
-
-    // 2) meta title
-    if (result.meta?.title &&
-        result.meta.title.trim() &&
-        result.meta.title !== "بدون عنوان" &&
-        result.meta.title !== domainName) {
-      return result.meta.title;
-    }
-
-    // 3) title اصلی صفحه
-    if (result.title &&
-        result.title.trim() &&
-        result.title !== "بدون عنوان" &&
-        result.title !== domainName) {
-      return result.title;
-    }
-
-    // 4) og:title به عنوان fallback
-    if (result.meta?.ogTitle && result.meta.ogTitle.trim()) {
-      return result.meta.ogTitle;
-    }
-
-    // 5) meta title
-    if (result.meta?.title && result.meta.title.trim()) {
-      return result.meta.title;
-    }
-
-    // 6) title
-    if (result.title && result.title.trim()) {
-      return result.title;
-    }
-
-    // 7) دامنه
-    return domainName || "عنوان یافت نشد";
+    return "عنوان یافت نشد";
   };
 
   const displayTitle = getBestTitle();
-
-  // --- تشخیص اینکه عنوان فقط خود دامنه است ---
-  const normalize = (s: string) =>
-    s.trim().replace(/^www\./, "").toLowerCase();
-
-  let isDomainTitle = false;
-
-  if (result.url) {
-    try {
-      const urlObj = new URL(result.url);
-      const domainName = urlObj.hostname.replace(/^www\./, "").toLowerCase();
-      const titleNorm = normalize(displayTitle);
-      isDomainTitle = titleNorm === domainName;
-    } catch {
-      isDomainTitle = displayTitle === result.url;
-    }
-  }
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 animate-slide-up">
@@ -119,12 +77,6 @@ export function WebsiteOverview({ result }: WebsiteOverviewProps) {
             <p className="font-bold text-gray-800 text-lg leading-snug line-clamp-2" title={displayTitle}>
               {displayTitle}
             </p>
-
-            {isDomainTitle && (
-              <p className="text-xs text-yellow-600 mt-1">
-                ⚠️ عنوان صفحه تنظیم نشده است
-              </p>
-            )}
 
             <div className="mt-2 space-y-1">
               {result.meta?.title && result.meta.title !== displayTitle && (
