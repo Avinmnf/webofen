@@ -181,7 +181,8 @@ export function HowItWorks() {
             آنالیز رایگان شروع کنید و گزارش دقیق دریافت نمایید
           </p>
           <button className="bg-white text-blue-600 hover:bg-blue-50 font-medium py-3 px-8 rounded-lg transition-all duration-200 transform hover:scale-105">
-            شروع آنالیز رایگان
+            <a href="https://webofen.com/analyze"> شروع آنالیز رایگان</a>
+           
           </button>
         </div>
       </div>
