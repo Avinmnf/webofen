@@ -155,7 +155,7 @@ export function HowItWorks() {
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-green-600">
                   <span className="text-sm">💡</span>
-                  <span className="text-xs font-medium">راهکارها</span>
+                  <span className="text-xs font-medium">راهکار ها</span>
                 </div>
                 <div className="space-y-2">
                   {area.solutions.map((solution, idx) => (
