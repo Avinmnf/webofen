@@ -1,63 +1,191 @@
 export function HowItWorks() {
-  const features = [
+  const processSteps = [
     {
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
-      ),
-      title: "بررسی عملکرد",
-      description: "سرعت لود، بهینه‌سازی تصاویر و رندرینگ صفحه را تحلیل می‌کند",
-      color: "blue",
-      delay: "0s"
+      step: "۱",
+      title: "دریافت آدرس",
+      description: "آدرس سایت شما دریافت و اعتبارسنجی می‌شود",
+      icon: "🌐",
+      color: "blue"
     },
     {
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-        </svg>
-      ),
-      title: "آنالیز سئو",
-      description: "ساختار سایت، متا تگ‌ها، سرعت و بهینه‌سازی موتورهای جستجو",
-      color: "green",
-      delay: "0.1s"
+      step: "۲",
+      title: "آنالیز فنی",
+      description: "سرعت، سئو و امنیت سایت بررسی می‌شود",
+      icon: "⚡",
+      color: "purple"
     },
     {
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-        </svg>
-      ),
-      title: "بررسی امنیت",
-      description: "HTTPS، هدرهای امنیتی و آسیب‌پذیری‌های احتمالی را بررسی می‌کند",
-      color: "blue",
-      delay: "0.2s"
+      step: "۳",
+      title: "شناسایی مشکلات",
+      description: "مشکلات و نقاط ضعف شناسایی می‌شوند",
+      icon: "🔍",
+      color: "orange"
+    },
+    {
+      step: "۴",
+      title: "پیشنهاد راهکار",
+      description: "راهکارها و محصولات مرتبط پیشنهاد می‌شود",
+      icon: "💡",
+      color: "green"
+    }
+  ];
+
+  const analysisAreas = [
+    {
+      area: "عملکرد",
+      issues: ["سرعت لود", "بهینه‌سازی تصاویر", "رندرینگ"],
+      solutions: ["هاست پرسرعت", "CDN", "بهینه‌ساز تصاویر"]
+    },
+    {
+      area: "سئو",
+      issues: ["متا تگ‌ها", "ساختار سایت", "محتوا"],
+      solutions: ["مشاوره سئو", "ابزار آنالیز", "تولید محتوا"]
+    },
+    {
+      area: "امنیت",
+      issues: ["HTTPS", "SSL", "هدرهای امنیتی"],
+      solutions: ["گواهی SSL", "فایروال", "اسکن امنیتی"]
     }
   ];
 
   return (
-    <div className="max-w-4xl mx-auto py-12">
-      <div className="text-center mb-12 animate-fade-in">
-        <h2 className="text-3xl font-bold text-gray-800 mb-4">چگونه آنالیز کار می‌ کند؟</h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">ابزار آنالیز ما بیش از ۵۰ پارامتر مختلف را بررسی می‌کند تا گزارش کاملی از وضعیت وبسایت شما ارائه دهد</p>
+    <div className="max-w-6xl mx-auto py-20 px-4 sm:px-6 lg:px-8">
+
+      {/* هدر */}
+      <div className="text-center mb-16">
+     
+        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          چگونه سایت شما آنالیز می‌شود؟
+        </h2>
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          در ۴ مرحله ساده، مشکلات سایت شناسایی و راهکارهای دقیق ارائه می‌شود
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {features.map((item, index) => (
-          <div
-            key={index}
-            className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center animate-fade-in-up hover:shadow-md transition-all duration-300 transform hover:-translate-y-1"
-            style={{ animationDelay: item.delay }}
-          >
-            <div className={`w-12 h-12 bg-${item.color}-100 rounded-xl flex items-center justify-center mx-auto mb-4`}>
-              {item.icon}
+      {/* مراحل */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-20">
+        {processSteps.map((step, index) => (
+          <div key={step.step} className="relative group">
+
+            {index < processSteps.length - 1 && (
+              <div className="hidden lg:block absolute top-8 left-1/2 w-full h-0.5 bg-gradient-to-r from-blue-200 to-blue-100 -z-10" />
+            )}
+
+            <div className="bg-white rounded-2xl p-6 text-center shadow-sm border border-gray-100 group-hover:shadow-lg group-hover:border-blue-100 transition-all duration-300 transform group-hover:-translate-y-2">
+              
+              <div className={`w-16 h-16 rounded-2xl bg-${step.color}-100 flex items-center justify-center mx-auto mb-4`}>
+                <span className="text-2xl">{step.icon}</span>
+              </div>
+
+              <div className="mb-3">
+                <div className={`inline-flex items-center gap-2 bg-${step.color}-400 text-${step.color}-700 px-3 py-1 rounded-full text-sm font-medium mb-3`}>
+                  <span>مرحله</span>
+                  <span className="font-bold">{step.step}</span>
+                </div>
+                <h3 className="font-bold text-lg text-gray-800 mb-2">{step.title}</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">{step.description}</p>
+              </div>
             </div>
-            <h3 className="font-bold text-lg text-gray-800 mb-2">{item.title}</h3>
-            <p className="text-gray-600">{item.description}</p>
           </div>
         ))}
       </div>
+
+      {/* بخش‌های آنالیز */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+        {analysisAreas.map((area) => (
+          <div
+            key={area.area}
+            className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300"
+          >
+            <div className="flex items-center gap-4 mb-6">
+            
+              <div>
+                <h3 className="font-bold text-lg text-gray-800">{area.area}</h3>
+                <p className="text-gray-500 text-sm">مشکلات شایع و راهکارها</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-red-600">
+                  <span className="text-sm">⚠️</span>
+                  <span className="text-xs font-medium">مشکلات</span>
+                </div>
+                <div className="space-y-2">
+                  {area.issues.map((issue, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-red-400 rounded-full"></div>
+                      <span className="text-xs text-gray-700">{issue}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-green-600">
+                  <span className="text-sm">💡</span>
+                  <span className="text-xs font-medium">راهکارها</span>
+                </div>
+                <div className="space-y-2">
+                  {area.solutions.map((solution, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
+                      <span className="text-xs text-gray-700">{solution}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* نمونه گزارش واقعی */}
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-8 mt-20">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-2 bg-white text-blue-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
+            <span>📊</span>
+            نمونه گزارش آنالیز
+          </div>
+          <h3 className="text-2xl font-bold text-gray-800 mb-3">
+            نمونه‌ای از خروجی واقعی آنالیز
+          </h3>
+          <p className="text-gray-600">این تصاویر بخشی از گزارش واقعی آنالیز هستند</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+
+          <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100">
+            <img
+              src="/analyze/Screenshot 2025-11-26 104643.png"
+              alt="نمونه گزارش بخش اول"
+            />
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100">
+            <img
+              src="/analyze/Screenshot 2025-11-26 111322.png"
+              alt="نمونه گزارش بخش دوم"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div className="text-center mt-12">
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
+          <h3 className="text-2xl font-bold mb-3">آماده بهبود سایت خود هستید؟</h3>
+          <p className="text-blue-100 mb-6 max-w-md mx-auto">
+            آنالیز رایگان شروع کنید و گزارش دقیق دریافت نمایید
+          </p>
+          <button className="bg-white text-blue-600 hover:bg-blue-50 font-medium py-3 px-8 rounded-lg transition-all duration-200 transform hover:scale-105">
+            شروع آنالیز رایگان
+          </button>
+        </div>
+      </div>
+
     </div>
   );
 }
