@@ -1,4 +1,8 @@
+import { useState } from 'react';
+
 export function HowItWorks() {
+  const [selectedImage, setSelectedImage] = useState(null);
+
   const processSteps = [
     {
       step: "۱",
@@ -48,12 +52,41 @@ export function HowItWorks() {
     }
   ];
 
+  const openImageModal = (imageSrc:any) => {
+    setSelectedImage(imageSrc);
+  };
+
+  const closeImageModal = () => {
+    setSelectedImage(null);
+  };
+
   return (
     <div className="max-w-6xl mx-auto py-20 px-4 sm:px-6 lg:px-8">
+      
+      {/* Modal برای نمایش عکس بزرگ */}
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
+          onClick={closeImageModal}
+        >
+          <div className="relative max-w-4xl max-h-full">
+            <button 
+              className="absolute -top-12 right-0 text-white text-2xl hover:text-gray-300 transition-colors"
+              onClick={closeImageModal}
+            >
+              ✕
+            </button>
+            <img 
+              src={selectedImage} 
+              alt="نمونه گزارش بزرگ شده" 
+              className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
+            />
+          </div>
+        </div>
+      )}
 
       {/* هدر */}
       <div className="text-center mb-16">
-     
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
           چگونه سایت شما آنالیز می‌شود؟
         </h2>
@@ -66,7 +99,6 @@ export function HowItWorks() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-20">
         {processSteps.map((step, index) => (
           <div key={step.step} className="relative group">
-
             {index < processSteps.length - 1 && (
               <div className="hidden lg:block absolute top-8 left-1/2 w-full h-0.5 bg-gradient-to-r from-blue-200 to-blue-100 -z-10" />
             )}
@@ -98,7 +130,6 @@ export function HowItWorks() {
             className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300"
           >
             <div className="flex items-center gap-4 mb-6">
-            
               <div>
                 <h3 className="font-bold text-lg text-gray-800">{area.area}</h3>
                 <p className="text-gray-500 text-sm">مشکلات شایع و راهکارها</p>
@@ -106,7 +137,6 @@ export function HowItWorks() {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-red-600">
                   <span className="text-sm">⚠️</span>
@@ -136,7 +166,6 @@ export function HowItWorks() {
                   ))}
                 </div>
               </div>
-
             </div>
           </div>
         ))}
@@ -152,22 +181,29 @@ export function HowItWorks() {
           <h3 className="text-2xl font-bold text-gray-800 mb-3">
             نمونه‌ای از خروجی واقعی آنالیز
           </h3>
-          <p className="text-gray-600">این تصاویر بخشی از گزارش واقعی آنالیز هستند</p>
+          <p className="text-gray-600">برای دیدن تصویر در اندازه بزرگ، روی آن کلیک کنید</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-
-          <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100">
+          <div 
+            className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 cursor-pointer transform hover:scale-105 transition-transform duration-300"
+            onClick={() => openImageModal("/analyze/Screenshot 2025-11-26 104643.png")}
+          >
             <img
               src="/analyze/Screenshot 2025-11-26 104643.png"
               alt="نمونه گزارش بخش اول"
+              className="w-full h-auto"
             />
           </div>
 
-          <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100">
+          <div 
+            className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 cursor-pointer transform hover:scale-105 transition-transform duration-300"
+            onClick={() => openImageModal("/analyze/Screenshot 2025-11-26 111322.png")}
+          >
             <img
               src="/analyze/Screenshot 2025-11-26 111322.png"
               alt="نمونه گزارش بخش دوم"
+              className="w-full h-auto"
             />
           </div>
         </div>
@@ -181,12 +217,10 @@ export function HowItWorks() {
             آنالیز رایگان شروع کنید و گزارش دقیق دریافت نمایید
           </p>
           <button className="bg-white text-blue-600 hover:bg-blue-50 font-medium py-3 px-8 rounded-lg transition-all duration-200 transform hover:scale-105">
-            <a href="https://webofen.com/analyze"> شروع آنالیز رایگان</a>
-           
+            <a href="/analyze">شروع آنالیز رایگان</a>
           </button>
         </div>
       </div>
-
     </div>
   );
 }
