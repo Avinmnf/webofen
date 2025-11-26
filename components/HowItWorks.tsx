@@ -7,28 +7,28 @@ export function HowItWorks() {
     {
       step: "۱",
       title: "دریافت آدرس",
-      description: "آدرس سایت شما دریافت و اعتبارسنجی می‌شود",
+      description: "آدرس سایت شما دریافت و اعتبارسنجی می‌ شود",
       icon: "🌐",
       color: "blue"
     },
     {
       step: "۲",
       title: "آنالیز فنی",
-      description: "سرعت، سئو و امنیت سایت بررسی می‌شود",
+      description: "سرعت، سئو و امنیت سایت بررسی می‌ شود",
       icon: "⚡",
       color: "purple"
     },
     {
       step: "۳",
       title: "شناسایی مشکلات",
-      description: "مشکلات و نقاط ضعف شناسایی می‌شوند",
+      description: "مشکلات و نقاط ضعف شناسایی می‌ شوند",
       icon: "🔍",
       color: "orange"
     },
     {
       step: "۴",
       title: "پیشنهاد راهکار",
-      description: "راهکارها و محصولات مرتبط پیشنهاد می‌شود",
+      description: "راهکار ها و محصولات مرتبط پیشنهاد می‌ شود",
       icon: "💡",
       color: "green"
     }
@@ -37,17 +37,17 @@ export function HowItWorks() {
   const analysisAreas = [
     {
       area: "عملکرد",
-      issues: ["سرعت لود", "بهینه‌سازی تصاویر", "رندرینگ"],
-      solutions: ["هاست پرسرعت", "CDN", "بهینه‌ساز تصاویر"]
+      issues: ["سرعت لود", "بهینه‌ سازی تصاویر", "رندرینگ"],
+      solutions: ["هاست پرسرعت", "CDN", "بهینه‌ ساز تصاویر"]
     },
     {
       area: "سئو",
-      issues: ["متا تگ‌ها", "ساختار سایت", "محتوا"],
+      issues: ["متا تگ‌ ها", "ساختار سایت", "محتوا"],
       solutions: ["مشاوره سئو", "ابزار آنالیز", "تولید محتوا"]
     },
     {
       area: "امنیت",
-      issues: ["HTTPS", "SSL", "هدرهای امنیتی"],
+      issues: ["HTTPS", "SSL", "هدر های امنیتی"],
       solutions: ["گواهی SSL", "فایروال", "اسکن امنیتی"]
     }
   ];
@@ -91,7 +91,7 @@ export function HowItWorks() {
           چگونه سایت شما آنالیز می‌شود؟
         </h2>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-          در ۴ مرحله ساده، مشکلات سایت شناسایی و راهکارهای دقیق ارائه می‌شود
+          در ۴ مرحله ساده، مشکلات سایت شناسایی و راهکار های دقیق ارائه می‌شود
         </p>
       </div>
 
@@ -132,7 +132,7 @@ export function HowItWorks() {
             <div className="flex items-center gap-4 mb-6">
               <div>
                 <h3 className="font-bold text-lg text-gray-800">{area.area}</h3>
-                <p className="text-gray-500 text-sm">مشکلات شایع و راهکارها</p>
+                <p className="text-gray-500 text-sm">مشکلات شایع و راهکار ها</p>
               </div>
             </div>
 
