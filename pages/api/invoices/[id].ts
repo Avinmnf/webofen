@@ -217,7 +217,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             <!-- هدر -->
             <div class="header">
               <h1>فاکتور فروش</h1>
-              <p>فروشگاه اینترنتی ویبوفن</p>
               <p>شماره فاکتور: ${order.id}</p>
             </div>
             
