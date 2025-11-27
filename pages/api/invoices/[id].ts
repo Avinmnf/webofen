@@ -301,7 +301,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             <!-- فوتر -->
             <div class="footer">
               <p>با تشکر از خرید شما | پشتیبانی: ۰۲۱-۱۲۳۴۵۶۷۸</p>
-              <p>www.webofen.com | email@webofen.com</p>
+              <p>www.webofen.com</p>
               <div class="thank-you">نظرات شما باعث بهبود ما می‌شود</div>
             </div>
           </div>
