@@ -130,7 +130,7 @@ export default function Home() {
                     style={{
                       bottom: "0",
                       height: "16%",
-                      backgroundColor: "#6FD6E5",
+                      backgroundColor: "#6FD6E5", 
                       color: "#fff",
                       boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
                       transition: "all 0.3s ease",
@@ -188,7 +188,7 @@ export default function Home() {
                     c0,.82-.66,1.48-1.48,1.48c-4.09,0-7.42,3.33-7.42,7.42c0,.82-.66,1.48-1.48,1.48s-1.48-.66-1.48-1.48
                     c0-5.73,4.66-10.39,10.39-10.39c.82,0,1.48.66,1.48,1.48Z"
                         />
-                      </svg>  
+                      </svg>
                     </div>
                   </div>
                 </Link>
@@ -228,15 +228,11 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="w-full p-4 mt-4 text-black font-bold">
-            <div className="max-w-[1250px] m-auto flex justify-center">
+            <div className="max-w-[1250px] m-auto flex justify-center mt-6">
               <div className="w-full rounded-2xl bg-white p-4">
                 {/* Input Fields */}
-                <div className="">
                   <FreeConsultationForm />
-                </div>
               </div>
-            </div>
           </div>
         </section>
         <section className="max-w-[1250px] m-auto mt-10 md:mt-20 px-4">

@@ -82,7 +82,6 @@ export default function ProductList() {
     const meta = getDynamicMetaData();
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://webofen.com";
 
-    // 📍 فقط یک ItemList Schema ساده برای کاروسل
     const itemListSchema = {
       "@context": "https://schema.org",
       "@type": "ItemList",
@@ -94,11 +93,11 @@ export default function ProductList() {
         products?.slice(0, 10).map((product: any, index: number) => ({
           "@type": "ListItem",
           position: index + 1,
-          name: product.title || "محصول سئو", // ✅ اینجا مشکل Unnamed item حل می‌شود
+          name: product.title || "محصول سئو",
           url: `${siteUrl}/products/${product.slug || ""}`,
           image:
             product.imageUrl?.replace(".mp4", ".jpg") ||
-            `${siteUrl}/images/default-product.jpg`, // ✅ تصویر باید JPG/PNG باشه نه MP4
+            `${siteUrl}/images/default-product.jpg`,
         })) || [],
     };
 
@@ -222,9 +221,6 @@ export default function ProductList() {
       }
     }
 
-    // ❌ حذف کامل بخش نظرات جعلی
-    // هیچگاه نظرات و رتبه‌بندی ساختگی اضافه نکنید
-
     return productSchema;
   };
   const faqs = [
@@ -270,13 +266,11 @@ export default function ProductList() {
     setActiveIndex(activeIndex === index ? null : index);
   };
 
-  // گرفتن متادیتاهای داینامیک
   const dynamicMeta = getDynamicMetaData();
   const structuredDataArray = generateDynamicStructuredData();
 
   return (
     <main>
-      {/* کامپوننت SEO با داده‌های داینامیک */}
       <SEO
         title={dynamicMeta.title}
         description={dynamicMeta.description}
@@ -293,6 +287,7 @@ export default function ProductList() {
       />
 
       <div className="max-w-[1250px] m-auto p-4">
+        
         <div className="relative w-full aspect-[3/1] md:aspect-[12/2] mt-10 md:rounded-lg overflow-hidden flex items-start">
           <Image
             src="/guidance/pharmacy-banner-main.webp"
@@ -308,7 +303,8 @@ export default function ProductList() {
             className="object-contain md:hidden block rounded-3xl"
             priority
           />
-        </div>
+        </div>        <Pills />
+
         <section className="mt-14 max-w-[1250px]">
           <div className="flex flex-col lg:flex-row gap-8 justify-center mx-auto items-center">
             {/* Left Image */}
@@ -781,7 +777,6 @@ export default function ProductList() {
             </div>
           </div>
         </section>
-        <Pills />
 
         <section>
           {/*FAQ*/}

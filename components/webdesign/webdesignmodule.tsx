@@ -82,7 +82,7 @@ export default function WebDesignModule() {
 
   return (
     <section className="bg-[#f7f8fc] pb-4 w-full rounded-2xl mt-8 sm:mt-10 md:mt-12">
-      <div className="max-w-[1250px] m-auto gap-4 sm:gap-6 flex flex-col lg:flex-row justify-center pt-6 sm:pt-8 md:pt-10 px-4 sm:px-6 md:px-8">
+      <div className="max-w-[1250px] m-auto gap-4 sm:gap-6 flex flex-col lg:flex-row justify-center pt-6 sm:pt-8 md:pt-10">
         <div className="relative w-full lg:w-1/2 rounded-lg overflow-hidden">
           <div className="aspect-[10/1] flex flex-col items-center md:items-start justify-between">
             <Image
@@ -383,7 +383,7 @@ export default function WebDesignModule() {
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="w-4 h-4"
+                      className="w-4 h-4 rotate-180"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
