@@ -7,7 +7,7 @@ const AccountingPage: React.FC = () => {
   const statusMap: Record<string, string> = {
     Processing: "در حال بررسی",
     Cancelled: "لغو شده",
-    waiting: "در حال پردازش", // اضافه شد در صورت نیاز
+    waiting: "در حال پردازش",
     pending: "در انتظار",
     submitted: "تکمیل شده",
     Completed: "تکمیل شده",
@@ -15,45 +15,58 @@ const AccountingPage: React.FC = () => {
 
   const { orders, loading, error } = useUserOrders();
 
-  if (loading)
-    return <p className="text-gray-500">در حال بارگذاری سفارش‌ ها...</p>;
-  if (error) return <p className="text-red-500">خطا: {error}</p>;
-  if (!orders.length) return <p className="text-gray-500">سفارشی یافت نشد.</p>;
-
   const handleDownloadInvoice = async (order: Order) => {
     try {
+      console.log("Sending order data:", order);
+      
       const response = await fetch(`/api/invoices/${order.id}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(order),
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        alert(`خطا: ${data.error}`);
+        const errorData = await response.json().catch(() => ({ error: "خطا در سرور" }));
+        console.error("Server error:", errorData);
+        alert(`خطا: ${errorData.error}${errorData.details ? ` - ${errorData.details}` : ''}`);
         return;
       }
 
       const blob = await response.blob();
+      
+      // بررسی نوع فایل
+      if (blob.type !== "application/pdf") {
+        const text = await blob.text();
+        const errorData = JSON.parse(text);
+        throw new Error(errorData.error || "فایل PDF تولید نشد");
+      }
+
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `فاکتور-${order.customerName}.pdf`;
+      a.download = `فاکتور-${order.customerName}-${order.id}.pdf`;
       document.body.appendChild(a);
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
+      
     } catch (err) {
-      console.error(err);
-      alert("خطا در دانلود فاکتور");
+      console.error("Download error:", err);
+      alert(err instanceof Error ? err.message : "خطا در دانلود فاکتور");
     }
   };
-  console.log(orders);
+
+  if (loading) return <p className="text-gray-500 text-center py-8">در حال بارگذاری سفارش‌ها...</p>;
+  if (error) return <p className="text-red-500 text-center py-8">خطا: {error}</p>;
+  if (!orders.length) return <p className="text-gray-500 text-center py-8">سفارشی یافت نشد.</p>;
+
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen flex flex-col bg-gray-50">
       {/* هدر بالا */}
-      <div className="p-6 border-b">
-        <h1 className="text-2xl font-bold text-gray-600">تراکنش‌ ها</h1>
+      <div className="p-6 border-b bg-white shadow-sm">
+        <h1 className="text-2xl font-bold text-gray-700">تراکنش‌ها</h1>
       </div>
 
       {/* بخش اسکرول‌دار */}
@@ -61,93 +74,98 @@ const AccountingPage: React.FC = () => {
         {orders.map((order: Order) => (
           <div
             key={order.id}
-            className="mb-8 bg-white rounded-xl shadow-md p-6 transition-transform hover:scale-[1.01]"
+            className="mb-6 bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:shadow-lg transition-all"
           >
-            <div className="flex justify-between mb-3 text-gray-700">
-              <span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-gray-700">
+              <div>
                 <strong>شناسه سفارش:</strong> {order.id}
-              </span>
-              <span>
+              </div>
+              <div className="text-left md:text-right">
                 <strong>تاریخ:</strong>{" "}
-                {new Date(order?.createdAt).toLocaleString("fa-IR")}
-              </span>
-            </div>
-
-            <div className="flex justify-between mb-3 text-gray-700">
-              <span>
+                {new Date(order?.createdAt || Date.now()).toLocaleString("fa-IR")}
+              </div>
+              <div>
                 <strong>نام مشتری:</strong> {order.customerName}
-              </span>
-              <span>
+              </div>
+              <div className="text-left md:text-right">
                 <strong>وضعیت:</strong>{" "}
-                {statusMap[order.status?.trim()] ?? order.status}
-              </span>
+                <span className={`px-2 py-1 rounded-full text-xs ${
+                  order.status === 'Completed' || order.status === 'submitted' 
+                    ? 'bg-green-100 text-green-800'
+                    : order.status === 'Cancelled'
+                    ? 'bg-red-100 text-red-800'
+                    : 'bg-yellow-100 text-yellow-800'
+                }`}>
+                  {statusMap[order.status?.trim()] ?? order.status}
+                </span>
+              </div>
             </div>
 
-            <div className="mb-4 text-gray-700">
+            <div className="mb-4 text-gray-700 text-lg">
               <strong>مبلغ کل:</strong>{" "}
-              {Number(order.totalPrice).toLocaleString("fa-IR")} تومان
+              {Number(order.totalPrice || 0).toLocaleString("fa-IR")} تومان
             </div>
 
-            <table className="w-full border border-gray-300 border-collapse text-sm text-right">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="border p-3 text-gray-600 text-center">
-                    محصول
-                  </th>
-                  <th className="border p-3 text-gray-600 text-center">
-                    ویژگی‌ ها
-                  </th>
-                  <th className="border p-3 text-gray-600 text-center">
-                    تعداد
-                  </th>
-                  <th className="border p-3 text-gray-600 text-center">قیمت</th>
-                  <th className="border p-3 text-gray-600 text-center">
-                    وضعیت
-                  </th>
-                  <th className="border p-3 text-gray-600 text-center">
-                    دانلود فاکتور
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {order.items.map((item, index) => (
-                  <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="border p-3 text-gray-700 text-center">
-                      {item.variant?.product?.title || "محصول حذف‌شده"}
-                    </td>
-                    <td className="border p-3 text-gray-700 text-center">
-                      {item.variant?.attributeValues
-                        ?.map((av) => `${av.attribute?.name || "ویژگی"}: ${av.value || "-"}`)
-                        .join(", ") || "-"}
-                    </td>
-                    <td className="border p-3 text-gray-700 text-center">
-                      {item.quantity || 0}
-                    </td>
-                    <td className="border p-3 text-gray-700 text-center">
-                      {item.finalPrice
-                        ? `${item.finalPrice.toLocaleString()} تومان`
-                        : "—"}
-                    </td>
-                    <td className="border p-3 text-gray-700 text-center">
-                      {statusMap[item.status?.trim()] ?? item.status ?? "نامشخص"}
-                    </td>
-                    {index === 0 && (
-                      <td
-                        className="border p-3 text-gray-700 text-center"
-                        rowSpan={order.items.length}
-                      >
-                        <button
-                          className="bg-blue-500 text-white px-3 cursor-pointer py-1 rounded hover:bg-blue-600 transition"
-                          onClick={() => handleDownloadInvoice(order)}
-                        >
-                          دانلود
-                        </button>
-                      </td>
-                    )}
+            <div className="overflow-x-auto">
+              <table className="w-full border border-gray-300 border-collapse text-sm text-right">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="border p-3 text-gray-600 text-center">محصول</th>
+                    <th className="border p-3 text-gray-600 text-center">ویژگی‌ها</th>
+                    <th className="border p-3 text-gray-600 text-center">تعداد</th>
+                    <th className="border p-3 text-gray-600 text-center">قیمت</th>
+                    <th className="border p-3 text-gray-600 text-center">وضعیت</th>
+                    <th className="border p-3 text-gray-600 text-center">عملیات</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {order.items.map((item, index) => (
+                    <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="border p-3 text-gray-700 text-center">
+                        {item.variant?.product?.title || "محصول حذف‌شده"}
+                      </td>
+                      <td className="border p-3 text-gray-700 text-center">
+                        {item.variant?.attributeValues
+                          ?.map((av) => `${av.attribute?.name || "ویژگی"}: ${av.value || "-"}`)
+                          .join(", ") || "-"}
+                      </td>
+                      <td className="border p-3 text-gray-700 text-center">
+                        {item.quantity || 0}
+                      </td>
+                      <td className="border p-3 text-gray-700 text-center">
+                        {item.finalPrice
+                          ? `${item.finalPrice.toLocaleString("fa-IR")} تومان`
+                          : "—"}
+                      </td>
+                      <td className="border p-3 text-gray-700 text-center">
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          item.status === 'Completed' || item.status === 'submitted' 
+                            ? 'bg-green-100 text-green-800'
+                            : item.status === 'Cancelled'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {statusMap[item.status?.trim()] ?? item.status ?? "نامشخص"}
+                        </span>
+                      </td>
+                      {index === 0 && (
+                        <td
+                          className="border p-3 text-gray-700 text-center"
+                          rowSpan={order.items.length}
+                        >
+                          <button
+                            className="bg-blue-500 text-white px-4 cursor-pointer py-2 rounded-lg hover:bg-blue-600 transition-colors duration-200 font-medium shadow-sm"
+                            onClick={() => handleDownloadInvoice(order)}
+                          >
+                            دانلود فاکتور
+                          </button>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         ))}
       </div>
