@@ -29,7 +29,7 @@ const FAQPage = () => {
         {
           question: "آیا ثبت‌نام در وبوفن رایگان است؟",
           answer:
-            "بله، ثبت‌نام و استفاده از خدمات پایه وبوفن کاملاً رایگان است. برای برخی خدمات پیشرفته ممکن است هزینه‌هایی اعمال شود که به طور شفاف اعلام می‌گردد.",
+            "بله، ثبت‌نام و استفاده از خدمات پایه وبوفن مانند سیستم آنالیز ما، کاملاً رایگان است. برای برخی خدمات پیشرفته ممکن است هزینه‌هایی اعمال شود که به طور شفاف اعلام می‌گردد.",
         },
         {
           question: "رمز عبور خود را فراموش کرده‌ام، چه کار کنم؟",
@@ -39,7 +39,7 @@ const FAQPage = () => {
         {
           question: "چگونه ایمیل حساب کاربری خود را تغییر دهم؟",
           answer:
-            'برای تغییر ایمیل، به بخش تنظیمات حساب کاربری مراجعه کرده و گزینه "تغییر ایمیل" را انتخاب کنید. پس از وارد کردن ایمیل جدید، کد تأیید را دریافت و وارد نمایید.',
+            'برای تغییر ایمیل، به بخش تنظیمات حساب کاربری در داشبورد مراجعه کرده و گزینه "تغییر ایمیل" را انتخاب کنید. پس از وارد کردن ایمیل جدید، کد تأیید را دریافت و وارد نمایید.',
         },
       ],
     },
@@ -57,11 +57,6 @@ const FAQPage = () => {
           answer:
             "بله، ما از استانداردهای بالای امنیتی استفاده می‌کنیم. تمام اطلاعات شما به صورت رمزنگاری شده ذخیره می‌شود و از پروتکل‌های امنیتی پیشرفته برای محافظت از داده‌های شما استفاده می‌کنیم.",
         },
-        {
-          question: "چگونه می‌توانم امنیت حساب کاربری خود را افزایش دهم؟",
-          answer:
-            "استفاده از رمز عبور قمند، فعال‌سازی تأیید دو مرحله‌ای، و عدم استفاده از رمز عبور یکسان در سرویس‌های مختلف می‌تواند امنیت حساب شما را значительно افزایش دهد.",
-        },
       ],
     },
     {
@@ -71,17 +66,12 @@ const FAQPage = () => {
         {
           question: "وبوفن چه خدماتی ارائه می‌دهد؟",
           answer:
-            "وبوفن پلتفرمی جامع برای [خدمات شما] است. ما امکانات متنوعی از جمله [لیست خدمات] را در اختیار کاربران قرار می‌دهیم.",
-        },
-        {
-          question: "آیا می‌توانم از چند دستگاه همزمان استفاده کنم؟",
-          answer:
-            "بله، شما می‌توانید از حساب کاربری خود در چند دستگاه مختلف استفاده کنید. البته برای امنیت بیشتر، توصیه می‌کنیم دستگاه‌های متصل را در بخش امنیت حساب کاربری مدیریت نمایید.",
+            "خدمات وبوفن شامل طراحی و توسعه انواع وب‌سایت‌ها، پیاده‌سازی سیستم‌های اختصاصی، سئو و بهینه‌سازی، تولید محتوا، پشتیبانی فنی و ارائه مشاوره دیجیتال مارکتینگ است",
         },
         {
           question: "چگونه می‌توانم از خدمات پشتیبانی استفاده کنم؟",
           answer:
-            'از طریق بخش "تماس با پشتیبانی" در پنل کاربری یا ارسال ایمیل به support@webofun.com می‌توانید با تیم پشتیبانی ما در ارتباط باشید.',
+            'جهت ارتباط و پشتیبانی میتوانید از طریق شماره های درج شده در سایت و یا مراجعه به داشبورد و ارسال تیکت، با ما در ارتباط باشید',
         },
       ],
     },
@@ -93,16 +83,6 @@ const FAQPage = () => {
           question: "روش‌های پرداخت در وبوفن کدامند؟",
           answer:
             "ما از درگاه‌های پرداخت امن بانکی پشتیبانی می‌کنیم. امکان پرداخت با کارت‌های عضو شتاب، کیف پول‌های الکترونیکی و سایر روش‌های پرداخت محلی وجود دارد.",
-        },
-        {
-          question: "آیا می‌توانم اشتراک خود را لغو کنم؟",
-          answer:
-            "بله، در هر زمان می‌توانید اشتراک خود را از بخش مدیریت اشتراک در پنل کاربری لغو نمایید. دسترسی شما تا پایان دوره پرداخت شده فعال خواهد ماند.",
-        },
-        {
-          question: "سیاست بازپرداخت وبوفن چگونه است؟",
-          answer:
-            "در صورت عدم رضایت از خدمات، تا ۷ روز پس از خرید امکان درخواست بازپرداخت وجود دارد. مبلغ پرداختی پس از کسر هزینه‌های انجام شده به حساب شما بازگردانده می‌شود.",
         },
       ],
     },
@@ -124,6 +104,7 @@ const FAQPage = () => {
       answer:
         "خیر، وبوفن از سراسر جهان در دسترس است. البته برخی خدمات ممکن است بسته به منطقه جغرافیایی متفاوت باشند.",
     },
+      
   ];
 
   // Filter FAQs based on search term
@@ -157,7 +138,7 @@ const FAQPage = () => {
       <div className="min-h-screen bg-white">
         <div className="max-w-[1250px] m-auto">
           {/* Header */}
-          <section className="pb-4 w-full rounded-2xl flex">
+          <section className="my-10 w-full rounded-2xl flex">
             {/* Left content */}
             <div className="relative w-full md:w-[60%] rounded-lg overflow-visible">
               <div className="relative">
@@ -165,64 +146,12 @@ const FAQPage = () => {
                   سوالات متداول
                 </h1>
 
-                {/* Container for gray box and SVG */}
-                  {/* Gray box */}
                   <div className=" relative">
-                    <p className="text-gray-600 leading-8">
+                    <p className="text-gray-600 leading-8 mt-2">
                       پاسخ به پرتکرارترین سوالات شما درباره وبوفن
                     </p>
                   </div>
               </div>
-            </div>
-
-            {/* Right image grid */}
-            <div className="w-full">
-                
-          {/* Popular Questions */}
-          {filteredPopularQuestions.length > 0 && (
-            <div className="mb-16">
-
-              <div className="grid md:grid-cols-2 gap-4">
-                {filteredPopularQuestions.map((item, index) => (
-                  <div
-                    key={index}
-                    className="bg-gray-50 rounded-lg p-6 cursor-pointer hover:bg-gray-100 transition-all duration-200 border border-transparent hover:border-gray-200"
-                    onClick={() => toggleItem(100 + index)}
-                  >
-                    <div className="flex items-start justify-between">
-                      <h3 className="font-medium text-gray-800 text-sm leading-relaxed flex-1">
-                        {item.question}
-                      </h3>
-                      <div
-                        className={`transform transition-transform duration-200 flex-shrink-0 ml-3 ${
-                          openItems.includes(100 + index) ? "rotate-180" : ""
-                        }`}
-                      >
-                        <svg
-                          className="w-5 h-5 text-[#6FD6E5]"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                    {openItems.includes(100 + index) && (
-                      <div className="mt-4 text-gray-600 leading-relaxed text-right pr-2 border-r-2 border-[#6FD6E5]">
-                        {item.answer}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
             </div>
           </section>
 
@@ -242,9 +171,6 @@ const FAQPage = () => {
                         <h2 className="text-xl font-medium text-gray-900">
                           {category.title}
                         </h2>
-                        <p className="text-gray-400 text-sm mt-1">
-                          {category.items.length} سوال
-                        </p>
                       </div>
                     </div>
                   </div>
@@ -262,7 +188,7 @@ const FAQPage = () => {
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <h3 className="font-medium text-gray-800 text-lg mb-3">
+                            <h3 className="font-medium text-gray-800 text-md mb-3">
                               {item.question}
                             </h3>
                             {openItems.includes(globalIndex) && (
@@ -301,36 +227,8 @@ const FAQPage = () => {
             ))}
           </div>
 
-          {/* No Results */}
-          {filteredCategories.length === 0 &&
-            filteredPopularQuestions.length === 0 && (
-              <div className="text-center py-16">
-                <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <svg
-                    className="w-8 h-8 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-medium text-gray-900 mb-2">
-                  نتیجه‌ای یافت نشد
-                </h3>
-                <p className="text-gray-500">
-                  هیچ سوالی با عبارت "{searchTerm}" پیدا نشد
-                </p>
-              </div>
-            )}
-
           {/* Contact Support */}
-          <div className="mt-20 bg-gradient-to-br from-[#6FD6E5] to-[#27b5cb] rounded-2xl p-8 text-center text-white">
+          <div className="mt-20 bg-[#1d546b] rounded-2xl p-8 text-center text-white">
             <div className="max-w-2xl mx-auto">
               <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm">
                 <svg
@@ -356,13 +254,13 @@ const FAQPage = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
                   onClick={() => router.push("/contact")}
-                  className="px-8 py-3 bg-white text-[#27b5cb] font-medium rounded-xl hover:bg-gray-50 transition-colors shadow-lg"
+                  className="px-8 py-3 bg-white text-[#27b5cb] font-base rounded-xl hover:bg-gray-50 transition-colors shadow cursor-pointer"
                 >
                   تماس با پشتیبانی
                 </button>
                 <button
                   onClick={() => router.push("/")}
-                  className="px-8 py-3 border border-white/30 text-white font-medium rounded-xl hover:bg-white/10 transition-colors backdrop-blur-sm"
+                  className="px-8 py-3 border cursor-pointer border-white/30 text-white font-base rounded-xl hover:bg-white/10 transition-colors backdrop-blur-sm"
                 >
                   بازگشت به خانه
                 </button>

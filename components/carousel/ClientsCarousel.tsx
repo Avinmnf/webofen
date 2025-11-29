@@ -14,17 +14,13 @@ export default function ClientsCarouselSection() {
     "/about-us/test/logoipsum-414.png",
   ];
 
-  // Duplicate exactly once for seamless loop
-  const duplicatedLogos = [...logos, ...logos];
-
   return (
     <section className="max-w-[1250px] mx-auto my-8 relative">
-      <div className="relative mx-auto aspect-[20/6] overflow-hidden rounded-lg">
-
+      <div className="relative mx-auto aspect-[17/6] overflow-hidden rounded-lg">
         {/* Background */}
         <Image
           src="/about-us/our-costumers.png"
-          alt="کلینیک تخصصی سئو وبوفن - خدمات سئو و بهینه‌سازی سایت"
+          alt=""
           fill
           className="object-contain"
           priority
@@ -35,70 +31,142 @@ export default function ClientsCarouselSection() {
           مشتریان <span className="text-[#29b0cb] mr-1"> وبوفن </span>
         </div>
 
-        {/* Fade edges - Improved */}
-        <div className="absolute left-0 top-0 h-full w-32 z-20 pointer-events-none">
-          <div className="h-full w-full bg-gradient-to-r from-white via-white/50 to-transparent"></div>
-        </div>
-        <div className="absolute right-0 top-0 h-full w-32 z-20 pointer-events-none">
-          <div className="h-full w-full bg-gradient-to-l from-white via-white/50 to-transparent"></div>
-        </div>
+        {/* Fade edges */}
+        <div className="absolute left-0 top-0 h-full w-32 z-20 bg-gradient-to-r from-white via-white/50 to-transparent pointer-events-none"></div>
+        <div className="absolute right-0 top-0 h-full w-32 z-20 bg-gradient-to-l from-white via-white/50 to-transparent pointer-events-none"></div>
 
-        {/* Carousels Container */}
-        <div className="absolute bottom-0 left-0 w-full overflow-hidden">
-          {/* MARQUEE 1 - RIGHT → LEFT */}
-          <div className="flex animate-marquee whitespace-nowrap py-8">
-            {duplicatedLogos.map((logo, index) => (
-              <div key={`c1-${index}`} className="mx-6 flex-shrink-0">
+        {/* Three rows */}
+        <div className="absolute bottom-5 left-0 w-full flex flex-col gap-3 pb-4">
+          {/* Row 1 - LEFT */}
+          <div className="marquee-row">
+            <div className="track track-left">
+              {logos.map((logo, i) => (
                 <Image
+                  key={`r1a-${i}`}
                   src={logo}
-                  alt="client logo"
                   width={120}
                   height={60}
-                  className="object-contain grayscale hover:grayscale-0 transition-all duration-300"
+                  className="mx-6"
+                  alt=""
                 />
-              </div>
-            ))}
+              ))}
+            </div>
+            <div className="track track-left second">
+              {logos.map((logo, i) => (
+                <Image
+                  key={`r1b-${i}`}
+                  src={logo}
+                  width={120}
+                  height={60}
+                  className="mx-6"
+                  alt=""
+                />
+              ))}
+            </div>
           </div>
 
-          {/* MARQUEE 2 - RIGHT → LEFT (Delayed start) */}
-          <div className="flex animate-marquee2 whitespace-nowrap py-8 absolute top-0 left-full">
-            {duplicatedLogos.map((logo, index) => (
-              <div key={`c2-${index}`} className="mx-6 flex-shrink-0">
+          {/* Row 2 - RIGHT */}
+          <div className="marquee-row">
+            <div className="track track-right">
+              {logos.map((logo, i) => (
                 <Image
+                  key={`r2a-${i}`}
                   src={logo}
-                  alt="client logo"
                   width={120}
                   height={60}
-                  className="object-contain grayscale hover:grayscale-0 transition-all duration-300"
+                  className="mx-6"
+                  alt=""
                 />
-              </div>
-            ))}
+              ))}
+            </div>
+            <div className="track track-right second">
+              {logos.map((logo, i) => (
+                <Image
+                  key={`r2b-${i}`}
+                  src={logo}
+                  width={120}
+                  height={60}
+                  className="mx-6"
+                  alt=""
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Row 3 - LEFT */}
+          <div className="marquee-row">
+            <div className="track track-left">
+              {logos.map((logo, i) => (
+                <Image
+                  key={`r3a-${i}`}
+                  src={logo}
+                  width={120}
+                  height={60}
+                  className="mx-6"
+                  alt=""
+                />
+              ))}
+            </div>
+            <div className="track track-left second">
+              {logos.map((logo, i) => (
+                <Image
+                  key={`r3b-${i}`}
+                  src={logo}
+                  width={120}
+                  height={60}
+                  className="mx-6"
+                  alt=""
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
       <style jsx>{`
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-100%); }
-        }
+  .marquee-row {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 80px;
+  }
 
-        @keyframes marquee2 {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-100%); }
-        }
+  .track {
+    display: flex;
+    position: absolute;
+    top: 0;
+    height: 80px;
+    white-space: nowrap;
+  }
 
-        .animate-marquee {
-          animation: marquee 20s linear infinite;
-          will-change: transform;
-        }
+  /* LEFT scroll */
+  .track-left {
+    animation: scrollLeft 25s linear infinite;
+  }
 
-        .animate-marquee2 {
-          animation: marquee2 20s linear infinite;
-          animation-delay: -10s;
-          will-change: transform;
-        }
-      `}</style>
+  .track-left.second {
+    left: 100%; 
+  }
+
+  /* RIGHT scroll */
+  .track-right {
+    animation: scrollRight 25s linear infinite;
+  }
+
+  .track-right.second {
+    left: -100%; x
+  }
+
+  @keyframes scrollLeft {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+
+  @keyframes scrollRight {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(100%); }
+  }
+`}</style>
     </section>
   );
 }
