@@ -32,141 +32,123 @@ export default function ClientsCarouselSection() {
         </div>
 
         {/* Fade edges */}
-        <div className="absolute left-0 top-0 h-full w-32 z-20 bg-gradient-to-r from-white via-white/50 to-transparent pointer-events-none"></div>
-        <div className="absolute right-0 top-0 h-full w-32 z-20 bg-gradient-to-l from-white via-white/50 to-transparent pointer-events-none"></div>
+        <div className="absolute left-0 top-0 h-full w-20 z-20 bg-gradient-to-r from-white via-white/50 to-transparent pointer-events-none"></div>
+        <div className="absolute right-0 top-0 h-full w-20 z-20 bg-gradient-to-l from-white via-white/50 to-transparent pointer-events-none"></div>
 
-        {/* Three rows */}
-        <div className="absolute bottom-5 left-0 w-full flex flex-col gap-3 pb-4">
-          {/* Row 1 - LEFT */}
+        {/* Scrolling rows */}
+        <div className="absolute bottom-5 left-0 w-full flex flex-col gap-6 pb-4">
+
+          {/* Row 1 */}
           <div className="marquee-row">
             <div className="track track-left">
               {logos.map((logo, i) => (
-                <Image
-                  key={`r1a-${i}`}
-                  src={logo}
-                  width={120}
-                  height={60}
-                  className="mx-6"
-                  alt=""
-                />
+                <div key={`r1a-${i}`} className="logo-item">
+                  <Image src={logo} width={120} height={60} className="object-contain" alt="" />
+                </div>
               ))}
             </div>
             <div className="track track-left second">
               {logos.map((logo, i) => (
-                <Image
-                  key={`r1b-${i}`}
-                  src={logo}
-                  width={120}
-                  height={60}
-                  className="mx-6"
-                  alt=""
-                />
+                <div key={`r1b-${i}`} className="logo-item">
+                  <Image src={logo} width={120} height={60} className="object-contain" alt="" />
+                </div>
               ))}
             </div>
           </div>
 
-          {/* Row 2 - RIGHT */}
+          {/* Row 2 */}
           <div className="marquee-row">
             <div className="track track-right">
               {logos.map((logo, i) => (
-                <Image
-                  key={`r2a-${i}`}
-                  src={logo}
-                  width={120}
-                  height={60}
-                  className="mx-6"
-                  alt=""
-                />
+                <div key={`r2a-${i}`} className="logo-item">
+                  <Image src={logo} width={120} height={60} className="object-contain" alt="" />
+                </div>
               ))}
             </div>
             <div className="track track-right second">
               {logos.map((logo, i) => (
-                <Image
-                  key={`r2b-${i}`}
-                  src={logo}
-                  width={120}
-                  height={60}
-                  className="mx-6"
-                  alt=""
-                />
+                <div key={`r2b-${i}`} className="logo-item">
+                  <Image src={logo} width={120} height={60} className="object-contain gap-2" alt="" />
+                </div>
               ))}
             </div>
           </div>
 
-          {/* Row 3 - LEFT */}
+          {/* Row 3 */}
           <div className="marquee-row">
             <div className="track track-left">
               {logos.map((logo, i) => (
-                <Image
-                  key={`r3a-${i}`}
-                  src={logo}
-                  width={120}
-                  height={60}
-                  className="mx-6"
-                  alt=""
-                />
+                <div key={`r3a-${i}`} className="logo-item">
+                  <Image src={logo} width={120} height={60} className="object-contain" alt="" />
+                </div>
               ))}
             </div>
             <div className="track track-left second">
               {logos.map((logo, i) => (
-                <Image
-                  key={`r3b-${i}`}
-                  src={logo}
-                  width={120}
-                  height={60}
-                  className="mx-6"
-                  alt=""
-                />
+                <div key={`r3b-${i}`} className="logo-item">
+                  <Image src={logo} width={120} height={60} className="object-contain" alt="" />
+                </div>
               ))}
             </div>
           </div>
         </div>
       </div>
 
+      {/* FIXED CSS */}
       <style jsx>{`
-  .marquee-row {
-    position: relative;
-    overflow: hidden;
-    width: 100%;
-    height: 80px;
-  }
+        .marquee-row {
+          position: relative;
+          overflow: hidden;
+          width: 100%;
+          height: 80px;
+          display: flex;
+          align-items: center;
+        }
 
-  .track {
-    display: flex;
-    position: absolute;
-    top: 0;
-    height: 80px;
-    white-space: nowrap;
-  }
+        .track {
+          display: flex;
+          position: absolute;
+          top: 0;
+          height: 100%;
+          align-items: center;
+          gap: 4rem;
+          white-space: nowrap;
+          width: max-content; /* مهم‌ترین خط */
+        }
 
-  /* LEFT scroll */
-  .track-left {
-    animation: scrollLeft 25s linear infinite;
-  }
+        .logo-item {
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 120px;
+          height: 60px;
+        }
 
-  .track-left.second {
-    left: 100%; 
-  }
+        /* Animations */
+        .track-left { animation: scrollLeft 30s linear infinite; }
+        .track-left.second { left:105%; }
 
-  /* RIGHT scroll */
-  .track-right {
-    animation: scrollRight 25s linear infinite;
-  }
+        .track-right { animation: scrollRight 30s linear infinite; }
+         .track-right.second {
+          left: calc(-125% - 4rem);
+        }
 
-  .track-right.second {
-    left: -100%; x
-  }
+        @keyframes scrollLeft {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-100%); }
+        }
 
-  @keyframes scrollLeft {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-100%); }
-  }
+        @keyframes scrollRight {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(100%); }
+        }
 
-  @keyframes scrollRight {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(100%); }
-  }
-`}</style>
+        @media (max-width: 768px) {
+          .track { gap: 2rem; }
+          .logo-item { width: 100px; height: 50px; }
+        }
+      `}</style>
     </section>
   );
 }
