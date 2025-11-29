@@ -144,7 +144,7 @@ export default function Footer() {
 
               <button
                 type="submit"
-                className="w-full bg-[#153e4c] hover:bg-orange-400 text-white py-3 px-4 rounded-md transition duration-200 font-medium mt-4"
+                className="w-full bg-[#153e4c] hover:bg-orange-400 cursor-pointer text-white py-3 px-4 rounded-md transition duration-200 font-medium mt-4"
               >
                 عضویت در خبرنامه
               </button>

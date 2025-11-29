@@ -224,7 +224,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             <div class="info-section">
               <div class="info-grid">
                 <div class="info-box">
-                  <div class="info-title">مشتری</div>
+                  <div class="info-title"> نام مشتری</div>
                   <div class="info-content">${order.customerName || "نامشخص"}</div>
                 </div>
                 <div class="info-box">
