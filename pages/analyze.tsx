@@ -325,16 +325,20 @@ const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
   return result;
 };
 
-// تابع برای نرمالایز کردن URL
+// تابع برای نرمالایز کردن URL - بهبود یافته
 const normalizeUrl = (url: string): string => {
   try {
     const urlObj = new URL(url);
-    // حذف پروتکل، www و اسلش انتها
+    // حذف پروتکل، www، اسلش انتها و پارامترهای کوئری
     let normalized = urlObj.hostname.replace(/^www\./, '') + urlObj.pathname;
     normalized = normalized.replace(/\/$/, ''); // حذف اسلش انتها
+    normalized = normalized.replace(/\/+/g, '/'); // حذف اسلش‌های تکراری
     return normalized.toLowerCase();
   } catch {
-    return url.toLowerCase().replace(/^www\./, '').replace(/\/$/, '');
+    // اگر URL نامعتبر است، ساده‌سازی کنیم
+    let normalized = url.toLowerCase().replace(/^www\./, '').replace(/\/$/, '');
+    normalized = normalized.replace(/\/+/g, '/');
+    return normalized;
   }
 };
 
@@ -383,7 +387,7 @@ export default function AnalyzePage() {
     });
     
     if (existing) {
-      console.log('✅ Found existing analysis:', existing.id);
+      console.log('✅ Found existing analysis:', existing.id, 'Status:', existing.status);
     } else {
       console.log('❌ No existing analysis found');
     }
@@ -395,6 +399,17 @@ export default function AnalyzePage() {
   const hasExistingAnalysis = useMemo(() => {
     return !!findExistingAnalysis;
   }, [findExistingAnalysis]);
+
+  // مدیریت وضعیت آنالیزهای موجود
+  useEffect(() => {
+    if (findExistingAnalysis && findExistingAnalysis.status === 'completed' && url && !pendingResult && !analysisStarted) {
+      console.log("🔄 Automatically loading existing analysis for:", url);
+      const convertedExisting = convertApiResultToAnalyzeResult(findExistingAnalysis);
+      setPendingResult(convertedExisting);
+      setIsDuplicateAnalysis(true);
+      setResultsViewed(true);
+    }
+  }, [findExistingAnalysis, url, pendingResult, analysisStarted]);
 
   // SEO Props با useMemo برای بهینه‌سازی
   const seoProps = useMemo(() => {
@@ -523,11 +538,14 @@ export default function AnalyzePage() {
     }
   }, [apiAnalysis]);
 
-  // مدیریت وضعیت پیشرفت
+  // مدیریت وضعیت پیشرفت - بهبود یافته برای پشتیبانی از آنالیزهای موجود
   useEffect(() => {
     if (!apiAnalysis) {
-      setProgress(0);
-      setAnalysisStatus("");
+      // اگر apiAnalysis نداریم اما آنالیز موجود داریم، وضعیت را تنظیم نکنیم
+      if (!findExistingAnalysis) {
+        setProgress(0);
+        setAnalysisStatus("");
+      }
       return;
     }
 
@@ -558,6 +576,11 @@ export default function AnalyzePage() {
           setShowAnalysisModal(false);
           setCurrentAnalysisId(null);
           setIsDuplicateAnalysis(false);
+          
+          // اسکرول به نتایج پس از تکمیل آنالیز جدید
+          setTimeout(() => {
+            setResultsViewed(true);
+          }, 500);
         }
         break;
       case "failed":
@@ -568,7 +591,7 @@ export default function AnalyzePage() {
         setIsDuplicateAnalysis(false);
         break;
     }
-  }, [apiAnalysis, convertedResult, currentAnalysisId]);
+  }, [apiAnalysis, convertedResult, currentAnalysisId, findExistingAnalysis]);
 
   // مدیریت زمان سپری شده
   useEffect(() => {
@@ -651,24 +674,42 @@ export default function AnalyzePage() {
     // بررسی وجود آنالیز قبلی - بهبود یافته
     const existingAnalysis = findExistingAnalysis;
     
-    if (existingAnalysis && existingAnalysis.status === 'completed') {
-      console.log("✅ استفاده از آنالیز موجود:", existingAnalysis.id);
-      const convertedExisting = convertApiResultToAnalyzeResult(existingAnalysis);
-      console.log('📦 Converted existing analysis issues:', convertedExisting.issues);
-      console.log('🗺️ Converted existing sitemap data:', convertedExisting.sitemapAnalysis);
-      console.log('🔗 Converted existing broken links count:', convertedExisting.brokenLinksCount);
-      console.log('🛡️ Converted existing security analysis:', convertedExisting.securityAnalysis);
+    if (existingAnalysis) {
+      console.log("🔍 Existing analysis found:", existingAnalysis.status);
       
-      setPendingResult(convertedExisting);
-      setShowSuccessAlert(false); // مستقیماً نمایش بده بدون آلرت
-      setAnalysisStarted(false);
-      setShowAnalysisModal(false);
-      setResultsViewed(true);
-      setIsDuplicateAnalysis(true);
-      return;
+      if (existingAnalysis.status === 'completed') {
+        console.log("✅ استفاده از آنالیز موجود:", existingAnalysis.id);
+        const convertedExisting = convertApiResultToAnalyzeResult(existingAnalysis);
+        
+        setPendingResult(convertedExisting);
+        setShowSuccessAlert(false);
+        setAnalysisStarted(false);
+        setShowAnalysisModal(false);
+        setResultsViewed(true);
+        setIsDuplicateAnalysis(true);
+        
+        // اسکرول به نتایج
+        setTimeout(() => {
+          resultsSectionRef.current?.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }, 300);
+        return;
+      } else {
+        // Existing analysis but not completed (pending or running)
+        console.log("⏳ آنالیز در حال انجام است:", existingAnalysis.id);
+        // Set the current analysis id to let the hook poll for updates
+        setCurrentAnalysisId(existingAnalysis.id);
+        setAnalysisStarted(true);
+        setShowAnalysisModal(false);
+        setResultsViewed(false);
+        setIsDuplicateAnalysis(false);
+        return;
+      }
     }
     
-    // اگر آنالیز موجود نبود، مدال را نمایش بده
+    // If no existing analysis, show the modal to start a new one
     console.log('🆕 No existing analysis found, showing modal');
     setShowAnalysisModal(true);
     setIsDuplicateAnalysis(false);
@@ -732,10 +773,22 @@ export default function AnalyzePage() {
           handleAnalyze={handleAnalyzeClick}
         />
 
-        {hasExistingAnalysis && !pendingResult && url && (
+        {hasExistingAnalysis && !pendingResult && url && !analysisStarted && (
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+              <span className="text-blue-600 text-sm sm:text-base">
+                ✅ آنالیز قبلی برای این آدرس موجود است - برای مشاهده نتایج دکمه "آنالیز سایت" را بزنید
+              </span>
+            </div>
+          </div>
+        )}
+
+        {isDuplicateAnalysis && pendingResult && (
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 mb-2">
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-              <span className="text-green-600 text-sm sm:text-base">✅ آنالیز قبلی برای این آدرس موجود است - نتایج در حال نمایش</span>
+              <span className="text-green-600 text-sm sm:text-base">
+                ✅ در حال نمایش نتایج آنالیز قبلی - برای آنالیز جدید دکمه "آنالیز جدید" را بزنید
+              </span>
             </div>
           </div>
         )}
@@ -769,6 +822,15 @@ export default function AnalyzePage() {
                       🔄 نمایش از آنالیز قبلی
                     </div>
                   )}
+                  {/* دکمه آنالیز جدید برای دسکتاپ */}
+                  <div className="hidden lg:block">
+                    <button
+                      onClick={handleNewAnalysis}
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
+                    >
+                      🔄 آنالیز جدید
+                    </button>
+                  </div>
                 </div>
 
                 {/* Layout ریسپانسیو برای WebsiteOverview و ScoreGuide */}
