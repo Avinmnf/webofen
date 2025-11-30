@@ -413,8 +413,12 @@ export default function AnalyzePage() {
 
   // SEO Props با useMemo برای بهینه‌سازی
   const seoProps = useMemo(() => {
-    const baseUrl = process.env.NEXT_PUBLIC_WEBOFEN || "https://webofen.com/";
-    const currentUrl = typeof window !== "undefined" ? window.location.href : `${baseUrl}${router.asPath}`;
+    const baseUrl = process.env.NEXT_PUBLIC_WEBOFEN || "https://webofen.com";
+    const currentUrl =
+  typeof window !== "undefined"
+    ? window.location.href
+    : `${baseUrl}${router.asPath}`;
+
     
     if (pendingResult) {
       const seoScore = Math.round((pendingResult.scores.seo || 0) * 100);
