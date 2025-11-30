@@ -572,6 +572,7 @@ export const ProductRecommendations = ({
                 </div>
               </div>
 
+              {/* بخش دکمه‌ها - اصلاح شده با باز شدن در تب جدید */}
               <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
                 <div className="text-sm font-medium text-blue-800">
                   {product.id === "3" ? "راه‌حل افزایش محتوا" : 
@@ -579,15 +580,31 @@ export const ProductRecommendations = ({
                    product.id === "5" ? "راه‌حل لینک‌سازی" : 
                    product.id === "6" ? "راه‌حل امنیتی" : "راه‌حل تخصصی"}
                 </div>
-                <Link 
-                  href={`/products/${product.slug}`}
-                  className="px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center group/btn bg-blue-700 hover:bg-blue-800 text-white"
-                >
-                  <span>خرید محصول</span>
-                  <svg className="w-4 h-4 mr-1 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </Link>
+                <div className="flex items-center gap-2">
+                  {/* دکمه تماس بگیرید */}
+                  <Link 
+                    href="tel:02188515914"
+                    className="px-4 py-1 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center group/contact-btn bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    <span>تماس بگیرید</span>
+                    <svg className="w-4 h-4 mr-1 group-hover/contact-btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                  </Link>
+                  
+                  {/* دکمه خرید محصول - باز شدن در تب جدید */}
+                  <Link 
+                    href={`/products/${product.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-1 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center group/btn bg-blue-700 hover:bg-blue-800 text-white"
+                  >
+                    <span>خرید محصول</span>
+                    <svg className="w-4 h-4 mr-1 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
