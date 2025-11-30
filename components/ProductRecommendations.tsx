@@ -572,7 +572,7 @@ export const ProductRecommendations = ({
                 </div>
               </div>
 
-              {/* بخش دکمه‌ها - اصلاح شده با اضافه شدن دکمه تماس بگیرید */}
+              {/* بخش دکمه‌ها - اصلاح شده با باز شدن در تب جدید */}
               <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
                 <div className="text-sm font-medium text-blue-800">
                   {product.id === "3" ? "راه‌حل افزایش محتوا" : 
@@ -581,8 +581,8 @@ export const ProductRecommendations = ({
                    product.id === "6" ? "راه‌حل امنیتی" : "راه‌حل تخصصی"}
                 </div>
                 <div className="flex items-center gap-2">
-                  {/* دکمه جدید تماس بگیرید */}
-                 <Link 
+                  {/* دکمه تماس بگیرید */}
+                  <Link 
                     href="tel:02188515914"
                     className="px-4 py-1 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center group/contact-btn bg-green-600 hover:bg-green-700 text-white"
                   >
@@ -592,9 +592,11 @@ export const ProductRecommendations = ({
                     </svg>
                   </Link>
                   
-                  {/* دکمه خرید محصول (همان دکمه قبلی) */}
+                  {/* دکمه خرید محصول - باز شدن در تب جدید */}
                   <Link 
                     href={`/products/${product.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="px-4 py-1 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center group/btn bg-blue-700 hover:bg-blue-800 text-white"
                   >
                     <span>خرید محصول</span>
