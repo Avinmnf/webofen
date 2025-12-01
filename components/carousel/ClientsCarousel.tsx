@@ -33,8 +33,8 @@ export default function ClientsCarouselSection() {
 
 
         {/* Horizontal fades - cleaner and more subtle */}
-        <div className="absolute inset-y-0 -left-10 w-100 z-10 pointer-events-none bg-gradient-to-r from-white via-white/40 to-transparent opacity-90" />
-        <div className="absolute inset-y-0 -right-10 w-100 z-10 pointer-events-none bg-gradient-to-l from-white via-white/40 to-transparent opacity-90" />
+        <div className="absolute inset-y-0 -left-10 backdrop-blur-[1px] w-100 z-10 pointer-events-none bg-gradient-to-r from-white via-white/40 to-transparent opacity-90" />
+        <div className="absolute inset-y-0 -right-10 backdrop-blur-[1px] w-100 z-10 pointer-events-none bg-gradient-to-l from-white via-white/40 to-transparent opacity-90" />
 
         {/* Scrolling rows container */}
         <div className="absolute bottom-5 left-0 w-full flex flex-col gap-6 pb-4">

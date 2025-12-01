@@ -177,7 +177,7 @@ export default function CollaborationShowcase() {
     }}
     onSlideChange={(swiper) => setActiveSlide(swiper.realIndex)}
     modules={[EffectCoverflow, Autoplay, Pagination]}
-    className="collaboration-swiper pb-12 h-96"
+    className="collaboration-swiper pb-12 h-90 "
     speed={800}
     // Add spaceBetween for better slide spacing
     spaceBetween={20} // Add this line
@@ -250,7 +250,7 @@ export default function CollaborationShowcase() {
                   </div>
 
                   {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-white via-blue-200/70 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-600 ease-out bottom-5 flex items-end">
+                  <div className="absolute bottom-10 inset-0 bg-gradient-to-t from-white via-blue-200/70 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-600 ease-out flex items-end">
                     <div className="p-6 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-600 ease-out opacity-0 group-hover:opacity-100 space-y-3 w-full">
                       <h3 className="text-gray-700 font-semibold text-lg mb-2">
                         {project.name}
