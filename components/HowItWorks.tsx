@@ -190,7 +190,7 @@ export function HowItWorks() {
             onClick={() => openImageModal("/analyze/Screenshot 2025-11-26 104643.png")}
           >
             <img
-              src="/analyze/Screenshot 2025-11-26 104643.png"
+              src="/analyze/Screenshot 2025-12-01 140440.png"
               alt="نمونه گزارش بخش اول"
               className="w-full h-auto"
             />
