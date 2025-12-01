@@ -1,11 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import {
-  EffectCoverflow,
-  Autoplay,
-  Pagination,
-  Mousewheel,
-} from "swiper/modules";
+import { EffectCoverflow, Autoplay, Pagination } from "swiper/modules";
 import Image from "next/image";
 import "swiper/css";
 import "swiper/css/effect-coverflow";
@@ -19,6 +14,7 @@ interface Collaboration {
   description: string;
   process: string[];
   screenshots: string[];
+  processDescription: string;
 }
 
 export default function CollaborationShowcase() {
@@ -34,7 +30,7 @@ export default function CollaborationShowcase() {
     {
       id: 1,
       logo: "/web-design/web-resume1Asset 8.png",
-      name: "ﺻﻨﺪوق ﺗﻮﺳﻌﻪ ﻓﻨﺎوریﻫﺎی ﻧﻮﯾﻦ",
+      name: "صندوق توسعۀ فناوری‌های نوین",
       domain: "htdf",
       description: "طراحی سایت و سامانه برای خدمات مالی و رفاهی",
       process: [
@@ -45,81 +41,80 @@ export default function CollaborationShowcase() {
         "تست کیفیت و راه‌اندازی",
       ],
       screenshots: ["/resume/htdf/htdf.png"],
+      processDescription:
+        "مراحل طراحی و توسعه پلتفرم فروشگاهی با تمرکز بر تجربه ",
     },
     {
       id: 2,
       logo: "/web-design/web-resume2Asset 9.png",
       name: "پایاپای",
       domain: "payapay",
-      description: "ساخت کانسپت و طراحی سایت ",
+      description: "ساخت کانسپت و طراحی سایت فروشگاهی",
       process: [
         "تحلیل هویت برند و تحقیقات بازار",
-        "طراحی موبایل فرست",
-        "توسعه فروشگاه اینترنتی",
-        "یکپارچه‌سازی درگاه پرداخت",
-        "بهینه‌سازی موتورهای جستجو",
+        "طراحی موبایل فرست و رابط کاربری مدرن",
+        "توسعه فروشگاه اینترنتی با قابلیت‌های پیشرفته",
+        "یکپارچه‌سازی درگاه پرداخت امن",
+        "بهینه‌سازی موتورهای جستجو (SEO)",
       ],
       screenshots: ["/resume/payapay/payapay.png"],
+      processDescription:
+        "مراحل طراحی و توسعه پلتفرم فروشگاهی با تمرکز بر تجربه کاربری بهینه",
     },
     {
       id: 3,
       logo: "/web-design/web-resume3Asset 10.png",
       name: "زنجان",
       domain: "zanjan",
-      description:
-        "سایت برای ارائه خدمات مالی و اعتباری",
+      description: "سایت برای ارائه خدمات مالی و اعتباری",
       process: [
-        "تحلیل رقبا و بازار",
-        "نمونه‌سازی تعاملی",
-        "توسعه سیستم مدیریت محتوا",
-        "راه‌اندازی پنل مشتریان",
-        "بهینه‌سازی عملکرد",
+        "تحلیل رقبا و بازار هدف",
+        "نمونه‌سازی تعاملی (Prototype)",
+        "توسعه سیستم مدیریت محتوا سفارشی",
+        "راه‌اندازی پنل مشتریان پیشرفته",
+        "بهینه‌سازی عملکرد و سرعت بارگذاری",
       ],
       screenshots: ["/resume/zanjan/zanjan.png"],
+      processDescription:
+        "فرآیند ساخت پورتال خدمات مالی با امکانات مدیریتی پیشرفته",
     },
     {
       id: 4,
       logo: "/web-design/web-resume1Asset 8.png",
-      name: "حسابداری استورم  ",
+      name: "حسابداری استورم",
       domain: "storm",
-      description:
-        "پلتفرم حسابداری ابری",
+      description: "پلتفرم حسابداری ابری",
       process: [
         "تحقیقات کاربر و پرسوناسازی",
-        "وایرفریمینگ و طراحی بصری",
-        "یکپارچه‌سازی واقعیت افزوده",
-        "موتور پیشنهاد هوشمند",
-        "تست چند پلتفرمی",
+        "وایرفریمینگ و طراحی بصری سیستم",
+        "توسعه ماژول‌های حسابداری پیشرفته",
+        "پیاده‌سازی گزارش‌گیری هوشمند",
+        "تست امنیت و عملکرد چند کاربره",
       ],
       screenshots: ["/resume/storm/Storm.jpg"],
+      processDescription:
+        "فرآیند توسعه پلتفرم حسابداری ابری با قابلیت‌های حرفه‌ای",
     },
   ];
 
-  // Helper functions for screenshot titles and descriptions in Farsi
+  // توابع کمکی برای نمایش عنوان عکس‌ها
   const getScreenshotTitle = (projectName: string, index: number) => {
     const titles: { [key: string]: string[] } = {
-      "وال کیف": ["داشبورد مدیریت", "پیگیری مسیرها", "آنالیز عملکرد"],
-      "گرین لایف": ["صفحه محصولات", "سبد خرید", "وبلاگ آموزشی"],
-      "اینوویت لبز": ["نمونه کارها", "خدمات تخصصی", "تماس با ما"],
-      "اوربن استایل": ["کاتالوگ محصول", "پروفایل کاربر", "پرداخت امن"],
+      "صندوق توسعۀ فناوری‌های نوین": [
+        "داشبورد مدیریت مالی",
+        "صفحه خدمات",
+        "پنل کاربری",
+      ],
+      پایاپای: ["صفحه اصلی فروشگاه", "صفحه محصولات", "سبد خرید"],
+      زنجان: ["صفحه خدمات اعتباری", "داشبورد مشتریان", "فرم درخواست"],
+      "حسابداری استورم": [
+        "داشبورد حسابداری",
+        "گزارش‌گیری مالی",
+        "مدیریت تراکنش‌ها",
+      ],
     };
 
     return titles[projectName]?.[index] || `صفحه ${index + 1}`;
-  };
-
-  // Process descriptions for each project
-  const getProcessDescription = (projectName: string) => {
-    const descriptions: { [key: string]: string } = {
-      واکلیف:
-        "فرآیند توسعه پلتفرم مدیریت حمل و نقل هوشمند از مرحله ایده‌پردازی تا راه‌اندازی",
-      "گرین لایف":
-        "مراحل طراحی و توسعه فروشگاه اینترنتی محصولات ارگانیک با تمرکز بر UX",
-      "اینوویت لبز":
-        "فرآیند ساخت وبسایت شرکتی با امکانات پیشرفته نمایش نمونه کارها",
-      "اوربن استایل": "مراحل ایجاد پلتفرم فروش مد و فشن با تکنولوژی‌های مدرن",
-    };
-
-    return descriptions[projectName] || "فرآیند طراحی و توسعه وبسایت";
   };
 
   const openModal = useCallback((project: Collaboration) => {
@@ -146,10 +141,9 @@ export default function CollaborationShowcase() {
 
   return (
     <div className="w-full bg-white px-4">
-      {/* Header with smooth entrance animation */}
+      {/* Header */}
       <div className="text-center mb-6 sm:mb-8 md:mb-10">
         <p className="text-[#29b0cb] text-xl sm:text-2xl">
-          {" "}
           <span className="text-[#253e5f]">نمونه کار </span>طراحی سایت
         </p>
         <p className="text-gray-700 text-xs sm:text-sm mt-1 sm:mt-2">
@@ -158,56 +152,66 @@ export default function CollaborationShowcase() {
       </div>
 
       {/* Logo Showcase */}
-      <div className="max-w-7xl mx-auto h-96">
-        <Swiper
-          effect="coverflow"
-          grabCursor={true}
-          centeredSlides={true}
-          slidesPerView="auto"
-          coverflowEffect={{
-            rotate: 0,
-            stretch: -60,
-            depth: 120,
-            modifier: 1.8,
-            slideShadows: false,
-          }}
-          autoplay={{
-            delay: 4500,
-            disableOnInteraction: false,
-          }}
-          pagination={{
-            clickable: true,
-            dynamicBullets: true,
-            dynamicMainBullets: 3,
-          }}
-          onSlideChange={(swiper) => setActiveSlide(swiper.realIndex)}
-          modules={[EffectCoverflow, Autoplay, Pagination]}
-          className="collaboration-swiper pb-12 h-96"
-          speed={800}
-          breakpoints={{
-            320: {
-              coverflowEffect: {
-                stretch: -20,
-                depth: 60,
-                modifier: 1.2,
-              },
-            },
-            768: {
-              coverflowEffect: {
-                stretch: -40,
-                depth: 90,
-                modifier: 1.5,
-              },
-            },
-            1024: {
-              coverflowEffect: {
-                stretch: -60,
-                depth: 120,
-                modifier: 1.8,
-              },
-            },
-          }}
-        >
+<div className="max-w-7xl mx-auto h-96">
+  <Swiper
+    effect="coverflow"
+    grabCursor={true}
+    centeredSlides={true}
+    slidesPerView="auto"
+    initialSlide={1} // Add this line - starts from second slide
+    coverflowEffect={{
+      rotate: 0,
+      stretch: -60,
+      depth: 120,
+      modifier: 1.8,
+      slideShadows: false,
+    }}
+    autoplay={{
+      delay: 4500,
+      disableOnInteraction: false,
+    }}
+    pagination={{
+      clickable: true,
+      dynamicBullets: true,
+      dynamicMainBullets: 3,
+    }}
+    onSlideChange={(swiper) => setActiveSlide(swiper.realIndex)}
+    modules={[EffectCoverflow, Autoplay, Pagination]}
+    className="collaboration-swiper pb-12 h-96"
+    speed={800}
+    // Add spaceBetween for better slide spacing
+    spaceBetween={20} // Add this line
+    // Update breakpoints for better display
+    breakpoints={{
+      320: {
+        slidesPerView: 1.2,
+        centeredSlides: true,
+        coverflowEffect: {
+          stretch: -20,
+          depth: 60,
+          modifier: 1.2,
+        },
+      },
+      768: {
+        slidesPerView: 2.5, // Changed from "auto"
+        centeredSlides: true,
+        coverflowEffect: {
+          stretch: -40,
+          depth: 90,
+          modifier: 1.5,
+        },
+      },
+      1024: {
+        slidesPerView: 3, // Changed from "auto"
+        centeredSlides: true,
+        coverflowEffect: {
+          stretch: -60,
+          depth: 120,
+          modifier: 1.8,
+        },
+      },
+    }}
+  >
           {collaborations.map((project, index) => (
             <SwiperSlide
               key={project.id}
@@ -222,7 +226,6 @@ export default function CollaborationShowcase() {
                 `}
                 onClick={() => openModal(project)}
               >
-                {/* Main scaling container that includes both image and overlay */}
                 <div
                   className={`
                   absolute inset-0 transition-all duration-700 ease-out overflow-visible
@@ -233,7 +236,7 @@ export default function CollaborationShowcase() {
                   {/* Static Background */}
                   <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 -z-10" />
 
-                  {/* Logo Container with Floating Animation */}
+                  {/* Logo Container */}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="relative w-170 h-150 animate-float-slow">
                       <Image
@@ -246,7 +249,7 @@ export default function CollaborationShowcase() {
                     </div>
                   </div>
 
-                  {/* Hover Overlay - Now scales with the image */}
+                  {/* Hover Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-white via-blue-200/70 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-600 ease-out bottom-5 flex items-end">
                     <div className="p-6 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-600 ease-out opacity-0 group-hover:opacity-100 space-y-3 w-full">
                       <h3 className="text-gray-700 font-semibold text-lg mb-2">
@@ -261,7 +264,7 @@ export default function CollaborationShowcase() {
                         </span>
                         <div className="w-6 h-6 bg-[#29b0cb] rounded-full flex items-center justify-center transform transition-transform duration-500 group-hover:scale-110">
                           <svg
-                            className="w-3 h-3 text-whitw transition-transform duration-500"
+                            className="w-3 h-3 text-white transition-transform duration-500"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -283,7 +286,8 @@ export default function CollaborationShowcase() {
           ))}
         </Swiper>
       </div>
-      {/* Enhanced Modal with Clean Minimal Design */}
+
+      {/* Enhanced Modal */}
       {selectedProject && (
         <div
           className={`
@@ -291,7 +295,7 @@ export default function CollaborationShowcase() {
       ${isModalOpen ? "opacity-100" : "opacity-0 pointer-events-none"}
     `}
         >
-          {/* Minimal Backdrop */}
+          {/* Backdrop */}
           <div
             className={`
         absolute inset-0 bg-black/40 transition-all duration-500
@@ -310,17 +314,40 @@ export default function CollaborationShowcase() {
         ${isModalOpen ? "scale-100 opacity-100" : "scale-95 opacity-0"}
       `}
           >
-            {/* Minimal Header */}
+            {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <div className="flex items-center space-x-4 ">
-                <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center">
-                  <Image
-                    src={selectedProject.logo}
-                    alt={`${selectedProject.name} logo`}
-                    width={32}
-                    height={32}
-                    className="object-contain"
-                  />
+                <div className="w-14 bg-gray-50 rounded-xl flex items-center justify-center">
+                  <svg
+                    viewBox="0 0 32 32"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="#1d546b"
+                  >
+                    <defs>
+                      <style>{`.cls-1{fill:#b2b2b2;}`}</style>
+                    </defs>
+
+                    <path
+                      className="cls-1"
+                      d="M24,8H12.54L10.83,5.45A1,1,0,0,0,10,5H8A3,3,0,0,0,5,8v5a1,1,0,0,0,1,1H26a1,1,0,0,0,1-1V11A3,3,0,0,0,24,8Z"
+                    ></path>
+
+                    <rect
+                      height="6"
+                      rx="1"
+                      ry="1"
+                      width="26"
+                      x="3"
+                      y="12"
+                    ></rect>
+
+                    <path
+                      className="cls-1"
+                      d="M30.81,16.42A1,1,0,0,0,30,16H2a1,1,0,0,0-.81.42,1,1,0,0,0-.14.9l3,9A1,1,0,0,0,5,27H27a1,1,0,0,0,.95-.68l3-9A1,1,0,0,0,30.81,16.42Z"
+                    ></path>
+
+                    <path d="M10,24H8a1,1,0,0,1,0-2h2a1,1,0,0,1,0,2Z"></path>
+                  </svg>
                 </div>
                 <div>
                   <h2 className="text-2xl font-semibold text-gray-900">
@@ -353,15 +380,15 @@ export default function CollaborationShowcase() {
 
             {/* Content Area */}
             <div className="flex-1 p-6 overflow-y-auto">
-              <div className="flex gap-8">
-                {/* Process Section - Minimal Design */}
-                <div className="space-y-6 w-1/3">
+              <div className="flex gap-8 flex-col md:flex-row">
+                {/* Process Section */}
+                <div className="space-y-6 w-full md:w-1/3">
                   <div className="border-b border-gray-100 pb-4">
                     <h3 className="text-lg font-medium text-gray-900">
                       فرآیند کار
                     </h3>
-                    <p className="text-sm text-gray-500 mt-1 text-left">
-                      {getProcessDescription(selectedProject.name)}
+                    <p className="text-sm text-gray-500 mt-1 text-justify">
+                      {selectedProject.processDescription}
                     </p>
                   </div>
 
@@ -372,10 +399,9 @@ export default function CollaborationShowcase() {
                           key={index}
                           className="flex items-start space-x-3 group cursor-default"
                         >
-                          {/* Minimal Number Indicator */}
                           <div
                             className={`
-                      flex-shrink-0 w-6 h-6 bg-gray-900 text-white 
+                      flex-shrink-0 w-6 h-6 bg-[#1d546b] text-white 
                       rounded-full flex items-center justify-center text-xs 
                       font-medium transition-all duration-300
                       ${isModalOpen ? "opacity-100" : "opacity-0 scale-0"}
@@ -388,7 +414,6 @@ export default function CollaborationShowcase() {
                             {index + 1}
                           </div>
 
-                          {/* Step Text */}
                           <div
                             className={`
                       flex-1 pt-1
@@ -403,11 +428,10 @@ export default function CollaborationShowcase() {
                               transitionDelay: `${200 + index * 150}ms`,
                             }}
                           >
-                            <p className="text-gray-700 text-sm leading-relaxed group-hover:text-gray-900 transition-colors duration-200">
+                            <p className="text-gray-700 text-sm leading-relaxed group-hover:text-gray-900 transition-colors duration-200 text-right">
                               {step}
                             </p>
 
-                            {/* Minimal Separator */}
                             {index < selectedProject.process.length - 1 && (
                               <div
                                 className={`
@@ -428,41 +452,36 @@ export default function CollaborationShowcase() {
                 </div>
 
                 {/* Screenshots Section */}
-                <div className="space-y-6 w-2/3">
+                <div className="space-y-6 w-full md:w-2/3">
                   <div className="relative bg-gray-200 rounded-2xl p-4 border border-gray-200">
                     {/* Browser Frame */}
-                    <div className="bg-gray-800 rounded-t-xl p-3 flex items-center space-x-2 rtl:space-x-reverse flex-shrink-0 mb-0">
-                      <div className="flex space-x-1 rtl:space-x-reverse">
+                    <div className="bg-gray-800 rounded-t-xl p-3 flex items-center space-x-2 mb-0">
+                      <div className="flex space-x-1">
                         <div className="w-3 h-3 bg-red-400 rounded-full"></div>
                         <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
                         <div className="w-3 h-3 bg-green-400 rounded-full"></div>
                       </div>
                       <div className="flex-1 text-end bg-gray-700 rounded px-3 py-1">
                         <span className="text-gray-300 text-xs">
-                          https://
-                          {selectedProject.domain
-                            .toLowerCase()
-                            .replace(/\s/g, "")}
-                          .com
+                          https://{selectedProject.domain}.com
                         </span>
                       </div>
                     </div>
 
-                    {/* Scrollable Image Container */}
+                    {/* Image Container */}
                     <div className="relative bg-white rounded-b-xl overflow-hidden border border-gray-200 border-t-0">
                       <div
                         className={`
-    relative w-full h-80 cursor-zoom-in bg-gray-100 overflow-y-auto scrollable-image-container
-    transform transition-all duration-500 ease-out
-    ${isModalOpen ? "animate-fadeInUp" : "opacity-0"}
-    group
-        `}
+                          relative w-full h-80 cursor-zoom-in bg-gray-100 overflow-y-auto scrollable-image-container
+                          transform transition-all duration-500 ease-out
+                          ${isModalOpen ? "animate-fadeInUp" : "opacity-0"}
+                          group
+                        `}
                         style={{
                           animationDelay: "400ms",
                           animationFillMode: "both",
                         }}
                       >
-                        {/* Single Scrollable Image */}
                         <div
                           className="relative w-full min-h-full"
                           onClick={() =>
@@ -502,14 +521,6 @@ export default function CollaborationShowcase() {
                           </div>
                         </div>
                       </div>
-
-                      {/* Custom Scrollbar */}
-                      <div className="absolute right-1 top-12 bottom-4 w-2 bg-gray-200 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <div
-                          className="w-2 bg-gray-400 rounded-full transition-all duration-300"
-                          style={{ height: "40%" }}
-                        ></div>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -520,14 +531,13 @@ export default function CollaborationShowcase() {
       )}
 
       {/* Image Lightbox Modal */}
-      {selectedImage && (
+      {selectedImage && selectedProject && (
         <div
           className={`
           fixed inset-0 z-[60] transition-all duration-500 ease-out
-          ${isImageModalOpen ? "opacity-100" : "opacity-0"}
+          ${isImageModalOpen ? "opacity-100" : "opacity-0 pointer-events-none"}
         `}
         >
-          {/* Backdrop */}
           <div
             className={`
               absolute inset-0 bg-black/90 backdrop-blur-md transition-all duration-500 ease-out
@@ -538,15 +548,17 @@ export default function CollaborationShowcase() {
             onClick={closeImageModal}
           />
 
-          {/* Image Container */}
-          {/* Image Container */}
           <div
             className={`
-    absolute inset-4 md:ins-20 flex items-center justify-center transform transition-all duration-500 ease-out
-    ${isImageModalOpen ? "scale-100 opacity-100" : "scale-95 opacity-0"}
-  `}
+              absolute inset-4 md:inset-30 flex items-center justify-center transform transition-all duration-500 ease-out
+              ${
+                isImageModalOpen
+                  ? "scale-100 opacity-100"
+                  : "scale-95 opacity-0"
+              }
+            `}
           >
-            <div className="relative w-full h-full max-w-6xl max-h-[80vh] flex items-center justify-center">
+            <div className="relative w-full h-full max-h-[80vh] flex items-center justify-center">
               <div className="relative w-full h-full overflow-auto custom-scrollbar">
                 <Image
                   src={selectedImage}
@@ -582,11 +594,13 @@ export default function CollaborationShowcase() {
                 </svg>
               </button>
 
-              {/* Navigation Arrows (if you want to add multiple image navigation) */}
-              <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-black/50 backdrop-blur-sm rounded-full px-4 py-2 z-10">
-                <span className="text-white text-sm font-medium">
-                  برای بستن کلیک کنید یا ESC را بزنید
-                </span>
+              {/* Image Info */}
+              <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-black/50 backdrop-blur-sm rounded-full px-6 py-3 z-10 min-w-[300px]">
+                <div className="text-center">
+                  <p className="text-white font-medium text-sm mb-1">
+                    {selectedProject.name}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -602,7 +616,6 @@ export default function CollaborationShowcase() {
         </div>
       )}
 
-      {/* Custom CSS for Smooth Animations */}
       <style jsx global>{`
         @keyframes fade-in-up {
           from {
@@ -625,82 +638,6 @@ export default function CollaborationShowcase() {
           }
         }
 
-        .animate-fade-in-up {
-          animation: fade-in-up 0.8s ease-out forwards;
-        }
-
-        .animate-float-slow {
-          animation: float-slow 6s ease-in-out infinite;
-        }
-
-        .animation-delay-100 {
-          animation-delay: 100ms;
-        }
-
-        .swiper-pagination-bullet {
-          transition: all 0.4s ease-out;
-        }
-
-        .swiper-pagination-bullet-active {
-          transform: scale(1.3);
-        }
-
-        .swiper-slide {
-          transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
-        }
-
-        @keyframes bounceIn {
-          0% {
-            opacity: 0;
-            transform: scale(0.3) rotate(180deg);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1.05) rotate(-10deg);
-          }
-          70% {
-            transform: scale(0.9) rotate(5deg);
-          }
-          100% {
-            opacity: 1;
-            transform: scale(1) rotate(0deg);
-          }
-        }
-
-        @keyframes slideInRight {
-          from {
-            opacity: 0;
-            transform: translateX(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        @keyframes widthGrow {
-          from {
-            opacity: 0;
-            width: 0%;
-          }
-          to {
-            opacity: 1;
-            width: 100%;
-          }
-        }
-
-        .animate-bounceIn {
-          animation: bounceIn 0.8s ease-out forwards;
-        }
-
-        .animate-slideInRight {
-          animation: slideInRight 0.6s ease-out forwards;
-        }
-
-        .animate-widthGrow {
-          animation: widthGrow 0.8s ease-out forwards;
-        }
-
         @keyframes fadeInUp {
           from {
             opacity: 0;
@@ -712,168 +649,28 @@ export default function CollaborationShowcase() {
           }
         }
 
+        .animate-fade-in-up {
+          animation: fade-in-up 0.8s ease-out forwards;
+        }
+
+        .animate-float-slow {
+          animation: float-slow 6s ease-in-out infinite;
+        }
+
         .animate-fadeInUp {
           animation: fadeInUp 0.8s ease-out forwards;
         }
 
-        /* Smooth scrolling for modal */
-        .modal-open {
-          overflow: hidden;
-        }
-        .screenshot-swiper-main {
-          padding-bottom: 50px;
+        /* Swiper Custom Styles */
+        .swiper-pagination-bullet {
+          transition: all 0.4s ease-out;
         }
 
-        .screenshot-swiper-main .swiper-pagination-bullet {
-          background: #cbd5e0;
-          opacity: 0.6;
-          width: 8px;
-          height: 8px;
-          transition: all 0.3s ease;
+        .swiper-pagination-bullet-active {
+          transform: scale(1.3);
+          background: #29b0cb !important;
         }
 
-        .screenshot-swiper-main .swiper-pagination-bullet-active {
-          background: #29b0cb;
-          opacity: 1;
-          width: 24px;
-          border-radius: 6px;
-        }
-        /* Add to your existing style tag */
-        .screenshot-swiper-main {
-          height: 400px;
-        }
-
-        .screenshot-swiper-main .swiper-wrapper {
-          transition-timing-function: cubic-bezier(0.68, -0.55, 0.27, 1.55);
-        }
-
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 4px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #f1f1f1;
-          border-radius: 10px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #cbd5e0;
-          border-radius: 10px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #29b0cb;
-        }
-
-        /* Vertical pagination styles */
-        .screenshot-swiper-main .swiper-pagination {
-          right: 10px;
-          left: auto;
-          top: 50%;
-          transform: translateY(-50%);
-          width: auto;
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
-
-        .screenshot-swiper-main .swiper-pagination-bullet {
-          background: #cbd5e0;
-          opacity: 0.6;
-          width: 8px;
-          height: 8px;
-          transition: all 0.3s ease;
-          margin: 4px 0 !important;
-        }
-
-        .screenshot-swiper-main .swiper-pagination-bullet-active {
-          background: #29b0cb;
-          opacity: 1;
-          height: 24px;
-          border-radius: 6px;
-        }
-
-        /* Fixed Browser Frame with Scrolling Content */
-        .screenshot-content-swiper {
-          height: 320px;
-        }
-
-        .screenshot-content-swiper .swiper-wrapper {
-          transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        .screenshot-content-swiper .swiper-slide {
-          height: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        /* Simulated Browser Scrollbar */
-        .browser-scrollbar {
-          position: absolute;
-          right: 2px;
-          top: 40px;
-          bottom: 4px;
-          width: 6px;
-          background: rgba(0, 0, 0, 0.1);
-          border-radius: 3px;
-          opacity: 0;
-          transition: opacity 0.3s ease;
-        }
-
-        .browser-scrollbar-thumb {
-          width: 100%;
-          background: rgba(0, 0, 0, 0.3);
-          border-radius: 3px;
-          animation: scrollThumb 2s ease-in-out infinite;
-        }
-
-        @keyframes scrollThumb {
-          0%,
-          100% {
-            height: 40%;
-            transform: translateY(0%);
-          }
-          50% {
-            height: 30%;
-            transform: translateY(60%);
-          }
-        }
-
-        .group:hover .browser-scrollbar {
-          opacity: 1;
-        }
-
-        /* Enhanced pagination for content swiper */
-        .screenshot-content-swiper .swiper-pagination {
-          right: 15px;
-          left: auto;
-          top: 50%;
-          transform: translateY(-50%);
-          width: auto;
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-
-        .screenshot-content-swiper .swiper-pagination-bullet {
-          background: rgba(203, 213, 224, 0.6);
-          opacity: 0.6;
-          width: 6px;
-          height: 6px;
-          transition: all 0.3s ease;
-          margin: 3px 0 !important;
-        }
-
-        .screenshot-content-swiper .swiper-pagination-bullet-active {
-          background: #29b0cb;
-          opacity: 1;
-          height: 20px;
-          border-radius: 4px;
-        }
-
-        /* Scrollable image container */
         .scrollable-image-container {
           scrollbar-width: thin;
           scrollbar-color: #cbd5e0 #f1f1f1;
@@ -895,6 +692,44 @@ export default function CollaborationShowcase() {
 
         .scrollable-image-container::-webkit-scrollbar-thumb:hover {
           background: #29b0cb;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #cbd5e0;
+          border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #29b0cb;
+        }
+
+        /* Responsive fixes */
+        @media (max-width: 768px) {
+          .collaboration-swiper {
+            height: 300px !important;
+          }
+
+          .modal-content {
+            height: 85vh !important;
+          }
+
+          .flex-col {
+            flex-direction: column !important;
+          }
+
+          .w-1\/3,
+          .w-2\/3 {
+            width: 100% !important;
+          }
         }
       `}</style>
     </div>

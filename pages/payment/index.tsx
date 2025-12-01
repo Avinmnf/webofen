@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Head from "next/head";
 import { useCart } from "@/contexts/CartContext";
 import { useCoupon } from "@/hooks/useCoupon";
 import Image from "next/image";
@@ -209,228 +210,235 @@ export default function CartPage() {
 
   // Normal cart with items
   return (
-    <div className="p-6 md:w-9/12 mx-auto space-y-8 text-gray-800">
-      <div className="border-b text-lg font-semibold text-gray-700 pb-4 border-gray-300 mb-6  items-center justify-between">
-        <p>سبد خرید شما</p>
-        <span className="text-sm font-normal text-gray-500">
-          {lines.length} آیتم
-        </span>
-      </div>
+    <>
+      <Head>
+        <title>ورود به حساب کاربری | وبوفن</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Head>
+      <div className="p-6 md:w-9/12 mx-auto space-y-8 text-gray-800">
+        <div className="border-b text-lg font-semibold text-gray-700 pb-4 border-gray-300 mb-6  items-center justify-between">
+          <p>سبد خرید شما</p>
+          <span className="text-sm font-normal text-gray-500">
+            {lines.length} آیتم
+          </span>
+        </div>
 
-      <div className="md:flex justify-between">
-        {/* Cart items */}
-        <div className="space-y-4 w-full pl-4">
-          {lines.map((item, index) => (
-            <div
-              key={index}
-              className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white p-4 border-b border-gray-300 transition"
-            >
-              {/* Link using slug */}
-              <div className="flex space-y-1 sm:space-y-0 sm:space-x-4">
-                <div className="w-1/6 ml-6">
-                  {item.imageUrl ? (
-                    <Productvideo product={item.imageUrl} />
-                  ) : (
-                    <Image
-                      width={100}
-                      height={90}
-                      src={item.imageUrl || "/dashboard/backlink.png"}
-                      loader={({ src }) => src}
-                      alt={item.title}
-                      className="rounded-t-2xl"
-                    />
-                  )}
-                </div>
-                <div>
-                  <p className="font-semibold text-lg mb-2">{item.title}</p>
-                  <p className="text-sm text-gray-500">
-                    تعداد بسته قرص: {item.quantity}
-                  </p>
-                  {item.variantAttributes && (
-                    <div className="text-sm text-gray-500 mt-1">
-                      {Object.entries(item.variantAttributes ?? {}).map(
-                        ([attr, value], i, arr) => (
-                          <span key={i}>
-                            {attr}: {value}
-                            {i < arr.length - 1 ? ", " : ""}
-                          </span>
-                        )
-                      )}
-                    </div>
-                  )}
+        <div className="md:flex justify-between">
+          {/* Cart items */}
+          <div className="space-y-4 w-full pl-4">
+            {lines.map((item, index) => (
+              <div
+                key={index}
+                className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white p-4 border-b border-gray-300 transition"
+              >
+                {/* Link using slug */}
+                <div className="flex space-y-1 sm:space-y-0 sm:space-x-4">
+                  <div className="w-1/6 ml-6">
+                    {item.imageUrl ? (
+                      <Productvideo product={item.imageUrl} />
+                    ) : (
+                      <Image
+                        width={100}
+                        height={90}
+                        src={item.imageUrl || "/dashboard/backlink.png"}
+                        loader={({ src }) => src}
+                        alt={item.title}
+                        className="rounded-t-2xl"
+                      />
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-lg mb-2">{item.title}</p>
+                    <p className="text-sm text-gray-500">
+                      تعداد بسته قرص: {item.quantity}
+                    </p>
+                    {item.variantAttributes && (
+                      <div className="text-sm text-gray-500 mt-1">
+                        {Object.entries(item.variantAttributes ?? {}).map(
+                          ([attr, value], i, arr) => (
+                            <span key={i}>
+                              {attr}: {value}
+                              {i < arr.length - 1 ? ", " : ""}
+                            </span>
+                          )
+                        )}
+                      </div>
+                    )}
 
-                  {/* Original Price (with line-through if coupon applied) */}
-                  <p
-                    className={`text-sm text-gray-500 ${
-                      item.couponApplied ? "line-through text-gray-400" : ""
-                    }`}
-                  >
-                    قیمت: {item.price ? (item.price / 10).toLocaleString() : 0}{" "}
-                    تومان
-                  </p>
-
-                  {/* Show discounted price if coupon applied */}
-                  {item.couponApplied && (
-                    <p className="text-sm text-emerald-600 font-semibold">
-                      بعد از کوپن: {(item.finalUnit / 10).toLocaleString()}{" "}
+                    {/* Original Price (with line-through if coupon applied) */}
+                    <p
+                      className={`text-sm text-gray-500 ${
+                        item.couponApplied ? "line-through text-gray-400" : ""
+                      }`}
+                    >
+                      قیمت:{" "}
+                      {item.price ? (item.price / 10).toLocaleString() : 0}{" "}
                       تومان
                     </p>
-                  )}
+
+                    {/* Show discounted price if coupon applied */}
+                    {item.couponApplied && (
+                      <p className="text-sm text-emerald-600 font-semibold">
+                        بعد از کوپن: {(item.finalUnit / 10).toLocaleString()}{" "}
+                        تومان
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex gap-3 mt-3 sm:mt-0">
+                  <button
+                    onClick={() => removeItem(item.productId, item.variantId)}
+                    className="p-2 rounded-lg  text-red-600 hover:bg-red-50"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                      <g
+                        id="SVGRepo_tracerCarrier"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      ></g>
+                      <g id="SVGRepo_iconCarrier">
+                        {" "}
+                        <path
+                          d="M9.17065 4C9.58249 2.83481 10.6937 2 11.9999 2C13.3062 2 14.4174 2.83481 14.8292 4"
+                          stroke="#6b6b6b"
+                          stroke-width="1.5"
+                          strokeLinecap="round"
+                        ></path>{" "}
+                        <path
+                          d="M20.5 6H3.49988"
+                          stroke="#6b6b6b"
+                          stroke-width="1.5"
+                          strokeLinecap="round"
+                        ></path>{" "}
+                        <path
+                          d="M18.3735 15.3991C18.1965 18.054 18.108 19.3815 17.243 20.1907C16.378 21 15.0476 21 12.3868 21H11.6134C8.9526 21 7.6222 21 6.75719 20.1907C5.89218 19.3815 5.80368 18.054 5.62669 15.3991L5.16675 8.5M18.8334 8.5L18.6334 11.5"
+                          stroke="#6b6b6b"
+                          stroke-width="1.5"
+                          strokeLinecap="round"
+                        ></path>{" "}
+                        <path
+                          d="M9.5 11L10 16"
+                          stroke="#6b6b6b"
+                          stroke-width="1.5"
+                          strokeLinecap="round"
+                        ></path>{" "}
+                        <path
+                          d="M14.5 11L14 16"
+                          stroke="#6b6b6b"
+                          stroke-width="1.5"
+                          strokeLinecap="round"
+                        ></path>{" "}
+                      </g>
+                    </svg>{" "}
+                  </button>
                 </div>
               </div>
-              <div className="flex gap-3 mt-3 sm:mt-0">
-                <button
-                  onClick={() => removeItem(item.productId, item.variantId)}
-                  className="p-2 rounded-lg  text-red-600 hover:bg-red-50"
-                >
-                  <svg
-                    className="w-5 h-5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                    <g
-                      id="SVGRepo_tracerCarrier"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    ></g>
-                    <g id="SVGRepo_iconCarrier">
-                      {" "}
-                      <path
-                        d="M9.17065 4C9.58249 2.83481 10.6937 2 11.9999 2C13.3062 2 14.4174 2.83481 14.8292 4"
-                        stroke="#6b6b6b"
-                        stroke-width="1.5"
-                        strokeLinecap="round"
-                      ></path>{" "}
-                      <path
-                        d="M20.5 6H3.49988"
-                        stroke="#6b6b6b"
-                        stroke-width="1.5"
-                        strokeLinecap="round"
-                      ></path>{" "}
-                      <path
-                        d="M18.3735 15.3991C18.1965 18.054 18.108 19.3815 17.243 20.1907C16.378 21 15.0476 21 12.3868 21H11.6134C8.9526 21 7.6222 21 6.75719 20.1907C5.89218 19.3815 5.80368 18.054 5.62669 15.3991L5.16675 8.5M18.8334 8.5L18.6334 11.5"
-                        stroke="#6b6b6b"
-                        stroke-width="1.5"
-                        strokeLinecap="round"
-                      ></path>{" "}
-                      <path
-                        d="M9.5 11L10 16"
-                        stroke="#6b6b6b"
-                        stroke-width="1.5"
-                        strokeLinecap="round"
-                      ></path>{" "}
-                      <path
-                        d="M14.5 11L14 16"
-                        stroke="#6b6b6b"
-                        stroke-width="1.5"
-                        strokeLinecap="round"
-                      ></path>{" "}
-                    </g>
-                  </svg>{" "}
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        <div className="bg-gray-100 p-6 rounded-2xl">
-          {/* Totals */}
-          <div className="mt-6">
-            {discountTotal > 0 && (
-              <p className="text-emerald-600">
-                تخفیف: {discountTotal.toLocaleString()} تومان
+          <div className="bg-gray-100 p-6 rounded-2xl">
+            {/* Totals */}
+            <div className="mt-6">
+              {discountTotal > 0 && (
+                <p className="text-emerald-600">
+                  تخفیف: {discountTotal.toLocaleString()} تومان
+                </p>
+              )}
+              <p className="text-sm mt-1">
+                قیمت محصولات: {(subtotal / 10).toLocaleString()} تومان
               </p>
-            )}
-            <p className="text-sm mt-1">
-              قیمت محصولات: {(subtotal / 10).toLocaleString()} تومان
-            </p>
-            <p className="text-sm mt-1">
-              جمع سبد خرید: {(totalPrice / 10).toLocaleString()} تومان
-            </p>
-          </div>
-          <div className="flex gap-2 items-center mt-6">
-            <input
-              type="text"
-              placeholder="کد تخفیف"
-              value={couponCode}
-              onChange={(e) => setCouponCode(e.target.value)}
-              className="flex-1 border-b px-4 py-2 border-gray-400 text-sm"
-            />
-            <button
-              onClick={handleApplyCoupon}
-              className="px-2 py-2 text-sm rounded-md bg-[#1d546b] text-white"
-            >
-              اعمال
-            </button>
-          </div>
-          {couponMessage && (
-            <div className="mt-2 text-sm font-medium">{couponMessage}</div>
-          )}
-        </div>
-      </div>
-
-      {/* Order Info */}
-      {cart.length > 0 && (
-        <div className="bg-white p-6 space-y-4 w-full md:w-3/4">
-          <h2 className="text-xl font-bold mb-2">اطلاعات سفارش</h2>
-          <div className="space-y-3">
-            <input
-              type="text"
-              placeholder="نام و نام خانوادگی"
-              value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
-              className="w-full px-4 py-2 rounded-md bg-gray-100 text-sm border border-gray-200"
-            />
-            <input
-              type="text"
-              placeholder="شماره تماس"
-              value={customerPhone}
-              onChange={handlePhoneChange}
-              className={`w-full px-4 py-2 rounded-md bg-gray-100 text-sm border ${
-                phoneError ? "border-red-500" : "border-gray-200"
-              }`}
-            />
-            {phoneError && (
-              <p className="text-red-500 text-xs mt-1">{phoneError}</p>
-            )}
-          </div>
-          <button
-            onClick={handlePlaceOrder}
-            disabled={loading}
-            className="md:w-1/4 text-sm p-2 bg-[#1d546b] text-white font-semibold py-3 rounded-lg hover:bg-emerald-700 transition disabled:opacity-50"
-          >
-            {loading ? "در حال ثبت سفارش..." : "ثبت سفارش"}
-          </button>
-
-          {orderMessage && (
-            <div className="text-center text-sm text-blue-700 mt-2 font-medium">
-              {orderMessage}
+              <p className="text-sm mt-1">
+                جمع سبد خرید: {(totalPrice / 10).toLocaleString()} تومان
+              </p>
             </div>
-          )}
-        </div>
-      )}
-
-      {/* Success Modal (alternative approach) */}
-      {showSuccessModal && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-white p-8 rounded-2xl shadow-lg max-w-sm w-full text-center space-y-4">
-            <div className="text-green-500 text-6xl">✓</div>
-            <h3 className="text-xl font-bold text-gray-800">پرداخت موفق</h3>
-            <p className="text-gray-600">پرداخت شما با موفقیت انجام شد.</p>
-            {refId && (
-              <p className="text-sm text-gray-500">کد رهگیری: {refId}</p>
+            <div className="flex gap-2 items-center mt-6">
+              <input
+                type="text"
+                placeholder="کد تخفیف"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                className="flex-1 border-b px-4 py-2 border-gray-400 text-sm"
+              />
+              <button
+                onClick={handleApplyCoupon}
+                className="px-2 py-2 text-sm rounded-md bg-[#1d546b] text-white"
+              >
+                اعمال
+              </button>
+            </div>
+            {couponMessage && (
+              <div className="mt-2 text-sm font-medium">{couponMessage}</div>
             )}
-            <button
-              onClick={() => setShowSuccessModal(false)}
-              className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-            >
-              ادامه
-            </button>
           </div>
         </div>
-      )}
-    </div>
+
+        {/* Order Info */}
+        {cart.length > 0 && (
+          <div className="bg-white p-6 space-y-4 w-full md:w-3/4">
+            <h2 className="text-xl font-bold mb-2">اطلاعات سفارش</h2>
+            <div className="space-y-3">
+              <input
+                type="text"
+                placeholder="نام و نام خانوادگی"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                className="w-full px-4 py-2 rounded-md bg-gray-100 text-sm border border-gray-200"
+              />
+              <input
+                type="text"
+                placeholder="شماره تماس"
+                value={customerPhone}
+                onChange={handlePhoneChange}
+                className={`w-full px-4 py-2 rounded-md bg-gray-100 text-sm border ${
+                  phoneError ? "border-red-500" : "border-gray-200"
+                }`}
+              />
+              {phoneError && (
+                <p className="text-red-500 text-xs mt-1">{phoneError}</p>
+              )}
+            </div>
+            <button
+              onClick={handlePlaceOrder}
+              disabled={loading}
+              className="md:w-1/4 text-sm p-2 bg-[#1d546b] text-white font-semibold py-3 rounded-lg hover:bg-emerald-700 transition disabled:opacity-50"
+            >
+              {loading ? "در حال ثبت سفارش..." : "ثبت سفارش"}
+            </button>
+
+            {orderMessage && (
+              <div className="text-center text-sm text-blue-700 mt-2 font-medium">
+                {orderMessage}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Success Modal (alternative approach) */}
+        {showSuccessModal && (
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+            <div className="bg-white p-8 rounded-2xl shadow-lg max-w-sm w-full text-center space-y-4">
+              <div className="text-green-500 text-6xl">✓</div>
+              <h3 className="text-xl font-bold text-gray-800">پرداخت موفق</h3>
+              <p className="text-gray-600">پرداخت شما با موفقیت انجام شد.</p>
+              {refId && (
+                <p className="text-sm text-gray-500">کد رهگیری: {refId}</p>
+              )}
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+              >
+                ادامه
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Head from "next/head";
 import { useCart } from "@/contexts/CartContext";
 import { Download, Mail, Copy, Check, ArrowLeft, Sparkles } from "lucide-react";
 import { useUserOrders } from "@/hooks/useUserOrders";
@@ -38,6 +39,11 @@ export default function PaymentSuccessPage() {
   };
 
   return (
+    <>
+          <Head>
+        <title>ورود به حساب کاربری | وبوفن</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Head>
     <div className=" min-h-screen bg-gradient-to-br from-white via-gray-50 to-blue-50/30 relative overflow-hidden">
       {/* Minimal Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
@@ -204,5 +210,6 @@ export default function PaymentSuccessPage() {
         </div>
       )}
     </div>
+    </>
   );
 }

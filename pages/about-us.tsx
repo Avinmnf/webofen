@@ -191,7 +191,7 @@ export default function AboutUs() {
 
         {/* Why Us Section */}
         <section className="pb-4 w-full">
-          <div className="md:max-w-[1250px] w-full m-auto py-20 px-4">
+          <div className="md:max-w-[1250px] w-full m-auto md:py-20 px-4">
             <div className="mb-12 text-center md:text-start">
               <p className="text-[#0364af] text-lg ">وبوفن</p>
               <h2 className="text-[#6fd6e5] text-3xl  mt-2">چرا ما ؟</h2>
@@ -224,7 +224,7 @@ export default function AboutUs() {
           </div>
         </section>
 
-        <section>
+        <section className="md:block hidden">
           <ClientsCarousel />
         </section>
 
