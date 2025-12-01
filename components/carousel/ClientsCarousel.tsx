@@ -22,7 +22,7 @@ export default function ClientsCarouselSection() {
           src="/about-us/our-costumers.png"
           alt=""
           fill
-          className="object-contain"
+          className="object-cover"
           priority
         />
 
@@ -31,26 +31,38 @@ export default function ClientsCarouselSection() {
           مشتریان <span className="text-[#29b0cb] mr-1"> وبوفن </span>
         </div>
 
-        {/* Fade edges */}
-        <div className="absolute left-0 top-0 h-full w-20 z-20 bg-gradient-to-r from-white via-white/50 to-transparent pointer-events-none"></div>
-        <div className="absolute right-0 top-0 h-full w-20 z-20 bg-gradient-to-l from-white via-white/50 to-transparent pointer-events-none"></div>
 
-        {/* Scrolling rows */}
+        {/* Horizontal fades - cleaner and more subtle */}
+        <div className="absolute inset-y-0 -left-10 w-100 z-10 pointer-events-none bg-gradient-to-r from-white via-white/40 to-transparent opacity-90" />
+        <div className="absolute inset-y-0 -right-10 w-100 z-10 pointer-events-none bg-gradient-to-l from-white via-white/40 to-transparent opacity-90" />
+
+        {/* Scrolling rows container */}
         <div className="absolute bottom-5 left-0 w-full flex flex-col gap-6 pb-4">
-
           {/* Row 1 */}
           <div className="marquee-row">
             <div className="track track-left">
               {logos.map((logo, i) => (
                 <div key={`r1a-${i}`} className="logo-item">
-                  <Image src={logo} width={120} height={60} className="object-contain" alt="" />
+                  <Image
+                    src={logo}
+                    width={120}
+                    height={60}
+                    className="object-contain"
+                    alt=""
+                  />
                 </div>
               ))}
             </div>
             <div className="track track-left second">
               {logos.map((logo, i) => (
                 <div key={`r1b-${i}`} className="logo-item">
-                  <Image src={logo} width={120} height={60} className="object-contain" alt="" />
+                  <Image
+                    src={logo}
+                    width={120}
+                    height={60}
+                    className="object-contain"
+                    alt=""
+                  />
                 </div>
               ))}
             </div>
@@ -61,14 +73,26 @@ export default function ClientsCarouselSection() {
             <div className="track track-right">
               {logos.map((logo, i) => (
                 <div key={`r2a-${i}`} className="logo-item">
-                  <Image src={logo} width={120} height={60} className="object-contain" alt="" />
+                  <Image
+                    src={logo}
+                    width={120}
+                    height={60}
+                    className="object-contain"
+                    alt=""
+                  />
                 </div>
               ))}
             </div>
             <div className="track track-right second">
               {logos.map((logo, i) => (
                 <div key={`r2b-${i}`} className="logo-item">
-                  <Image src={logo} width={120} height={60} className="object-contain gap-2" alt="" />
+                  <Image
+                    src={logo}
+                    width={120}
+                    height={60}
+                    className="object-contain"
+                    alt=""
+                  />
                 </div>
               ))}
             </div>
@@ -79,14 +103,26 @@ export default function ClientsCarouselSection() {
             <div className="track track-left">
               {logos.map((logo, i) => (
                 <div key={`r3a-${i}`} className="logo-item">
-                  <Image src={logo} width={120} height={60} className="object-contain" alt="" />
+                  <Image
+                    src={logo}
+                    width={120}
+                    height={60}
+                    className="object-contain"
+                    alt=""
+                  />
                 </div>
               ))}
             </div>
             <div className="track track-left second">
               {logos.map((logo, i) => (
                 <div key={`r3b-${i}`} className="logo-item">
-                  <Image src={logo} width={120} height={60} className="object-contain" alt="" />
+                  <Image
+                    src={logo}
+                    width={120}
+                    height={60}
+                    className="object-contain"
+                    alt=""
+                  />
                 </div>
               ))}
             </div>
@@ -94,7 +130,7 @@ export default function ClientsCarouselSection() {
         </div>
       </div>
 
-      {/* FIXED CSS */}
+      {/* CSS for animations */}
       <style jsx>{`
         .marquee-row {
           position: relative;
@@ -103,6 +139,21 @@ export default function ClientsCarouselSection() {
           height: 80px;
           display: flex;
           align-items: center;
+          /* Clean mask with smoother transitions */
+          mask-image: linear-gradient(
+            90deg,
+            transparent 0%,
+            black 80px,
+            black calc(100% - 80px),
+            transparent 100%
+          );
+          -webkit-mask-image: linear-gradient(
+            90deg,
+            transparent 0%,
+            black 80px,
+            black calc(100% - 80px),
+            transparent 100%
+          );
         }
 
         .track {
@@ -113,7 +164,7 @@ export default function ClientsCarouselSection() {
           align-items: center;
           gap: 4rem;
           white-space: nowrap;
-          width: max-content; /* مهم‌ترین خط */
+          width: max-content;
         }
 
         .logo-item {
@@ -123,30 +174,128 @@ export default function ClientsCarouselSection() {
           justify-content: center;
           width: 120px;
           height: 60px;
+          filter: grayscale(100%) brightness(1.1);
+          opacity: 0.85;
+          transition: filter 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
         }
 
-        /* Animations */
-        .track-left { animation: scrollLeft 30s linear infinite; }
-        .track-left.second { left:105%; }
+        .logo-item:hover {
+          filter: grayscale(0%) brightness(1);
+          opacity: 1;
+          transform: scale(1.05);
+        }
 
-        .track-right { animation: scrollRight 30s linear infinite; }
-         .track-right.second {
+        .track-left {
+          animation: scrollLeft 30s linear infinite;
+        }
+        .track-left.second {
+          left: 105%;
+        }
+
+        .track-right {
+          animation: scrollRight 30s linear infinite;
+        }
+        .track-right.second {
           left: calc(-125% - 4rem);
         }
 
         @keyframes scrollLeft {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-100%); }
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-100%);
+          }
         }
 
         @keyframes scrollRight {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(100%); }
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
+
+        .marquee-row:hover .track {
+          animation-play-state: paused;
+        }
+
+        @media (max-width: 1024px) {
+          .marquee-row {
+            mask-image: linear-gradient(
+              90deg,
+              transparent 0%,
+              black 60px,
+              black calc(100% - 60px),
+              transparent 100%
+            );
+            -webkit-mask-image: linear-gradient(
+              90deg,
+              transparent 0%,
+              black 60px,
+              black calc(100% - 60px),
+              transparent 100%
+            );
+          }
         }
 
         @media (max-width: 768px) {
-          .track { gap: 2rem; }
-          .logo-item { width: 100px; height: 50px; }
+          .marquee-row {
+            height: 70px;
+            mask-image: linear-gradient(
+              90deg,
+              transparent 0%,
+              black 40px,
+              black calc(100% - 40px),
+              transparent 100%
+            );
+            -webkit-mask-image: linear-gradient(
+              90deg,
+              transparent 0%,
+              black 40px,
+              black calc(100% - 40px),
+              transparent 100%
+            );
+          }
+          
+          .track {
+            gap: 3rem;
+          }
+          
+          .logo-item {
+            width: 100px;
+            height: 50px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .marquee-row {
+            height: 60px;
+            mask-image: linear-gradient(
+              90deg,
+              transparent 0%,
+              black 30px,
+              black calc(100% - 30px),
+              transparent 100%
+            );
+            -webkit-mask-image: linear-gradient(
+              90deg,
+              transparent 0%,
+              black 30px,
+              black calc(100% - 30px),
+              transparent 100%
+            );
+          }
+          
+          .track {
+            gap: 2.5rem;
+          }
+          
+          .logo-item {
+            width: 85px;
+            height: 42px;
+          }
         }
       `}</style>
     </section>
