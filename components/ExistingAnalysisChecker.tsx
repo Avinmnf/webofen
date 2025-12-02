@@ -23,20 +23,13 @@ export function ExistingAnalysisChecker({
   onNoExistingResult,
   onError,
 }: any) {
-  const { analyses, loading } = useAnalyses();
+  const { analyses, loading, checkExistingAnalysis } = useAnalyses();
   const [checking, setChecking] = useState(true);
 
-  const normalize = (u: string) =>
-    u.replace(/\/$/, "").toLowerCase();
-
   useEffect(() => {
-    // ⛔ تا وقتی داده لود نشده، هیچ کاری نکن
-    if (loading) return;
+    if (loading) return; // تا وقتی داده‌ها کامل نشدن توقف
 
-    const existing = analyses
-      .filter((a: any) => a.status === "completed")
-      .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .find((a: any) => normalize(a.url) === normalize(url));
+    const existing = checkExistingAnalysis(url);
 
     if (existing) {
       onExistingResultFound(convertApiResultToAnalyzeResult(existing));
