@@ -1,56 +1,40 @@
-# Stage 1: dependencies
-FROM node:20 AS deps
+# مرحله 1: نصب dependency‌ها
+FROM node:20-alpine AS deps
 WORKDIR /app
 
+# فقط فایل‌های مربوط به نصب
 COPY package.json package-lock.json* ./
+
+# نصب dependency‌ها
 RUN npm ci
 
-# Stage 2: build
-FROM node:20 AS builder
+# مرحله 2: بیلد پروژه
+FROM node:20-alpine AS builder
 WORKDIR /app
 
+# کپی کردن node_modules و سورس
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+# بیلد next
 RUN npm run build
 
-# Stage 3: runtime
-FROM node:20 AS runner
+# مرحله 3: ران‌تایم
+FROM node:20-alpine AS runner
 WORKDIR /app
 
-# Puppeteer dependencies (Debian)
-RUN apt-get update && apt-get install -y \
-    wget \
-    ca-certificates \
-    fonts-liberation \
-    libasound2 \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libcups2 \
-    libdrm2 \
-    libgbm1 \
-    libglib2.0-0 \
-    libnspr4 \
-    libnss3 \
-    libx11-6 \
-    libx11-xcb1 \
-    libxcb1 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxext6 \
-    libxfixes3 \
-    libxrandr2 \
-    libxrender1 \
-    libxshmfence1 \
-    xdg-utils \
-    && rm -rf /var/lib/apt/lists/*
-
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false
+# فقط فایل‌های لازم برای اجرا
 ENV NODE_ENV=production
 
+# کپی از مرحله بیلد
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
+# تنظیم پورت
 EXPOSE 3000
+ENV PORT=3000
+
+# اجرای برنامه
 CMD ["npm", "start"]
