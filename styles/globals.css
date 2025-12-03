@@ -34,8 +34,6 @@ text-align: left;
 display: block;
 padding: 5px 10px;
 background-color: #f8f8f8;
-border-radius: 10px;
-margin: 5px;
 }
 table {
 text-indent: 0;
@@ -141,9 +139,9 @@ color: white;
 .related {
   color: black;
 }
-.toc-level-1{margin-right: 2px; font-size: 1.2rem;}
+.toc-level-1{margin-right: 2px; font-size: 1rem;}
 .toc-level-2{margin-right: 5px; font-size: 1rem;}
-.toc-level-3{margin-right: 10px; font-size: 0.9rem;}
+.toc-level-3{margin-right: 10px; font-size: 1rem;}
 }
 .toc-sidebar {
   position: sticky;
@@ -204,10 +202,8 @@ p{
   width: 100%;
   height: 100%;
   object-fit: contain;
-  /* این خط باعث میشه پیکسل‌های سفید پاسخی شبیه "شفاف" داشته باشند */
   mix-blend-mode: multiply;
   will-change: filter, mix-blend-mode;
-  /* اگر نیاز به افزایش تضاد لبه‌ها داری */
   filter: contrast(1.2) saturate(1.05);
   background: transparent;
 }
@@ -253,6 +249,151 @@ p{
   background-color: #1d546b;
   transform: scale(1.2);
 }
+
+pre {
+  direction: ltr;
+  text-align: left;
+  position: relative;
+}
+
+code {
+  font-family: 'Fira Code', 'Consolas', 'Monaco', 'Andale Mono', monospace;
+}
+
+.code-block-container {
+  position: relative;
+  margin: 1.5rem 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.code-block-container pre {
+  margin: 0 !important;
+  border-radius: 0 0 0.5rem 0.5rem;
+}
+
+.code-block-container code {
+  color: gray !important; /* text-gray-100 */
+  font-size: 0.875rem !important; /* text-sm */
+  overflow-x: auto;
+}
+
+/* دکمه کپی */
+.copy-code-button {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.copy-code-button:hover {
+  transform: translateY(-1px);
+}
+
+.copy-code-button:active {
+  transform: translateY(0);
+}
+
+/* کدهای خطی */
+.inline-code-container {
+  position: relative;
+}
+
+.inline-code-container code {
+  padding: 0.25rem 0.5rem;
+  background-color: #f3f4f6;
+  color: #1f2937;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: monospace;
+}
+
+.copy-inline-code {
+  cursor: pointer;
+  z-index: 10;
+}
+
+.copy-inline-code:hover {
+  background-color: #374151 !important; /* bg-gray-700 */
+}
+
+/* هایلایت سینتکس (اختیاری) */
+.hljs {
+  background: transparent !important;
+}
+
+.hljs-keyword {
+  color: #f472b6 !important; /* pink-400 */
+}
+
+.hljs-string {
+  color: #34d399 !important; /* emerald-400 */
+}
+
+.hljs-number {
+  color: #60a5fa !important; /* blue-400 */
+}
+
+.hljs-comment {
+  color: #9ca3af !important; /* gray-400 */
+  font-style: italic;
+}
+
+.hljs-function {
+  color: #fbbf24 !important; /* amber-400 */
+}
+
+.hljs-params {
+  color: #a78bfa !important; /* violet-400 */
+}
+
+/* خط‌های کد */
+pre code .line-number {
+  display: inline-block;
+  width: 2em;
+  padding-right: 1em;
+  margin-right: 1em;
+  text-align: right;
+  color: #6b7280; /* gray-500 */
+  border-right: 1px solid #4b5563; /* gray-600 */
+  user-select: none;
+}
+
+/* انیمیشن برای موفقیت کپی */
+@keyframes copySuccess {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.copy-code-button.bg-green-600 svg {
+  animation: copySuccess 0.3s ease;
+}
+
+/* ریسپانسیو */
+@media (max-width: 768px) {
+  .code-block-container {
+    margin: 1rem 0;
+  }
+  
+  .code-block-container pre {
+    font-size: 0.75rem !important;
+  }
+  
+  .copy-code-button {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.75rem !important;
+  }
+}
+
+/* برای حالت تاریک */
+@media (prefers-color-scheme: dark) {
+  .inline-code-container code {
+    background-color: #374151; /* gray-700 */
+    color: #f3f4f6; /* gray-100 */
+  }
+  
+
+}
+
 
 .slide-content {
   font-size: 1.25rem;

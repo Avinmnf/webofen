@@ -473,9 +473,12 @@ export default function PostPage({ post, viewCount }: Props) {
                     )}
                   </div>
                   <div className="w-full flex gap-6 p-2 mt-3 justify-center items-center">
-                    <Link href={"/instagram"}>
-                      <svg
-                        className="w-6 h-6 text-gray-400 hover:text-amber-700"
+         <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://instagram.com/webofen"
+              >                      <svg
+                        className="w-6 h-6 text-gray-400 hover:text-red-700"
                         viewBox="0 0 24 24"
                         id="meteor-icon-kit__solid-instagram"
                         fill="currentColor"
@@ -489,7 +492,7 @@ export default function PostPage({ post, viewCount }: Props) {
                           fill="currentColor"
                         />{" "}
                       </svg>{" "}
-                    </Link>{" "}
+                    </a>{" "}
                     <span
                       className="fake-link icon-twitter cursor-pointer"
                       onClick={() => {

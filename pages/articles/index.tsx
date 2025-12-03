@@ -113,7 +113,7 @@ function generateOrganizationSchema() {
     url: "https://webofen.com",
     logo: "https://webofen.com/logo.png",
     description: "وبوفن - پلتفرم تخصصی دیجیتال مارکتینگ و کسب درآمد آنلاین",
-    sameAs: ["https://t.me/yourchannel", "https://instagram.com/yourpage"],
+    sameAs: ["https://t.me/webofenlearn", "https://instagram.com/webofen"],
     contactPoint: {
       "@type": "ContactPoint",
       telephone: "+98-XXX-XXX-XXXX",
@@ -759,7 +759,13 @@ export default function PostsPage({
                   <div className="md:p-0 p-4 w-full md:w-[70%] rounded-2xl h-full">
                     {/* Featured First Post */}
                     {posts.length > 0 && (
-                      <Link href={`/articles/${posts[0].slug}`} passHref>
+                      <a
+                        href={`/articles/${posts[0].slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rounded-2xl bg-white mb-8 shadow hover:shadow-lg transition cursor-pointer block"
+                      >
+                        {" "}
                         <div className="rounded-2xl bg-white mb-8 shadow hover:shadow-lg transition cursor-pointer">
                           {posts[0].imageUrl && (
                             <Image
@@ -899,7 +905,7 @@ export default function PostsPage({
                             </div>
                           </div>
                         </div>
-                      </Link>
+                      </a>
                     )}
                   </div>
                   {/* ✅ Right Sidebar */}

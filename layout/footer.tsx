@@ -5,17 +5,20 @@ import Image from "next/image";
 export default function Footer() {
   const [contact, setContact] = useState("");
 
-  const handleChange = (e:any) => {
+  const handleChange = (e: any) => {
     setContact(e.target.value);
   };
 
-  const handleSubmit = (e:any) => {
+  const handleSubmit = (e: any) => {
     e.preventDefault();
     // تشخیص اینکه کاربر ایمیل وارد کرده یا شماره تلفن
-    const isEmail = contact.includes('@');
+    const isEmail = contact.includes("@");
     const isPhone = /^[\d\s\-\+\(\)]+$/.test(contact);
-    
-    console.log("فرم ارسال شد:", { contact, type: isEmail ? 'email' : isPhone ? 'phone' : 'unknown' });
+
+    console.log("فرم ارسال شد:", {
+      contact,
+      type: isEmail ? "email" : isPhone ? "phone" : "unknown",
+    });
     alert("اطلاعات شما با موفقیت ثبت شد!");
     setContact("");
   };
@@ -123,7 +126,7 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        
+
         <div className="md:w-[50%] flex flex-col gap-4 mt-4">
           <div className="text-gray-50 text-start">
             <p className="text-lg">دریافت خبرنامه وبوفن</p>
@@ -184,43 +187,48 @@ export default function Footer() {
                 <span>یوتیوب</span>
               </div>
             </Link>
-            <Link href={"/"}>
-              <div className="text-gray-50 cursor-pointer border border-[#f78c0a] rounded-md justify-center p-2 md:p-0 md:w-30 md:h-12 text-sm flex items-center">
-                <svg
-                  className="w-6 h-6 ml-4"
-                  id="Layer_2"
-                  data-name="Layer 2"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 31.9 31.9"
-                >
-                  <defs>
-                    <style>
-                      {`
-        .cls-1 {
-          fill: #b3c0c9;
-          fill-rule: evenodd;
-        }
-        .cls-2 {
-          opacity: 0.5;
-        }
-      `}
-                    </style>
-                  </defs>
-                  <g id="Layer_1-2" data-name="Layer 1">
-                    <g id="Artboard" className="cls-2">
-                      <path
-                        className="cls-1"
-                        d="M15.95,0C7.14,0,0,7.14,0,15.95s7.14,15.95,15.95,15.95,15.95-7.14,15.95-15.95S24.76,0,15.95,0ZM23.35,10.85c-.24,2.52-1.28,8.64-1.81,11.47-.22,1.2-.66,1.6-1.09,1.64-.93.09-1.63-.61-2.53-1.2-1.4-.92-2.2-1.49-3.56-2.39-1.58-1.04-.55-1.61.34-2.54.24-.24,4.32-3.96,4.4-4.29,0-.04.02-.2-.07-.28s-.23-.05-.33-.03c-.14.03-2.38,1.51-6.73,4.45-.64.44-1.21.65-1.73.64-.57-.01-1.66-.32-2.48-.59-1-.32-1.79-.5-1.72-1.05.04-.29.43-.58,1.19-.88,4.65-2.03,7.75-3.36,9.3-4.01,4.43-1.84,5.35-2.16,5.95-2.17.75-.01.93.61.87,1.25Z"
-                      />
-                    </g>
-                  </g>
-                </svg>
 
-                <span>تلگرام</span>
-              </div>
-            </Link>
-            <Link href={"/"}>
-              <div className="text-gray-50 cursor-pointer border border-[#f78c0a] rounded-md justify-center p-2 md:p-0 md:w-30 md:h-12 text-sm flex items-center">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://t.me/webofenlearn"
+              className="text-gray-50 cursor-pointer border border-[#f78c0a] rounded-md justify-center p-2 md:p-0 md:w-30 md:h-12 text-sm flex items-center"
+            >
+              <svg
+                className="w-6 h-6 ml-4"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 31.9 31.9"
+              >
+                <defs>
+                  <style>
+                    {`
+            .cls-1 {
+              fill: #b3c0c9;
+              fill-rule: evenodd;
+            }
+            .cls-2 {
+              opacity: 0.5;
+            }
+          `}
+                  </style>
+                </defs>
+                <g className="cls-2">
+                  <path
+                    className="cls-1"
+                    d="M15.95,0C7.14,0,0,7.14,0,15.95s7.14,15.95,15.95,15.95,15.95-7.14,15.95-15.95S24.76,0,15.95,0ZM23.35,10.85c-.24,2.52-1.28,8.64-1.81,11.47-.22,1.2-.66,1.6-1.09,1.64-.93.09-1.63-.61-2.53-1.2-1.4-.92-2.2-1.49-3.56-2.39-1.58-1.04-.55-1.61.34-2.54.24-.24,4.32-3.96,4.4-4.29,0-.04.02-.2-.07-.28s-.23-.05-.33-.03c-.14.03-2.38,1.51-6.73,4.45-.64.44-1.21.65-1.73.64-.57-.01-1.66-.32-2.48-.59-1-.32-1.79-.5-1.72-1.05.04-.29.43-.58,1.19-.88,4.65-2.03,7.75-3.36,9.3-4.01,4.43-1.84,5.35-2.16,5.95-2.17.75-.01.93.61.87,1.25Z"
+                  />
+                </g>
+              </svg>
+
+              <span>تلگرام</span>
+            </a>
+
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://instagram.com/webofen"
+                className="text-gray-50 cursor-pointer border border-[#f78c0a] rounded-md justify-center p-2 md:p-0 md:w-30 md:h-12 text-sm flex items-center"
+              >
                 <svg
                   className="w-6 h-6 ml-2"
                   id="Layer_2"
@@ -245,8 +253,7 @@ export default function Footer() {
                 </svg>
 
                 <span>اینستاگرام</span>
-              </div>
-            </Link>
+              </a>
           </div>
           <div className="text-start text-sm text-gray-300 bg-[#153e4c] rounded-md p-6 mt-5 md:mt-10">
             <div className="flex items-center gap-1 md:gap-2 mt-2">
