@@ -83,21 +83,27 @@ export function InjectRelatedCategories({
 
               // Create new pre block with copy button
               return `
-                <div class="code-block-container relative group my-6" data-block-id="code-${index}">
-                  <div class="flex justify-between items-center bg-[#f8f8f8] text-gray-500 pt-2 rounded-t-lg">
+                <div class="code-block-wrapper relative my-6" data-block-id="code-${index}">
+                  <div class="flex items-center justify-between px-4 py-2 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 rounded-t-lg">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-mono text-gray-600 dark:text-gray-400">
+                        ${language}
+                      </span>
+                    </div>
                     <button 
-                      class="copy-code-button flex items-center gap-2 px-3 py-1 text-gray-500 hover:text-gray-700 transition-colors duration-200"
+                      class="copy-code-button flex items-center gap-2 px-3 py-1.5 text-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 shadow-sm"
                       data-code="${encodeURIComponent(codeText)}"
                       data-code-html="${encodeURIComponent(codeHtml)}"
                       data-full-block="${encodeURIComponent(codeWithTags)}"
                       aria-label="کپی کد"
                     >
-                      <svg class="w-5 h-5 copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-4 h-4 copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                       </svg>
+                      <span class="copy-text">کپی</span>
                     </button>
                   </div>
-                  <div class="code-content-wrapper">
+                  <div class="relative">
                     ${preBlock.replace(
                       /class="([^"]*)"/,
                       'class="$1 !rounded-t-none !mt-0"'
@@ -111,49 +117,62 @@ export function InjectRelatedCategories({
         }
       );
 
-      // Step 3: Process inline code blocks
+      // Step 3: Process inline code blocks (IMPROVED VERSION)
       processed = processed.replace(
         /<code\b[^>]*>[\s\S]*?<\/code>/gi,
-        (codeBlock, index) => {
-          // Only process if it's a standalone code block (not inside pre)
-          const isInsidePre = codeBlock.includes("</pre>") || processed.includes("<pre>") && 
-            processed.indexOf(codeBlock) > processed.indexOf("<pre>") && 
-            processed.indexOf(codeBlock) < processed.indexOf("</pre>");
+        (codeBlock, offset) => {
+          // Check if we're inside a pre tag that we've already processed
+          const position = processed.indexOf(codeBlock);
+          const before = processed.substring(0, position);
+          const after = processed.substring(position + codeBlock.length);
           
-          if (!isInsidePre) {
-            const tempDiv = document.createElement("div");
-            tempDiv.innerHTML = codeBlock;
-            const codeText = tempDiv.textContent || "";
-            const codeHtml = tempDiv.innerHTML;
+          // Check if this code is inside a pre tag (looking backward and forward)
+          const preOpenBefore = before.lastIndexOf("<pre");
+          const preCloseBefore = before.lastIndexOf("</pre");
+          const preOpenAfter = after.indexOf("<pre");
+          const preCloseAfter = after.indexOf("</pre");
+          
+          // If we're inside a pre tag, don't process it
+          if (
+            (preOpenBefore > preCloseBefore) || // We're inside a pre tag that hasn't closed
+            (preOpenBefore > -1 && (preCloseAfter > -1 && preOpenAfter === -1)) // We're between pre tags
+          ) {
+            return codeBlock;
+          }
 
-            // For inline code that looks like a code snippet (has special characters)
-            const hasCodeLikeContent = /[{}()<>;=+\-*/\[\]]/.test(codeText) || 
-              codeText.includes("function") || 
-              codeText.includes("const") || 
-              codeText.includes("let") || 
-              codeText.includes("var") ||
-              codeText.includes("class ") ||
-              codeText.includes("import ");
+          const tempDiv = document.createElement("div");
+          tempDiv.innerHTML = codeBlock;
+          const codeText = tempDiv.textContent || "";
+          const codeHtml = tempDiv.innerHTML;
 
-            if (codeText.length > 20 && hasCodeLikeContent) {
-              return `
-                <span class="inline-code-wrapper relative inline-block group" data-inline-id="inline-${index}">
-                  <code class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm font-mono border border-gray-200">
-                    ${codeHtml}
-                  </code>
-                  <button 
-                    class="copy-inline-code absolute -top-2 -left-2 bg-gray-800 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-md hover:bg-gray-900 z-10"
-                    data-code="${encodeURIComponent(codeText)}"
-                    data-code-html="${encodeURIComponent(codeHtml)}"
-                    aria-label="کپی کد"
-                  >
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                    </svg>
-                  </button>
-                </span>
-              `;
-            }
+          // More precise detection for code snippets
+          const hasCodeLikeContent = 
+            /[{}()<>;=+\-*/\[\]\n\r\t]/.test(codeText) || 
+            /\b(function|const|let|var|class|import|export|return|if|else|for|while|switch|case|default|break|continue)\b/.test(codeText) ||
+            codeText.length > 30;
+
+          if (hasCodeLikeContent && codeText.length > 10) {
+            // Create a unique ID for this inline code block
+            const inlineId = `inline-${offset}-${Date.now()}`;
+            
+            return `
+              <span class="inline-code-container relative inline-block" id="${inlineId}">
+                <code class="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-2 py-1 rounded text-sm font-mono border border-gray-300 dark:border-gray-700 whitespace-nowrap">
+                  ${codeHtml}
+                </code>
+                <button 
+                  class="copy-inline-code absolute -top-2 -right-2 bg-gray-800 dark:bg-gray-700 text-white p-1.5 rounded-full opacity-0 hover:opacity-100 focus:opacity-100 transition-opacity duration-200 shadow-lg hover:bg-gray-900 dark:hover:bg-gray-600 z-10 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                  data-code="${encodeURIComponent(codeText)}"
+                  data-code-html="${encodeURIComponent(codeHtml)}"
+                  aria-label="کپی کد"
+                  tabindex="0"
+                >
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                  </svg>
+                </button>
+              </span>
+            `;
           }
           return codeBlock;
         }
@@ -200,31 +219,35 @@ export function InjectRelatedCategories({
           // Show success state
           if (copyText) {
             copyText.textContent = "کپی شد!";
-            copyText.classList.add("text-gray-600");
+            copyText.classList.add("text-green-600", "dark:text-green-400");
           }
 
           if (svg) {
-            svg.classList.remove("text-gray-600");
-            svg.classList.add("text-gray-600");
+            const originalPath = svg.innerHTML;
             svg.innerHTML = `
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
             `;
-          }
+            svg.classList.remove("text-gray-600");
+            svg.classList.add("text-green-600", "dark:text-green-400");
 
-          // Reset after 2 seconds
-          setTimeout(() => {
-            if (copyText) {
-              copyText.textContent = "کپی";
-              copyText.classList.remove("text-gray-600");
-            }
-            if (svg) {
-              svg.classList.remove("text-gray-600");
-              svg.classList.add("text-gray-600");
-              svg.innerHTML = `
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-              `;
-            }
-          }, 2000);
+            // Reset after 2 seconds
+            setTimeout(() => {
+              svg.innerHTML = originalPath;
+              svg.classList.remove("text-green-600", "dark:text-green-400");
+              if (copyText) {
+                copyText.textContent = "کپی";
+                copyText.classList.remove("text-green-600", "dark:text-green-400");
+              }
+            }, 2000);
+          } else {
+            // For inline buttons without text, just change the icon
+            const button = copyButton as HTMLElement;
+            button.classList.add("bg-green-600", "dark:bg-green-700");
+            
+            setTimeout(() => {
+              button.classList.remove("bg-green-600", "dark:bg-green-700");
+            }, 2000);
+          }
         } catch (err) {
           console.error("Failed to copy as rich text:", err);
           
@@ -257,8 +280,65 @@ export function InjectRelatedCategories({
       }
     };
 
+    // Also handle keyboard events for accessibility
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        const target = e.target as HTMLElement;
+        if (target.closest('.copy-code-button, .copy-inline-code')) {
+          e.preventDefault();
+          const clickEvent = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window
+          });
+          target.dispatchEvent(clickEvent);
+        }
+      }
+    };
+
     document.addEventListener("click", handleCopy);
-    return () => document.removeEventListener("click", handleCopy);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("click", handleCopy);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  // Add CSS for the copy buttons
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      .inline-code-container {
+        margin: 0 2px;
+      }
+      
+      .inline-code-container:hover .copy-inline-code,
+      .inline-code-container:focus-within .copy-inline-code {
+        opacity: 1;
+      }
+      
+      .code-block-wrapper {
+        position: relative;
+      }
+      
+      .code-block-wrapper pre {
+        margin: 0 !important;
+
+      }
+      
+      .code-block-wrapper:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+      
+      .dark .code-block-wrapper:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(style);
+    };
   }, []);
 
   if (!hasProducts && !hasPosts) {

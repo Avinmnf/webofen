@@ -919,7 +919,7 @@ export default function PostsPage({
                       >
                         <Image
                           src="/blog/programming-learn (1).png"
-                          alt="متخصصان سئو وبوفن - دکتر مجتبی خداخواه"
+                          alt="آموزش برنامه نویسی"
                           fill
                           className="object-cover"
                           priority
@@ -939,7 +939,7 @@ export default function PostsPage({
                       >
                         <Image
                           src="/blog/ui-ux.png"
-                          alt="متخصصان سئو وبوفن - دکتر مجتبی خداخواه"
+                          alt="آموزش ui ux"
                           fill
                           className="object-cover"
                           priority
@@ -959,7 +959,7 @@ export default function PostsPage({
                       >
                         <Image
                           src="/blog/seo.png"
-                          alt="متخصصان سئو وبوفن - دکتر مجتبی خداخواه"
+                          alt="آموزش سئو سایت"
                           fill
                           className="object-cover"
                           priority
@@ -1124,10 +1124,13 @@ export default function PostsPage({
                             </div>
                           </div>
                         ) : (
-                          <Link
+                 
+                                 <a
                             href={`/articles/${(card as Post).slug}`}
-                            passHref
-                          >
+                        target="_blank"
+                        rel="noopener noreferrer"
+            
+                      >
                             <div className="rounded-2xl bg-white shadow hover:shadow-sm transition cursor-pointer">
                               {(card as Post).imageUrl && (
                                 <Image
@@ -1246,7 +1249,7 @@ export default function PostsPage({
                                 </div>
                               </div>
                             </div>
-                          </Link>
+                          </a>
                         )}
                       </div>
                     ))}
