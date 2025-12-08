@@ -345,6 +345,50 @@ export interface HeadingAnalysis {
   total: number;
 }
 
+// types/analysis.ts
+export interface SitemapAnalysis {
+  totalLinks: number;
+  sitemapExists: boolean;
+  sitemapUrls: string[];
+  sitemapLinks: Array<{ url: string; sitemap: string }>;
+}
+
+export interface Analysis {
+  id: string;
+  url: string;
+  performance?: number;
+  accessibility?: number;
+  bestPractices?: number;
+  seo?: number;
+  brokenLinksCount?: number;
+  name?: string;
+  phoneNumber?: string;
+  createdAt: string;
+  sitemapAnalysis?: SitemapAnalysis;
+}
+
+export interface UserDashboard {
+  phoneNumber: string;
+  name?: string;
+  totalAnalyses: number;
+  lastAnalysis: string;
+  analyses: Analysis[];
+  stats: {
+    averagePerformance: number;
+    averageAccessibility: number;
+    averageSEO: number;
+    averageBestPractices: number;
+    totalBrokenLinks: number;
+    totalSitemapLinks: number;
+  };
+}
+
+export interface AnalysisStats {
+  totalUsers: number;
+  totalAnalyses: number;
+  users: UserDashboard[];
+}
+
 export interface JobData {
   analysisId: string;
   url: string;

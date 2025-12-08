@@ -1,8 +1,9 @@
-"use client";
+'use client';
 
 import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserOrders } from "@/hooks/useUserOrders";
+import AnalysisLinks from "@/components/AnalysisLinks";
 
 const productVideoMap = [
   {
@@ -32,7 +33,7 @@ const productVideoMap = [
 ];
 
 const DashboardHome: React.FC = () => {
-  const { isLoggedIn, user } = useAuth();
+  const { isLoggedIn, user } = useAuth(); 
   const { orders, loading: ordersLoading } = useUserOrders();
 
   if (!isLoggedIn) {
@@ -82,7 +83,7 @@ const DashboardHome: React.FC = () => {
         </span>
       </div>
 
-      {/* ✅ Show latest video if exists */}
+      {/* Latest Video */}
       {matchedVideo && (
         <div
           className="relative w-full aspect-[16/5] bg-[#001933] rounded-3xl overflow-hidden flex items-start"
@@ -125,37 +126,46 @@ const DashboardHome: React.FC = () => {
         </div>
       </div>
 
-{/* Recent Activity */}
-<div className="bg-gray-50 p-4 rounded-2xl h-80 overflow-y-auto">
-  <h3 className="text-lg font-semibold mb-2 text-gray-600">
-    سفارشات اخیر
-  </h3>
-  <ul className="divide-y divide-gray-200">
-    {orders.slice(0, 50).map((order) => (
-      <li
-        key={order.id}
-        className="py-2 flex justify-between flex-col sm:flex-row sm:items-center"
-      >
-        <div className="w-full">
-          {order.items.map((item) => (
-            <div
-              key={item.id}
-              className="flex justify-between items-center rounded-lg p-2"
+      {/* Recent Orders */}
+      <div className="bg-gray-50 p-4 rounded-2xl h-80 overflow-y-auto ">
+        <h3 className="text-lg font-semibold mb-2 text-gray-600">
+          سفارشات اخیر
+        </h3>
+        <ul className="divide-y divide-gray-200">
+          {orders.slice(0, 50).map((order) => (
+            <li
+              key={order.id}
+              className="py-2 flex justify-between flex-col sm:flex-row sm:items-center"
             >
-              <p className="text-gray-600">
-                {item.variant.product?.title} ({item.quantity} عدد)
-              </p>
-              <span className="text-sm text-gray-500">
-                {item.adminStatus}
-              </span>
-            </div>
+              <div className="w-full">
+                {order.items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex justify-between items-center rounded-lg p-2"
+                  >
+                    <p className="text-gray-600">
+                      {item.variant.product?.title} ({item.quantity} عدد)
+                    </p>
+                    <span className="text-sm text-gray-500">
+                      {item.adminStatus}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </li>
           ))}
-        </div>
-      </li>
-    ))}
-  </ul>
-</div>
+        </ul>
+      </div>
 
+      {/* Analysis Links (no extra margin) */}
+      <div>
+        <AnalysisLinks 
+          compact={true}
+          showHeader={true}
+          itemsPerPage={5}
+          showAllByDefault={false}
+        />
+      </div>
     </div>
   );
 };
