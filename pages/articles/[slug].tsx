@@ -93,12 +93,6 @@ const BreadcrumbSchema = ({ post }: SchemaProps) => {
       {
         "@type": "ListItem",
         position: 3,
-        name: post?.category?.title || "دسته‌بندی",
-        item: `https://webofen.com/category/${categorySlug}`,
-      },
-      {
-        "@type": "ListItem",
-        position: 4,
         name: post?.title || "",
         item: typeof window !== "undefined" ? window.location.href : "",
       },
@@ -172,13 +166,12 @@ export default function PostPage({ post, viewCount }: Props) {
         author={post?.author?.name || ""}
       />
 
-      {/* اضافه کردن اسکیماها */}
       <ArticleSchema post={post} />
       <BreadcrumbSchema post={post} />
 
       <main className="md:w-[1250px] mx-auto p-4 relative articles">
         {/*Background Section */}
-        <div className="relative pt-20">
+        <div className="relative">
           <div className="w-full m-auto">
             {/* Breadcrumb Navigation */}
             <nav className="mb-6 px-4 text-gray-500 " aria-label="breadcrumb">

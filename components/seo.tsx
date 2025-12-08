@@ -1,5 +1,6 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
 type SEOProps = {
   title?: string;
@@ -79,29 +80,24 @@ const SEO: React.FC<SEOProps> = ({
   additionalScripts,
 }) => {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const baseUrl = (
     process.env.NEXT_PUBLIC_WEBOFEN || "https://webofen.com/"
   ).replace(/\/+$/, "");
-  const cdnUrl = process.env.NEXT_PUBLIC_CDN_URL;
+  
   const currentUrl = canonical || `${baseUrl}${router.asPath}`;
-  const defaultImage = ogImage
-    ? `${cdnUrl}${ogImage.replace(/^\/+/, "")}`
-    : `${cdnUrl}images/og-default.jpg`;
+  
+  // Use provided ogImage or fallback to blog image for articles page
+  const defaultImage = ogImage || (router.asPath.includes('/articles') 
+    ? "https://webofen.com/images/og-blog.jpg" 
+    : "https://webofen.com/images/og-default.jpg");
 
-  const defaultStructuredData = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: "وبوفن",
-    url: baseUrl,
-    potentialAction: {
-      "@type": "SearchAction",
-      target: `${baseUrl}/search?q={search_term_string}`,
-      "query-input": "required name=search_term_string",
-    },
-  };
-
-  let finalStructuredData: object | null =
-    productSchema || structuredData || defaultStructuredData;
+  let finalStructuredData: object | null = productSchema || structuredData;
 
   if (ogType === "article" && post) {
     finalStructuredData = {
@@ -181,88 +177,110 @@ const SEO: React.FC<SEOProps> = ({
     };
   }
 
+  // Format title
+  const formattedTitle = title 
+    ? (title.includes("وبوفن") ? title : `${title} | وبوفن`)
+    : "وبوفن";
+
   return (
     <Head>
-      <title>{title.includes("وبوفن") ? title : `${title} | وبوفن`}</title>
-      <meta name="description" content={description} />
-      <meta name="keywords" content={keywords} />
-      <meta
-        name="robots"
-        content={`${noindex ? "noindex" : "index"}, ${
-          nofollow ? "nofollow" : "follow"
-        }`}
-      />
-      <meta name="author" content={author} />
-      <link rel="canonical" href={currentUrl} />
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
-      <meta property="og:image" content={defaultImage} />
-      <meta property="og:url" content={currentUrl} />
-      <meta property="og:type" content={ogType} />
-      <meta property="og:locale" content={locale} />
-      <meta property="og:site_name" content="وبوفن" />
+      {/* Basic Meta Tags */}
+      <title>{formattedTitle}</title>
+      <meta name="description" content={description} key="desc" />
+      {keywords && <meta name="keywords" content={keywords} key="keywords" />}
+      <meta name="robots" content={`${noindex ? "noindex" : "index"}, ${nofollow ? "nofollow" : "follow"}`} key="robots" />
+      <meta name="author" content={author} key="author" />
+      
+      {/* Canonical URL */}
+      <link rel="canonical" href={currentUrl} key="canonical" />
+      
+      {/* Open Graph */}
+      <meta property="og:title" content={formattedTitle} key="og:title" />
+      <meta property="og:description" content={description} key="og:desc" />
+      <meta property="og:image" content={defaultImage} key="og:image" />
+      <meta property="og:url" content={currentUrl} key="og:url" />
+      <meta property="og:type" content={ogType} key="og:type" />
+      <meta property="og:locale" content={locale} key="og:locale" />
+      <meta property="og:site_name" content="وبوفن" key="og:site_name" />
+      
+      {/* Article specific OG tags */}
       {ogType === "article" && (
         <>
           {publishedTime && (
-            <meta property="article:published_time" content={publishedTime} />
+            <meta property="article:published_time" content={publishedTime} key="article:published" />
           )}
           {modifiedTime && (
-            <meta property="article:modified_time" content={modifiedTime} />
+            <meta property="article:modified_time" content={modifiedTime} key="article:modified" />
           )}
-          {section && <meta property="article:section" content={section} />}
+          {section && <meta property="article:section" content={section} key="article:section" />}
           {tags.map((tag, i) => (
-            <meta key={i} property="article:tag" content={tag} />
+            <meta key={`article:tag-${i}`} property="article:tag" content={tag} />
           ))}
-          {author && <meta property="article:author" content={author} />}
+          {author && <meta property="article:author" content={author} key="article:author" />}
         </>
       )}
-      <meta name="twitter:card" content={twitterCard} />
-      <meta name="twitter:title" content={title} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={defaultImage} />
-      {finalStructuredData && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(finalStructuredData),
-          }}
-        />
-      )}
+      
+      {/* Twitter */}
+      <meta name="twitter:card" content={twitterCard} key="twitter:card" />
+      <meta name="twitter:title" content={formattedTitle} key="twitter:title" />
+      <meta name="twitter:description" content={description} key="twitter:desc" />
+      <meta name="twitter:image" content={defaultImage} key="twitter:image" />
+      
+      {/* Structured Data */}
+{finalStructuredData && (
+  Array.isArray(finalStructuredData) ? (
+    finalStructuredData.map((data, index) => (
+      <script
+        key={`ld-json-${index}`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(data),
+        }}
+      />
+    ))
+  ) : (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(finalStructuredData),
+      }}
+      key="ld-json"
+    />
+  )
+)}
+      
+      {/* Additional Scripts */}
       {additionalScripts}
-      <link
-        rel="icon"
-        type="image/png"
-        href="/favicon-96x96.png"
-        sizes="96x96"
-      />
-      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-      <link rel="shortcut icon" href="/favicon.ico" />
-      <link
-        rel="apple-touch-icon"
-        sizes="180x180"
-        href="/apple-touch-icon.png"
-      />
-      <meta name="apple-mobile-web-app-title" content="MyWebSite" />
-      <link rel="manifest" href="/site.webmanifest" />
-      {process.env.NODE_ENV === "production" &&
-        process.env.NEXT_PUBLIC_GA_ID && (
-          <>
-            <script
-              async
-              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
-            />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `
+      
+      {/* Favicons - only include once */}
+      <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" key="favicon-png" />
+      <link rel="icon" type="image/svg+xml" href="/favicon.svg" key="favicon-svg" />
+      <link rel="shortcut icon" href="/favicon.ico" key="favicon-ico" />
+      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" key="apple-touch-icon" />
+      <meta name="apple-mobile-web-app-title" content="وبوفن" key="apple-title" />
+      <link rel="manifest" href="/site.webmanifest" key="manifest" />
+      
+      {/* Google Analytics - only in production */}
+      {mounted && process.env.NODE_ENV === "production" && process.env.NEXT_PUBLIC_GA_ID && (
+        <>
+          <script
+            async
+            src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+            key="ga-script"
+          />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
                 gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
               `,
-              }}
-            />
-          </>
-        )}
+            }}
+            key="ga-config"
+          />
+        </>
+      )}
     </Head>
   );
 };

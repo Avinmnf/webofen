@@ -84,14 +84,9 @@ export function InjectRelatedCategories({
               // Create new pre block with copy button
               return `
                 <div class="code-block-wrapper relative my-6" data-block-id="code-${index}">
-                  <div class="flex items-center justify-between px-4 py-2 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 rounded-t-lg">
-                    <div class="flex items-center gap-2">
-                      <span class="text-xs font-mono text-gray-600 dark:text-gray-400">
-                        ${language}
-                      </span>
-                    </div>
+                  <div class="flex items-center justify-between px-4 py-2 bg-[#f8f8f8] overflow-auto dark:border-gray-300 rounded-t-lg">
                     <button 
-                      class="copy-code-button flex items-center gap-2 px-3 py-1.5 text-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 shadow-sm"
+                      class="copy-code-button flex items-center gap-2  text-sm dark:border-gray-600 rounded-md text-gray-700  transition-colors duration-200"
                       data-code="${encodeURIComponent(codeText)}"
                       data-code-html="${encodeURIComponent(codeHtml)}"
                       data-full-block="${encodeURIComponent(codeWithTags)}"
@@ -100,7 +95,6 @@ export function InjectRelatedCategories({
                       <svg class="w-4 h-4 copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                       </svg>
-                      <span class="copy-text">کپی</span>
                     </button>
                   </div>
                   <div class="relative">
@@ -157,11 +151,11 @@ export function InjectRelatedCategories({
             
             return `
               <span class="inline-code-container relative inline-block" id="${inlineId}">
-                <code class="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-2 py-1 rounded text-sm font-mono border border-gray-300 dark:border-gray-700 whitespace-nowrap">
+                <code class=" text-gray-800 dark:text-gray-200 rounded text-sm font-mono ">
                   ${codeHtml}
                 </code>
                 <button 
-                  class="copy-inline-code absolute -top-2 -right-2 bg-gray-800 dark:bg-gray-700 text-white p-1.5 rounded-full opacity-0 hover:opacity-100 focus:opacity-100 transition-opacity duration-200 shadow-lg hover:bg-gray-900 dark:hover:bg-gray-600 z-10 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                  class="copy-inline-code absolute -top-2 -right-2  dark:bg-gray-700 text-white p-1.5 rounded-full opacity-0 hover:opacity-100 focus:opacity-100 transition-opacity duration-200 shadow-lg hover:bg-gray-900 dark:hover:bg-gray-600 z-10 focus:outline-none focus:ring-2 focus:ring-gray-400"
                   data-code="${encodeURIComponent(codeText)}"
                   data-code-html="${encodeURIComponent(codeHtml)}"
                   aria-label="کپی کد"
@@ -308,31 +302,77 @@ export function InjectRelatedCategories({
   useEffect(() => {
     const style = document.createElement('style');
     style.textContent = `
-      .inline-code-container {
-        margin: 0 2px;
-      }
-      
-      .inline-code-container:hover .copy-inline-code,
-      .inline-code-container:focus-within .copy-inline-code {
-        opacity: 1;
-      }
-      
-      .code-block-wrapper {
-        position: relative;
-      }
-      
-      .code-block-wrapper pre {
-        margin: 0 !important;
+.inline-code-container {
+  margin: 0 2px;
+  max-width: 100%;
+  overflow: visible;
+}
 
-      }
-      
-      .code-block-wrapper:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      }
-      
-      .dark .code-block-wrapper:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      }
+.inline-code-container:hover .copy-inline-code,
+.inline-code-container:focus-within .copy-inline-code {
+  opacity: 1;
+}
+
+.code-block-wrapper {
+  position: relative;
+}
+
+.code-block-wrapper pre {
+  margin: 0 !important;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.code-block-wrapper:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.dark .code-block-wrapper:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile-specific fixes */
+@media (max-width: 768px) {
+  .inline-code-container {
+    position: relative;
+    overflow: visible;
+  }
+  
+  .copy-inline-code {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    z-index: 10;
+  }
+  
+  /* Ensure code blocks are scrollable on mobile */
+  pre code {
+    overflow-x: auto;
+    display: block;
+    padding: 12px;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Make sure the wrapper doesn't cause horizontal overflow */
+  .code-block-wrapper {
+    overflow: hidden;
+    border-radius: 8px;
+  }
+  
+  .code-block-wrapper pre {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* For very small screens */
+@media (max-width: 480px) {
+  .copy-inline-code {
+    transform: scale(0.9);
+    top: -6px;
+    right: -6px;
+  }
+}
     `;
     document.head.appendChild(style);
     

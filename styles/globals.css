@@ -299,7 +299,6 @@ code {
 
 .inline-code-container code {
   padding: 0.25rem 0.5rem;
-  background-color: #f3f4f6;
   color: #1f2937;
   border-radius: 0.25rem;
   font-size: 0.875rem;
@@ -382,16 +381,6 @@ pre code .line-number {
     padding: 0.25rem 0.5rem !important;
     font-size: 0.75rem !important;
   }
-}
-
-/* برای حالت تاریک */
-@media (prefers-color-scheme: dark) {
-  .inline-code-container code {
-    background-color: #374151; /* gray-700 */
-    color: #f3f4f6; /* gray-100 */
-  }
-  
-
 }
 
 

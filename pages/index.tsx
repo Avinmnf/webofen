@@ -18,8 +18,8 @@ const organizationSchema = {
   description:
     "اولین کلینیک تخصصی سئو با ارائه بسته‌های درمانی ماژولار برای وبسایت‌ها",
   url: "https://webofen.com",
-  logo: "https://webofen.com/images/logo.png",
-  foundingDate: "2023",
+  logo: "https://webofen.com/images/logo.png ",
+  foundingDate: "2025",
   founders: [
     {
       "@type": "Person",
@@ -29,7 +29,7 @@ const organizationSchema = {
 
   contactPoint: {
     "@type": "ContactPoint",
-    telephone: "+98-21-5527334",
+    telephone: "+021-14595188",
     contactType: "customer service",
     areaServed: "IR",
   },
@@ -49,6 +49,12 @@ const breadcrumbSchema = {
       "@type": "ListItem",
       position: 1,
       name: "صفحه اصلی",
+      item: "https://webofen.com",
+    },
+        {
+      "@type": "ListItem",
+      position: 2,
+      name: "محصولات",
       item: "https://webofen.com",
     },
   ],
@@ -94,19 +100,7 @@ export default function Home() {
         canonical="https://webofen.com"
         ogType="website"
         ogImage="https://webofen.com/images/og-home.jpg"
-      />
-
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        structuredData={[organizationSchema, breadcrumbSchema, websiteSchema]}
       />
 
       <main className=" m-auto">
@@ -130,7 +124,7 @@ export default function Home() {
                     style={{
                       bottom: "0",
                       height: "16%",
-                      backgroundColor: "#6FD6E5", 
+                      backgroundColor: "#6FD6E5",
                       color: "#fff",
                       boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
                       transition: "all 0.3s ease",
@@ -228,11 +222,11 @@ export default function Home() {
             </div>
           </div>
 
-            <div className="max-w-[1250px] m-auto flex justify-center mt-6">
-              <div className="w-full rounded-2xl bg-white p-4">
-                {/* Input Fields */}
-                  <FreeConsultationForm />
-              </div>
+          <div className="max-w-[1250px] m-auto flex justify-center mt-6">
+            <div className="w-full rounded-2xl bg-white p-4">
+              {/* Input Fields */}
+              <FreeConsultationForm />
+            </div>
           </div>
         </section>
         <section className="max-w-[1250px] m-auto mt-10 md:mt-20 px-4">
