@@ -36,12 +36,13 @@ export default async function handler(
 
   try {
     const backendUrl = process.env.NEXT_PUBLIC_ANALYZE_URL || 'http://localhost:4000';
-    const apiUrl = `${backendUrl}/analytics/recent`;
-    
+    // اضافه کردن پارامتر limit بزرگ برای گرفتن همه رکوردها
+    const apiUrl = `${backendUrl}/analytics/recent?limit=1000`; // می‌توانید عدد بزرگتری قرار دهید
+
     console.log('🔍 Fetching analyses from:', apiUrl);
-    
+
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
     const response = await fetch(apiUrl, {
       method: 'GET',
@@ -58,19 +59,42 @@ export default async function handler(
     if (!response.ok) {
       const errorText = await response.text();
       console.error('❌ Backend error response:', errorText);
-      
+
       if (response.status === 404) {
         return res.status(200).json({ analyses: [] });
       }
-      
+
       throw new Error(`Backend error: ${response.status} - ${errorText}`);
     }
 
-    const analyses: Analysis[] = await response.json();
-    
-    // 🔥 لاگ‌های مفصل برای دیباگ مشکل سایت‌مپ و لینک‌های شکسته
+    // -----------------------------
+    // خواندن داده‌ها از backend
+    // -----------------------------
+    const analysesData = await response.json();
+    let analyses: Analysis[] = Array.isArray(analysesData)
+      ? analysesData
+      : analysesData.analyses || [];
+
     console.log('✅ Successfully fetched analyses:', analyses.length);
-    
+
+    // -----------------------------
+    // گرفتن شماره کاربر از هدر یا query
+    // -----------------------------
+    const userPhone = req.headers['x-user-phone'] || req.query.phoneNumber;
+
+    if (userPhone) {
+      console.log('📱 Filtering analyses for phone:', userPhone);
+
+      analyses = analyses.filter(a => a.phoneNumber === userPhone);
+
+      console.log('📉 Filtered analyses count:', analyses.length);
+    } else {
+      console.log('⚠️ No phone number provided — returning all analyses');
+    }
+
+    // -----------------------------
+    // لاگ‌ها و آنالیزهای داخلی
+    // -----------------------------
     if (analyses.length > 0) {
       console.log('📊 Analysis Debug Info:');
       analyses.forEach((analysis, index) => {
@@ -89,24 +113,21 @@ export default async function handler(
           sitemapUrlsCount: analysis.sitemapAnalysis?.sitemapUrls?.length,
           sitemapLinksCount: analysis.sitemapAnalysis?.sitemapLinks?.length
         });
-        
-        // 🔥 اگر سایت‌مپ وجود داره اما لینک‌ها 0 هستن
+
         if (analysis.sitemapAnalysis?.sitemapExists && analysis.sitemapAnalysis.totalLinks === 0) {
           console.log('🚨 PROBLEM: Sitemap exists but totalLinks is 0!', {
             url: analysis.url,
             sitemapUrls: analysis.sitemapAnalysis.sitemapUrls
           });
         }
-        
-        // 🔥 اگر سایت‌مپ داده‌ها پر هستن
+
         if (analysis.sitemapAnalysis?.totalLinks && analysis.sitemapAnalysis.totalLinks > 0) {
           console.log('🎉 GOOD: Sitemap data is properly saved!', {
             url: analysis.url,
             totalLinks: analysis.sitemapAnalysis.totalLinks
           });
         }
-        
-        // 🔥 اطلاعات لینک‌های شکسته
+
         if (analysis.brokenLinksCount && analysis.brokenLinksCount > 0) {
           console.log('🔗 BROKEN LINKS: Analysis has broken links!', {
             url: analysis.url,
@@ -118,12 +139,11 @@ export default async function handler(
           });
         }
       });
-      
-      // آمار کلی
+
       const analysesWithSitemap = analyses.filter(a => a.sitemapAnalysis?.sitemapExists);
       const analysesWithLinks = analyses.filter(a => a.sitemapAnalysis?.totalLinks && a.sitemapAnalysis.totalLinks > 0);
       const analysesWithBrokenLinks = analyses.filter(a => a.brokenLinksCount && a.brokenLinksCount > 0);
-      
+
       console.log('📈 Analysis Statistics:', {
         totalAnalyses: analyses.length,
         analysesWithSitemap: analysesWithSitemap.length,
@@ -133,7 +153,6 @@ export default async function handler(
         analysesWithZeroLinks: analysesWithSitemap.length - analysesWithLinks.length
       });
 
-      // نمایش آنالیزهایی که بیشترین لینک شکسته را دارند
       const topBrokenLinks = analyses
         .filter(a => a.brokenLinksCount && a.brokenLinksCount > 0)
         .sort((a, b) => (b.brokenLinksCount || 0) - (a.brokenLinksCount || 0))
@@ -146,25 +165,26 @@ export default async function handler(
         });
       }
     }
-    
+
     return res.status(200).json({ analyses });
+
   } catch (error: unknown) {
     console.error('❌ Error in analyses API:', error);
-    
+
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
         return res.status(408).json({ error: 'Request timeout' });
       }
-      
+
       if (error.message.includes('fetch failed') || error.message.includes('ECONNREFUSED')) {
         console.log('⚠️ Analysis service not available, returning empty array');
         return res.status(200).json({ analyses: [] });
       }
-      
+
       const errorMessage = error.message || 'Unknown error occurred';
       return res.status(500).json({ error: errorMessage });
     }
-    
+
     return res.status(500).json({ error: 'Unknown error occurred' });
   }
 }

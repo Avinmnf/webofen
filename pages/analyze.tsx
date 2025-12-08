@@ -661,63 +661,67 @@ export default function AnalyzePage() {
     }
   };
 
-  const handleAnalyzeClick = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!url) {
-      resetError();
-      return;
-    }
-    
-    try { 
-      new URL(url); 
-    } catch { 
-      resetError();
-      return;
-    }
+const handleAnalyzeClick = (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
 
-    // بررسی وجود آنالیز قبلی - بهبود یافته
-    const existingAnalysis = findExistingAnalysis;
-    
-    if (existingAnalysis) {
-      console.log("🔍 Existing analysis found:", existingAnalysis.status);
-      
-      if (existingAnalysis.status === 'completed') {
-        console.log("✅ استفاده از آنالیز موجود:", existingAnalysis.id);
-        const convertedExisting = convertApiResultToAnalyzeResult(existingAnalysis);
-        
-        setPendingResult(convertedExisting);
-        setShowSuccessAlert(false);
-        setAnalysisStarted(false);
-        setShowAnalysisModal(false);
-        setResultsViewed(true);
-        setIsDuplicateAnalysis(true);
-        
-        // اسکرول به نتایج
-        setTimeout(() => {
-          resultsSectionRef.current?.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'start'
-          });
-        }, 300);
-        return;
-      } else {
-        // Existing analysis but not completed (pending or running)
-        console.log("⏳ آنالیز در حال انجام است:", existingAnalysis.id);
-        // Set the current analysis id to let the hook poll for updates
-        setCurrentAnalysisId(existingAnalysis.id);
-        setAnalysisStarted(true);
-        setShowAnalysisModal(false);
-        setResultsViewed(false);
-        setIsDuplicateAnalysis(false);
-        return;
-      }
+  if (!url.trim()) {
+    resetError();
+    return;
+  }
+
+  let finalUrl = url.trim();
+
+  // اگر http یا https نداشت خودش اضافه کن
+  if (!/^https?:\/\//i.test(finalUrl)) {
+    finalUrl = "https://" + finalUrl;
+  }
+
+  // اعتبارسنجی URL بعد از تصحیح
+  try {
+    new URL(finalUrl);
+  } catch {
+    resetError();
+    return;
+  }
+
+  // اعمال url نهایی تصحیح‌شده
+  setUrl(finalUrl);
+
+  // بررسی وجود آنالیز قبلی
+  const existingAnalysis = findExistingAnalysis;
+
+  if (existingAnalysis) {
+    if (existingAnalysis.status === "completed") {
+      const convertedExisting = convertApiResultToAnalyzeResult(existingAnalysis);
+      setPendingResult(convertedExisting);
+      setShowSuccessAlert(false);
+      setAnalysisStarted(false);
+      setShowAnalysisModal(false);
+      setResultsViewed(true);
+      setIsDuplicateAnalysis(true);
+
+      setTimeout(() => {
+        resultsSectionRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 300);
+
+      return;
+    } else {
+      setCurrentAnalysisId(existingAnalysis.id);
+      setAnalysisStarted(true);
+      setShowAnalysisModal(false);
+      setResultsViewed(false);
+      setIsDuplicateAnalysis(false);
+      return;
     }
-    
-    // If no existing analysis, show the modal to start a new one
-    console.log('🆕 No existing analysis found, showing modal');
-    setShowAnalysisModal(true);
-    setIsDuplicateAnalysis(false);
-  };
+  }
+
+  // اگر آنالیز قبلی نیست → مودال را باز کن
+  setShowAnalysisModal(true);
+  setIsDuplicateAnalysis(false);
+};
 
   const handleCloseModal = () => {
     setShowAnalysisModal(false);
