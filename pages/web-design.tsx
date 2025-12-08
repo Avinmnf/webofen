@@ -120,9 +120,9 @@ export default function WebDesign() {
               {/* Title + Icon */}
               <div className="flex items-start">
                 <div className="md:mr-4">
-                  <h1 className="text-[#0364af] text-base sm:text-lg md:text-lg">
+                  <p className="text-[#0364af] text-base sm:text-lg md:text-lg">
                     طراحی سایت
-                  </h1>
+                  </p>
                   <div className="flex flex-wrap items-center text-sm md:text-lg">
                     <p className="text-[#0364af] text-xl sm:text-2xl mt-2">
                       <span className="text-[#29b0cb]">cms</span> اختصاصی سایت{" "}

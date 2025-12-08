@@ -113,7 +113,7 @@ function generateOrganizationSchema() {
     url: "https://webofen.com",
     logo: "https://webofen.com/logo.png",
     description: "وبوفن - پلتفرم تخصصی دیجیتال مارکتینگ و کسب درآمد آنلاین",
-    sameAs: ["https://t.me/yourchannel", "https://instagram.com/yourpage"],
+    sameAs: ["https://t.me/webofenlearn", "https://instagram.com/webofen"],
     contactPoint: {
       "@type": "ContactPoint",
       telephone: "+98-XXX-XXX-XXXX",
@@ -759,7 +759,13 @@ export default function PostsPage({
                   <div className="md:p-0 p-4 w-full md:w-[70%] rounded-2xl h-full">
                     {/* Featured First Post */}
                     {posts.length > 0 && (
-                      <Link href={`/articles/${posts[0].slug}`} passHref>
+                      <a
+                        href={`/articles/${posts[0].slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rounded-2xl bg-white mb-8 shadow hover:shadow-lg transition cursor-pointer block"
+                      >
+                        {" "}
                         <div className="rounded-2xl bg-white mb-8 shadow hover:shadow-lg transition cursor-pointer">
                           {posts[0].imageUrl && (
                             <Image
@@ -899,7 +905,7 @@ export default function PostsPage({
                             </div>
                           </div>
                         </div>
-                      </Link>
+                      </a>
                     )}
                   </div>
                   {/* ✅ Right Sidebar */}
@@ -913,7 +919,7 @@ export default function PostsPage({
                       >
                         <Image
                           src="/blog/programming-learn (1).png"
-                          alt="متخصصان سئو وبوفن - دکتر مجتبی خداخواه"
+                          alt="آموزش برنامه نویسی"
                           fill
                           className="object-cover"
                           priority
@@ -933,7 +939,7 @@ export default function PostsPage({
                       >
                         <Image
                           src="/blog/ui-ux.png"
-                          alt="متخصصان سئو وبوفن - دکتر مجتبی خداخواه"
+                          alt="آموزش ui ux"
                           fill
                           className="object-cover"
                           priority
@@ -953,7 +959,7 @@ export default function PostsPage({
                       >
                         <Image
                           src="/blog/seo.png"
-                          alt="متخصصان سئو وبوفن - دکتر مجتبی خداخواه"
+                          alt="آموزش سئو سایت"
                           fill
                           className="object-cover"
                           priority
@@ -1118,10 +1124,13 @@ export default function PostsPage({
                             </div>
                           </div>
                         ) : (
-                          <Link
+                 
+                                 <a
                             href={`/articles/${(card as Post).slug}`}
-                            passHref
-                          >
+                        target="_blank"
+                        rel="noopener noreferrer"
+            
+                      >
                             <div className="rounded-2xl bg-white shadow hover:shadow-sm transition cursor-pointer">
                               {(card as Post).imageUrl && (
                                 <Image
@@ -1240,7 +1249,7 @@ export default function PostsPage({
                                 </div>
                               </div>
                             </div>
-                          </Link>
+                          </a>
                         )}
                       </div>
                     ))}

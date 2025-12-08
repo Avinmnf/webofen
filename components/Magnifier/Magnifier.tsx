@@ -6,97 +6,79 @@ export default function Magnifier() {
     const initializeMagnifier = () => {
       const images = document.querySelectorAll(".article-image-magnify");
 
-      images.forEach((element) => {
-        const img = element as HTMLImageElement;
+      images.forEach((imgElement) => {
+        const img = imgElement as HTMLImageElement;
 
+        // Skip if already initialized
         if (img.classList.contains("magnify-initialized")) return;
         img.classList.add("magnify-initialized");
 
-        const zoom = 4; // Increased zoom for better effect
-        const lensSize = 200; // Larger lens for better visibility
+        const zoom = 2.5;
+        const lensSize = 180; // Good balance of size and visibility
 
+        // Create lens element
         const lens = document.createElement("div");
         lens.className = "magnifier-lens";
         lens.style.width = `${lensSize}px`;
         lens.style.height = `${lensSize}px`;
 
-        // Create a container for the image and lens if needed
+        // Get or create container
         let container = img.parentElement;
         if (!container || container === document.body) {
           container = img;
         }
 
+        // Ensure container has positioning
         if (window.getComputedStyle(container).position === "static") {
           container.style.position = "relative";
         }
+
         container.appendChild(lens);
 
         const moveLens = (e: MouseEvent) => {
           const rect = img.getBoundingClientRect();
-          const scrollLeft =
-            window.pageXOffset || document.documentElement.scrollLeft;
-          const scrollTop =
-            window.pageYOffset || document.documentElement.scrollTop;
-
-          // Get cursor position relative to the page
-          const x = e.pageX - rect.left - scrollLeft;
-          const y = e.pageY - rect.top - scrollTop;
+          
+          // Calculate cursor position relative to image
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
 
           // Calculate lens position (center on cursor)
           let lensX = x - lensSize / 2;
           let lensY = y - lensSize / 2;
 
-          // Constrain lens within image boundaries
-          const minX = -lensSize / 2;
-          const maxX = rect.width - lensSize / 2;
-          const minY = -lensSize / 2;
-          const maxY = rect.height - lensSize / 2;
+          // Keep lens within image boundaries
+          lensX = Math.max(0, Math.min(lensX, rect.width - lensSize));
+          lensY = Math.max(0, Math.min(lensY, rect.height - lensSize));
 
-          lensX = Math.max(minX, Math.min(lensX, maxX));
-          lensY = Math.max(minY, Math.min(lensY, maxY));
-
+          // Position the lens
           lens.style.left = `${lensX}px`;
           lens.style.top = `${lensY}px`;
 
-          // Calculate the corresponding position in the zoomed image
-          // This is the most important calculation
-          const bgX =
-            ((lensX + lensSize / 2) / rect.width) * (img.naturalWidth * zoom) -
-            lensSize / 2;
-          const bgY =
-            ((lensY + lensSize / 2) / rect.height) *
-              (img.naturalHeight * zoom) -
-            lensSize / 2;
+          // Calculate zoomed background position
+          const bgX = (x / rect.width) * (img.naturalWidth * zoom) - lensSize / 2;
+          const bgY = (y / rect.height) * (img.naturalHeight * zoom) - lensSize / 2;
 
           lens.style.backgroundPosition = `-${bgX}px -${bgY}px`;
-          lens.style.display = "block";
         };
 
         const setupMagnifier = () => {
-          console.log("Setting up magnifier for:", img.src);
-          console.log("Image dimensions:", {
-            natural: `${img.naturalWidth}x${img.naturalHeight}`,
-            displayed: `${img.width}x${img.height}`,
-            zoom: zoom,
-          });
-
+          // Set lens background
           lens.style.backgroundImage = `url('${img.src}')`;
-          lens.style.backgroundSize = `${img.naturalWidth * zoom}px ${
-            img.naturalHeight * zoom
-          }px`;
+          lens.style.backgroundSize = `${img.naturalWidth * zoom}px ${img.naturalHeight * zoom}px`;
           lens.style.backgroundRepeat = "no-repeat";
 
+          // Event listeners
           img.addEventListener("mousemove", moveLens);
-          lens.addEventListener("mousemove", moveLens);
           img.addEventListener("mouseleave", () => {
             lens.style.display = "none";
           });
           img.addEventListener("mouseenter", (e: MouseEvent) => {
             lens.style.display = "block";
-            moveLens(e); // Initialize position
+            moveLens(e);
           });
         };
 
+        // Initialize when image loads
         if (img.complete) {
           setupMagnifier();
         } else {
@@ -105,18 +87,78 @@ export default function Magnifier() {
       });
     };
 
-    // Multiple initialization attempts
-    setTimeout(initializeMagnifier, 100);
-    setTimeout(initializeMagnifier, 500);
-    setTimeout(initializeMagnifier, 1000);
+    // Clean CSS - minimal and effective
+    const style = document.createElement('style');
+    style.textContent = `
+      .magnifier-lens {
+        position: absolute;
+        border: 2px solid #3db4c6;
+        border-radius: 100px;
+        cursor: none;
+        pointer-events: none;
+        z-index: 100;
+        box-shadow: 
+          0 0 0 2px white,
+          0 0 15px rgba(0, 0, 0, 0.3);
+        background: white;
+        overflow: hidden;
+        display: none;
+      }
+      
+      /* Simple crosshair overlay */
+      .magnifier-lens::before,
+      .magnifier-lens::after {
+        content: '';
+        position: absolute;
+        background: rgba(255, 0, 0, 0.5);
+        z-index: 101;
+      }
+      
+      .magnifier-lens::before {
+        width: 100%;
+        height: 1px;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+      }
+      
+      .magnifier-lens::after {
+        width: 1px;
+        height: 100%;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      
+      /* Image styling */
+      .article-image-magnify {
+        cursor: crosshair;
+        transition: transform 0.2s ease;
+      }
+      
+      .article-image-magnify:hover {
+        transform: scale(1.01);
+      }
+    `;
+    document.head.appendChild(style);
 
+    // Initialize
+    setTimeout(initializeMagnifier, 100);
+
+    // Watch for new images
     const observer = new MutationObserver(initializeMagnifier);
     observer.observe(document.body, {
       childList: true,
       subtree: true,
     });
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      // Clean up the style element
+      if (document.head.contains(style)) {
+        document.head.removeChild(style);
+      }
+    };
   }, []);
 
   return null;

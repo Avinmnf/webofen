@@ -318,7 +318,7 @@ export default function PostPage({ post, viewCount }: Props) {
 
           <div className="flex flex-wrap w-full m-auto justify-between content">
             <div className="text-gray-700 mt-6 w-full md:w-4/5">
-              <div className="bg-[#0364af] rounded-md p-2 text-sm text-white w-full">
+              <div className="bg-[#0364af] rounded-md p-2 mb-4 text-sm text-white w-full">
                 <p> {post.description}</p>
               </div>
               <InjectRelatedCategories
@@ -473,9 +473,12 @@ export default function PostPage({ post, viewCount }: Props) {
                     )}
                   </div>
                   <div className="w-full flex gap-6 p-2 mt-3 justify-center items-center">
-                    <Link href={"/instagram"}>
-                      <svg
-                        className="w-6 h-6 text-gray-400 hover:text-amber-700"
+         <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://instagram.com/webofen"
+              >                      <svg
+                        className="w-6 h-6 text-gray-400 hover:text-red -700"
                         viewBox="0 0 24 24"
                         id="meteor-icon-kit__solid-instagram"
                         fill="currentColor"
@@ -489,7 +492,7 @@ export default function PostPage({ post, viewCount }: Props) {
                           fill="currentColor"
                         />{" "}
                       </svg>{" "}
-                    </Link>{" "}
+                    </a>{" "}
                     <span
                       className="fake-link icon-twitter cursor-pointer"
                       onClick={() => {
