@@ -33,7 +33,7 @@ code{
 text-align: left;
 display: block;
 padding: 5px 10px;
-background-color: #f8f8f8;
+width: fit-content;
 }
 table {
 text-indent: 0;
@@ -254,6 +254,8 @@ pre {
   direction: ltr;
   text-align: left;
   position: relative;
+  background-color: #f8f8f8;
+
 }
 
 code {
@@ -347,7 +349,7 @@ code {
 /* خط‌های کد */
 pre code .line-number {
   display: inline-block;
-  width: 2em;
+  width: 100%;
   padding-right: 1em;
   margin-right: 1em;
   text-align: right;
