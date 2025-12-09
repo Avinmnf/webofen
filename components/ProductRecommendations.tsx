@@ -56,7 +56,7 @@ export const ProductRecommendations = ({
     {
       id: "1",
       title: "قرص بهینه‌ سازی",
-      description: "بهینه‌سازی کامل سئو، عملکرد، دسترسی‌پذیری و بهترین شیوه‌ها برای بهبود کلی وبسایت",
+      description: "بهینه‌ سازی کامل سئو، عملکرد، دسترسی‌ پذیری و بهترین شیوه‌ها برای بهبود کلی وبسایت",
       imageUrl: "optimization.mp4",
       slug: "optimization",
     },
@@ -84,7 +84,7 @@ export const ProductRecommendations = ({
     {
       id: "5",
       title: "قرص لینک‌ سازی داخلی",
-      description: "ساخت بک‌لینک‌های باکیفیت و بهبود اعتبار دامنه برای افزایش رتبه در موتورهای جستجو",
+      description: "ساخت بک‌لینک‌ های باکیفیت و بهبود اعتبار دامنه برای افزایش رتبه در موتور های جستجو",
       imageUrl: "internallink.mp4",
       slug: "internal-linking",
     },
@@ -126,7 +126,7 @@ export const ProductRecommendations = ({
 
     const mappedScores = {
       performance: scores["performance"] ?? scores["عملکرد"],
-      accessibility: scores["accessibility"] ?? scores["دسترس‌پذیری"],
+      accessibility: scores["accessibility"] ?? scores["دسترس‌ پذیری"],
       bestPractices: scores["bestPractices"] ?? scores["بهترین شیوه‌ها"],
       seo: scores["seo"] ?? scores["سئو"],
     };
@@ -279,11 +279,11 @@ export const ProductRecommendations = ({
       <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 shadow-sm border border-green-100 text-center">
         <h2 className="font-bold text-2xl text-green-700 mb-2">وضعیت وبسایت شما عالی است 🎉</h2>
         <p className="text-gray-700">
-          تمام بخش‌های اصلی وبسایت شما (عملکرد، سئو، بهترین شیوه‌ها، دسترسی‌پذیری) امتیاز بالای ۹۰ دارند.
+          تمام بخش‌های اصلی وبسایت شما (عملکرد، سئو، بهترین شیوه‌ها، دسترسی‌ پذیری) امتیاز بالای ۹۰ دارند.
           <br />
           {sitemapData && sitemapData.totalLinks >= 200 && (
             <span className="text-green-600 font-medium mt-2 inline-block">
-              ✅ تعداد لینک‌های سایت‌مپ شما ({sitemapData.totalLinks}) نیز مناسب است.
+              ✅ تعداد لینک‌های سایت‌ مپ شما ({sitemapData.totalLinks}) نیز مناسب است.
             </span>
           )}
           {brokenLinksCount === 0 && (
@@ -293,7 +293,7 @@ export const ProductRecommendations = ({
           )}
           {brokenLinksCount > 0 && brokenLinksCount <= 10 && (
             <span className="text-green-600 font-medium mt-2 inline-block">
-              ✅ تعداد لینک‌های شکسته ({brokenLinksCount}) کم است و نیاز به اقدام فوری ندارد.
+              ✅ تعداد لینک‌ های شکسته ({brokenLinksCount}) کم است و نیاز به اقدام فوری ندارد.
             </span>
           )}
           {securityAnalysis && securityAnalysis.securityScore >= 80 && securityAnalysis.isHttps && securityAnalysis.hasValidSSL && securityAnalysis.securityIssues.length === 0 && (
@@ -357,8 +357,8 @@ export const ProductRecommendations = ({
         <div className="flex items-center space-x-2 space-x-reverse bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
           <span>
             {isDuplicate 
-              ? "بر اساس تحلیل امتیازها و سایت‌مپ موجود" 
-              : "بر اساس تحلیل امتیازها و سایت‌مپ"
+              ? "بر اساس تحلیل امتیازها و سایت ‌مپ موجود" 
+              : "بر اساس تحلیل امتیازها و سایت ‌مپ"
             }
             {securityAnalysis && " و امنیت"}
           </span>
@@ -385,7 +385,7 @@ export const ProductRecommendations = ({
           <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-bold text-blue-800 text-sm mb-1">وضعیت سایت‌مپ</h4>
+                <h4 className="font-bold text-blue-800 text-sm mb-1">وضعیت سایت ‌مپ</h4>
                 <p className="text-blue-700 text-sm">
                   سایت‌مپ: ✅ موجود | 
                   تعداد لینک‌ها: <strong>{sitemapData.totalLinks}</strong>
@@ -419,7 +419,7 @@ export const ProductRecommendations = ({
                 </p>
               </div>
               <div className={linkSeverityColors.badge + " px-3 py-1 rounded-full text-xs font-medium"}>
-                {linkBuildingSeverity === 'medium' && "نیاز به لینک‌سازی"}
+                {linkBuildingSeverity === 'medium' && "نیاز به لینک‌ سازی"}
                 {linkBuildingSeverity === 'high' && "نیاز فوری"}
               </div>
             </div>
@@ -465,7 +465,7 @@ export const ProductRecommendations = ({
               </div>
               <div className={securitySeverityColors.badge + " px-3 py-1 rounded-full text-xs font-medium"}>
                 {securitySeverity === 'low' && "نیاز به بهبود امنیت"}
-                {securitySeverity === 'medium' && "نیاز به امنیت‌سازی"}
+                {securitySeverity === 'medium' && "نیاز به امنیت‌ سازی"}
                 {securitySeverity === 'high' && "نیاز فوری به امنیت"}
               </div>
             </div>
@@ -485,7 +485,7 @@ export const ProductRecommendations = ({
                 این ممکن است به دلیل مشکل در منطق نمایش باشد.
               </p>
               <div className="mt-2 text-xs text-red-600">
-                <strong>لطفاً کنسول مرورگر را بررسی کنید (F12) و لاگ‌های مربوطه را ببینید.</strong>
+                <strong>لطفاً کنسول مرورگر را بررسی کنید (F12) و لاگ‌ های مربوطه را ببینید.</strong>
               </div>
             </div>
           </div>
@@ -522,7 +522,7 @@ export const ProductRecommendations = ({
                 {product.id === "3" && sitemapData && sitemapData.totalLinks < 200 && (
                   <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-blue-700 font-medium">لینک‌های فعلی:</span>
+                      <span className="text-blue-700 font-medium">لینک‌ های فعلی:</span>
                       <span className="text-blue-800 font-bold">{sitemapData.totalLinks}</span>
                     </div>
                     <div className="flex justify-between items-center text-sm mt-1">
@@ -622,14 +622,14 @@ export const ProductRecommendations = ({
           <div className="flex items-start">
             <div className="flex-shrink-0 w-6 h-6 text-orange-600 mt-0.5">📈</div>
             <div className="mr-3">
-              <h4 className="font-bold text-blue-800 text-sm mb-1">نیاز به تولید محتوای بیشتر و ساختاردهی</h4>
+              <h4 className="font-bold text-blue-800 text-sm mb-1">نیاز به تولید محتوای بیشتر و ساختار دهی</h4>
               <p className="text-blue-700 text-sm">
                 تعداد لینک‌های سایت‌مپ شما ({sitemapData.totalLinks}) کمتر از ۲۰۰ است.
                 برای بهبود رتبه سئو و افزایش visibility در موتورهای جستجو، 
                 تولید محتوای بیشتر و ساختاردهی مناسب محتواها (کلاسترینگ) ضروری است.
                 {isDuplicate && (
                   <span className="block mt-1 text-blue-800 font-medium">
-                    🔄 این پیشنهاد بر اساس تحلیل تکراری و داده‌های موجود ارائه می‌شود.
+                    🔄 این پیشنهاد بر اساس تحلیل تکراری و داده‌ های موجود ارائه می‌شود.
                   </span>
                 )}
                 <strong className="block mt-1">توصیه: ابتدا قرص کلاسترینگ را خریداری کنید سپس تولید محتوا را آغاز نمایید.</strong>
@@ -648,19 +648,19 @@ export const ProductRecommendations = ({
             </div>
             <div className="mr-3">
               <h4 className={`font-bold text-sm mb-1 ${linkSeverityColors.text}`}>
-                {linkBuildingSeverity === 'medium' && "نیاز به لینک‌سازی"}
-                {linkBuildingSeverity === 'high' && "نیاز فوری به لینک‌سازی"}
+                {linkBuildingSeverity === 'medium' && "نیاز به لینک‌ سازی"}
+                {linkBuildingSeverity === 'high' && "نیاز فوری به لینک‌ سازی"}
               </h4>
               <p className={`text-sm ${linkSeverityColors.text}`}>
                 {linkBuildingSeverity === 'medium' && 
-                  `تعداد لینک‌های شکسته سایت شما (${brokenLinksCount}) بین ۱۱ تا ۳۰ است. نیاز به اقدام برای لینک‌سازی خارجی دارید.`
+                  `تعداد لینک‌های شکسته سایت شما (${brokenLinksCount}) بین ۱۱ تا ۳۰ است. نیاز به اقدام برای لینک‌ سازی خارجی دارید.`
                 }
                 {linkBuildingSeverity === 'high' && 
-                  `تعداد لینک‌های شکسته سایت شما (${brokenLinksCount}) بیشتر از ۳۰ است که نیاز به لینک‌سازی فوری دارد. این لینک‌های شکسته می‌توانند بر رتبه سئوی شما تأثیر منفی بگذارند.`
+                  `تعداد لینک‌های شکسته سایت شما (${brokenLinksCount}) بیشتر از ۳۰ است که نیاز به لینک‌سازی فوری دارد. این لینک‌ های شکسته می‌ توانند بر رتبه سئوی شما تأثیر منفی بگذارند.`
                 }
                 <strong className="block mt-1">
-                  {linkBuildingSeverity === 'medium' && "توصیه: با استفاده از قرص لینک‌سازی، بک‌لینک‌های باکیفیت و مرتبط بسازید."}
-                  {linkBuildingSeverity === 'high' && "توصیه: فوراً قرص لینک‌سازی را خریداری کنید تا بک‌لینک‌های باکیفیت بسازید."}
+                  {linkBuildingSeverity === 'medium' && "توصیه: با استفاده از قرص لینک‌ سازی، بک ‌لینک‌ های باکیفیت و مرتبط بسازید."}
+                  {linkBuildingSeverity === 'high' && "توصیه: فوراً قرص لینک‌ سازی را خریداری کنید تا بک‌ لینک‌های باکیفیت بسازید."}
                 </strong>
               </p>
             </div>
@@ -678,15 +678,15 @@ export const ProductRecommendations = ({
             <div className="mr-3">
               <h4 className={`font-bold text-sm mb-1 ${securitySeverityColors.text}`}>
                 {securitySeverity === 'low' && "نیاز به بهبود امنیت"}
-                {securitySeverity === 'medium' && "نیاز به امنیت‌سازی"}
-                {securitySeverity === 'high' && "نیاز فوری به امنیت‌سازی"}
+                {securitySeverity === 'medium' && "نیاز به امنیت‌ سازی"}
+                {securitySeverity === 'high' && "نیاز فوری به امنیت‌ سازی"}
               </h4>
               <p className={`text-sm ${securitySeverityColors.text}`}>
                 {!securityAnalysis.isHttps && 
-                  "وبسایت شما از پروتکل ناامن HTTP استفاده می‌کند که می‌تواند برای کاربران و اطلاعات آن‌ها خطرناک باشد."
+                  "وبسایت شما از پروتکل ناامن HTTP استفاده می‌کند که می‌ تواند برای کاربران و اطلاعات آن‌ها خطرناک باشد."
                 }
                 {securityAnalysis.isHttps && !securityAnalysis.hasValidSSL && 
-                  "گواهی SSL وبسایت شما معتبر نیست که می‌تواند باعث کاهش اعتماد کاربران و مشکلات امنیتی شود."
+                  "گواهی SSL وبسایت شما معتبر نیست که می‌ تواند باعث کاهش اعتماد کاربران و مشکلات امنیتی شود."
                 }
                 {securityAnalysis.securityScore < 70 && 
                   `امتیاز امنیتی وبسایت شما (${securityAnalysis.securityScore}) بسیار پایین است و نیاز به اقدام فوری دارد.`
@@ -695,9 +695,9 @@ export const ProductRecommendations = ({
                   `تعداد ${securityAnalysis.securityIssues.length} مشکل امنیتی در وبسایت شما شناسایی شده است.`
                 }
                 <strong className="block mt-1">
-                  {securitySeverity === 'high' && "توصیه: فوراً قرص امنیت‌سازی را خریداری کنید تا مشکلات امنیتی برطرف شوند."}
-                  {securitySeverity === 'medium' && "توصیه: با خرید قرص امنیت‌سازی، امنیت وبسایت خود را ارتقا دهید."}
-                  {securitySeverity === 'low' && "توصیه: برای بهبود وضعیت امنیتی، قرص امنیت‌سازی را خریداری کنید."}
+                  {securitySeverity === 'high' && "توصیه: فوراً قرص امنیت‌ سازی را خریداری کنید تا مشکلات امنیتی برطرف شوند."}
+                  {securitySeverity === 'medium' && "توصیه: با خرید قرص امنیت‌ سازی، امنیت وبسایت خود را ارتقا دهید."}
+                  {securitySeverity === 'low' && "توصیه: برای بهبود وضعیت امنیتی، قرص امنیت‌ سازی را خریداری کنید."}
                 </strong>
               </p>
             </div>
@@ -720,7 +720,7 @@ function getProductReasons(
 
   const seo = scores["seo"] ?? scores["سئو"]; 
   const performance = scores["performance"] ?? scores["عملکرد"];
-  const accessibility = scores["accessibility"] ?? scores["دسترس‌پذیری"];
+  const accessibility = scores["accessibility"] ?? scores["دسترس ‌پذیری"];
   const bestPractices = scores["bestPractices"] ?? scores["بهترین شیوه‌ها"];
 
   switch (productId) {
@@ -741,7 +741,7 @@ function getProductReasons(
     
     case "3":
       if (sitemapData && sitemapData.totalLinks < 200) {
-        reasons.push(`فقط ${sitemapData.totalLinks} لینک در سایت‌مپ`);
+        reasons.push(`فقط ${sitemapData.totalLinks} لینک در سایت‌ مپ`);
         reasons.push("نیاز به تولید محتوای بیشتر");
       }
       if ((seo || 0) < 0.9) {
@@ -758,10 +758,10 @@ function getProductReasons(
     case "5":
       if (brokenLinksCount && brokenLinksCount > 10) {
         reasons.push(`${brokenLinksCount} لینک شکسته`);
-        reasons.push("نیاز به لینک‌سازی");
+        reasons.push("نیاز به لینک ‌سازی");
       }
       if ((seo || 0) < 0.9) {
-        reasons.push("بهبود سئو با بک‌لینک");
+        reasons.push("بهبود سئو با بک‌ لینک");
       }
       break;
 

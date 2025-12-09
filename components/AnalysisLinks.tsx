@@ -1,62 +1,58 @@
 'use client';
-
 import { useState, useEffect, useMemo } from 'react';
-
+import { useRouter } from 'next/navigation';
 interface User {
   name: string;
   phone: string;
   email?: string;
 }
-
 interface Analysis {
   id: string;
+  url: string;
   phoneNumber: string;
   status: 'pending' | 'completed' | 'failed';
   createdAt: string;
   analysisType: string;
-  result?: {
-    url?: string;
-    siteUrl?: string;
-    website?: string;
-    [key: string]: any;
+  performance?: number;
+  accessibility?: number;
+  bestPractices?: number;
+  seo?: number;
+  name?: string;
+  result?: any;
+  sitemapAnalysis?: {
+    totalLinks: number;
+    sitemapExists: boolean;
+    sitemapUrls: string[];
+    sitemapLinks: Array<{ url: string; sitemap: string }>;
   };
-  score?: number;
-  duration?: number;
   [key: string]: any;
 }
-
 interface ApiResponse {
   analyses: Analysis[];
 }
-
 interface AnalysisLinksProps {
   compact?: boolean;
   showHeader?: boolean;
   itemsPerPage?: number;
-  showAllByDefault?: boolean; // نمایش همه آیتم‌ها به صورت پیش‌فرض
+  showAllByDefault?: boolean;
 }
-
 export default function AnalysisLinks({ 
   compact = false, 
   showHeader = true,
   itemsPerPage = 7,
-  showAllByDefault = false // به صورت پیش‌فرض صفحه‌بندی فعال است
+  showAllByDefault = false
 }: AnalysisLinksProps) {
   const [allAnalyses, setAllAnalyses] = useState<Analysis[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  
-  // حالت‌های صفحه‌بندی
   const [currentPage, setCurrentPage] = useState(1);
   const [showAllItems, setShowAllItems] = useState(showAllByDefault);
-
+  const router = useRouter();
   // محاسبه داده‌های صفحه‌بندی
   const paginationData = useMemo(() => {
     const totalItems = allAnalyses.length;
-    
     if (showAllItems) {
-      // نمایش همه آیتم‌ها بدون صفحه‌بندی
       return {
         totalItems,
         totalPages: 1,
@@ -66,12 +62,10 @@ export default function AnalysisLinks({
         showAll: true
       };
     } else {
-      // نمایش با صفحه‌بندی
       const totalPages = Math.ceil(totalItems / itemsPerPage);
       const startIndex = (currentPage - 1) * itemsPerPage;
       const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
       const currentItems = allAnalyses.slice(startIndex, endIndex);
-      
       return {
         totalItems,
         totalPages,
@@ -82,12 +76,10 @@ export default function AnalysisLinks({
       };
     }
   }, [allAnalyses, currentPage, itemsPerPage, showAllItems]);
-
   // تابع برای تولید آرایه صفحات
   const getPageNumbers = (currentPage: number, totalPages: number) => {
     const pageNumbers = [];
     const maxVisiblePages = 5;
-    
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
         pageNumbers.push(i);
@@ -115,34 +107,26 @@ export default function AnalysisLinks({
         pageNumbers.push(totalPages);
       }
     }
-    
     return pageNumbers;
   };
-
   // تابع fetch برای دریافت همه داده‌ها
   const fetchAnalyses = async () => {
     try {
       setLoading(true);
       setError(null);
-
       // 1. Get logged in user
       const meRes = await fetch('/api/auth/me');
-      
       if (!meRes.ok) {
         throw new Error('خطا در دریافت اطلاعات کاربر');
       }
-      
       const meData = await meRes.json();
       const loggedUser: User = meData?.user;
-
       if (!loggedUser) {
         setError('لطفاً ابتدا وارد حساب کاربری شوید.');
         setLoading(false);
         return;
       }
-
       setUser(loggedUser);
-
       // 2. Fetch all analyses
       const response = await fetch('/api/analyses', {
         headers: { 
@@ -150,13 +134,10 @@ export default function AnalysisLinks({
           'Cache-Control': 'no-cache'
         },
       });
-
       if (!response.ok) {
         throw new Error(`خطا در دریافت آنالیزها: ${response.status}`);
       }
-
       const data: ApiResponse = await response.json();
-      
       // 3. Check if analyses exist
       if (!data?.analyses?.length) {
         setError('هیچ آنالیزی یافت نشد.');
@@ -164,27 +145,22 @@ export default function AnalysisLinks({
         setLoading(false);
         return;
       }
-
       // 4. Filter by phone number
       const filtered = data.analyses.filter(
         (item: Analysis) => item.phoneNumber === loggedUser.phone
       );
-
       if (!filtered.length) {
         setError('هیچ آنالیزی مربوط به شماره شما یافت نشد.');
         setAllAnalyses([]);
         setLoading(false);
         return;
       }
-
       // 5. Sort by date (newest first)
       const sorted = filtered.sort((a, b) => 
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
-
       setAllAnalyses(sorted);
       setCurrentPage(1);
-
     } catch (err: any) {
       console.error('Error fetching analyses:', err);
       setError(err.message || 'خطایی در دریافت آنالیزها رخ داده است.');
@@ -193,37 +169,35 @@ export default function AnalysisLinks({
       setLoading(false);
     }
   };
-
   // تابع برای تغییر صفحه
   const handlePageChange = (page: number) => {
     if (page < 1 || page > paginationData.totalPages) return;
     setCurrentPage(page);
     
-    // اسکرول به بالای کامپوننت
     const element = document.getElementById('analysis-container');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
-
-  // تابع برای تغییر حالت نمایش (همه یا صفحه‌بندی شده)
+  // تابع برای تغییر حالت نمایش
   const toggleDisplayMode = () => {
     setShowAllItems(!showAllItems);
     if (!showAllItems) {
       setCurrentPage(1);
     }
-    
-    // اسکرول به بالای کامپوننت
     const element = document.getElementById('analysis-container');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
-
   useEffect(() => {
     fetchAnalyses();
-  }, []);
 
+    // شروع polling هر 10 ثانیه
+    const interval = setInterval(fetchAnalyses, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('fa-IR') + ' ' + date.toLocaleTimeString('fa-IR', {
@@ -231,7 +205,6 @@ export default function AnalysisLinks({
       minute: '2-digit'
     });
   };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed': return 'text-green-600 bg-green-50 border border-green-200';
@@ -240,7 +213,6 @@ export default function AnalysisLinks({
       default: return 'text-gray-600 bg-gray-50 border border-gray-200';
     }
   };
-
   const getStatusText = (status: string) => {
     switch (status) {
       case 'completed': return '✅ تکمیل شده';
@@ -249,27 +221,6 @@ export default function AnalysisLinks({
       default: return status;
     }
   };
-
-  // تابع برای استخراج URL سایت از آنالیز
-  const getSiteUrl = (analysis: Analysis): string | null => {
-    if (analysis.url) return analysis.url;
-    if (analysis.result?.url) return analysis.result.url;
-    if (analysis.result?.siteUrl) return analysis.result.siteUrl;
-    if (analysis.result?.website) return analysis.result.website;
-    
-    const possibleUrlFields = ['site', 'domain', 'link', 'webpage', 'page'];
-    for (const field of possibleUrlFields) {
-      if (analysis.result?.[field] && typeof analysis.result[field] === 'string') {
-        const value = analysis.result[field];
-        if (value.includes('http') || value.includes('www') || value.includes('.')) {
-          return value;
-        }
-      }
-    }
-    
-    return null;
-  };
-
   // تابع برای نمایش URL به صورت کوتاه شده
   const formatUrl = (url: string): string => {
     try {
@@ -281,29 +232,47 @@ export default function AnalysisLinks({
       return url;
     }
   };
-
-  const handleViewSite = (analysis: Analysis) => {
-    const siteUrl = getSiteUrl(analysis);
-    
-    if (siteUrl) {
-      const fullUrl = siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`;
+  // تابع برای باز کردن سایت در تب جدید
+  const handleViewSite = (url: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    if (url) {
+      const fullUrl = url.startsWith('http') ? url : `https://${url}`;
       window.open(fullUrl, '_blank', 'noopener,noreferrer');
-    } else {
-      alert('آدرس سایت برای این آنالیز موجود نیست.');
     }
   };
-
+  // تابع برای مشاهده تحلیل در تب جدید
+  const handleViewAnalysisInNewTab = (analysis: Analysis, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    // ذخیره تحلیل در localStorage برای استفاده در صفحه تحلیل
+    const analysisData = {
+      ...analysis,
+      url: analysis.url || '',
+      status: analysis.status || 'completed',
+      performance: analysis.performance || 0,
+      accessibility: analysis.accessibility || 0,
+      bestPractices: analysis.bestPractices || 0,
+      seo: analysis.seo || 0,
+      result: analysis.result || {},
+      sitemapAnalysis: analysis.sitemapAnalysis || null
+    };
+    localStorage.setItem('currentAnalysis', JSON.stringify(analysisData));
+    // همچنین ذخیره URL در localStorage برای نمایش در اینپوت صفحه تحلیل
+    localStorage.setItem('analysisUrl', analysis.url || '');
+    // باز کردن صفحه تحلیل در تب جدید
+    const url = `/analyze?id=${analysis.id}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
   // کامپوننت Pagination
   const Pagination = () => {
     const { totalPages, totalItems, startIndex, endIndex, showAll } = paginationData;
-    
     if (showAll || totalPages <= 1) return null;
-    
     const pageNumbers = getPageNumbers(currentPage, totalPages);
-
     return (
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-gray-200">
-        {/* اطلاعات صفحه */}
         <div className="text-sm text-gray-600">
           <span className="font-medium">{totalItems.toLocaleString('fa-IR')}</span> مورد یافت شد • 
           نمایش <span className="font-medium">{startIndex.toLocaleString('fa-IR')}</span> تا{' '}
@@ -311,8 +280,6 @@ export default function AnalysisLinks({
           صفحه <span className="font-medium">{currentPage.toLocaleString('fa-IR')}</span> از{' '}
           <span className="font-medium">{totalPages.toLocaleString('fa-IR')}</span>
         </div>
-        
-        {/* دکمه‌های صفحه‌بندی */}
         <div className="flex items-center gap-2">
           <button
             onClick={() => handlePageChange(1)}
@@ -324,7 +291,6 @@ export default function AnalysisLinks({
             <span>««</span>
             <span className="hidden sm:inline">ابتدا</span>
           </button>
-          
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
@@ -335,8 +301,6 @@ export default function AnalysisLinks({
             <span>«</span>
             <span className="hidden sm:inline">قبلی</span>
           </button>
-          
-          {/* شماره صفحات */}
           <div className="flex items-center gap-1">
             {pageNumbers.map((pageNumber, index) => (
               pageNumber === -1 ? (
@@ -358,7 +322,6 @@ export default function AnalysisLinks({
               )
             ))}
           </div>
-          
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
@@ -369,7 +332,6 @@ export default function AnalysisLinks({
             <span className="hidden sm:inline">بعدی</span>
             <span>»</span>
           </button>
-          
           <button
             onClick={() => handlePageChange(totalPages)}
             disabled={currentPage === totalPages}
@@ -384,7 +346,6 @@ export default function AnalysisLinks({
       </div>
     );
   };
-
   if (loading && allAnalyses.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm border border-gray-200">
@@ -393,13 +354,11 @@ export default function AnalysisLinks({
       </div>
     );
   }
-
   return (
     <div 
       id="analysis-container"
       className={`${compact ? '' : 'bg-white rounded-xl shadow-lg border border-gray-300 mb-6'}`}
     >
-      {/* Header با طراحی واضح‌تر */}
       {showHeader && (
         <div className={`p-4 ${compact ? 'pb-3' : 'border-b'} bg-gradient-to-r from-blue-100 to-blue-200 ${compact ? 'rounded-t-xl' : 'rounded-t-xl'}`}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -447,8 +406,6 @@ export default function AnalysisLinks({
               </button>
             </div>
           </div>
-          
-          {/* آمار و اطلاعات */}
           {allAnalyses.length > 0 && (
             <div className="flex flex-wrap items-center gap-4 mt-4 pt-3 border-t border-blue-300/50">
               <div className="flex items-center gap-2">
@@ -457,7 +414,6 @@ export default function AnalysisLinks({
                   <span className="font-bold">{allAnalyses.length}</span> آنالیز ثبت شده
                 </span>
               </div>
-              
               <div className="flex items-center gap-2">
                 <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">✅</span>
                 <span className="text-sm text-gray-700">
@@ -466,7 +422,6 @@ export default function AnalysisLinks({
                   </span> تکمیل شده
                 </span>
               </div>
-              
               {!paginationData.showAll && paginationData.totalPages > 1 && (
                 <div className="flex items-center gap-2">
                   <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">📄</span>
@@ -476,7 +431,6 @@ export default function AnalysisLinks({
                   </span>
                 </div>
               )}
-              
               {paginationData.showAll && (
                 <div className="flex items-center gap-2">
                   <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">📋</span>
@@ -489,8 +443,6 @@ export default function AnalysisLinks({
           )}
         </div>
       )}
-
-      {/* Content */}
       <div className={compact ? '' : 'p-4'}>
         {error ? (
           <div className={`${compact ? 'py-3' : 'py-6'} text-center`}>
@@ -517,7 +469,6 @@ export default function AnalysisLinks({
           </div>
         ) : (
           <>
-            {/* اطلاعات نمایش فعلی */}
             <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="text-sm text-gray-700">
@@ -536,26 +487,19 @@ export default function AnalysisLinks({
                     </>
                   )}
                 </div>
-                
-              
               </div>
             </div>
-            
-            {/* لیست آنالیزها با طراحی بهبود یافته */}
             <div className="space-y-3">
               {paginationData.currentItems.map((analysis, index) => {
-                const siteUrl = getSiteUrl(analysis);
                 const rowNumber = paginationData.showAll 
                   ? index + 1 
                   : (currentPage - 1) * itemsPerPage + index + 1;
-                
                 return (
                   <div 
                     key={analysis.id} 
                     className="flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-blue-50 
                              rounded-xl border border-gray-200 transition-all duration-200 bg-white shadow-sm"
                   >
-                    {/* شماره ردیف و اطلاعات اصلی */}
                     <div className="flex-1 min-w-0 mb-3 sm:mb-0">
                       <div className="flex items-center gap-3 mb-3">
                         <div className="flex-shrink-0 bg-blue-100 text-blue-700 w-8 h-8 rounded-lg 
@@ -576,18 +520,19 @@ export default function AnalysisLinks({
                           </span>
                         </div>
                       </div>
-                      
-                      {/* اطلاعات سایت و زمان */}
                       <div className="space-y-3">
                         {/* URL سایت */}
-                        {siteUrl ? (
+                        {analysis.url ? (
                           <div className="flex items-start gap-2">
                             <span className="text-gray-500 text-xs mt-0.5">🌐</span>
                             <div>
                               <div className="text-gray-500 text-xs mb-1">آدرس سایت:</div>
-                              <div className="text-blue-700 text-sm font-medium truncate bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200">
-                                {formatUrl(siteUrl)}
-                                <span className="text-xs text-gray-500 mr-2">({siteUrl.length > 50 ? 'آدرس طولانی' : 'آدرس کوتاه'})</span>
+                              <div 
+                                onClick={() => handleViewSite(analysis.url)}
+                                className="text-blue-700 text-sm font-medium truncate bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200 hover:bg-blue-100 cursor-pointer"
+                              >
+                                {formatUrl(analysis.url)}
+                                <span className="text-xs text-gray-500 mr-2">({analysis.url.length > 50 ? 'آدرس طولانی' : 'آدرس کوتاه'})</span>
                               </div>
                             </div>
                           </div>
@@ -596,46 +541,13 @@ export default function AnalysisLinks({
                             بدون آدرس سایت
                           </div>
                         )}
-                        
-                        {/* اطلاعات اضافی در یک ردیف */}
                         <div className="flex flex-wrap items-center gap-4">
-                          {/* تاریخ و زمان */}
                           <div className="flex items-center gap-2">
                             <span className="text-gray-400 text-xs">📅</span>
                             <span className="text-xs text-gray-600 font-medium">
                               {formatDate(analysis.createdAt)}
                             </span>
-                          </div>
-                          
-                          {/* امتیاز */}
-                          {analysis.score !== undefined && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-gray-400 text-xs">⭐</span>
-                              <div className="flex items-center gap-1">
-                                <span className="text-xs text-gray-500">امتیاز:</span>
-                                <span className={`text-xs font-bold ${
-                                  analysis.score >= 80 ? 'text-green-600' : 
-                                  analysis.score >= 60 ? 'text-yellow-600' : 'text-red-600'
-                                }`}>
-                                  {analysis.score}%
-                                </span>
-                              </div>
-                            </div>
-                          )}
-                          
-                          {/* مدت زمان */}
-                          {analysis.duration && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-gray-400 text-xs">⏱️</span>
-                              <div className="flex items-center gap-1">
-                                <span className="text-xs text-gray-500">زمان:</span>
-                                <span className="text-xs font-semibold text-gray-700">
-                                  {analysis.duration} ثانیه
-                                </span>
-                              </div>
-                            </div>
-                          )}
-                          
+                          </div>  
                           {/* شناسه آنالیز */}
                           <div className="flex items-center gap-2">
                             <span className="text-gray-400 text-xs">🆔</span>
@@ -646,35 +558,51 @@ export default function AnalysisLinks({
                         </div>
                       </div>
                     </div>
-
                     {/* دکمه‌های عملیاتی */}
                     <div className="flex items-center gap-2 sm:flex-col sm:items-end">
-                      {siteUrl && (
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        {/* دکمه مشاهده تحلیل در تب جدید */}
                         <button
-                          onClick={() => handleViewSite(analysis)}
+                          onClick={(e) => handleViewAnalysisInNewTab(analysis, e)}
                           className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl 
                                    hover:from-blue-700 hover:to-blue-800 transition-all flex items-center 
                                    justify-center gap-2 shadow-sm px-4 py-2.5 text-sm min-w-[140px] 
-                                   hover:shadow-md"
+                                   hover:shadow-md group relative"
+                          title="مشاهده تحلیل در تب جدید"
                         >
-                          <span className="text-lg">🔗</span>
-                          مشاهده سایت
+                          <span className="text-lg">📊</span>
+                          <span>مشاهده تحلیل</span>
+                          <span className="absolute -top-2 -right-2 bg-blue-800 text-white text-xs px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                            🔗
+                          </span>
                         </button>
-                      )}
-                      
+                      </div>
                     </div>
                   </div>
                 );
               })}
             </div>
-
-            {/* Pagination */}
             <Pagination />
-            
-            {/* دکمه نمایش همه/صفحه‌بندی شده در پایین */}
             {allAnalyses.length > itemsPerPage && (
               <div className="text-center pt-4 mt-4 border-t border-gray-200">
-            
+                <button
+                  onClick={toggleDisplayMode}
+                  className="text-sm px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 
+                           border border-gray-300 rounded-lg transition-colors flex items-center 
+                           gap-2 mx-auto"
+                >
+                  {showAllItems ? (
+                    <>
+                      <span>📄</span>
+                      نمایش صفحه‌بندی شده
+                    </>
+                  ) : (
+                    <>
+                      <span>📋</span>
+                      نمایش همه آنالیزها ({allAnalyses.length})
+                    </>
+                  )}
+                </button>
               </div>
             )}
           </>
