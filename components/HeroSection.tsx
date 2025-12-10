@@ -21,14 +21,15 @@ export const HeroSection = ({
 }: HeroSectionProps) => {
 
   // هنگام لود کامپوننت، بررسی کن اگر URL از localStorage آمده باشد
+  // **تغییر مهم: فقط در حالت readOnly این کار را انجام دهیم**
   useEffect(() => {
-    if (!url) {
+    if (!url && readOnly) {
       const savedUrl = localStorage.getItem('analysisUrl');
       if (savedUrl) {
         setUrl(savedUrl);
       }
     }
-  }, []);
+  }, [readOnly, url, setUrl]);
 
   return (
     <div className="w-full bg-gradient-to-br from-blue-600/90 to-blue-700/90 text-white relative overflow-hidden">
