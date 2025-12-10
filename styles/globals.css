@@ -231,25 +231,6 @@ p{
 }
 
 
-.mySwiper .swiper-pagination-bullet {
-  background-color: #d0d7da; /* default (inactive) */
-  opacity: 1;
-  width: 8px;
-  height: 8px;
-  transition: all 0.3s ease;
-}
-
-.mySwiper .swiper-pagination-bullet-active {
-  background-color: #1d546b; /* your color */
-  width: 20px;
-  border-radius: 6px;
-}
-
-.mySwiper .swiper-pagination-bullet:hover {
-  background-color: #1d546b;
-  transform: scale(1.2);
-}
-
 pre {
   direction: ltr;
   text-align: left;

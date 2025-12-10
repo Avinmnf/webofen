@@ -164,7 +164,15 @@ export default function WebDesign() {
 
         <section>
           <div className="max-w-[1250px] m-auto pt-6 sm:pt-8 md:pt-10">
-
+      {/* Header */}
+      <div className="text-center mb-6 sm:mb-8 md:mb-10">
+        <p className="text-[#29b0cb] text-xl sm:text-2xl">
+          <span className="text-[#253e5f]">نمونه کار </span>طراحی سایت
+        </p>
+        <p className="text-gray-700 text-xs sm:text-sm mt-1 sm:mt-2">
+          بخشی از نمونه های طراحی سایت توسط تیم ما
+        </p>
+      </div>
             <Resume />
           </div>
         </section>

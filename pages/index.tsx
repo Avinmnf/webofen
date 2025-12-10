@@ -8,6 +8,7 @@ import FreeConsultationForm from "@/components/FreeConsultationForm";
 import SEO from "@/components/seo";
 import Link from "next/link";
 import HomepageResume from "@/components/resume/homepageresume";
+import CollaborationShowcase from "@/components/resume/resume";
 import { useState } from "react";
 import { useRef } from "react";
 // اسکیما Organization برای وبوفن
@@ -1283,58 +1284,63 @@ export default function Home() {
             <Reservetime />
           </div>
         </section>
-        <section className="bg-[#f7f8fc] w-full pt-4">
-          <div className="md:max-w-[1250px] w-full m-auto mt-5 md:p-0 p-2">
-            <div className="text-center mb-10">
-              <p className="text-[#29b0cb] text-2xl">
-                <span className="text-[#253e5f]">نمونه کار </span>درمان سایت
-              </p>
+       <section className="bg-[#f7f8fc] w-full pt-4 ">
+  <div className="md:max-w-[1250px] w-full m-auto mt-5 md:p-0 p-2">
+    <div className="text-center mb-10">
+      <p className="text-[#29b0cb] text-2xl">
+        <span className="text-[#253e5f]">نمونه کار </span>درمان سایت
+      </p>
 
-              {/* Buttons wrapper */}
-              <div className="flex justify-center items-center mt-6">
-                <div className="flex w-full md:w-2/4 justify-center border rounded-full p-2">
-                  <div className="relative flex gap-4 rounded-full h-10 w-full md:mt-0 overflow-hidden">
-                    {/* Active highlight */}
-                    <div
-                      className="absolute top-0 left-0 h-full bg-[#1d546b] rounded-full transition-all duration-300"
-                      style={{
-                        width: "50%",
-                        transform:
-                          activeDiv === "second"
-                            ? "translateX(0%)"
-                            : "translateX(100%)",
-                      }}
-                    ></div>
+      {/* Buttons wrapper */}
+      <div className="flex justify-center items-center mt-6">
+        <div className="flex w-full md:w-2/4 justify-center border rounded-full p-2">
+          <div className="relative flex gap-4 rounded-full h-10 w-full md:mt-0 overflow-hidden">
+            {/* Active highlight */}
+            <div
+              className="absolute top-0 left-0 h-full bg-[#1d546b] rounded-full transition-all duration-300"
+              style={{
+                width: "50%",
+                transform:
+                  activeDiv === "second"
+                    ? "translateX(0%)"
+                    : "translateX(100%)",
+              }}
+            ></div>
 
-                    {/* Buttons */}
-
-                    <button
-                      onClick={() => handleClick("first")}
-                      className={`flex-1 z-10 text-sm md:text-md py-1 rounded-full h-10 transition-all duration-200 ${
-                        activeDiv === "first"
-                          ? "text-white"
-                          : "text-[#1d546b] hover:text-[#1d546b]"
-                      }`}
-                    >
-                      سئو سایت
-                    </button>
-                    <button
-                      onClick={() => handleClick("second")}
-                      className={`flex-1 z-10 text-sm md:text-md py-1 rounded-full h-10 transition-all duration-200 ${
-                        activeDiv === "second"
-                          ? "text-white"
-                          : "text-[#1d546b] hover:text-[#1d546b]"
-                      }`}
-                    >
-                      طراحی سایت
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <HomepageResume />
+            {/* Buttons */}
+            <button
+              onClick={() => handleClick("first")}
+              className={`flex-1 z-10 text-sm md:text-md py-1 rounded-full h-10 transition-all duration-200 ${
+                activeDiv === "first"
+                  ? "text-white"
+                  : "text-[#1d546b] hover:text-[#1d546b]"
+              }`}
+            >
+              سئو سایت
+            </button>
+            <button
+              onClick={() => handleClick("second")}
+              className={`flex-1 z-10 text-sm md:text-md py-1 rounded-full h-10 transition-all duration-200 ${
+                activeDiv === "second"
+                  ? "text-white"
+                  : "text-[#1d546b] hover:text-[#1d546b]"
+              }`}
+            >
+              طراحی سایت
+            </button>
           </div>
-        </section>
+        </div>
+      </div>
+    </div>
+    
+    {/* Conditional Rendering based on activeDiv */}
+    {activeDiv === "first" ? (
+      <HomepageResume />
+    ) : (
+      <CollaborationShowcase />
+    )}
+  </div>
+</section>
       </main>
     </>
   );
