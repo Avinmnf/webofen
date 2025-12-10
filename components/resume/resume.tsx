@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useCallback } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { EffectCoverflow, Autoplay, Pagination } from "swiper/modules";
@@ -140,89 +141,85 @@ export default function CollaborationShowcase() {
   }, []);
 
   return (
-    <div className="w-full bg-white px-4">
-      {/* Header */}
-      <div className="text-center mb-6 sm:mb-8 md:mb-10">
-        <p className="text-[#29b0cb] text-xl sm:text-2xl">
-          <span className="text-[#253e5f]">نمونه کار </span>طراحی سایت
-        </p>
-        <p className="text-gray-700 text-xs sm:text-sm mt-1 sm:mt-2">
-          بخشی از نمونه های طراحی سایت توسط تیم ما
-        </p>
-      </div>
+    <div className="w-full px-4">
 
       {/* Logo Showcase */}
-<div className="max-w-7xl mx-auto h-96">
-  <Swiper
-    effect="coverflow"
-    grabCursor={true}
-    centeredSlides={true}
-    slidesPerView="auto"
-    initialSlide={1} // Add this line - starts from second slide
-    coverflowEffect={{
-      rotate: 0,
-      stretch: -60,
-      depth: 120,
-      modifier: 1.8,
-      slideShadows: false,
-    }}
-    autoplay={{
-      delay: 4500,
-      disableOnInteraction: false,
-    }}
-    pagination={{
-      clickable: true,
-      dynamicBullets: true,
-      dynamicMainBullets: 3,
-    }}
-    onSlideChange={(swiper) => setActiveSlide(swiper.realIndex)}
-    modules={[EffectCoverflow, Autoplay, Pagination]}
-    className="collaboration-swiper pb-12 h-90 "
-    speed={800}
-    // Add spaceBetween for better slide spacing
-    spaceBetween={20} // Add this line
-    // Update breakpoints for better display
-    breakpoints={{
-      320: {
-        slidesPerView: 1.2,
-        centeredSlides: true,
-        coverflowEffect: {
-          stretch: -20,
-          depth: 60,
-          modifier: 1.2,
-        },
-      },
-      768: {
-        slidesPerView: 2.5, // Changed from "auto"
-        centeredSlides: true,
-        coverflowEffect: {
-          stretch: -40,
-          depth: 90,
-          modifier: 1.5,
-        },
-      },
-      1024: {
-        slidesPerView: 3, // Changed from "auto"
-        centeredSlides: true,
-        coverflowEffect: {
-          stretch: -60,
-          depth: 120,
-          modifier: 1.8,
-        },
-      },
-    }}
-  >
+      <div className="max-w-7xl mx-auto h-96 relative">
+      <Swiper
+  slidesPerView={3}
+  spaceBetween={30}
+  centeredSlides={true}
+  grabCursor={true}
+  initialSlide={1}
+  effect="coverflow"
+  coverflowEffect={{
+    rotate: 0,
+    stretch: -30,      // ← Negative value pulls slides closer
+    depth: 50,         // ← Reduce depth
+    modifier: 1.5,     // ← Reduce modifier
+    slideShadows: false,
+  }}
+          autoplay={{
+            delay: 3000,
+            disableOnInteraction: false,
+          }}
+          pagination={{
+            clickable: true,
+            dynamicBullets: true,
+            renderBullet: function (index, className) {
+              return '<span class="' + className + '">' + '</span>';
+            }
+          }}
+          onSlideChange={(swiper) => setActiveSlide(swiper.realIndex)}
+          modules={[EffectCoverflow, Autoplay, Pagination]}
+          className="collaboration-swiper h-90 pb-16" // Increased padding-bottom for pagination
+          breakpoints={{
+            320: {
+              slidesPerView: 1,
+              spaceBetween: 10,
+              coverflowEffect: {
+                rotate: 0,
+        stretch: -10,   // ← Smaller negative value for mobile
+                depth: 40,
+                modifier: 1.5,
+              }
+            },
+               640: {
+      slidesPerView: 2,
+      spaceBetween: 20,
+      coverflowEffect: {
+        stretch: -20,
+        depth: 40,
+        modifier: 1.2,
+      }
+    },
+    1024: {
+      slidesPerView: 3,
+      spaceBetween: 30,
+      coverflowEffect: {
+        stretch: -30,
+        depth: 50,
+        modifier: 1.5,
+      }
+    },
+  }}
+>
           {collaborations.map((project, index) => (
             <SwiperSlide
               key={project.id}
-              className="max-w-xs md:max-w-sm lg:max-w-md transition-all duration-700 ease-out"
+              className="flex items-center justify-center"
             >
               <div
                 className={`
-                  relative h-85 rounded-2xl cursor-pointer group overflow-visible
+                  relative h-85 w-full rounded-2xl cursor-pointer group overflow-visible
                   transform transition-all duration-700 ease-out
                   ${activeSlide === index ? "rotate-0" : "rotate-1"}
                   hover:rotate-0
+                  ${
+                    activeSlide === index
+                      ? "animate-float-slow scale-102"
+                      : "scale-95"
+                  }
                 `}
                 onClick={() => openModal(project)}
               >
@@ -238,7 +235,7 @@ export default function CollaborationShowcase() {
 
                   {/* Logo Container */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="relative w-170 h-150 animate-float-slow">
+                    <div className="relative w-170 h-150">
                       <Image
                         src={project.logo}
                         alt={`${project.name} logo`}
@@ -287,6 +284,7 @@ export default function CollaborationShowcase() {
         </Swiper>
       </div>
 
+      {/* Rest of your modal code remains the same */}
       {/* Enhanced Modal */}
       {selectedProject && (
         <div
@@ -641,7 +639,7 @@ export default function CollaborationShowcase() {
         @keyframes fadeInUp {
           from {
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(10px);
           }
           to {
             opacity: 1;
@@ -661,14 +659,27 @@ export default function CollaborationShowcase() {
           animation: fadeInUp 0.8s ease-out forwards;
         }
 
-        /* Swiper Custom Styles */
-        .swiper-pagination-bullet {
-          transition: all 0.4s ease-out;
+        .collaboration-swiper .swiper-pagination {
+          bottom: 0 !important;
+          margin-top: 3.5rem;
         }
 
-        .swiper-pagination-bullet-active {
-          transform: scale(1.3);
-          background: #29b0cb !important;
+        .collaboration-swiper .swiper-pagination-bullet {
+          width: 10px;
+          height: 10px;
+          background: #d1d5db;
+          opacity: 0.7;
+          transition: all 0.4s ease-out;
+          margin: 0 4px !important;
+        }
+
+        .collaboration-swiper .swiper-pagination-bullet-active {
+          width: 20px;
+          height: 7px;
+          border-radius: 5px;
+          background: #1d546b !important;
+          opacity: 1;
+          transform: scale(1.2);
         }
 
         .scrollable-image-container {
@@ -718,6 +729,10 @@ export default function CollaborationShowcase() {
             height: 300px !important;
           }
 
+          .collaboration-swiper .swiper-pagination {
+            bottom: -5px !important;
+          }
+
           .modal-content {
             height: 85vh !important;
           }
@@ -729,6 +744,18 @@ export default function CollaborationShowcase() {
           .w-1\/3,
           .w-2\/3 {
             width: 100% !important;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .collaboration-swiper .swiper-pagination-bullet {
+            width: 5px;
+            height: 4px;
+          }
+
+          .collaboration-swiper .swiper-pagination-bullet-active {
+            width: 10px;
+            height: 8px;
           }
         }
       `}</style>
