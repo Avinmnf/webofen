@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useRef } from "react";
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useAnalyses } from "@/hooks/useAnalyses";
 // Import components
 import { HeroSection } from "@/components/HeroSection";
@@ -342,8 +342,37 @@ const normalizeUrl = (url: string): string => {
   }
 };
 
+// تابع برای پاکسازی داده‌های آنالیز ذخیره شده
+const cleanupAnalysisStorage = () => {
+  // پاک کردن تمام داده‌های مرتبط با آنالیز از localStorage
+  localStorage.removeItem('currentAnalysis');
+  localStorage.removeItem('analysisUrl');
+  localStorage.removeItem('lastViewedAnalysis');
+  localStorage.removeItem('analysisData');
+  
+  // پاک کردن تمام داده‌های مرتبط با آنالیز از sessionStorage
+  sessionStorage.removeItem('currentAnalysis');
+  sessionStorage.removeItem('analysisUrl');
+  sessionStorage.removeItem('analysisTimestamp');
+  sessionStorage.removeItem('fromDashboard');
+  
+  // همچنین پاک کردن هر چیز دیگری که ممکن است مربوط به آنالیز باشد
+  const keysToRemove = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && (key.includes('analysis') || key.includes('analyze') || key.includes('currentAnalysis'))) {
+      keysToRemove.push(key);
+    }
+  }
+  keysToRemove.forEach(key => localStorage.removeItem(key));
+  
+  console.log('🧹 تمیز کردن داده‌های آنالیز از storage');
+};
+
 export default function AnalyzePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const [url, setUrl] = useState<string>("");
   const [progress, setProgress] = useState<number>(0);
   const [animatedScores, setAnimatedScores] = useState<Record<string, number>>({});
@@ -356,6 +385,7 @@ export default function AnalyzePage() {
   const [currentAnalysisId, setCurrentAnalysisId] = useState<string | null>(null);
   const [resultsViewed, setResultsViewed] = useState<boolean>(false);
   const [isDuplicateAnalysis, setIsDuplicateAnalysis] = useState<boolean>(false);
+  const [hasCleanedStorage, setHasCleanedStorage] = useState<boolean>(false);
 
   const resultsSectionRef = useRef<HTMLDivElement>(null);
 
@@ -402,23 +432,56 @@ export default function AnalyzePage() {
 
   // مدیریت وضعیت آنالیزهای موجود
   useEffect(() => {
-    if (findExistingAnalysis && findExistingAnalysis.status === 'completed' && url && !pendingResult && !analysisStarted) {
+    // فقط اگر کاربر به صورت دستی URL وارد کرده باشد، آنالیز قبلی را نمایش بده
+    if (findExistingAnalysis && findExistingAnalysis.status === 'completed' && url && !pendingResult && !analysisStarted && !hasCleanedStorage) {
       console.log("🔄 Automatically loading existing analysis for:", url);
       const convertedExisting = convertApiResultToAnalyzeResult(findExistingAnalysis);
       setPendingResult(convertedExisting);
       setIsDuplicateAnalysis(true);
       setResultsViewed(true);
     }
-  }, [findExistingAnalysis, url, pendingResult, analysisStarted]);
+  }, [findExistingAnalysis, url, pendingResult, analysisStarted, hasCleanedStorage]);
+
+  // پاکسازی storage هنگام بارگذاری صفحه
+  useEffect(() => {
+    // بررسی آیا کاربر از داشبورد آمده است؟
+    const fromDashboard = sessionStorage.getItem('fromDashboard');
+    
+    if (fromDashboard) {
+      console.log('🚫 User came from dashboard - cleaning storage');
+      // پاکسازی کامل storage
+      cleanupAnalysisStorage();
+      setHasCleanedStorage(true);
+      
+      // پاک کردن flag
+      sessionStorage.removeItem('fromDashboard');
+      
+      // همچنین URL را خالی کنیم
+      setUrl("");
+    }
+    
+    // همچنین اگر کاربر مستقیماً به صفحه تحلیل آمده باشد، storage را پاک کنیم
+    // این تضمین می‌کند که صفحه همیشه با فرم خالی شروع شود
+    if (!url && !pendingResult && !hasCleanedStorage) {
+      console.log('🧹 Cleaning storage on initial load');
+      cleanupAnalysisStorage();
+      setHasCleanedStorage(true);
+    }
+  }, [url, pendingResult, hasCleanedStorage]);
 
   // SEO Props با useMemo برای بهینه‌سازی
   const seoProps = useMemo(() => {
     const baseUrl = process.env.NEXT_PUBLIC_WEBOFEN || "https://webofen.com";
-    const currentUrl =
-  typeof window !== "undefined"
-    ? window.location.href
-    : `${baseUrl}${router.asPath}`;
-
+    
+    // ساخت currentUrl - استفاده از window.location.href در سمت کلاینت
+    let currentUrl = baseUrl;
+    if (typeof window !== "undefined") {
+      currentUrl = window.location.href;
+    } else {
+      // در سمت سرور، از pathname و searchParams استفاده کنید
+      const params = searchParams?.toString();
+      currentUrl = `${baseUrl}${pathname}${params ? `?${params}` : ''}`;
+    }
     
     if (pendingResult) {
       const seoScore = Math.round((pendingResult.scores.seo || 0) * 100);
@@ -496,7 +559,7 @@ export default function AnalyzePage() {
         }
       }
     };
-  }, [pendingResult, url, router.asPath]);
+  }, [pendingResult, url, pathname, searchParams]);
 
   // دیباگ برای ردیابی issues و سایت‌مپ و brokenLinksCount و securityAnalysis
   useEffect(() => {
@@ -651,6 +714,7 @@ export default function AnalyzePage() {
     setShowAnalysisModal(false);
     setResultsViewed(false);
     setIsDuplicateAnalysis(false);
+    setHasCleanedStorage(false);
 
     try {
       await hookStartAnalysis(url, userData);
@@ -736,8 +800,12 @@ const handleAnalyzeClick = (e: React.FormEvent<HTMLFormElement>) => {
     setResultsViewed(true);
   };
 
-  // تابع برای شروع آنالیز جدید
+  // تابع برای شروع آنالیز جدید - با پاکسازی کامل
   const handleNewAnalysis = () => {
+    // پاکسازی کامل storage
+    cleanupAnalysisStorage();
+    
+    // ریست تمام stateها
     setPendingResult(null);
     setAnalysisStarted(false);
     setAnalysisStatus("");
@@ -749,7 +817,18 @@ const handleAnalyzeClick = (e: React.FormEvent<HTMLFormElement>) => {
     setShowSuccessAlert(false);
     setResultsViewed(false);
     setIsDuplicateAnalysis(false);
+    setHasCleanedStorage(false);
     setUrl("");
+    resetError();
+  };
+
+  // تابع برای پاک کردن URL و شروع مجدد
+  const handleClearUrl = () => {
+    setUrl("");
+    setPendingResult(null);
+    setIsDuplicateAnalysis(false);
+    setResultsViewed(false);
+    setHasCleanedStorage(false);
     resetError();
   };
 
@@ -781,11 +860,17 @@ const handleAnalyzeClick = (e: React.FormEvent<HTMLFormElement>) => {
           handleAnalyze={handleAnalyzeClick}
         />
 
+        {!!url && !pendingResult && (
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+       
+          </div>
+        )}
+
         {hasExistingAnalysis && !pendingResult && url && !analysisStarted && (
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
               <span className="text-blue-600 text-sm sm:text-base">
-                ✅ آنالیز قبلی برای این آدرس موجود است - برای مشاهده نتایج دکمه "آنالیز سایت" را بزنید
+                ✅ آنالیز قبلی برای این آدرس موجود است - برای مشاهده نتایج دکمه "شروع آنالیز " را بزنید
               </span>
             </div>
           </div>
@@ -831,7 +916,8 @@ const handleAnalyzeClick = (e: React.FormEvent<HTMLFormElement>) => {
                     </div>
                   )}
                   {/* دکمه آنالیز جدید برای دسکتاپ */}
-                  <div className="hidden lg:block">
+                  <div className="hidden lg:flex gap-2">
+               
                     <button
                       onClick={handleNewAnalysis}
                       className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
@@ -872,8 +958,9 @@ const handleAnalyzeClick = (e: React.FormEvent<HTMLFormElement>) => {
                   />
                 </div>
 
-                {/* دکمه آنالیز جدید برای موبایل */}
-                <div className="lg:hidden px-4 pb-6">
+                {/* دکمه‌های آنالیز جدید برای موبایل */}
+                <div className="lg:hidden px-4 pb-6 space-y-3">
+               
                   <button
                     onClick={handleNewAnalysis}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 text-sm"
