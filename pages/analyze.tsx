@@ -18,18 +18,14 @@ import { WebsiteOverview } from "@/components/WebsiteOverview";
 import { ScoreGuide } from "@/components/ScoreGuide";
 import { AnalysisModal } from "@/components/AnalysisModal";
 import SEO from "@/components/seo";
-
 // Import types
 import { AnalyzeResult, Analysis } from "@/lib/models/analyze";
-
 // تبدیل API result به AnalyzeResult - نسخه بهبود یافته با پشتیبانی از سایت‌مپ، brokenLinksCount و securityAnalysis
 const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
   console.log('🔄 Converting API result to AnalyzeResult...', apiResult);
-  
   // استخراج عنوان از مسیرهای مختلف با اولویت‌بندی
   let pageTitle = "بدون عنوان";
   let titleSource = "default";
-  
   // اولویت ۱: عنوان از result.meta.title
   if (apiResult.result?.meta?.title && apiResult.result.meta.title.trim() && apiResult.result.meta.title !== "بدون عنوان") {
     pageTitle = apiResult.result.meta.title;
@@ -55,13 +51,10 @@ const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
     pageTitle = apiResult.result.metaTitle;
     titleSource = "result.metaTitle";
   }
-  
   console.log(`🏷️ Title extracted from ${titleSource}: ${pageTitle}`);
-  
   // استخراج issues از مسیرهای مختلف برای اطمینان
   let issues = [];
   let source = 'unknown';
-  
   // اولویت ۱: مسیر اصلی سرور - analysisIssues در extra
   if (apiResult.result?.extra?.analysisIssues) {
     issues = apiResult.result.extra.analysisIssues;
@@ -102,11 +95,9 @@ const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
       'privateData': apiResult.privateData
     });
   }
-
   // استخراج اطلاعات سایت‌مپ از مسیرهای مختلف
   let sitemapData = null;
   let sitemapSource = 'unknown';
-  
   // اولویت ۱: مسیر اصلی سرور - sitemapAnalysis در extra
   if (apiResult.result?.extra?.sitemapAnalysis) {
     sitemapData = apiResult.result.extra.sitemapAnalysis;
@@ -140,7 +131,6 @@ const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
   else {
     console.log('❌ No sitemap data found in any path');
   }
-
   // 🔥 استخراج brokenLinksCount از مسیرهای مختلف
   let brokenLinksCount = 0;
   let brokenLinksSource = 'unknown';
@@ -169,13 +159,10 @@ const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
     brokenLinksCount = apiResult.brokenLinksDetails.length;
     brokenLinksSource = 'calculated from brokenLinksDetails (root)';
   }
-
   console.log(`🔗 Broken links count from ${brokenLinksSource}: ${brokenLinksCount}`);
-
   // 🔥 استخراج securityAnalysis از مسیرهای مختلف - بهبود یافته
   let securityAnalysis = null;
   let securitySource = 'unknown';
-  
   // اولویت ۱: مسیر اصلی سرور - securityAnalysis در extra
   if (apiResult.result?.extra?.securityAnalysis) {
     securityAnalysis = apiResult.result.extra.securityAnalysis;
@@ -218,7 +205,6 @@ const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
     try {
       const urlObj = new URL(apiResult.url);
       const isHttps = urlObj.protocol === 'https:';
-      
       securityAnalysis = {
         isHttps: isHttps,
         hasValidSSL: false,
@@ -248,11 +234,9 @@ const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
       console.log('❌ Could not create manual security analysis:', error);
     }
   }
-
   console.log(`📦 Conversion source: ${source}, issues count: ${issues.length}`);
   console.log(`🗺️ Sitemap source: ${sitemapSource}, total links: ${sitemapData?.totalLinks || 0}`);
   console.log(`🛡️ Security source: ${securitySource}, security score: ${securityAnalysis?.securityScore || 'N/A'}`);
-
   // ساخت result نهایی
   const result: AnalyzeResult = {
     url: apiResult.url,
@@ -267,41 +251,34 @@ const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
     metrics: apiResult.result?.metrics || apiResult.metrics || {},
     brokenLinksCount: brokenLinksCount, // 🔥 اضافه کردن brokenLinksCount
   };
-
   // اضافه کردن meta data اگر وجود دارد
   if (apiResult.result?.meta) {
     result.meta = apiResult.result.meta;
   } else if (apiResult.meta) {
     result.meta = apiResult.meta;
   }
-
   // اضافه کردن extra اگر وجود دارد
   if (apiResult.result?.extra) {
     result.extra = apiResult.result.extra;
   } else if (apiResult.extra) {
     result.extra = apiResult.extra;
   }
-
   // اضافه کردن result اگر وجود دارد
   if (apiResult.result) {
     result.result = apiResult.result;
   }
-
   // اضافه کردن translations اگر وجود دارد
   if (apiResult.translations) {
     result.translations = apiResult.translations;
   }
-
   // اضافه کردن sitemap data اگر وجود دارد
   if (sitemapData) {
     result.sitemapAnalysis = sitemapData;
   }
-
   // 🔥 اضافه کردن security analysis اگر وجود دارد
   if (securityAnalysis) {
     result.securityAnalysis = securityAnalysis;
   }
-
   console.log('✅ Final converted result:', {
     title: result.title,
     titleSource: titleSource,
@@ -321,10 +298,8 @@ const convertApiResultToAnalyzeResult = (apiResult: any): AnalyzeResult => {
     securityIssuesCount: result.securityAnalysis?.securityIssues?.length || 0, // 🔥 اضافه شده
     productRecommendations: result.securityAnalysis?.productRecommendations?.length || 0 // 🔥 اضافه شده
   });
-
   return result;
 };
-
 // تابع برای نرمالایز کردن URL - بهبود یافته
 const normalizeUrl = (url: string): string => {
   try {
@@ -341,7 +316,6 @@ const normalizeUrl = (url: string): string => {
     return normalized;
   }
 };
-
 // تابع برای پاکسازی داده‌های آنالیز ذخیره شده
 const cleanupAnalysisStorage = () => {
   // پاک کردن تمام داده‌های مرتبط با آنالیز از localStorage
@@ -349,13 +323,11 @@ const cleanupAnalysisStorage = () => {
   localStorage.removeItem('analysisUrl');
   localStorage.removeItem('lastViewedAnalysis');
   localStorage.removeItem('analysisData');
-  
   // پاک کردن تمام داده‌های مرتبط با آنالیز از sessionStorage
   sessionStorage.removeItem('currentAnalysis');
   sessionStorage.removeItem('analysisUrl');
   sessionStorage.removeItem('analysisTimestamp');
   sessionStorage.removeItem('fromDashboard');
-  
   // همچنین پاک کردن هر چیز دیگری که ممکن است مربوط به آنالیز باشد
   const keysToRemove = [];
   for (let i = 0; i < localStorage.length; i++) {
@@ -365,10 +337,8 @@ const cleanupAnalysisStorage = () => {
     }
   }
   keysToRemove.forEach(key => localStorage.removeItem(key));
-  
   console.log('🧹 تمیز کردن داده‌های آنالیز از storage');
 };
-
 export default function AnalyzePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -387,28 +357,22 @@ export default function AnalyzePage() {
   const [isDuplicateAnalysis, setIsDuplicateAnalysis] = useState<boolean>(false);
   const [hasCleanedStorage, setHasCleanedStorage] = useState<boolean>(false);
   const [hasAutoLoaded, setHasAutoLoaded] = useState<boolean>(false); // حالت جدید
-
   const resultsSectionRef = useRef<HTMLDivElement>(null);
-
   const { analyses: allAnalyses, analysis: apiAnalysis, loading, error, startAnalysis: hookStartAnalysis, resetError, checkExistingAnalysis } = useAnalyses();
-
   const convertedResult = useMemo(() => {
     if (apiAnalysis) {
       return convertApiResultToAnalyzeResult(apiAnalysis);
     }
     return null;
   }, [apiAnalysis]);
-
   // یافتن آنالیز موجود - بهبود یافته
   const findExistingAnalysis = useMemo(() => {
     if (!url || !allAnalyses || allAnalyses.length === 0) {
       console.log('❌ No URL or analyses to check');
       return null;
     }
-    
     const normalizedUrl = normalizeUrl(url);
     console.log('🔍 Checking for existing analysis for:', normalizedUrl);
-    
     // بررسی در همه آنالیزها برای URL نرمالایز شده
     const existing = allAnalyses.find(analysis => {
       const analysisNormalized = normalizeUrl(analysis.url);
@@ -416,21 +380,17 @@ export default function AnalyzePage() {
       console.log(`   Comparing: ${analysisNormalized} === ${normalizedUrl} -> ${isMatch}`);
       return isMatch;
     });
-    
     if (existing) {
       console.log('✅ Found existing analysis:', existing.id, 'Status:', existing.status);
     } else {
       console.log('❌ No existing analysis found');
     }
-    
     return existing || null;
   }, [url, allAnalyses]);
-
   // بررسی وجود آنالیز تکراری
   const hasExistingAnalysis = useMemo(() => {
     return !!findExistingAnalysis;
   }, [findExistingAnalysis]);
-
   // مدیریت وضعیت آنالیزهای موجود - تغییر یافته برای بارگذاری خودکار
   useEffect(() => {
     // فقط اگر کاربر به صورت دستی URL وارد کرده باشد و هنوز آنالیز قدیمی را به صورت خودکار لود نکرده باشیم
@@ -446,7 +406,6 @@ export default function AnalyzePage() {
       setIsDuplicateAnalysis(true);
       setResultsViewed(true);
       setHasAutoLoaded(true); // علامت گذاری که بارگذاری خودکار انجام شده است
-      
       // اسکرول به نتایج
       setTimeout(() => {
         resultsSectionRef.current?.scrollIntoView({
@@ -456,27 +415,17 @@ export default function AnalyzePage() {
       }, 300);
     }
   }, [findExistingAnalysis, url, pendingResult, analysisStarted, hasAutoLoaded]);
-
   // پاکسازی storage هنگام بارگذاری صفحه
   useEffect(() => {
-    // بررسی آیا کاربر از داشبورد آمده است؟
     const fromDashboard = sessionStorage.getItem('fromDashboard');
-    
     if (fromDashboard) {
       console.log('🚫 User came from dashboard - cleaning storage');
-      // پاکسازی کامل storage
       cleanupAnalysisStorage();
       setHasCleanedStorage(true);
       setHasAutoLoaded(false); // ریست کردن حالت بارگذاری خودکار
-      
-      // پاک کردن flag
       sessionStorage.removeItem('fromDashboard');
-      
-      // همچنین URL را خالی کنیم
       setUrl("");
     }
-    
-    // همچنین اگر کاربر مستقیماً به صفحه تحلیل آمده باشد، storage را پاک کنیم
     // این تضمین می‌کند که صفحه همیشه با فرم خالی شروع شود
     if (!url && !pendingResult && !hasCleanedStorage) {
       console.log('🧹 Cleaning storage on initial load');
@@ -485,11 +434,9 @@ export default function AnalyzePage() {
       setHasAutoLoaded(false); // ریست کردن حالت بارگذاری خودکار
     }
   }, [url, pendingResult, hasCleanedStorage]);
-
   // SEO Props با useMemo برای بهینه‌سازی
   const seoProps = useMemo(() => {
     const baseUrl = process.env.NEXT_PUBLIC_WEBOFEN || "https://webofen.com";
-    
     // ساخت currentUrl - استفاده از window.location.href در سمت کلاینت
     let currentUrl = baseUrl;
     if (typeof window !== "undefined") {
@@ -499,25 +446,20 @@ export default function AnalyzePage() {
       const params = searchParams?.toString();
       currentUrl = `${baseUrl}${pathname}${params ? `?${params}` : ''}`;
     }
-    
     if (pendingResult) {
       const seoScore = Math.round((pendingResult.scores.seo || 0) * 100);
       const performanceScore = Math.round((pendingResult.scores.performance || 0) * 100);
       const accessibilityScore = Math.round((pendingResult.scores.accessibility || 0) * 100);
       const bestPracticesScore = Math.round((pendingResult.scores.bestPractices || 0) * 100);
-      
       // اطلاعات سایت‌مپ برای SEO
       const sitemapInfo = pendingResult.sitemapAnalysis ? 
         ` | لینک‌های سایت‌مپ: ${pendingResult.sitemapAnalysis.totalLinks}` : '';
-      
       // اطلاعات broken links برای SEO
       const brokenLinksInfo = pendingResult.brokenLinksCount ? 
         ` | لینک‌های شکسته: ${pendingResult.brokenLinksCount}` : '';
-      
       // 🔥 اطلاعات امنیتی برای SEO
       const securityInfo = pendingResult.securityAnalysis ? 
         ` | امنیت: ${pendingResult.securityAnalysis.securityScore}% | HTTPS: ${pendingResult.securityAnalysis.isHttps ? 'بله' : 'خیر'}` : '';
-      
       return {
         title: `نتایج آنالیز ${pendingResult.title || url} | وبوفن`,
         description: `آنالیز کامل سایت ${url} - سئو: ${seoScore}% | عملکرد: ${performanceScore}% | دسترسی: ${accessibilityScore}% | بهترین روش‌ها: ${bestPracticesScore}%${sitemapInfo}${brokenLinksInfo}${securityInfo}`,
@@ -553,7 +495,6 @@ export default function AnalyzePage() {
         }
       };
     }
-
     // حالت پیش‌فرض - وقتی آنالیزی نمایش داده نمی‌شود
     return {
       title: "آنالیز رایگان سایت | وبوفن",
@@ -577,7 +518,6 @@ export default function AnalyzePage() {
       }
     };
   }, [pendingResult, url, pathname, searchParams]);
-
   // دیباگ برای ردیابی issues و سایت‌مپ و brokenLinksCount و securityAnalysis
   useEffect(() => {
     if (pendingResult) {
@@ -602,7 +542,6 @@ export default function AnalyzePage() {
       });
     }
   }, [pendingResult]);
-
   // لاگ برای apiAnalysis
   useEffect(() => {
     if (apiAnalysis) {
@@ -621,7 +560,6 @@ export default function AnalyzePage() {
       });
     }
   }, [apiAnalysis]);
-
   // مدیریت وضعیت پیشرفت - بهبود یافته برای پشتیبانی از آنالیزهای موجود
   useEffect(() => {
     if (!apiAnalysis) {
@@ -632,7 +570,6 @@ export default function AnalyzePage() {
       }
       return;
     }
-
     if (apiAnalysis.id && apiAnalysis.id !== currentAnalysisId) {
       setCurrentAnalysisId(apiAnalysis.id);
       setAnalysisStarted(true);
@@ -640,7 +577,6 @@ export default function AnalyzePage() {
       setIsDuplicateAnalysis(false);
       setHasAutoLoaded(false); // ریست کردن حالت بارگذاری خودکار
     }
-
     switch (apiAnalysis.status) {
       case "pending":
         setProgress(20);
@@ -653,7 +589,6 @@ export default function AnalyzePage() {
       case "completed":
         setProgress(100);
         setAnalysisStatus("✅ آنالیز کامل شد!");
-
         if (convertedResult) {
           setPendingResult(convertedResult);
           setShowSuccessAlert(true);
@@ -679,7 +614,6 @@ export default function AnalyzePage() {
         break;
     }
   }, [apiAnalysis, convertedResult, currentAnalysisId, findExistingAnalysis]);
-
   // مدیریت زمان سپری شده
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
@@ -693,17 +627,14 @@ export default function AnalyzePage() {
     }
     return () => intervalId && clearInterval(intervalId);
   }, [analysisStarted, apiAnalysis?.status]);
-
   // انیمیشن نمرات
   useEffect(() => {
     if (!pendingResult) return;
-
     const intervalIds: NodeJS.Timeout[] = [];
     Object.entries(pendingResult.scores).forEach(([key, score]) => {
       if (score === undefined) return;
       let current = 0;
       const target = Math.round(score * 100);
-
       const id = setInterval(() => {
         current += 1;
         setAnimatedScores((prev) => ({ ...prev, [key]: current }));
@@ -711,10 +642,8 @@ export default function AnalyzePage() {
       }, 20);
       intervalIds.push(id);
     });
-
     return () => intervalIds.forEach(clearInterval);
   }, [pendingResult]);
-
   // اسکرول به بخش نتایج وقتی نمایش داده می‌شوند
   useEffect(() => {
     if (pendingResult && resultsViewed && resultsSectionRef.current) {
@@ -726,7 +655,6 @@ export default function AnalyzePage() {
       }, 100);
     }
   }, [pendingResult, resultsViewed]);
-
   const startAnalysis = async (userData: { name: string; phoneNumber: string }) => {
     setAnalysisStarted(true);
     setAnalysisStatus("🔄 در حال ارسال درخواست آنالیز...");
@@ -736,7 +664,6 @@ export default function AnalyzePage() {
     setIsDuplicateAnalysis(false);
     setHasCleanedStorage(false);
     setHasAutoLoaded(false); // ریست کردن حالت بارگذاری خودکار
-
     try {
       await hookStartAnalysis(url, userData);
     } catch (err) {
@@ -745,22 +672,17 @@ export default function AnalyzePage() {
       setCurrentAnalysisId(null);
     }
   };
-
   const handleAnalyzeClick = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     if (!url.trim()) {
       resetError();
       return;
     }
-
     let finalUrl = url.trim();
-
     // اگر http یا https نداشت خودش اضافه کن
     if (!/^https?:\/\//i.test(finalUrl)) {
       finalUrl = "https://" + finalUrl;
     }
-
     // اعتبارسنجی URL بعد از تصحیح
     try {
       new URL(finalUrl);
@@ -768,16 +690,12 @@ export default function AnalyzePage() {
       resetError();
       return;
     }
-
     // اعمال url نهایی تصحیح‌شده
     setUrl(finalUrl);
-    
     // ریست کردن حالت بارگذاری خودکار
     setHasAutoLoaded(false);
-
     // بررسی وجود آنالیز قبلی
     const existingAnalysis = findExistingAnalysis;
-
     if (existingAnalysis) {
       if (existingAnalysis.status === "completed") {
         const convertedExisting = convertApiResultToAnalyzeResult(existingAnalysis);
@@ -787,14 +705,12 @@ export default function AnalyzePage() {
         setShowAnalysisModal(false);
         setResultsViewed(true);
         setIsDuplicateAnalysis(true);
-
         setTimeout(() => {
           resultsSectionRef.current?.scrollIntoView({
             behavior: "smooth",
             block: "start",
           });
         }, 300);
-
         return;
       } else {
         setCurrentAnalysisId(existingAnalysis.id);
@@ -806,30 +722,25 @@ export default function AnalyzePage() {
         return;
       }
     }
-
-    // اگر آنالیز قبلی نیست → مودال را باز کن
+    // اگر آنالیز قبلی نیست → مودال را بازکن
     setShowAnalysisModal(true);
     setIsDuplicateAnalysis(false);
   };
-
   const handleCloseModal = () => {
     setShowAnalysisModal(false);
     if (!analysisStarted) {
       setAnalysisStatus("");
     }
   };
-
   // تابع برای مشاهده نتایج
   const handleViewResults = () => {
     setShowSuccessAlert(false);
     setResultsViewed(true);
   };
-
   // تابع برای شروع آنالیز جدید - با پاکسازی کامل
   const handleNewAnalysis = () => {
     // پاکسازی کامل storage
     cleanupAnalysisStorage();
-    
     // ریست تمام stateها
     setPendingResult(null);
     setAnalysisStarted(false);
@@ -847,8 +758,6 @@ export default function AnalyzePage() {
     setUrl("");
     resetError();
   };
-
-  // تابع برای پاک کردن URL و شروع مجدد
   const handleClearUrl = () => {
     setUrl("");
     setPendingResult(null);
@@ -858,27 +767,22 @@ export default function AnalyzePage() {
     setHasAutoLoaded(false); // ریست کردن حالت بارگذاری خودکار
     resetError();
   };
-
   const showLoading = analysisStarted && !pendingResult;
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30">
       {/* کامپوننت SEO */}
       <SEO {...seoProps} />
-
       <SuccessAlert
         isOpen={showSuccessAlert}
         onClose={() => setShowSuccessAlert(false)}
         onViewResults={handleViewResults}
       />
-
       <AnalysisModal
         isOpen={showAnalysisModal && !analysisStarted}
         onClose={handleCloseModal}
         onStartAnalysis={startAnalysis}
         loading={loading}
       />
-
       <div className="w-full">
         <HeroSection 
           url={url} 
@@ -886,13 +790,11 @@ export default function AnalyzePage() {
           loading={loading && analysisStarted} 
           handleAnalyze={handleAnalyzeClick}
         />
-
         {!!url && !pendingResult && !isDuplicateAnalysis && (
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
        
           </div>
         )}
-
         {/* تغییر: نمایش پیام فقط وقتی که آنالیز موجود است اما هنوز به صورت خودکار لود نشده */}
         {hasExistingAnalysis && !pendingResult && url && !analysisStarted && !hasAutoLoaded && (
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
@@ -903,7 +805,6 @@ export default function AnalyzePage() {
             </div>
           </div>
         )}
-
         {isDuplicateAnalysis && pendingResult && hasAutoLoaded && (
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 mb-2">
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
@@ -913,7 +814,6 @@ export default function AnalyzePage() {
             </div>
           </div>
         )}
-
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
           <ErrorDisplay error={error} />
           {showLoading && (
@@ -931,7 +831,6 @@ export default function AnalyzePage() {
               )}
             </div>
           )}
-
           {/* بخش نتایج - همیشه نمایش داده شود اگر pendingResult وجود دارد */}
           <div ref={resultsSectionRef}>
             {pendingResult && (
@@ -945,7 +844,6 @@ export default function AnalyzePage() {
                   )}
                   {/* دکمه آنالیز جدید برای دسکتاپ */}
                   <div className="hidden lg:flex gap-2">
-               
                     <button
                       onClick={handleNewAnalysis}
                       className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
@@ -954,7 +852,6 @@ export default function AnalyzePage() {
                     </button>
                   </div>
                 </div>
-
                 {/* Layout ریسپانسیو برای WebsiteOverview و ScoreGuide */}
                 <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 px-2 sm:px-0">
                   <div className="w-full lg:w-9/12 order-2 lg:order-1">
@@ -964,9 +861,7 @@ export default function AnalyzePage() {
                     <ScoreGuide />
                   </div>
                 </div>
-
                 <AnalysisScores result={pendingResult} animatedScores={animatedScores} />
-                
                 {/* 🔥 ProductRecommendations با پشتیبانی کامل از brokenLinksCount و securityAnalysis */}
                 <ProductRecommendations 
                   scores={pendingResult.scores} 
@@ -975,9 +870,7 @@ export default function AnalyzePage() {
                   brokenLinksCount={pendingResult.brokenLinksCount || 0}
                   securityAnalysis={pendingResult.securityAnalysis}
                 />
-                
                 <CoreMetrics result={pendingResult} />
-                
                 {/* IssuesList همیشه نمایش داده شود */}
                 <div className="mt-6 sm:mt-8 px-2 sm:px-0">
                   <IssuesList 
@@ -985,7 +878,6 @@ export default function AnalyzePage() {
                     isDuplicate={isDuplicateAnalysis}
                   />
                 </div>
-
                 {/* دکمه‌های آنالیز جدید برای موبایل */}
                 <div className="lg:hidden px-4 pb-6 space-y-3">
                
@@ -999,7 +891,6 @@ export default function AnalyzePage() {
               </div>
             )}
           </div>
-          
           {/* نمایش HowItWorks فقط وقتی که هیچ آنالیزی در حال نمایش نیست */}
           {!pendingResult && !showLoading && !url && (
             <div className="px-2 sm:px-0">
