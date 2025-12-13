@@ -386,6 +386,7 @@ export default function AnalyzePage() {
   const [resultsViewed, setResultsViewed] = useState<boolean>(false);
   const [isDuplicateAnalysis, setIsDuplicateAnalysis] = useState<boolean>(false);
   const [hasCleanedStorage, setHasCleanedStorage] = useState<boolean>(false);
+  const [hasAutoLoaded, setHasAutoLoaded] = useState<boolean>(false); // حالت جدید
 
   const resultsSectionRef = useRef<HTMLDivElement>(null);
 
@@ -430,17 +431,31 @@ export default function AnalyzePage() {
     return !!findExistingAnalysis;
   }, [findExistingAnalysis]);
 
-  // مدیریت وضعیت آنالیزهای موجود
+  // مدیریت وضعیت آنالیزهای موجود - تغییر یافته برای بارگذاری خودکار
   useEffect(() => {
-    // فقط اگر کاربر به صورت دستی URL وارد کرده باشد، آنالیز قبلی را نمایش بده
-    if (findExistingAnalysis && findExistingAnalysis.status === 'completed' && url && !pendingResult && !analysisStarted && !hasCleanedStorage) {
+    // فقط اگر کاربر به صورت دستی URL وارد کرده باشد و هنوز آنالیز قدیمی را به صورت خودکار لود نکرده باشیم
+    if (findExistingAnalysis && 
+        findExistingAnalysis.status === 'completed' && 
+        url && 
+        !pendingResult && 
+        !analysisStarted && 
+        !hasAutoLoaded) { // اضافه کردن شرط hasAutoLoaded
       console.log("🔄 Automatically loading existing analysis for:", url);
       const convertedExisting = convertApiResultToAnalyzeResult(findExistingAnalysis);
       setPendingResult(convertedExisting);
       setIsDuplicateAnalysis(true);
       setResultsViewed(true);
+      setHasAutoLoaded(true); // علامت گذاری که بارگذاری خودکار انجام شده است
+      
+      // اسکرول به نتایج
+      setTimeout(() => {
+        resultsSectionRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 300);
     }
-  }, [findExistingAnalysis, url, pendingResult, analysisStarted, hasCleanedStorage]);
+  }, [findExistingAnalysis, url, pendingResult, analysisStarted, hasAutoLoaded]);
 
   // پاکسازی storage هنگام بارگذاری صفحه
   useEffect(() => {
@@ -452,6 +467,7 @@ export default function AnalyzePage() {
       // پاکسازی کامل storage
       cleanupAnalysisStorage();
       setHasCleanedStorage(true);
+      setHasAutoLoaded(false); // ریست کردن حالت بارگذاری خودکار
       
       // پاک کردن flag
       sessionStorage.removeItem('fromDashboard');
@@ -466,6 +482,7 @@ export default function AnalyzePage() {
       console.log('🧹 Cleaning storage on initial load');
       cleanupAnalysisStorage();
       setHasCleanedStorage(true);
+      setHasAutoLoaded(false); // ریست کردن حالت بارگذاری خودکار
     }
   }, [url, pendingResult, hasCleanedStorage]);
 
@@ -621,6 +638,7 @@ export default function AnalyzePage() {
       setAnalysisStarted(true);
       setResultsViewed(false);
       setIsDuplicateAnalysis(false);
+      setHasAutoLoaded(false); // ریست کردن حالت بارگذاری خودکار
     }
 
     switch (apiAnalysis.status) {
@@ -643,6 +661,7 @@ export default function AnalyzePage() {
           setShowAnalysisModal(false);
           setCurrentAnalysisId(null);
           setIsDuplicateAnalysis(false);
+          setHasAutoLoaded(false); // ریست کردن حالت بارگذاری خودکار
           
           // اسکرول به نتایج پس از تکمیل آنالیز جدید
           setTimeout(() => {
@@ -656,6 +675,7 @@ export default function AnalyzePage() {
         setAnalysisStarted(false);
         setCurrentAnalysisId(null);
         setIsDuplicateAnalysis(false);
+        setHasAutoLoaded(false); // ریست کردن حالت بارگذاری خودکار
         break;
     }
   }, [apiAnalysis, convertedResult, currentAnalysisId, findExistingAnalysis]);
@@ -715,6 +735,7 @@ export default function AnalyzePage() {
     setResultsViewed(false);
     setIsDuplicateAnalysis(false);
     setHasCleanedStorage(false);
+    setHasAutoLoaded(false); // ریست کردن حالت بارگذاری خودکار
 
     try {
       await hookStartAnalysis(url, userData);
@@ -725,67 +746,71 @@ export default function AnalyzePage() {
     }
   };
 
-const handleAnalyzeClick = (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
+  const handleAnalyzeClick = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  if (!url.trim()) {
-    resetError();
-    return;
-  }
-
-  let finalUrl = url.trim();
-
-  // اگر http یا https نداشت خودش اضافه کن
-  if (!/^https?:\/\//i.test(finalUrl)) {
-    finalUrl = "https://" + finalUrl;
-  }
-
-  // اعتبارسنجی URL بعد از تصحیح
-  try {
-    new URL(finalUrl);
-  } catch {
-    resetError();
-    return;
-  }
-
-  // اعمال url نهایی تصحیح‌شده
-  setUrl(finalUrl);
-
-  // بررسی وجود آنالیز قبلی
-  const existingAnalysis = findExistingAnalysis;
-
-  if (existingAnalysis) {
-    if (existingAnalysis.status === "completed") {
-      const convertedExisting = convertApiResultToAnalyzeResult(existingAnalysis);
-      setPendingResult(convertedExisting);
-      setShowSuccessAlert(false);
-      setAnalysisStarted(false);
-      setShowAnalysisModal(false);
-      setResultsViewed(true);
-      setIsDuplicateAnalysis(true);
-
-      setTimeout(() => {
-        resultsSectionRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }, 300);
-
-      return;
-    } else {
-      setCurrentAnalysisId(existingAnalysis.id);
-      setAnalysisStarted(true);
-      setShowAnalysisModal(false);
-      setResultsViewed(false);
-      setIsDuplicateAnalysis(false);
+    if (!url.trim()) {
+      resetError();
       return;
     }
-  }
 
-  // اگر آنالیز قبلی نیست → مودال را باز کن
-  setShowAnalysisModal(true);
-  setIsDuplicateAnalysis(false);
-};
+    let finalUrl = url.trim();
+
+    // اگر http یا https نداشت خودش اضافه کن
+    if (!/^https?:\/\//i.test(finalUrl)) {
+      finalUrl = "https://" + finalUrl;
+    }
+
+    // اعتبارسنجی URL بعد از تصحیح
+    try {
+      new URL(finalUrl);
+    } catch {
+      resetError();
+      return;
+    }
+
+    // اعمال url نهایی تصحیح‌شده
+    setUrl(finalUrl);
+    
+    // ریست کردن حالت بارگذاری خودکار
+    setHasAutoLoaded(false);
+
+    // بررسی وجود آنالیز قبلی
+    const existingAnalysis = findExistingAnalysis;
+
+    if (existingAnalysis) {
+      if (existingAnalysis.status === "completed") {
+        const convertedExisting = convertApiResultToAnalyzeResult(existingAnalysis);
+        setPendingResult(convertedExisting);
+        setShowSuccessAlert(false);
+        setAnalysisStarted(false);
+        setShowAnalysisModal(false);
+        setResultsViewed(true);
+        setIsDuplicateAnalysis(true);
+
+        setTimeout(() => {
+          resultsSectionRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }, 300);
+
+        return;
+      } else {
+        setCurrentAnalysisId(existingAnalysis.id);
+        setAnalysisStarted(true);
+        setShowAnalysisModal(false);
+        setResultsViewed(false);
+        setIsDuplicateAnalysis(false);
+        setHasAutoLoaded(false); // ریست کردن حالت بارگذاری خودکار
+        return;
+      }
+    }
+
+    // اگر آنالیز قبلی نیست → مودال را باز کن
+    setShowAnalysisModal(true);
+    setIsDuplicateAnalysis(false);
+  };
 
   const handleCloseModal = () => {
     setShowAnalysisModal(false);
@@ -818,6 +843,7 @@ const handleAnalyzeClick = (e: React.FormEvent<HTMLFormElement>) => {
     setResultsViewed(false);
     setIsDuplicateAnalysis(false);
     setHasCleanedStorage(false);
+    setHasAutoLoaded(false); // ریست کردن حالت بارگذاری خودکار
     setUrl("");
     resetError();
   };
@@ -829,6 +855,7 @@ const handleAnalyzeClick = (e: React.FormEvent<HTMLFormElement>) => {
     setIsDuplicateAnalysis(false);
     setResultsViewed(false);
     setHasCleanedStorage(false);
+    setHasAutoLoaded(false); // ریست کردن حالت بارگذاری خودکار
     resetError();
   };
 
@@ -860,27 +887,28 @@ const handleAnalyzeClick = (e: React.FormEvent<HTMLFormElement>) => {
           handleAnalyze={handleAnalyzeClick}
         />
 
-        {!!url && !pendingResult && (
+        {!!url && !pendingResult && !isDuplicateAnalysis && (
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
        
           </div>
         )}
 
-        {hasExistingAnalysis && !pendingResult && url && !analysisStarted && (
+        {/* تغییر: نمایش پیام فقط وقتی که آنالیز موجود است اما هنوز به صورت خودکار لود نشده */}
+        {hasExistingAnalysis && !pendingResult && url && !analysisStarted && !hasAutoLoaded && (
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
               <span className="text-blue-600 text-sm sm:text-base">
-                ✅ آنالیز قبلی برای این آدرس موجود است - برای مشاهده نتایج دکمه "شروع آنالیز " را بزنید
+                🔄 در حال بارگذاری نتایج آنالیز قبلی...
               </span>
             </div>
           </div>
         )}
 
-        {isDuplicateAnalysis && pendingResult && (
+        {isDuplicateAnalysis && pendingResult && hasAutoLoaded && (
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 mb-2">
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
               <span className="text-green-600 text-sm sm:text-base">
-                ✅ در حال نمایش نتایج آنالیز قبلی - برای آنالیز جدید دکمه "آنالیز جدید" را بزنید
+                ✅ نمایش خودکار نتایج آنالیز قبلی - برای آنالیز جدید دکمه "آنالیز جدید" را بزنید
               </span>
             </div>
           </div>
