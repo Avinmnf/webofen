@@ -187,10 +187,10 @@ export function HowItWorks() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
           <div 
             className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 cursor-pointer transform hover:scale-105 transition-transform duration-300"
-            onClick={() => openImageModal("/analyze/Screenshot 2025-11-26 104643.png")}
+            onClick={() => openImageModal("/analyze/Screenshot 2025-12-13 162303.png")}
           >
             <img
-              src="/analyze/Screenshot 2025-12-01 140440.png"
+              src="/analyze/Screenshot 2025-12-13 162303.png"
               alt="نمونه گزارش بخش اول"
               className="w-full h-auto"
             />

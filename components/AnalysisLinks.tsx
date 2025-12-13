@@ -1,11 +1,13 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+
 interface User {
   name: string;
   phone: string;
   email?: string;
 }
+
 interface Analysis {
   id: string;
   url: string;
@@ -27,15 +29,18 @@ interface Analysis {
   };
   [key: string]: any;
 }
+
 interface ApiResponse {
   analyses: Analysis[];
 }
+
 interface AnalysisLinksProps {
   compact?: boolean;
   showHeader?: boolean;
   itemsPerPage?: number;
   showAllByDefault?: boolean;
 }
+
 export default function AnalysisLinks({ 
   compact = false, 
   showHeader = true,
@@ -48,7 +53,10 @@ export default function AnalysisLinks({
   const [user, setUser] = useState<User | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [showAllItems, setShowAllItems] = useState(showAllByDefault);
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
+  
   const router = useRouter();
+
   // محاسبه داده‌های صفحه‌بندی
   const paginationData = useMemo(() => {
     const totalItems = allAnalyses.length;
@@ -76,10 +84,12 @@ export default function AnalysisLinks({
       };
     }
   }, [allAnalyses, currentPage, itemsPerPage, showAllItems]);
+
   // تابع برای تولید آرایه صفحات
   const getPageNumbers = (currentPage: number, totalPages: number) => {
     const pageNumbers = [];
     const maxVisiblePages = 5;
+    
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
         pageNumbers.push(i);
@@ -109,58 +119,99 @@ export default function AnalysisLinks({
     }
     return pageNumbers;
   };
+
   // تابع fetch برای دریافت همه داده‌ها
-  const fetchAnalyses = async () => {
+  const fetchAnalyses = async (forceRefresh = false) => {
     try {
       setLoading(true);
       setError(null);
+      
       // 1. Get logged in user
-      const meRes = await fetch('/api/auth/me');
+      const meRes = await fetch('/api/auth/me', {
+        cache: forceRefresh ? 'no-cache' : 'default'
+      });
+      
       if (!meRes.ok) {
         throw new Error('خطا در دریافت اطلاعات کاربر');
       }
+      
       const meData = await meRes.json();
       const loggedUser: User = meData?.user;
+      
       if (!loggedUser) {
         setError('لطفاً ابتدا وارد حساب کاربری شوید.');
         setLoading(false);
         return;
       }
+      
       setUser(loggedUser);
-      // 2. Fetch all analyses
-      const response = await fetch('/api/analyses', {
+      
+      // 2. Fetch all analyses با timestamp برای جلوگیری از cache
+      const timestamp = new Date().getTime();
+      const response = await fetch(`/api/analyses?t=${timestamp}`, {
         headers: { 
           'x-user-phone': loggedUser.phone,
-          'Cache-Control': 'no-cache'
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
         },
+        cache: 'no-store'
       });
+      
       if (!response.ok) {
         throw new Error(`خطا در دریافت آنالیزها: ${response.status}`);
       }
+      
       const data: ApiResponse = await response.json();
+      
       // 3. Check if analyses exist
       if (!data?.analyses?.length) {
         setError('هیچ آنالیزی یافت نشد.');
         setAllAnalyses([]);
         setLoading(false);
+        setLastRefresh(new Date());
         return;
       }
+      
       // 4. Filter by phone number
       const filtered = data.analyses.filter(
         (item: Analysis) => item.phoneNumber === loggedUser.phone
       );
+      
       if (!filtered.length) {
         setError('هیچ آنالیزی مربوط به شماره شما یافت نشد.');
         setAllAnalyses([]);
         setLoading(false);
+        setLastRefresh(new Date());
         return;
       }
+      
       // 5. Sort by date (newest first)
       const sorted = filtered.sort((a, b) => 
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
+      
+      // 6. بررسی و لاگ آنالیزهای امروز برای دیباگ
+      const today = new Date().toDateString();
+      const todayAnalyses = sorted.filter(item => 
+        new Date(item.createdAt).toDateString() === today
+      );
+      
+      console.log('کل آنالیزها:', sorted.length);
+      console.log('آنالیزهای امروز:', todayAnalyses.length);
+      todayAnalyses.forEach((item, index) => {
+        console.log(`آنالیز امروز ${index + 1}:`, {
+          id: item.id,
+          url: item.url,
+          createdAt: item.createdAt,
+          status: item.status
+        });
+      });
+      
       setAllAnalyses(sorted);
       setCurrentPage(1);
+      setLastRefresh(new Date());
+      
     } catch (err: any) {
       console.error('Error fetching analyses:', err);
       setError(err.message || 'خطایی در دریافت آنالیزها رخ داده است.');
@@ -169,6 +220,7 @@ export default function AnalysisLinks({
       setLoading(false);
     }
   };
+
   // تابع برای تغییر صفحه
   const handlePageChange = (page: number) => {
     if (page < 1 || page > paginationData.totalPages) return;
@@ -179,6 +231,7 @@ export default function AnalysisLinks({
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
+
   // تابع برای تغییر حالت نمایش
   const toggleDisplayMode = () => {
     setShowAllItems(!showAllItems);
@@ -190,21 +243,40 @@ export default function AnalysisLinks({
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
-  useEffect(() => {
-    fetchAnalyses();
 
-    // شروع polling هر 10 ثانیه
-    const interval = setInterval(fetchAnalyses, 10000);
+  useEffect(() => {
+    fetchAnalyses(true); // اولین بار با force refresh
+    
+    // شروع polling هر 15 ثانیه
+    const interval = setInterval(() => {
+      fetchAnalyses();
+    }, 15000);
 
     return () => clearInterval(interval);
   }, []);
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('fa-IR') + ' ' + date.toLocaleTimeString('fa-IR', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / (3600000 * 24));
+    
+    if (diffMins < 1) {
+      return 'همین لحظه';
+    } else if (diffMins < 60) {
+      return `${diffMins} دقیقه پیش`;
+    } else if (diffHours < 24) {
+      return `${diffHours} ساعت پیش`;
+    } else {
+      return date.toLocaleDateString('fa-IR') + ' ' + date.toLocaleTimeString('fa-IR', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
   };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed': return 'text-green-600 bg-green-50 border border-green-200';
@@ -213,6 +285,7 @@ export default function AnalysisLinks({
       default: return 'text-gray-600 bg-gray-50 border border-gray-200';
     }
   };
+
   const getStatusText = (status: string) => {
     switch (status) {
       case 'completed': return '✅ تکمیل شده';
@@ -221,6 +294,7 @@ export default function AnalysisLinks({
       default: return status;
     }
   };
+
   // تابع برای نمایش URL به صورت کوتاه شده
   const formatUrl = (url: string): string => {
     try {
@@ -232,6 +306,7 @@ export default function AnalysisLinks({
       return url;
     }
   };
+
   // تابع برای باز کردن سایت در تب جدید
   const handleViewSite = (url: string, e?: React.MouseEvent) => {
     if (e) {
@@ -242,11 +317,13 @@ export default function AnalysisLinks({
       window.open(fullUrl, '_blank', 'noopener,noreferrer');
     }
   };
+
   // تابع برای مشاهده تحلیل در تب جدید
   const handleViewAnalysisInNewTab = (analysis: Analysis, e?: React.MouseEvent) => {
     if (e) {
       e.stopPropagation();
     }
+    
     // ذخیره تحلیل در localStorage برای استفاده در صفحه تحلیل
     const analysisData = {
       ...analysis,
@@ -259,18 +336,23 @@ export default function AnalysisLinks({
       result: analysis.result || {},
       sitemapAnalysis: analysis.sitemapAnalysis || null
     };
+    
     localStorage.setItem('currentAnalysis', JSON.stringify(analysisData));
-    // همچنین ذخیره URL در localStorage برای نمایش در اینپوت صفحه تحلیل
     localStorage.setItem('analysisUrl', analysis.url || '');
+    
     // باز کردن صفحه تحلیل در تب جدید
     const url = `/analyze?id=${analysis.id}`;
     window.open(url, '_blank', 'noopener,noreferrer');
   };
+
   // کامپوننت Pagination
   const Pagination = () => {
     const { totalPages, totalItems, startIndex, endIndex, showAll } = paginationData;
+    
     if (showAll || totalPages <= 1) return null;
+    
     const pageNumbers = getPageNumbers(currentPage, totalPages);
+    
     return (
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-gray-200">
         <div className="text-sm text-gray-600">
@@ -280,6 +362,7 @@ export default function AnalysisLinks({
           صفحه <span className="font-medium">{currentPage.toLocaleString('fa-IR')}</span> از{' '}
           <span className="font-medium">{totalPages.toLocaleString('fa-IR')}</span>
         </div>
+        
         <div className="flex items-center gap-2">
           <button
             onClick={() => handlePageChange(1)}
@@ -291,6 +374,7 @@ export default function AnalysisLinks({
             <span>««</span>
             <span className="hidden sm:inline">ابتدا</span>
           </button>
+          
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
@@ -301,6 +385,7 @@ export default function AnalysisLinks({
             <span>«</span>
             <span className="hidden sm:inline">قبلی</span>
           </button>
+          
           <div className="flex items-center gap-1">
             {pageNumbers.map((pageNumber, index) => (
               pageNumber === -1 ? (
@@ -322,6 +407,7 @@ export default function AnalysisLinks({
               )
             ))}
           </div>
+          
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
@@ -332,6 +418,7 @@ export default function AnalysisLinks({
             <span className="hidden sm:inline">بعدی</span>
             <span>»</span>
           </button>
+          
           <button
             onClick={() => handlePageChange(totalPages)}
             disabled={currentPage === totalPages}
@@ -346,6 +433,13 @@ export default function AnalysisLinks({
       </div>
     );
   };
+
+  // تابع برای فرمت تاریخ آخرین بروزرسانی
+  const formatLastRefresh = () => {
+    if (!lastRefresh) return '';
+    return formatDate(lastRefresh.toISOString());
+  };
+
   if (loading && allAnalyses.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm border border-gray-200">
@@ -354,6 +448,7 @@ export default function AnalysisLinks({
       </div>
     );
   }
+
   return (
     <div 
       id="analysis-container"
@@ -375,6 +470,7 @@ export default function AnalysisLinks({
                 )}
               </div>
             </div>
+            
             <div className="flex flex-wrap items-center gap-2">
               {allAnalyses.length > 0 && (
                 <button
@@ -395,8 +491,9 @@ export default function AnalysisLinks({
                   )}
                 </button>
               )}
+              
               <button
-                onClick={fetchAnalyses}
+                onClick={() => fetchAnalyses(true)}
                 className="text-sm px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 
                          border border-blue-700 rounded-lg transition-colors flex items-center gap-2 font-medium"
                 disabled={loading}
@@ -406,6 +503,7 @@ export default function AnalysisLinks({
               </button>
             </div>
           </div>
+          
           {allAnalyses.length > 0 && (
             <div className="flex flex-wrap items-center gap-4 mt-4 pt-3 border-t border-blue-300/50">
               <div className="flex items-center gap-2">
@@ -414,6 +512,7 @@ export default function AnalysisLinks({
                   <span className="font-bold">{allAnalyses.length}</span> آنالیز ثبت شده
                 </span>
               </div>
+              
               <div className="flex items-center gap-2">
                 <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">✅</span>
                 <span className="text-sm text-gray-700">
@@ -422,6 +521,7 @@ export default function AnalysisLinks({
                   </span> تکمیل شده
                 </span>
               </div>
+              
               {!paginationData.showAll && paginationData.totalPages > 1 && (
                 <div className="flex items-center gap-2">
                   <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">📄</span>
@@ -431,6 +531,7 @@ export default function AnalysisLinks({
                   </span>
                 </div>
               )}
+              
               {paginationData.showAll && (
                 <div className="flex items-center gap-2">
                   <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">📋</span>
@@ -439,10 +540,20 @@ export default function AnalysisLinks({
                   </span>
                 </div>
               )}
+              
+              {lastRefresh && (
+                <div className="flex items-center gap-2">
+                  <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">🕐</span>
+                  <span className="text-sm text-gray-700">
+                    آخرین بروزرسانی: {formatLastRefresh()}
+                  </span>
+                </div>
+              )}
             </div>
           )}
         </div>
       )}
+      
       <div className={compact ? '' : 'p-4'}>
         {error ? (
           <div className={`${compact ? 'py-3' : 'py-6'} text-center`}>
@@ -452,7 +563,7 @@ export default function AnalysisLinks({
               </div>
               <p className="text-gray-600 font-medium">{error}</p>
               <button
-                onClick={fetchAnalyses}
+                onClick={() => fetchAnalyses(true)}
                 className="mt-2 text-sm px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg font-medium"
               >
                 تلاش مجدد
@@ -487,13 +598,21 @@ export default function AnalysisLinks({
                     </>
                   )}
                 </div>
+                
+                <div className="text-xs text-gray-500">
+                  {lastRefresh && (
+                    <span>آخرین بروزرسانی: {formatLastRefresh()}</span>
+                  )}
+                </div>
               </div>
             </div>
+            
             <div className="space-y-3">
               {paginationData.currentItems.map((analysis, index) => {
                 const rowNumber = paginationData.showAll 
                   ? index + 1 
                   : (currentPage - 1) * itemsPerPage + index + 1;
+                
                 return (
                   <div 
                     key={analysis.id} 
@@ -518,8 +637,16 @@ export default function AnalysisLinks({
                           }`}>
                             {analysis.analysisType === 'full' ? 'آنالیز کامل' : 'آنالیز سریع'}
                           </span>
+                          
+                          {/* نشانگر آنالیز امروز */}
+                          {new Date(analysis.createdAt).toDateString() === new Date().toDateString() && (
+                            <span className="text-xs px-2 py-1 bg-green-100 text-green-700 border border-green-300 rounded-lg font-medium">
+                              🆕 امروز
+                            </span>
+                          )}
                         </div>
                       </div>
+                      
                       <div className="space-y-3">
                         {/* URL سایت */}
                         {analysis.url ? (
@@ -541,13 +668,15 @@ export default function AnalysisLinks({
                             بدون آدرس سایت
                           </div>
                         )}
+                        
                         <div className="flex flex-wrap items-center gap-4">
                           <div className="flex items-center gap-2">
                             <span className="text-gray-400 text-xs">📅</span>
-                            <span className="text-xs text-gray-600 font-medium">
+                            <span className="text-xs text-gray-600 font-medium" title={new Date(analysis.createdAt).toLocaleString('fa-IR')}>
                               {formatDate(analysis.createdAt)}
                             </span>
                           </div>  
+                          
                           {/* شناسه آنالیز */}
                           <div className="flex items-center gap-2">
                             <span className="text-gray-400 text-xs">🆔</span>
@@ -558,6 +687,7 @@ export default function AnalysisLinks({
                         </div>
                       </div>
                     </div>
+                    
                     {/* دکمه‌های عملیاتی */}
                     <div className="flex items-center gap-2 sm:flex-col sm:items-end">
                       <div className="flex flex-col sm:flex-row gap-2">
@@ -582,27 +712,12 @@ export default function AnalysisLinks({
                 );
               })}
             </div>
+            
             <Pagination />
+            
             {allAnalyses.length > itemsPerPage && (
               <div className="text-center pt-4 mt-4 border-t border-gray-200">
-                <button
-                  onClick={toggleDisplayMode}
-                  className="text-sm px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 
-                           border border-gray-300 rounded-lg transition-colors flex items-center 
-                           gap-2 mx-auto"
-                >
-                  {showAllItems ? (
-                    <>
-                      <span>📄</span>
-                      نمایش صفحه‌بندی شده
-                    </>
-                  ) : (
-                    <>
-                      <span>📋</span>
-                      نمایش همه آنالیزها ({allAnalyses.length})
-                    </>
-                  )}
-                </button>
+              
               </div>
             )}
           </>
