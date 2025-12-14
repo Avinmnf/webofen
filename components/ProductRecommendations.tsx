@@ -408,8 +408,8 @@ export const ProductRecommendations = ({
           <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-bold text-green-800 text-xs mb-1">وضعیت لینک‌ های شکسته</h4>
-                <p className="text-green-700 text-xs">
+                <h4 className="font-bold text-green-800 text-s mb-1">وضعیت لینک‌ های شکسته</h4>
+                <p className="text-green-700 text-s">
                   تعداد لینک‌های شکسته: <strong>{brokenLinksCount}</strong>
                   <span className="mr-2 font-medium text-green-600">(وضعیت قابل قبول)</span>
                 </p>
