@@ -250,7 +250,7 @@ export default function AnalysisLinks({
     // شروع polling هر 15 ثانیه
     const interval = setInterval(() => {
       fetchAnalyses();
-    }, 15000);
+    }, 30000);
 
     return () => clearInterval(interval);
   }, []);
@@ -476,7 +476,7 @@ export default function AnalysisLinks({
                 <button
                   onClick={toggleDisplayMode}
                   className="text-sm px-4 py-2 bg-white text-blue-700 hover:bg-blue-50 
-                           border border-blue-300 rounded-lg transition-colors flex items-center gap-2 font-medium"
+                           border border-blue-300 rounded-lg transition-colors flex items-center gap-2 cursor-pointer font-medium"
                 >
                   {showAllItems ? (
                     <>
@@ -495,7 +495,7 @@ export default function AnalysisLinks({
               <button
                 onClick={() => fetchAnalyses(true)}
                 className="text-sm px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 
-                         border border-blue-700 rounded-lg transition-colors flex items-center gap-2 font-medium"
+                         border border-blue-700 rounded-lg transition-colors flex items-center gap-2 cursor-pointer font-medium"
                 disabled={loading}
               >
                 <span className={`${loading ? 'animate-spin' : ''}`}>🔄</span>
@@ -580,12 +580,12 @@ export default function AnalysisLinks({
           </div>
         ) : (
           <>
-            <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="mb-4 p-3 bg-gray-50 rounded-lg  border border-gray-200">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="text-sm text-gray-700">
+                <div className="text-sm text-gray-700 ">
                   {paginationData.showAll ? (
                     <>
-                      <span className="font-bold">📋 نمایش همه:</span>
+                      <span className="font-bold ">📋 نمایش همه:</span>
                       <span className="font-medium mr-2"> {paginationData.totalItems} آنالیز</span>
                     </>
                   ) : (
@@ -696,11 +696,11 @@ export default function AnalysisLinks({
                           onClick={(e) => handleViewAnalysisInNewTab(analysis, e)}
                           className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl 
                                    hover:from-blue-700 hover:to-blue-800 transition-all flex items-center 
-                                   justify-center gap-2 shadow-sm px-4 py-2.5 text-sm min-w-[140px] 
+                                   justify-center gap-2 shadow-sm cursor-pointer px-4 py-2.5 text-sm min-w-[140px] 
                                    hover:shadow-md group relative"
                           title="مشاهده تحلیل در تب جدید"
                         >
-                          <span className="text-lg">📊</span>
+                          <span className="text-lg cursor-pointer">📊</span>
                           <span>مشاهده تحلیل</span>
                           <span className="absolute -top-2 -right-2 bg-blue-800 text-white text-xs px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
                             🔗

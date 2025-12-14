@@ -65,25 +65,31 @@ export function HowItWorks() {
       
       {/* Modal برای نمایش عکس بزرگ */}
       {selectedImage && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
+        <div
+          className="fixed inset-0 z-50 flex items-center  justify-center p-4
+                    backdrop-blur-md bg-white/10"
           onClick={closeImageModal}
         >
-          <div className="relative max-w-4xl max-h-full">
-            <button 
-              className="absolute -top-12 right-0 text-white text-2xl hover:text-gray-300 transition-colors"
+          <div
+            className="relative max-w-4xl max-h-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="absolute -top-12 right-0 text-black text-2xl cursor-pointer transition-colors"
               onClick={closeImageModal}
             >
               ✕
             </button>
-            <img 
-              src={selectedImage} 
-              alt="نمونه گزارش بزرگ شده" 
-              className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
+
+            <img
+              src={selectedImage}
+              alt="نمونه گزارش بزرگ شده"
+              className="w-full h-auto max-h-[80vh] object-contain rounded-2xl shadow-2xl"
             />
           </div>
         </div>
       )}
+
 
       {/* هدر */}
       <div className="text-center mb-16">
