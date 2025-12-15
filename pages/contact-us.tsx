@@ -10,6 +10,28 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useForms, FormPayload } from "@/hooks/useform";
+import SEO from "@/components/seo";
+function generateContactUsSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    name: "تماس با وبوفن",
+    description:
+      "راه‌های ارتباط با وبوفن برای دریافت مشاوره طراحی سایت، توسعه نرم‌افزار و سیستم‌های اختصاصی",
+    mainEntity: {
+      "@type": "Organization",
+      name: "وبوفن",
+      description:
+        "وبوفن تیم متخصص طراحی سایت، توسعه CMS اختصاصی و راهکارهای نرم‌افزاری",
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        availableLanguage: ["fa"],
+        areaServed: "IR",
+      },
+    },
+  };
+}
 
 const ContactUs = () => {
   interface FormData {
@@ -49,39 +71,45 @@ const ContactUs = () => {
   // Helper function to validate Iranian phone numbers
   const isValidIranianPhone = (phone: string): boolean => {
     // Remove any whitespace, dashes, or plus signs
-    const cleanedPhone = phone.replace(/[\s\-+]/g, '');
-    
+    const cleanedPhone = phone.replace(/[\s\-+]/g, "");
+
     // Check if it's a valid number
     if (!/^\d+$/.test(cleanedPhone)) {
       return false;
     }
-    
+
     // Iranian phone number patterns:
     // 1. Mobile: 09xx xxx xxxx (11 digits total)
     // 2. Landline: 0xx xxx xxxx (11 digits total)
     // 3. International format: +98 xxx xxx xxxx
-    
+
     // For simplicity, we'll check if it's a valid Iranian mobile number
     const mobileRegex = /^(09[0-9]{9})$/; // 09 followed by 9 digits
     const landlineRegex = /^(0[0-9]{10})$/; // 0 followed by 10 digits
-    
+
     return mobileRegex.test(cleanedPhone) || landlineRegex.test(cleanedPhone);
   };
 
   // Format phone number as user types (optional)
   const formatPhoneNumber = (value: string): string => {
     // Remove all non-digit characters
-    const phoneNumber = value.replace(/\D/g, '');
-    
+    const phoneNumber = value.replace(/\D/g, "");
+
     // Format as Iranian phone number
     if (phoneNumber.length <= 4) {
       return phoneNumber;
     } else if (phoneNumber.length <= 7) {
       return `${phoneNumber.slice(0, 4)} ${phoneNumber.slice(4)}`;
     } else if (phoneNumber.length <= 11) {
-      return `${phoneNumber.slice(0, 4)} ${phoneNumber.slice(4, 7)} ${phoneNumber.slice(7)}`;
+      return `${phoneNumber.slice(0, 4)} ${phoneNumber.slice(
+        4,
+        7
+      )} ${phoneNumber.slice(7)}`;
     } else {
-      return `${phoneNumber.slice(0, 4)} ${phoneNumber.slice(4, 8)} ${phoneNumber.slice(8, 12)}`;
+      return `${phoneNumber.slice(0, 4)} ${phoneNumber.slice(
+        4,
+        8
+      )} ${phoneNumber.slice(8, 12)}`;
     }
   };
 
@@ -252,7 +280,7 @@ const ContactUs = () => {
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    
+
     // Special handling for phone number input
     if (name === "phone") {
       // Allow only numbers and optional spaces/dashes
@@ -282,13 +310,13 @@ const ContactUs = () => {
     if (!formData.name.trim()) {
       newErrors.name = "نام را وارد کنید";
     }
-    
+
     if (!formData.phone.trim()) {
       newErrors.phone = "شماره تلفن را وارد کنید";
     } else {
       // Check if phone contains only numbers and optional spaces/dashes
-      const phoneWithoutSpaces = formData.phone.replace(/[\s\-]/g, '');
-      
+      const phoneWithoutSpaces = formData.phone.replace(/[\s\-]/g, "");
+
       // Check if it's a number
       if (!/^\d+$/.test(phoneWithoutSpaces)) {
         newErrors.phone = "شماره تلفن باید فقط شامل اعداد باشد";
@@ -299,7 +327,8 @@ const ContactUs = () => {
       }
       // Check if it's a valid Iranian phone number format
       else if (!isValidIranianPhone(phoneWithoutSpaces)) {
-        newErrors.phone = "شماره تلفن معتبر نیست. فرمت صحیح: ۰۹۱۲۳۴۵۶۷۸۹ یا ۰۲۱۱۲۳۴۵۶۷۸";
+        newErrors.phone =
+          "شماره تلفن معتبر نیست. فرمت صحیح: ۰۹۱۲۳۴۵۶۷۸۹ یا ۰۲۱۱۲۳۴۵۶۷۸";
       }
     }
 
@@ -326,7 +355,7 @@ const ContactUs = () => {
     }
 
     // Clean phone number before sending (remove spaces/dashes)
-    const cleanPhone = formData.phone.replace(/[\s\-]/g, '');
+    const cleanPhone = formData.phone.replace(/[\s\-]/g, "");
 
     // Prepare payload for useForms hook
     const payload: FormPayload = {
@@ -373,298 +402,319 @@ const ContactUs = () => {
     `w-full px-4 py-3 rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-[#29b0cb] focus:border-transparent ${
       hasError ? "border-red-300 bg-red-50" : "border-gray-300"
     }`;
+  const contactusSchema = generateContactUsSchema();
 
   return (
-    <main>
-      {/* Contact Form Section */}
-      <section className="pb-4 w-full">
-        <div className="max-w-[1250px] m-auto flex flex-col lg:flex-row gap-8 md:py-20 md:px-0 px-4">
-          {/* Contact Information */}
-          <div className="lg:w-1/3 space-y-8">
-            <div className="mb-6">
-              <h1 className="text-[#0364af] text-4xl font-semibold md:pt-0 pt-6">
-                تماس با ما
-              </h1>
-            </div>
+    <>
+      <SEO
+        title="تماس با وبوفن | دریافت مشاوره طراحی سایت و توسعه نرم‌افزار"
+        description="برای دریافت مشاوره طراحی سایت اختصاصی، توسعه CMS و راهکارهای نرم‌افزاری با تیم وبوفن در تماس باشید. پاسخ‌گویی سریع و تخصصی."
+        keywords="تماس با وبوفن, مشاوره طراحی سایت, ارتباط با وبوفن, پشتیبانی طراحی سایت, مشاوره CMS اختصاصی"
+        canonical="https://webofen.com/contact-us"
+        ogType="website"
+        ogImage="https://webofen.com/images/og-contact.jpg"
+      />
 
-            <div className="space-y-6">
-              {contactInfo.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex items-start gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors border border-gray-100"
-                >
-                  <div className="p-3 bg-[#f7f8fc] rounded-lg">{item.icon}</div>
-                  <div>
-                    <h3 className="font-medium text-gray-800">{item.title}</h3>
-                    <p className="text-gray-600 text-sm mt-1">{item.value}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+      {/* Structured Data Schemas */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(contactusSchema) }}
+      />
+      <main>
+        {/* Contact Form Section */}
+        <section className="pb-4 w-full">
+          <div className="max-w-[1250px] m-auto flex flex-col lg:flex-row gap-8 md:py-20 md:px-0 px-4">
+            {/* Contact Information */}
+            <div className="lg:w-1/3 space-y-8">
+              <div className="mb-6">
+                <h1 className="text-[#0364af] text-4xl font-semibold md:pt-0 pt-6">
+                  تماس با ما
+                </h1>
+              </div>
 
-            {/* Social Media */}
-            <div className="pt-4 border-t border-gray-200">
-              <h2 className="font-medium text-gray-800 mb-4 text-lg">
-                شبکه‌های اجتماعی
-              </h2>
-              <div className="flex gap-3">
-                {socialMedia.map((social, index) => (
-                  <a
+              <div className="space-y-6">
+                {contactInfo.map((item, index) => (
+                  <div
                     key={index}
-                    href={social.href}
-                    className="w-12 h-12 rounded-full flex items-center justify-center text-gray-500 bg-[#1d546b] hover:bg-[#29b0cb] transition-colors duration-200"
-                    aria-label={social.name}
+                    className="flex items-start gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors border border-gray-100"
                   >
-                    {social.icon}
-                  </a>
+                    <div className="p-3 bg-[#f7f8fc] rounded-lg">
+                      {item.icon}
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-gray-800">
+                        {item.title}
+                      </h3>
+                      <p className="text-gray-600 text-sm mt-1">{item.value}</p>
+                    </div>
+                  </div>
                 ))}
               </div>
-            </div>
-          </div>
 
-          {/* Contact Form */}
-          <div className="lg:w-2/3">
-            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
-              <div className="mb-8">
-                <h2 className="text-2xl font-normal text-gray-900 mb-3">
-                  ارسال پیام
+              {/* Social Media */}
+              <div className="pt-4 border-t border-gray-200">
+                <h2 className="font-medium text-gray-800 mb-4 text-lg">
+                  شبکه‌های اجتماعی
                 </h2>
-                <p className="text-gray-500">
-                  فرم زیر را پر کنید تا با شما تماس بگیریم
-                </p>
+                <div className="flex gap-3">
+                  {socialMedia.map((social, index) => (
+                    <a
+                      key={index}
+                      href={social.href}
+                      className="w-12 h-12 rounded-full flex items-center justify-center text-gray-500 bg-[#1d546b] hover:bg-[#29b0cb] transition-colors duration-200"
+                      aria-label={social.name}
+                    >
+                      {social.icon}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Contact Form */}
+            <div className="lg:w-2/3">
+              <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
+                <div className="mb-8">
+                  <h2 className="text-2xl font-normal text-gray-900 mb-3">
+                    ارسال پیام
+                  </h2>
+                  <p className="text-gray-500">
+                    فرم زیر را پر کنید تا با شما تماس بگیریم
+                  </p>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-500">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        نام و نام خانوادگی *
+                      </label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className={getInputClass(!!errors.name)}
+                        placeholder="مثال: علی محمدی"
+                      />
+                      {errors.name && (
+                        <p className="mt-2 text-xs text-red-600 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" />
+                          {errors.name}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        ایمیل *
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className={getInputClass(!!errors.email)}
+                        placeholder="example@email.com"
+                        dir="ltr"
+                      />
+                      {errors.email && (
+                        <p className="mt-2 text-xs text-red-600 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" />
+                          {errors.email}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-500">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        شماره تماس *
+                      </label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className={getInputClass(!!errors.phone)}
+                        placeholder="۰۹۱۲۳۴۵۶۷۸۹"
+                        inputMode="numeric"
+                        maxLength={13} // 11 digits + 2 spaces for formatting
+                      />
+                      {errors.phone && (
+                        <p className="mt-2 text-xs text-red-600 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" />
+                          {errors.phone}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        موضوع
+                      </label>
+                      <input
+                        type="text"
+                        name="subject"
+                        value={formData.subject}
+                        onChange={handleChange}
+                        className={getInputClass(false)}
+                        placeholder="موضوع پیام خود را وارد کنید"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      پیام شما *
+                    </label>
+                    <textarea
+                      name="message"
+                      value={formData.message}
+                      onChange={handleChange}
+                      rows={6}
+                      className={`${getInputClass(
+                        !!errors.message
+                      )} text-gray-500 resize-none`}
+                      placeholder="متن پیام خود را اینجا بنویسید..."
+                    />
+                    {errors.message && (
+                      <p className="mt-2 text-xs text-red-600 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3" />
+                        {errors.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className={`w-full py-4 px-6 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 text-lg relative overflow-hidden ${
+                      loading
+                        ? "bg-gray-300 cursor-not-allowed text-gray-500"
+                        : "bg-[#29b0cb] hover:bg-orange-400 text-white group"
+                    }`}
+                  >
+                    {/* Shimmer effect */}
+                    {!loading && (
+                      <span className="absolute inset-0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                    )}
+
+                    {/* Shadow animation */}
+                    {!loading && (
+                      <span className="absolute inset-0 rounded-lg shadow-lg group-hover:shadow-xl group-hover:shadow-orange-400/30 transition-shadow duration-300" />
+                    )}
+
+                    {/* Content with bounce animation */}
+                    <span className="relative flex items-center gap-2">
+                      {loading ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          در حال ارسال...
+                        </>
+                      ) : (
+                        <>
+                          <span className="group-hover:scale-105 transition-transform duration-300">
+                            ارسال پیام
+                          </span>
+                        </>
+                      )}
+                    </span>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Map Section */}
+        <section className="pb-4 w-full bg-[#f7f8fc] rounded-2xl">
+          <div className="max-w-[1250px] m-auto md:py-20 py-10  md:px-0 px-4">
+            <div className="mb-12 text-center">
+              <h2 className="text-[#0364af] text-lg">موقعیت ما</h2>
+              <h2 className="text-[#6fd6e5] text-3xl mt-2">دفتر مرکزی</h2>
+            </div>
+
+            <div className="relative h-80 md:h-96 rounded-2xl overflow-hidden bg-gray-100">
+              {/* Map Placeholder */}
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="text-center">
+                  <MapPin className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-500 text-lg">
+                    تهران - سهروردی شمالی - کوچه مهاجر - پلاک 30
+                  </p>
+                  <p className="text-gray-400 text-sm mt-2">
+                    برای دیدن نقشه دقیق، روی این ناحیه کلیک کنید
+                  </p>
+                </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-500">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      نام و نام خانوادگی *
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      className={getInputClass(!!errors.name)}
-                      placeholder="مثال: علی محمدی"
-                    />
-                    {errors.name && (
-                      <p className="mt-2 text-xs text-red-600 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" />
-                        {errors.name}
-                      </p>
-                    )}
-                  </div>
+              {/* You can add a real map component here */}
+              <div className="absolute inset-0 opacity-10 bg-gradient-to-r from-[#0364af] to-[#29b0cb]"></div>
+            </div>
+          </div>
+        </section>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      ایمیل *
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className={getInputClass(!!errors.email)}
-                      placeholder="example@email.com"
-                      dir="ltr"
-                    />
-                    {errors.email && (
-                      <p className="mt-2 text-xs text-red-600 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" />
-                        {errors.email}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-500">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      شماره تماس *
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className={getInputClass(!!errors.phone)}
-                      placeholder="۰۹۱۲۳۴۵۶۷۸۹"
-                      inputMode="numeric"
-                      maxLength={13} // 11 digits + 2 spaces for formatting
-                    />
-                    {errors.phone && (
-                      <p className="mt-2 text-xs text-red-600 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" />
-                        {errors.phone}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      موضوع
-                    </label>
-                    <input
-                      type="text"
-                      name="subject"
-                      value={formData.subject}
-                      onChange={handleChange}
-                      className={getInputClass(false)}
-                      placeholder="موضوع پیام خود را وارد کنید"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    پیام شما *
-                  </label>
-                  <textarea
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    rows={6}
-                    className={`${getInputClass(
-                      !!errors.message
-                    )} text-gray-500 resize-none`}
-                    placeholder="متن پیام خود را اینجا بنویسید..."
-                  />
-                  {errors.message && (
-                    <p className="mt-2 text-xs text-red-600 flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3" />
-                      {errors.message}
-                    </p>
-                  )}
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className={`w-full py-4 px-6 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 text-lg relative overflow-hidden ${
-                    loading
-                      ? "bg-gray-300 cursor-not-allowed text-gray-500"
-                      : "bg-[#29b0cb] hover:bg-orange-400 text-white group"
-                  }`}
+        {/* Success Modal */}
+        {showSuccessModal && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
+            <div className="bg-white rounded-2xl p-6 w-full max-w-md text-center shadow-xl animate-fadeIn">
+              <div className="mb-4">
+                <svg
+                  className="mx-auto h-12 w-12 text-[#6FD6E5]"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
                 >
-                  {/* Shimmer effect */}
-                  {!loading && (
-                    <span className="absolute inset-0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                  )}
-
-                  {/* Shadow animation */}
-                  {!loading && (
-                    <span className="absolute inset-0 rounded-lg shadow-lg group-hover:shadow-xl group-hover:shadow-orange-400/30 transition-shadow duration-300" />
-                  )}
-
-                  {/* Content with bounce animation */}
-                  <span className="relative flex items-center gap-2">
-                    {loading ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                        در حال ارسال...
-                      </>
-                    ) : (
-                      <>
-                        <span className="group-hover:scale-105 transition-transform duration-300">
-                          ارسال پیام
-                        </span>
-                      </>
-                    )}
-                  </span>
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Map Section */}
-      <section className="pb-4 w-full bg-[#f7f8fc] rounded-2xl">
-        <div className="max-w-[1250px] m-auto md:py-20 py-10  md:px-0 px-4">
-          <div className="mb-12 text-center">
-            <h2 className="text-[#0364af] text-lg">موقعیت ما</h2>
-            <h2 className="text-[#6fd6e5] text-3xl mt-2">دفتر مرکزی</h2>
-          </div>
-
-          <div className="relative h-80 md:h-96 rounded-2xl overflow-hidden bg-gray-100">
-            {/* Map Placeholder */}
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="text-center">
-                <MapPin className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500 text-lg">
-                  تهران - سهروردی شمالی - کوچه مهاجر - پلاک 30
-                </p>
-                <p className="text-gray-400 text-sm mt-2">
-                  برای دیدن نقشه دقیق، روی این ناحیه کلیک کنید
-                </p>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
               </div>
-            </div>
-
-            {/* You can add a real map component here */}
-            <div className="absolute inset-0 opacity-10 bg-gradient-to-r from-[#0364af] to-[#29b0cb]"></div>
-          </div>
-        </div>
-      </section>
-
-      {/* Success Modal */}
-      {showSuccessModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md text-center shadow-xl animate-fadeIn">
-            <div className="mb-4">
-              <svg
-                className="mx-auto h-12 w-12 text-[#6FD6E5]"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                viewBox="0 0 24 24"
+              <p className="text-gray-700 text-lg mb-5">
+                فرم شما با موفقیت ارسال شد. <br />
+                همکاران ما در اسرع وقت با شما تماس خواهند گرفت.
+              </p>
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                className="px-6 py-2 bg-[#6FD6E5] text-white rounded-full font-medium hover:bg-[#5ac7d7] transition-colors duration-200"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
+                متوجه شدم
+              </button>
             </div>
-            <p className="text-gray-700 text-lg mb-5">
-              فرم شما با موفقیت ارسال شد. <br />
-              همکاران ما در اسرع وقت با شما تماس خواهند گرفت.
-            </p>
-            <button
-              onClick={() => setShowSuccessModal(false)}
-              className="px-6 py-2 bg-[#6FD6E5] text-white rounded-full font-medium hover:bg-[#5ac7d7] transition-colors duration-200"
-            >
-              متوجه شدم
-            </button>
           </div>
-        </div>
-      )}
+        )}
 
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
+        <style jsx>{`
+          @keyframes fadeIn {
+            from {
+              opacity: 0;
+              transform: translateY(-10px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
           }
-          to {
-            opacity: 1;
-            transform: translateY(0);
+
+          .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out;
           }
-        }
 
-        .animate-fadeIn {
-          animation: fadeIn 0.5s ease-out;
-        }
-
-        select {
-          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-          background-position: left 0.75rem center;
-          background-repeat: no-repeat;
-          background-size: 1em 1em;
-          padding-left: 2.5rem;
-        }
-      `}</style>
-    </main>
+          select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: left 0.75rem center;
+            background-repeat: no-repeat;
+            background-size: 1em 1em;
+            padding-left: 2.5rem;
+          }
+        `}</style>
+      </main>
+    </>
   );
 };
 
