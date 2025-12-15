@@ -213,7 +213,6 @@ export default function CollaborationShowcase() {
                 className={`
                   relative h-85 w-full rounded-2xl cursor-pointer group overflow-visible
                   transform transition-all duration-700 ease-out
-                  ${activeSlide === index ? "rotate-0" : "rotate-1"}
                   hover:rotate-0
                   ${
                     activeSlide === index
