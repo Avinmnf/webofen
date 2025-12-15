@@ -81,7 +81,7 @@ export function WebsiteOverview({ result }: WebsiteOverviewProps) {
             <div className="mt-2 space-y-1">
               {result.meta?.title && result.meta.title !== displayTitle && (
                 <p className="text-xs text-gray-500">
-                  <span className="font-medium">متا تایتل:</span> {result.meta.title}
+                  <span className="font-medium">متا تایتل:</span> {result.title}
                 </p>
               )}
 

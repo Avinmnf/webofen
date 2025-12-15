@@ -317,13 +317,13 @@ export const ProductRecommendations = ({
   const getProductGradient = (productId: string) => {
     switch(productId) {
       case "1":
-        return "bg-gradient-to-br from-red-50 to-cyan-50";
+        return "bg-gradient-to-br from-red-50 ";
       case "2":
-        return "bg-gradient-to-br from-purple-50 to-pink-50";
+        return "bg-gradient-to-br from-green-100 to-green-70";
       case "3":
-        return "bg-blue-to-br from-green-50 to-emerald-50";
+        return "bg-gradient-to-br from-blue-100";
       case "4":
-        return "bg-gradient-to-br from-yellow-50 to-orange-50";
+        return "bg-gradient-to-br from-pink-50 to-violet-50";
       case "5":
         return "bg-gradient-to-br from-indigo-50 to-blue-50";
       case "6":
@@ -333,7 +333,7 @@ export const ProductRecommendations = ({
     }
   };
   return (
-    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 shadow-sm border border-green-100">
+    <div className="bg-gradient-to-br bg-gray-50 rounded-xl p-5 shadow-sm border border-green-100">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-bold text-xl text-gray-800">محصولات پیشنهادی برای بهبود وبسایت</h2>
         <div className="flex items-center space-x-2 space-x-reverse bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
@@ -351,8 +351,8 @@ export const ProductRecommendations = ({
           <div className="flex items-start">
             <div className="flex-shrink-0 w-5 h-5 text-yellow-600 mt-0.5">🔄</div>
             <div className="mr-2">
-              <h4 className="font-bold text-yellow-800 text-xs mb-1">تحلیل مجدد با لینک تکراری</h4>
-              <p className="text-yellow-700 text-xs">
+              <h4 className="font-bold text-yellow-800 text-s mb-1">تحلیل مجدد با لینک تکراری</h4>
+              <p className="text-yellow-700 text-s">
                 از آنجایی که این لینک قبلاً تحلیل شده، از داده‌های موجود استفاده می‌شود.
               </p>
             </div>
@@ -365,8 +365,8 @@ export const ProductRecommendations = ({
           <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-bold text-blue-800 text-xs mb-1">وضعیت سایت ‌مپ</h4>
-                <p className="text-blue-700 text-xs">
+                <h4 className="font-bold text-blue-800 text-s mb-1">وضعیت سایت ‌مپ</h4>
+                <p className="text-blue-700 text-s">
                   سایت‌مپ: ✅ موجود | 
                   تعداد لینک‌ها: <strong>{sitemapData.totalLinks}</strong>
                   {sitemapData.totalLinks < 200 && (
@@ -386,10 +386,10 @@ export const ProductRecommendations = ({
           <div className={`p-3 border rounded-lg ${linkSeverityColors.bg} ${linkSeverityColors.border}`}>
             <div className="flex items-center justify-between">
               <div>
-                <h4 className={`font-bold text-xs mb-1 ${linkSeverityColors.text}`}>
+                <h4 className={`font-bold text-s mb-1 ${linkSeverityColors.text}`}>
                   وضعیت لینک‌های شکسته
                 </h4>
-                <p className={`text-xs ${linkSeverityColors.text}`}>
+                <p className={`text-s ${linkSeverityColors.text}`}>
                   تعداد لینک‌های شکسته: <strong>{brokenLinksCount}</strong>
                   <span className="mr-2 font-medium">
                     {linkBuildingSeverity === 'medium' && "(نیاز به لینک‌ سازی)"}
@@ -408,8 +408,8 @@ export const ProductRecommendations = ({
           <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-bold text-green-800 text-xs mb-1">وضعیت لینک‌ های شکسته</h4>
-                <p className="text-green-700 text-xs">
+                <h4 className="font-bold text-green-800 text-s mb-1">وضعیت لینک‌ های شکسته</h4>
+                <p className="text-green-700 text-s">
                   تعداد لینک‌های شکسته: <strong>{brokenLinksCount}</strong>
                   <span className="mr-2 font-medium text-green-600">(وضعیت قابل قبول)</span>
                 </p>
@@ -424,10 +424,10 @@ export const ProductRecommendations = ({
           <div className={`p-3 border rounded-lg ${securitySeverityColors.bg} ${securitySeverityColors.border}`}>
             <div className="flex items-center justify-between">
               <div>
-                <h4 className={`font-bold text-xs mb-1 ${securitySeverityColors.text}`}>
+                <h4 className={`font-bold text-s mb-1 ${securitySeverityColors.text}`}>
                   وضعیت امنیتی
                 </h4>
-                <p className={`text-xs ${securitySeverityColors.text}`}>
+                <p className={`text-s ${securitySeverityColors.text}`}>
                   امتیاز امنیتی: <strong>{securityAnalysis.securityScore}/100</strong>
                   {!securityAnalysis.isHttps && (
                     <span className="mr-2 font-medium">(عدم استفاده از HTTPS)</span>
@@ -566,7 +566,7 @@ export const ProductRecommendations = ({
                   {/* دکمه تماس بگیرید */}
                   <Link 
                     href="tel:02188515914"
-                    className="flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-colors duration-200 flex items-center justify-center group/contact-btn bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-sm"
+                    className="flex-1 px-3 py-2 rounded-lg text-s font-medium transition-colors duration-200 flex items-center justify-center group/contact-btn bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-sm"
                   >
                     <span>تماس بگیرید</span>
                     <svg className="w-3 h-3 mr-1 group-hover/contact-btn:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -578,7 +578,7 @@ export const ProductRecommendations = ({
                     href={`/products/${product.slug}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-colors duration-200 flex items-center justify-center group/btn bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-sm"
+                    className="flex-1 px-3 py-2 rounded-lg text-s font-medium transition-colors duration-200 flex items-center justify-center group/btn bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-sm"
                   >
                     <span>خرید محصول</span>
                     <svg className="w-3 h-3 mr-1 group-hover/btn:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -601,17 +601,17 @@ export const ProductRecommendations = ({
           <div className="flex items-start">
             <div className="flex-shrink-0 w-5 h-5 text-orange-600 mt-0.5">📈</div>
             <div className="mr-2">
-              <h4 className="font-bold text-blue-800 text-xs mb-1">نیاز به تولید محتوای بیشتر و ساختار دهی</h4>
-              <p className="text-blue-700 text-xs">
+              <h4 className="font-bold text-blue-800 text-s mb-1">نیاز به تولید محتوای بیشتر و ساختار دهی</h4>
+              <p className="text-blue-700 text-s">
                 تعداد لینک‌های سایت‌مپ شما ({sitemapData.totalLinks}) کمتر از ۲۰۰ است.
                 برای بهبود رتبه سئو و افزایش visibility در موتورهای جستجو، 
                 تولید محتوای بیشتر و ساختاردهی مناسب محتواها (کلاسترینگ) ضروری است.
                 {isDuplicate && (
-                  <span className="block mt-1 text-blue-800 font-medium text-xs">
+                  <span className="block mt-1 text-blue-800 font-medium text-s">
                     🔄 این پیشنهاد بر اساس تحلیل تکراری و داده‌ های موجود ارائه می‌شود.
                   </span>
                 )}
-                <strong className="block mt-1 text-xs">توصیه: ابتدا قرص کلاسترینگ را خریداری کنید سپس تولید محتوا را آغاز نمایید.</strong>
+                <strong className="block mt-1 text-s">توصیه: ابتدا قرص کلاسترینگ را خریداری کنید سپس تولید محتوا را آغاز نمایید.</strong>
               </p>
             </div>
           </div>
@@ -625,18 +625,18 @@ export const ProductRecommendations = ({
               {linkBuildingSeverity === 'high' && "🚨"}
             </div>
             <div className="mr-2">
-              <h4 className={`font-bold text-xs mb-1 ${linkSeverityColors.text}`}>
+              <h4 className={`font-bold text-s mb-1 ${linkSeverityColors.text}`}>
                 {linkBuildingSeverity === 'medium' && "نیاز به لینک‌ سازی"}
                 {linkBuildingSeverity === 'high' && "نیاز فوری به لینک‌ سازی"}
               </h4>
-              <p className={`text-xs ${linkSeverityColors.text}`}>
+              <p className={`text-s ${linkSeverityColors.text}`}>
                 {linkBuildingSeverity === 'medium' && 
                   `تعداد لینک‌های شکسته سایت شما (${brokenLinksCount}) بین ۱۱ تا ۳۰ است. نیاز به اقدام برای لینک‌ سازی خارجی دارید.`
                 }
                 {linkBuildingSeverity === 'high' && 
                   `تعداد لینک‌های شکسته سایت شما (${brokenLinksCount}) بیشتر از ۳۰ است که نیاز به لینک‌سازی فوری دارد. این لینک‌ های شکسته می‌ توانند بر رتبه سئوی شما تأثیر منفی بگذارند.`
                 }
-                <strong className="block mt-1 text-xs">
+                <strong className="block mt-1 text-s">
                   {linkBuildingSeverity === 'medium' && "توصیه: با استفاده از قرص لینک‌ سازی، بک ‌لینک‌ های باکیفیت و مرتبط بسازید."}
                   {linkBuildingSeverity === 'high' && "توصیه: فوراً قرص لینک‌ سازی را خریداری کنید تا بک‌ لینک‌های باکیفیت بسازید."}
                 </strong>

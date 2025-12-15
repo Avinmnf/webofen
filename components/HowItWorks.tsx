@@ -65,25 +65,31 @@ export function HowItWorks() {
       
       {/* Modal برای نمایش عکس بزرگ */}
       {selectedImage && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
+        <div
+          className="fixed inset-0 z-50 flex items-center  justify-center p-4
+                    backdrop-blur-md bg-white/10"
           onClick={closeImageModal}
         >
-          <div className="relative max-w-4xl max-h-full">
-            <button 
-              className="absolute -top-12 right-0 text-white text-2xl hover:text-gray-300 transition-colors"
+          <div
+            className="relative max-w-4xl max-h-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="absolute -top-12 right-0 text-black text-2xl cursor-pointer transition-colors"
               onClick={closeImageModal}
             >
               ✕
             </button>
-            <img 
-              src={selectedImage} 
-              alt="نمونه گزارش بزرگ شده" 
-              className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
+
+            <img
+              src={selectedImage}
+              alt="نمونه گزارش بزرگ شده"
+              className="w-full h-auto max-h-[80vh] object-contain rounded-2xl shadow-2xl"
             />
           </div>
         </div>
       )}
+
 
       {/* هدر */}
       <div className="text-center mb-16">
@@ -187,10 +193,10 @@ export function HowItWorks() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
           <div 
             className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 cursor-pointer transform hover:scale-105 transition-transform duration-300"
-            onClick={() => openImageModal("/analyze/Screenshot 2025-11-26 104643.png")}
+            onClick={() => openImageModal("/analyze/Screenshot 2025-12-13 162303.png")}
           >
             <img
-              src="/analyze/Screenshot 2025-12-01 140440.png"
+              src="/analyze/Screenshot 2025-12-13 162303.png"
               alt="نمونه گزارش بخش اول"
               className="w-full h-auto"
             />

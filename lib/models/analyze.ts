@@ -190,13 +190,13 @@ export interface SimpleProduct {
 }
 
 export const tabLabels: Record<string, string> = {
-  all: "همه خطاها",
+  all: "همه خطا ها",
   critical: "بحرانی",
   serious: "جدی",
   moderate: "متوسط",
   minor: "جزئی",
   performance: "عملکرد",
-  debugdata: "داده‌های خطایابی",
+  debugdata: "داده‌ های خطایابی",
   table: "جدول",
   list: "لیست",
   opportunity: "فرصت بهبود",
@@ -507,7 +507,7 @@ export const securityImpactLabels: Record<string, string> = {
 export const securityIssueTypes: Record<string, string> = {
   https: "پروتکل HTTPS",
   ssl: "گواهی SSL",
-  headers: "هدرهای امنیتی",
+  headers: "هدر های امنیتی",
   csp: "سیاست امنیت محتوا",
   'mixed-content': "محتوای مختلط",
   other: "سایر مشکلات امنیتی"
