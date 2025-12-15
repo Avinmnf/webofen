@@ -319,17 +319,36 @@ export const ProductRecommendations = ({
       case "1":
         return "bg-gradient-to-br from-red-50 ";
       case "2":
-        return "bg-gradient-to-br from-green-100 to-green-70";
+        return "bg-gradient-to-br from-green-100 to-green-100";
       case "3":
-        return "bg-gradient-to-br from-blue-100";
+        return "bg-gradient-to-br from-blue-50";
       case "4":
-        return "bg-gradient-to-br from-pink-50 to-violet-50";
+        return "bg-gradient-to-br from-pink-50 to-violet-100";
       case "5":
         return "bg-gradient-to-br from-indigo-50 to-blue-50";
       case "6":
         return "bg-gradient-to-br from-red-50 to-pink-50";
       default:
         return "bg-gradient-to-br from-gray-50 to-white";
+    }
+  };
+  // تابع برای دریافت رنگ پس‌زمینه ویدیو
+  const getVideoBackground = (productId: string) => {
+    switch(productId) {
+      case "1":
+        return "bg-red-100";
+      case "2":
+        return "bg-green-100";
+      case "3":
+        return "bg-blue-100";
+      case "4":
+        return "bg-purple-100";
+      case "5":
+        return "bg-indigo-100";
+      case "6":
+        return "bg-red-100";
+      default:
+        return "bg-gray-100";
     }
   };
   return (
@@ -477,7 +496,7 @@ export const ProductRecommendations = ({
               {product.imageUrl && (
                 <div className="relative mb-3">
                   {/* ویدیو مربعی */}
-                  <div className="w-50 h-50 mx-auto overflow-hidden rounded-lg shadow-sm">
+                  <div className={`w-full h-48 mx-auto overflow-hidden rounded-lg shadow-sm ${getVideoBackground(product.id)} flex items-center justify-center`}>
                     <video
                       src={
                         product.id === "1" ? "/guidance/optimization.mp4" :
@@ -487,7 +506,7 @@ export const ProductRecommendations = ({
                         product.id === "5" ? "/guidance/internallink.mp4" :
                         "/guidance/security.mp4"
                       }
-                      className="w-full h-full object-cover"
+                      className="w-auto h-full max-w-full object-contain"
                       autoPlay
                       loop
                       muted
@@ -653,7 +672,7 @@ export const ProductRecommendations = ({
               {securitySeverity === 'high' && "🚨"}
             </div>
             <div className="mr-2">
-              <h4 className={`font-bold text-xs mb-1 ${securitySeverityColors.text}`}>
+              <h4 className={`font-bold text-s mb-1 ${securitySeverityColors.text}`}>
                 {securitySeverity === 'low' && "نیاز به بهبود امنیت"}
                 {securitySeverity === 'medium' && "نیاز به امنیت‌ سازی"}
                 {securitySeverity === 'high' && "نیاز فوری به امنیت‌ سازی"}
@@ -671,7 +690,7 @@ export const ProductRecommendations = ({
                 {securityAnalysis.securityIssues.length > 0 && 
                   `تعداد ${securityAnalysis.securityIssues.length} مشکل امنیتی در وبسایت شما شناسایی شده است.`
                 }
-                <strong className="block mt-1 text-xs">
+                <strong className="block mt-1 text-s">
                   {securitySeverity === 'high' && "توصیه: فوراً قرص امنیت‌ سازی را خریداری کنید تا مشکلات امنیتی برطرف شوند."}
                   {securitySeverity === 'medium' && "توصیه: با خرید قرص امنیت‌ سازی، امنیت وبسایت خود را ارتقا دهید."}
                   {securitySeverity === 'low' && "توصیه: برای بهبود وضعیت امنیتی، قرص امنیت‌ سازی را خریداری کنید."}
@@ -700,7 +719,7 @@ function getProductReasons(
   switch (productId) {
     case "1":
       if ([seo, performance, accessibility, bestPractices].some((s) => (s || 0) < 0.8)) {
-        reasons.push("امتیازهای پایین در چند بخش");
+        reasons.push("امتیاز های پایین در چند بخش");
       }
       if ((performance || 0) < 0.9) {
         reasons.push("عملکرد نیاز به بهبود دارد");
