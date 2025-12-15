@@ -64,9 +64,10 @@ export default function Header() {
           <div className="w-full flex items-center justify-between lg:w-auto">
             <Link href="/">
               <Image
-                width={150}
-                height={100}
-                src="/homepage/logo.png"
+              className="py-2"
+                width={140}
+                height={90}
+                src="/logos/logo.png"
                 alt="logo"
                 priority
               />

@@ -31,7 +31,7 @@ export default function Footer() {
             <Image
               width={160}
               height={100}
-              src="/homepage/white-logoAsset 7.png"
+              src="/logos/logo-footer.png"
               alt="logo"
               priority
             />

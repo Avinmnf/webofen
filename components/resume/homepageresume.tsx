@@ -132,7 +132,6 @@ export default function HomepageResume() {
               className={`
                 relative bg-[#29b0cb] rounded-2xl overflow-hidden p-4 flex flex-col items-center
                 transform transition-all duration-700 ease-out
-                ${activeSlide === i ? "rotate-0" : "rotate-1"}
                 hover:rotate-0
                 ${
                   activeSlide === i
@@ -205,13 +204,8 @@ export default function HomepageResume() {
           animation: float-slow 3s ease-in-out infinite;
         }
 
-        .rotate-0 {
-          transform: rotate(0deg);
-        }
-
-        .rotate-1 {
-          transform: rotate(0.5deg);
-        }
+    
+    
         .collaboration-swiper .swiper-pagination {
           bottom: 0 !important;
           margin-bottom: 1.5rem;
