@@ -195,7 +195,6 @@ export default function Home() {
                   href="/analyze"
                   className="relative block w-full h-full group"
                 >
-                  {/* Cover image fallback */}
 
                   {/* Video background */}
                   <video

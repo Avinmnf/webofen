@@ -144,7 +144,7 @@ export default function CollaborationShowcase() {
     <div className="w-full px-4">
 
       {/* Logo Showcase */}
-      <div className="max-w-7xl mx-auto h-96 relative">
+      <div className="max-w-7xl mx-auto md:h-96 h-86 relative">
       <Swiper
   slidesPerView={3}
   spaceBetween={30}
@@ -172,7 +172,7 @@ export default function CollaborationShowcase() {
           }}
           onSlideChange={(swiper) => setActiveSlide(swiper.realIndex)}
           modules={[EffectCoverflow, Autoplay, Pagination]}
-          className="collaboration-swiper h-90 pb-16" // Increased padding-bottom for pagination
+          className="collaboration-swiper h-86 pb-16" // Increased padding-bottom for pagination
           breakpoints={{
             320: {
               slidesPerView: 1,
@@ -725,12 +725,9 @@ export default function CollaborationShowcase() {
         /* Responsive fixes */
         @media (max-width: 768px) {
           .collaboration-swiper {
-            height: 300px !important;
+            height: 310px !important;
           }
 
-          .collaboration-swiper .swiper-pagination {
-            bottom: -5px !important;
-          }
 
           .modal-content {
             height: 85vh !important;

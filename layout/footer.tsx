@@ -80,7 +80,7 @@ export default function Footer() {
                 { label: "صفحه اصلی", href: "/" },
                 { label: "درباره ما", href: "/about-us" },
                 { label: "تماس با ما", href: "/contact-us" },
-                { label: "سوالات متداول", href: "/" },
+                { label: "سوالات متداول", href: "/faq" },
                 { label: "نقشه سایت", href: "/sitemap.xml", isExternal: true },
               ].map((item) =>
                 item.isExternal ? (

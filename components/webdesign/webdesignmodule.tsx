@@ -86,19 +86,18 @@ export default function WebDesignModule() {
         <div className="relative w-full lg:w-1/2 rounded-lg overflow-hidden">
           <div className="aspect-[10/1] flex flex-col items-center md:items-start justify-between">
             <Image
-              width={210}
+              className="py-2"
+              width={180}
               height={150}
-              src="/homepage/logo.png"
+              src="/logos/logo.png"
               alt="logo"
               priority
-              className="w-32 sm:w-40 md:w-48 lg:w-52 xl:w-60"
             />
           </div>
-          <h1 className="text-[#0364af] text-xl sm:text-2xl font-semibold mt-4 md:text-start text-center">
-            پکیج های طراحی سایت
-          </h1>
-
-          <p className="text-gray-600 mt-4 sm:mt-6 text-sm sm:text-base">
+          <h2 className="text-[#0364af] text-xl sm:text-2xl font-semibold mt-4 md:text-start text-center">
+            انواع طراحی سایت
+          </h2>
+          <p className="text-gray-600 mt-4 sm:mt-6 text-sm sm:text-base md:p-0 p-4 ">
             ما در هر پروژه طراحی سایت، ابتدا نیازهای فنی و محتوایی شما را بررسی
             کرده و سپس ساختار مناسبی را برای سایت پیشنهاد می‌کنیم. نتیجه این
             رویکرد، وب‌سایتی است که هم از نظر ظاهر حرفه‌ای است و هم از نظر فنی و
@@ -135,7 +134,7 @@ export default function WebDesignModule() {
               </div>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 sm:mt-8 md:mt-10">
+          <div className="flex flex-col md:px-0 px-6 sm:flex-row gap-3 sm:gap-4 mt-6 sm:mt-8 md:mt-10">
             <button
               type="button"
               onClick={() => setOpen(true)}
@@ -166,15 +165,15 @@ export default function WebDesignModule() {
                   transition={{ duration: 0.4 }}
                 >
                   <div className="text-center mb-4 sm:mb-6">
-                    <motion.p
+                    <motion.h3
                       className="text-[#0364af] text-lg font-semibold"
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.4 }}
                     >
-                      سایتت را انتخاب کن
-                    </motion.p>
+                    تعرفه و قیمت طراحی سایت
+                    </motion.h3>
                     <motion.p
                       className="text-gray-600 text-xs sm:text-sm mt-1"
                       initial={{ opacity: 0, y: -10 }}

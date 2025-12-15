@@ -62,7 +62,7 @@ export default function WebDesign() {
             <div className="relative w-full lg:w-1/2 xl:w-[60%] rounded-lg overflow-hidden">
               <div className="mt-8 sm:mt-12 md:mt-20 lg:mt-40">
                 <h1 className="text-[#0364af] text-2xl sm:text-3xl md:text-4xl font-semibold">
-                  طراحی سایت شما
+                  طراحی سایت
                 </h1>
                 <p className="text-[#0364af] text-xl sm:text-2xl md:text-3xl font-semibold mt-2 sm:mt-3">
                   با <span className="text-[#29b0cb]">cms ما </span> دیده شوید
@@ -120,21 +120,20 @@ export default function WebDesign() {
               {/* Title + Icon */}
               <div className="flex items-start">
                 <div className="md:mr-4">
-                  <p className="text-[#0364af] text-base sm:text-lg md:text-lg">
-                    طراحی سایت
-                  </p>
                   <div className="flex flex-wrap items-center text-sm md:text-lg">
-                    <p className="text-[#0364af] text-xl sm:text-2xl mt-2">
-                      <span className="text-[#29b0cb]">cms</span> اختصاصی سایت{" "}
-                    </p>
+                    <h2 className="text-[#0364af] text-xl sm:text-2xl mt-2">
+                      خدمات ما در{" "}
+                      <span className="text-[#29b0cb]">طراحی سایت</span>
+                    </h2>
                   </div>
-                  <p className="text-gray-600 mt-4 sm:mt-6 text-sm sm:text-base">
-                    سیستم مدیریت محتوای اختصاصی ما با توجه به نیازهای دقیق
-                    کسب‌وکار شما طراحی می‌شود. این CMS برخلاف سیستم‌های آماده
-                    مثل وردپرس، کاملاً بهینه‌سازی‌شده، ایمن و قابل توسعه است و
-                    می‌تواند با رشد کسب‌وکار شما هماهنگ شود. هدف ما ارائه ابزاری
-                    است که علاوه بر زیبایی ظاهری، عملکرد بالا و تجربه کاربری
-                    بی‌نقص را برای شما و کاربران‌تان فراهم کند.
+                  <p className="text-gray-600 mt-4 text-sm sm:text-base">
+                    ما وب‌سایت‌هایی طراحی می‌کنیم که فقط زیبا نیستند، بلکه
+                    دقیقاً بر اساس اهداف کسب‌وکار شما ساخته شده‌اند. از طراحی
+                    رابط کاربری مدرن و تجربه کاربری حرفه‌ای گرفته تا پیاده‌سازی
+                    فنی بهینه، سریع و سازگار با سئو، همه‌چیز به‌صورت اختصاصی
+                    انجام می‌شود. وب‌سایت شما مقیاس‌پذیر، امن و آماده رشد است و
+                    به‌گونه‌ای توسعه داده می‌شود که در آینده نیز بتوان آن را
+                    بدون محدودیت ارتقا داد.
                   </p>
                 </div>
               </div>
@@ -164,28 +163,38 @@ export default function WebDesign() {
 
         <section>
           <div className="max-w-[1250px] m-auto pt-6 sm:pt-8 md:pt-10">
-      {/* Header */}
-      <div className="text-center mb-6 sm:mb-8 md:mb-10">
-        <p className="text-[#29b0cb] text-xl sm:text-2xl">
-          <span className="text-[#253e5f]">نمونه کار </span>طراحی سایت
-        </p>
-        <p className="text-gray-700 text-xs sm:text-sm mt-1 sm:mt-2">
-          بخشی از نمونه های طراحی سایت توسط تیم ما
-        </p>
-      </div>
+            {/* Header */}
+            <div className="text-center mb-6 sm:mb-8 md:mb-10">
+              <h2 className="text-[#29b0cb] text-xl sm:text-2xl">
+                <span className="text-[#253e5f]">نمونه کار </span>طراحی سایت
+              </h2>
+              <p className="text-gray-700 text-xs sm:text-sm mt-1 sm:mt-2">
+                بخشی از نمونه های طراحی سایت توسط تیم ما
+              </p>
+            </div>
             <Resume />
           </div>
         </section>
-
         <section>
-          <div className="max-w-[1250px] m-auto pt-6 sm:pt-8 md:pt-10">
-            <div className="relative mx-auto aspect-[19/6] ">
+          <div className="max-w-[1250px] m-auto pt-6 sm:pt-8 md:pt-10 hidden md:block">
+            <div className="relative mx-auto aspect-[19/6] overflow-hidden rounded-2xl">
+              {/* Image */}
               <Image
-                src="/web-design/web-technology.png"
+                src="/web-design/technology.png"
                 alt="تکنولوژی‌های مورد استفاده در طراحی سایت - وبوفن"
                 fill
                 className="object-contain"
               />
+
+              {/* Overlay */}
+              <div className="absolute text-center inset-0 top-14 right-0">
+                <h2 className="text-white text-lg md:text-2xl font-bold">
+                  تکنولوژی‌های <span className="text-[#29b0cb]">وبوفن</span>
+                </h2>
+                <p className="mt-2 text-gray-200 text-sm sm:text-base">
+                  تکنولوژی‌های روز، پشتوانه‌ی نرم‌افزارهای ما
+                </p>
+              </div>
             </div>
           </div>
         </section>
