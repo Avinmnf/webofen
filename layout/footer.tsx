@@ -128,31 +128,46 @@ export default function Footer() {
         </div>
 
         <div className="md:w-[50%] flex flex-col gap-4 mt-4">
-          <div className="text-gray-50 text-start">
-            <p className="text-lg">دریافت خبرنامه وبوفن</p>
-            <p className="text-sm text-gray-100 mt-4">
-              جهت دریافت خبرنامه، شماره تلفن یا ایمیل خود را وارد کنید
-            </p>
+  <div className="text-gray-50 text-start">
+    <p className="text-lg">دریافت خبرنامه وبوفن</p>
+   
 
-            <form onSubmit={handleSubmit} className="mt-4">
-              <input
-                type="text"
-                name="contact"
-                placeholder="شماره تلفن یا ایمیل خود را وارد کنید"
-                className="w-full p-3 text-sm rounded-md bg-[#153e4c] text-gray-50 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 transition"
-                value={contact}
-                onChange={handleChange}
-                required
-              />
+    <form onSubmit={handleSubmit} className="mt-4 w-full">
+      <div className="relative">
+        <input
+          type="text"
+          name="contact"
+          placeholder="      جهت دریافت خبرنامه، شماره تلفن یا ایمیل خود را وارد کنید
+"
+          className="w-full p-4 pr-4 text-sm rounded-full bg-[#153e4c] text-gray-50 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 transition"
+          value={contact}
+          onChange={handleChange}
+          required
+        />
+        
+        <button
+          type="submit"
+          className="absolute left-1 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-[#f78c0a] hover:bg-orange-500 cursor-pointer text-white flex items-center justify-center transition duration-200 shadow-lg"
+          title="عضویت در خبرنامه"
+        >
+          <svg 
+            className="w-5 h-5" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth="2" 
+              d="M14 5l7 7m0 0l-7 7m7-7H3"
+            />
+          </svg>
+        </button>
+      </div>
+    </form>
+  </div>
 
-              <button
-                type="submit"
-                className="w-full bg-[#153e4c] hover:bg-orange-400 cursor-pointer text-white py-3 px-4 rounded-md transition duration-200 font-medium mt-4"
-              >
-                عضویت در خبرنامه
-              </button>
-            </form>
-          </div>
           <div className="flex items-center justify-between mt-5 md:mt-10">
             <Link href={"/"}>
               <div className="text-gray-50 cursor-pointer border border-[#f78c0a] rounded-md justify-center p-2 md:p-0 md:w-30 md:h-12 text-sm flex items-center">
