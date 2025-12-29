@@ -5,17 +5,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const { cart } = useCart();
   const { user, isLoggedIn, logout } = useAuth();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
-  // Close profile dropdown if clicked outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -40,9 +40,15 @@ export default function Header() {
     { label: "وبلاگ", href: "/articles" },
     { label: "آنالیز وبسایت", href: "/analyze" },
     { label: "درباره ما", href: "/about-us" },
+    { label: "تماس با ما", href: "/contact-us" },
   ];
 
-  // Logout called from modal, no redirect
+  const getActiveIndex = () => {
+    return menuItems.findIndex(item => pathname === item.href);
+  };
+
+  const activeIndex = getActiveIndex();
+
   const handleLogout = async () => {
     await logout();
     setShowLogoutModal(false);
@@ -56,9 +62,10 @@ export default function Header() {
           <div className="w-full flex items-center justify-between lg:w-auto">
             <Link href="/">
               <Image
-                width={150}
-                height={100}
-                src="/homepage/logo.png"
+              className="py-2"
+                width={140}
+                height={90}
+                src="/logos/logo.png"
                 alt="logo"
                 priority
               />
@@ -112,10 +119,7 @@ export default function Header() {
               {menuItems.map((item, index) => (
                 <li
                   key={index}
-                  onClick={() => {
-                    setActiveIndex(index);
-                    setMenuOpen(false);
-                  }}
+                  onClick={() => setMenuOpen(false)}
                   className={`cursor-pointer select-none ${
                     activeIndex === index
                       ? "text-[#6fd6e5] font-bold"

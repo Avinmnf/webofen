@@ -1,6 +1,6 @@
 // layout/Layout.tsx
 import Header from "./header";
-import Footer from "./footer"; // I'll provide Footer next
+import Footer from "./footer";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
