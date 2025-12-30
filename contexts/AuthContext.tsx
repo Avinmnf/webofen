@@ -1,6 +1,5 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { deleteCookie } from 'cookies-next';
-import { useRouter } from 'next/navigation';
 
 export interface Role { id: string; name: string; }
 export interface User { id: string; name: string; email: string; phone?: string; role: Role; }
@@ -13,6 +12,9 @@ interface AuthContextType {
   loginWithPhone: (phone: string, code: string) => Promise<boolean>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  redirectPath: string;
+  setRedirectPath: (path: string) => void;
+  clearRedirectPath: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,8 +30,26 @@ interface AuthProviderProps { children: ReactNode; }
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [redirectPath, setRedirectPathState] = useState<string>('/dashboard');
   const isLoggedIn = !!user;
-  const router = useRouter();
+
+  // Load redirect path from localStorage on initial render
+  useEffect(() => {
+    const savedRedirectPath = localStorage.getItem('auth_redirect_path');
+    if (savedRedirectPath) {
+      setRedirectPathState(savedRedirectPath);
+    }
+  }, []);
+
+  const setRedirectPath = (path: string) => {
+    setRedirectPathState(path);
+    localStorage.setItem('auth_redirect_path', path);
+  };
+
+  const clearRedirectPath = () => {
+    setRedirectPathState('/dashboard');
+    localStorage.removeItem('auth_redirect_path');
+  };
 
   const refreshUser = async () => {
     setLoading(true);
@@ -91,6 +111,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const logout = async () => {
     try {
+      // Clear redirect path on logout
+      clearRedirectPath();
+      
       // پاک کردن کوکی سمت کلاینت
       deleteCookie('token', { path: '/' });
 
@@ -99,15 +122,24 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       // خالی کردن وضعیت کاربر
       setUser(null);
-
-      // ریدایرکت به لاگین
     } catch (err) {
       console.error('Logout failed:', err);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, isLoggedIn, login, loginWithPhone, logout, refreshUser }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      isLoggedIn, 
+      login, 
+      loginWithPhone, 
+      logout, 
+      refreshUser,
+      redirectPath,
+      setRedirectPath,
+      clearRedirectPath
+    }}>
       {children}
     </AuthContext.Provider>
   );

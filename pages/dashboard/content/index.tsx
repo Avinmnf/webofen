@@ -274,10 +274,10 @@ const ContentPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="h-full overflow-auto bg-white">
       {/* Header */}
       <div className="sticky top-0 z-40 bg-white border-b">
-        <div className="px-6 py-4">
+        <div className=" py-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xl text-gray-500 mt-1">مدیریت سفارش‌های محتوا</p>
@@ -293,7 +293,7 @@ const ContentPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="px-6 py-8 max-w-7xl mx-auto">
+      <div className="py-8 max-w-7xl mx-auto">
         {/* Active Orders */}
         {activeItems.length > 0 && (
           <div className="mb-12">
@@ -345,7 +345,7 @@ const ContentPage: React.FC = () => {
                     />
                     <button
                       onClick={() => handleItemClick(mainActiveItem.id)}
-                      className="mt-6 px-6 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition text-sm font-medium"
+                      className="mt-6 px-6 py-2.5 bg-[#1d546b] text-white rounded-lg hover:bg-gray-800 transition text-sm font-medium"
                     >
                       مشاهده جزئیات
                     </button>

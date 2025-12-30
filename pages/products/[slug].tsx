@@ -21,8 +21,7 @@ import { useProductRating } from "@/hooks/useProductRating";
 type Props = { product: Product };
 
 export default function ProductDetailPage({ product }: Props) {
-  const { user } = useAuth();
-  const { addItem } = useCart();
+  const { user, setRedirectPath } = useAuth(); const { addItem } = useCart();
   const router = useRouter();
   const { slug } = router.query;
   const [skip, setSkip] = useState(0);
@@ -119,6 +118,16 @@ export default function ProductDetailPage({ product }: Props) {
 `,
     },
   ];
+
+
+  useEffect(() => {
+    if (!user) {
+      // Store the current product page URL for redirection after login
+      setRedirectPath(router.asPath);
+    }
+  }, [user, router.asPath, setRedirectPath]);
+
+
 
   const tooltipMap: Record<string, string> = products.reduce((acc, product) => {
     acc[product.slug] = product.tooltip;
@@ -244,12 +253,12 @@ export default function ProductDetailPage({ product }: Props) {
           aggregateRating:
             product.reviews && product.reviews.length > 0
               ? {
-                  ratingValue: (
-                    product.reviews.reduce((sum, r) => sum + r.rating, 0) /
-                    product.reviews.length
-                  ).toFixed(1),
-                  reviewCount: product.reviews.length,
-                }
+                ratingValue: (
+                  product.reviews.reduce((sum, r) => sum + r.rating, 0) /
+                  product.reviews.length
+                ).toFixed(1),
+                reviewCount: product.reviews.length,
+              }
               : undefined,
         }}
       />
@@ -313,11 +322,10 @@ export default function ProductDetailPage({ product }: Props) {
                               [attrName]: value,
                             }))
                           }
-                          className={`px-4 py-2 rounded-[100px] border ${
-                            selectedAttributes[attrName] === value
+                          className={`px-4 py-2 rounded-[100px] border ${selectedAttributes[attrName] === value
                               ? "bg-green-600 text-white border-indigo-600"
                               : "bg-white border-gray-300"
-                          }`}
+                            }`}
                         >
                           {value}
                         </button>
@@ -391,11 +399,10 @@ export default function ProductDetailPage({ product }: Props) {
                   )}
 
                   <button
-                    className={`flex p-2 rounded-3xl text-white items-center w-full cursor-pointer justify-center ${
-                      isAddToCartDisabled
+                    className={`flex p-2 rounded-3xl text-white items-center w-full cursor-pointer justify-center ${isAddToCartDisabled
                         ? "bg-gray-400 cursor-not-allowed"
                         : "bg-green-700 hover:bg-green-800"
-                    }`}
+                      }`}
                     disabled={isAddToCartDisabled}
                     onClick={handleAddToCart}
                   >
@@ -468,7 +475,12 @@ export default function ProductDetailPage({ product }: Props) {
               {!user ? (
                 <p className="text-sm">
                   برای افزودن محصول ابتدا{" "}
-                  <Link href="/login" className="underline font-semibold">
+                  <Link
+                    href="/login"
+                    className="underline font-semibold"
+                  // You can also pass the redirect as query param as backup
+                  // href={`/login?redirect=${encodeURIComponent(router.asPath)}`}
+                  >
                     وارد شوید
                   </Link>
                 </p>
@@ -479,6 +491,7 @@ export default function ProductDetailPage({ product }: Props) {
               )}
             </div>
           )}
+
         </div>
       </main>
     </>
