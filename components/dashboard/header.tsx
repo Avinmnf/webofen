@@ -110,16 +110,9 @@ const HeaderPanel: React.FC = () => {
 
       {/* Middle Section: Logo */}
       <div className="flex-1 w-4/12 flex justify-center">
-      <Link href="/">
-              <Image
-              className="py-2"
-                width={140}
-                height={90}
-                src="/logos/logo.png"
-                alt="logo"
-                priority
-              />
-            </Link>
+      <a href="/">
+        <Image src="/logos/logo.png" alt="Logo" width={160} height={50} />
+        </a>
       </div>
 
       {/* Right Section: Profile */}
