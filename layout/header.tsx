@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
-import { usePathname } from "next/navigation";
+import { usePathname } from "next/navigation"; // Add this import
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -14,7 +14,7 @@ export default function Header() {
   const { cart } = useCart();
   const { user, isLoggedIn, logout } = useAuth();
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const pathname = usePathname();
+  const pathname = usePathname(); // Get current path
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -40,15 +40,16 @@ export default function Header() {
     { label: "وبلاگ", href: "/articles" },
     { label: "آنالیز وبسایت", href: "/analyze" },
     { label: "درباره ما", href: "/about-us" },
-    { label: "تماس با ما", href: "/contact-us" },
   ];
 
+  // Find active index based on current path
   const getActiveIndex = () => {
     return menuItems.findIndex(item => pathname === item.href);
   };
 
   const activeIndex = getActiveIndex();
 
+  // Logout called from modal, no redirect
   const handleLogout = async () => {
     await logout();
     setShowLogoutModal(false);

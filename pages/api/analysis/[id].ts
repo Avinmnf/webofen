@@ -1,7 +1,7 @@
 // pages/api/analysis/[id].ts
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-type Analysis = {
+type AnalysisDetail = {
   id: string;
   url: string;
   status: string;
@@ -13,10 +13,16 @@ type Analysis = {
   phoneNumber?: string;
   createdAt: string;
   result?: any;
+  sitemapAnalysis?: {
+    totalLinks: number;
+    sitemapExists: boolean;
+    sitemapUrls: string[];
+    sitemapLinks: Array<{ url: string; sitemap: string }>;
+  };
 };
 
 type ResponseData = {
-  analysis?: Analysis;
+  analysis?: AnalysisDetail;
   error?: string;
 };
 
@@ -28,35 +34,85 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  const { id } = req.query;
+
+  if (!id || typeof id !== 'string') {
+    return res.status(400).json({ error: 'Analysis ID is required' });
+  }
+
   try {
-    const { id } = req.query;
-    
-    if (!id || typeof id !== 'string') {
-      return res.status(400).json({ error: 'Analysis ID is required' });
-    }
-
     const backendUrl = process.env.NEXT_PUBLIC_ANALYZE_URL || 'http://localhost:4000';
+    const apiUrl = `${backendUrl}/analysis/${id}`;
     
-    console.log('🔍 Fetching analysis status for:', id);
+    console.log('🔍 Fetching analysis details from:', apiUrl);
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-    const response = await fetch(`${backendUrl}/analysis/${id}`, {
-      signal: AbortSignal.timeout(10000) // 10 ثانیه timeout
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      signal: controller.signal
     });
+
+    clearTimeout(timeoutId);
 
     console.log('📡 Backend response status:', response.status);
 
     if (!response.ok) {
-      throw new Error(`Backend responded with status: ${response.status}`);
+      const errorText = await response.text();
+      console.error('❌ Backend error response:', errorText);
+      
+      if (response.status === 404) {
+        return res.status(404).json({ error: 'Analysis not found' });
+      }
+      
+      throw new Error(`Backend error: ${response.status} - ${errorText}`);
     }
 
-    const analysis: Analysis = await response.json();
-    console.log('✅ Analysis status:', analysis.status);
+    const analysis: AnalysisDetail = await response.json();
     
-    res.status(200).json({ analysis });
-  } catch (error) {
-    console.error('❌ Error in analysis status API:', error);
+    // 🔥 لاگ‌های مفصل برای دیباگ
+    console.log('✅ Successfully fetched analysis details:', {
+      id: analysis.id,
+      url: analysis.url,
+      status: analysis.status,
+      hasSitemapAnalysis: !!analysis.sitemapAnalysis,
+      sitemapExists: analysis.sitemapAnalysis?.sitemapExists,
+      totalLinks: analysis.sitemapAnalysis?.totalLinks,
+      sitemapUrlsCount: analysis.sitemapAnalysis?.sitemapUrls?.length,
+      sitemapLinksCount: analysis.sitemapAnalysis?.sitemapLinks?.length
+    });
+
+    // 🔥 اگر مشکل داره
+    if (analysis.sitemapAnalysis?.sitemapExists && analysis.sitemapAnalysis.totalLinks === 0) {
+      console.log('🚨 CRITICAL: Sitemap data problem!', {
+        url: analysis.url,
+        sitemapUrls: analysis.sitemapAnalysis.sitemapUrls,
+        expectedLinks: 'Should be > 0 but is 0'
+      });
+    }
     
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    res.status(500).json({ error: errorMessage });
+    return res.status(200).json({ analysis });
+  } catch (error: unknown) {
+    console.error('❌ Error in analysis details API:', error);
+    
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        return res.status(408).json({ error: 'Request timeout' });
+      }
+      
+      if (error.message.includes('fetch failed') || error.message.includes('ECONNREFUSED')) {
+        console.log('⚠️ Analysis service not available');
+        return res.status(503).json({ error: 'Analysis service unavailable' });
+      }
+      
+      const errorMessage = error.message || 'Unknown error occurred';
+      return res.status(500).json({ error: errorMessage });
+    }
+    
+    return res.status(500).json({ error: 'Unknown error occurred' });
   }
 }

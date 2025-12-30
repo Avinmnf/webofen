@@ -82,26 +82,26 @@ export default function WebDesignModule() {
 
   return (
     <section className="bg-[#f7f8fc] pb-4 w-full rounded-2xl mt-8 sm:mt-10 md:mt-12">
-      <div className="max-w-[1250px] m-auto gap-4 sm:gap-6 flex flex-col lg:flex-row justify-center pt-6 sm:pt-8 md:pt-10 px-4 sm:px-6 md:px-8">
+      <div className="max-w-[1250px] m-auto gap-4 sm:gap-6 flex flex-col lg:flex-row justify-center pt-6 sm:pt-8 md:pt-10">
         <div className="relative w-full lg:w-1/2 rounded-lg overflow-hidden">
           <div className="aspect-[10/1] flex flex-col items-center md:items-start justify-between">
             <Image
-              width={210}
+              className="py-2"
+              width={180}
               height={150}
-              src="/homepage/logo.png"
+              src="/logos/logo.png"
               alt="logo"
               priority
-              className="w-32 sm:w-40 md:w-48 lg:w-52 xl:w-60"
             />
           </div>
-          <h1 className="text-[#0364af] text-xl sm:text-2xl font-semibold mt-4 md:text-start text-center">
-            پکیج های طراحی سایت
-          </h1>
-
-          <p className="text-gray-600 mt-4 sm:mt-6 text-sm sm:text-base">
-            لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با
-            استفاده از طراحان گرافیک است، چاپگرها و متون بلکه روزنامه و مجله در
-            ستون و سطرآنچنان که لازم است، و برای شرایط فعلی تکنولوژی مورد
+          <h2 className="text-[#0364af] text-xl sm:text-2xl font-semibold mt-4 md:text-start text-center">
+            انواع طراحی سایت
+          </h2>
+          <p className="text-gray-600 mt-4 sm:mt-6 text-sm sm:text-base md:p-0 p-4 ">
+            ما در هر پروژه طراحی سایت، ابتدا نیازهای فنی و محتوایی شما را بررسی
+            کرده و سپس ساختار مناسبی را برای سایت پیشنهاد می‌کنیم. نتیجه این
+            رویکرد، وب‌سایتی است که هم از نظر ظاهر حرفه‌ای است و هم از نظر فنی و
+            سئو استاندارد و قابل اعتماد.
           </p>
           <div className="w-full mx-auto">
             <div className="">
@@ -134,7 +134,7 @@ export default function WebDesignModule() {
               </div>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 sm:mt-8 md:mt-10">
+          <div className="flex flex-col md:px-0 px-6 sm:flex-row gap-3 sm:gap-4 mt-6 sm:mt-8 md:mt-10">
             <button
               type="button"
               onClick={() => setOpen(true)}
@@ -165,15 +165,15 @@ export default function WebDesignModule() {
                   transition={{ duration: 0.4 }}
                 >
                   <div className="text-center mb-4 sm:mb-6">
-                    <motion.p
+                    <motion.h3
                       className="text-[#0364af] text-lg font-semibold"
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.4 }}
                     >
-                      سایتت را انتخاب کن
-                    </motion.p>
+                    تعرفه و قیمت طراحی سایت
+                    </motion.h3>
                     <motion.p
                       className="text-gray-600 text-xs sm:text-sm mt-1"
                       initial={{ opacity: 0, y: -10 }}
@@ -181,7 +181,7 @@ export default function WebDesignModule() {
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.4, delay: 0.1 }}
                     >
-                      لورم ایپسوم متن ساختگی با تولید سادگی
+                      مناسب ترین گزینه را برای کسب و کار خود انتخاب کنید
                     </motion.p>
                   </div>
                   <motion.div
@@ -344,6 +344,7 @@ export default function WebDesignModule() {
                       onClick={() => {
                         setStep(1);
                         setSelectedModules([]);
+                        setActiveOption(null);
                       }}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -381,7 +382,7 @@ export default function WebDesignModule() {
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="w-4 h-4"
+                      className="w-4 h-4 rotate-180"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"

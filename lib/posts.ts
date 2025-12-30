@@ -3,7 +3,7 @@ import { calculateReadTime } from './readTime';
 
 const website = process.env.NEXT_PUBLIC_WEBOFEN || 'https://webofen.com'
 
-export async function fetchPosts(options: UsePostsOptions = {}) {
+export async function fetchPosts(options: UsePostsOptions = {}, signal?: AbortSignal) {
     try {
         const params = new URLSearchParams();
         params.append("limit", String(options.limit ?? 10));
@@ -18,7 +18,9 @@ export async function fetchPosts(options: UsePostsOptions = {}) {
         if (options.order) params.append("order", options.order);
         if (options.search) params.append("search", options.search);
 
-        const res = await fetch(`${website}/api/proxy/posts?${params.toString()}`);
+        const res = await fetch(`${website}/api/proxy/posts?${params.toString()}`, {
+            signal // Pass the abort signal here
+        });
 
         if (!res.ok) {
             throw new Error(`Failed to fetch posts: ${res.status}`);
@@ -38,6 +40,8 @@ export async function fetchPosts(options: UsePostsOptions = {}) {
                 }
                 let counts = 0
                 try {
+                    // Create a separate request for view count without abort signal
+                    // to avoid cancelling view count requests
                     const res = await fetch(`${website}/api/proxy/getviewbyslug/${safeSlug}`);
                     if (!res.ok) {
                         throw new Error(`Failed to fetch page views: ${res.status}`);
@@ -59,7 +63,11 @@ export async function fetchPosts(options: UsePostsOptions = {}) {
             posts: postsWithReadtime,
             total: data.total
         };
-    } catch (error) {
+    } catch (error: any) {
+        // Check if it's an abort error
+        if (error.name === 'AbortError') {
+            throw error; // Re-throw abort errors
+        }
         console.error("Failed to fetch posts:", error);
         return {
             posts: [],

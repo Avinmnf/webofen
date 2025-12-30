@@ -93,7 +93,7 @@ export default function Pills() {
     },
   ];
   return (
-    <section className="mt-10 flex flex-col gap-2">
+    <section className="mt-6 flex flex-col gap-2">
       <div className="md:flex items-center border-3 border-gray-200 bg-gray-100 rounded-2xl md:rounded-full p-2">
         <div className="flex items-center ml-4 md:w-1/4">
           <div className="bg-[#6fd6e5] w-16 h-16 rounded-full flex items-center justify-center">

@@ -8,6 +8,7 @@ import FreeConsultationForm from "@/components/FreeConsultationForm";
 import SEO from "@/components/seo";
 import Link from "next/link";
 import HomepageResume from "@/components/resume/homepageresume";
+import CollaborationShowcase from "@/components/resume/resume";
 import { useState } from "react";
 import { useRef } from "react";
 // اسکیما Organization برای وبوفن
@@ -18,8 +19,8 @@ const organizationSchema = {
   description:
     "اولین کلینیک تخصصی سئو با ارائه بسته‌های درمانی ماژولار برای وبسایت‌ها",
   url: "https://webofen.com",
-  logo: "https://webofen.com/images/logo.png",
-  foundingDate: "2023",
+  logo: "https://webofen.com/images/logo.png ",
+  foundingDate: "2025",
   founders: [
     {
       "@type": "Person",
@@ -29,7 +30,7 @@ const organizationSchema = {
 
   contactPoint: {
     "@type": "ContactPoint",
-    telephone: "+98-21-5527334",
+    telephone: "+021-14595188",
     contactType: "customer service",
     areaServed: "IR",
   },
@@ -49,6 +50,12 @@ const breadcrumbSchema = {
       "@type": "ListItem",
       position: 1,
       name: "صفحه اصلی",
+      item: "https://webofen.com",
+    },
+        {
+      "@type": "ListItem",
+      position: 2,
+      name: "محصولات",
       item: "https://webofen.com",
     },
   ],
@@ -94,19 +101,7 @@ export default function Home() {
         canonical="https://webofen.com"
         ogType="website"
         ogImage="https://webofen.com/images/og-home.jpg"
-      />
-
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        structuredData={[organizationSchema, breadcrumbSchema, websiteSchema]}
       />
 
       <main className=" m-auto">
@@ -188,7 +183,7 @@ export default function Home() {
                     c0,.82-.66,1.48-1.48,1.48c-4.09,0-7.42,3.33-7.42,7.42c0,.82-.66,1.48-1.48,1.48s-1.48-.66-1.48-1.48
                     c0-5.73,4.66-10.39,10.39-10.39c.82,0,1.48.66,1.48,1.48Z"
                         />
-                      </svg>  
+                      </svg>
                     </div>
                   </div>
                 </Link>
@@ -200,7 +195,6 @@ export default function Home() {
                   href="/analyze"
                   className="relative block w-full h-full group"
                 >
-                  {/* Cover image fallback */}
 
                   {/* Video background */}
                   <video
@@ -228,14 +222,10 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="w-full p-4 mt-4 text-black font-bold">
-            <div className="max-w-[1250px] m-auto flex justify-center">
-              <div className="w-full rounded-2xl bg-white p-4">
-                {/* Input Fields */}
-                <div className="">
-                  <FreeConsultationForm />
-                </div>
-              </div>
+          <div className="max-w-[1250px] m-auto flex justify-center mt-6">
+            <div className="w-full rounded-2xl bg-white p-4">
+              {/* Input Fields */}
+              <FreeConsultationForm />
             </div>
           </div>
         </section>
@@ -306,29 +296,29 @@ export default function Home() {
                   xmlns="http://www.w3.org/2000/svg"
                   stroke="#1d546b"
                 >
-                  <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                  <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
                   <g
                     id="SVGRepo_tracerCarrier"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     stroke="#CCCCCC"
-                    stroke-width="8"
+                    strokeWidth="8"
                   ></g>
                   <g id="SVGRepo_iconCarrier">
                     {" "}
                     <path
                       d="M142 125.853C155.049 97.8883 180.62 82.7645 200.381 78.4757C227.189 72.6575 249.859 84.0511 257.624 112.528C260.302 122.352 259.217 138.128 253.081 148.517C247.426 158.092 239.904 165.942 227.555 176.481C225.251 178.447 217.389 185.018 216.649 185.643C199.849 199.818 191.567 209.152 186.81 220.972C182.053 232.792 182.305 269.489 216.649 266.35"
                       stroke="#1d546b"
-                      stroke-opacity="0.9"
-                      stroke-width="20"
+                      strokeOpacity="0.9"
+                      strokeWidth="20"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     ></path>{" "}
                     <path
                       d="M198.744 315.68C198.744 317.274 198.744 319.614 198.744 322.7"
                       stroke="#1d546b"
-                      stroke-opacity="0.9"
-                      stroke-width="16"
+                      strokeOpacity="0.9"
+                      strokeWidth="16"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     ></path>{" "}
@@ -346,7 +336,7 @@ export default function Home() {
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
                     >
-                      <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
                       <g
                         id="SVGRepo_tracerCarrier"
                         strokeLinecap="round"
@@ -383,11 +373,11 @@ export default function Home() {
                             gradientUnits="userSpaceOnUse"
                           >
                             {" "}
-                            <stop stop-color="#00CC00"></stop>{" "}
-                            <stop offset="0.1878" stop-color="#06C102"></stop>{" "}
-                            <stop offset="0.5185" stop-color="#17A306"></stop>{" "}
-                            <stop offset="0.9507" stop-color="#33740C"></stop>{" "}
-                            <stop offset="1" stop-color="#366E0D"></stop>{" "}
+                            <stop stopColor="#00CC00"></stop>{" "}
+                            <stop offset="0.1878" stopColor="#06C102"></stop>{" "}
+                            <stop offset="0.5185" stopColor="#17A306"></stop>{" "}
+                            <stop offset="0.9507" stopColor="#33740C"></stop>{" "}
+                            <stop offset="1" stopColor="#366E0D"></stop>{" "}
                           </linearGradient>{" "}
                           <linearGradient
                             id="paint1_linear"
@@ -400,13 +390,13 @@ export default function Home() {
                             {" "}
                             <stop
                               offset="0.2544"
-                              stop-color="#90D856"
+                              stopColor="#90D856"
                             ></stop>{" "}
-                            <stop offset="0.736" stop-color="#00CC00"></stop>{" "}
-                            <stop offset="0.7716" stop-color="#0BCD07"></stop>{" "}
-                            <stop offset="0.8342" stop-color="#29CF18"></stop>{" "}
-                            <stop offset="0.9166" stop-color="#59D335"></stop>{" "}
-                            <stop offset="1" stop-color="#90D856"></stop>{" "}
+                            <stop offset="0.736" stopColor="#00CC00"></stop>{" "}
+                            <stop offset="0.7716" stopColor="#0BCD07"></stop>{" "}
+                            <stop offset="0.8342" stopColor="#29CF18"></stop>{" "}
+                            <stop offset="0.9166" stopColor="#59D335"></stop>{" "}
+                            <stop offset="1" stopColor="#90D856"></stop>{" "}
                           </linearGradient>{" "}
                           <radialGradient
                             id="paint2_radial"
@@ -418,27 +408,27 @@ export default function Home() {
                           >
                             {" "}
                             <stop
-                              stop-color="#FBE07A"
+                              stopColor="#FBE07A"
                               stopOpacity="0.75"
                             ></stop>{" "}
                             <stop
                               offset="0.0803394"
-                              stop-color="#FBE387"
+                              stopColor="#FBE387"
                               stopOpacity="0.6897"
                             ></stop>{" "}
                             <stop
                               offset="0.5173"
-                              stop-color="#FDF2C7"
+                              stopColor="#FDF2C7"
                               stopOpacity="0.362"
                             ></stop>{" "}
                             <stop
                               offset="0.8357"
-                              stop-color="#FFFBF0"
+                              stopColor="#FFFBF0"
                               stopOpacity="0.1233"
                             ></stop>{" "}
                             <stop
                               offset="1"
-                              stop-color="white"
+                              stopColor="white"
                               stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
@@ -452,12 +442,12 @@ export default function Home() {
                           >
                             {" "}
                             <stop
-                              stop-color="#440063"
+                              stopColor="#440063"
                               stopOpacity="0.25"
                             ></stop>{" "}
                             <stop
                               offset="1"
-                              stop-color="#420061"
+                              stopColor="#420061"
                               stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
@@ -474,7 +464,7 @@ export default function Home() {
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
                     >
-                      <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
                       <g
                         id="SVGRepo_tracerCarrier"
                         strokeLinecap="round"
@@ -511,11 +501,11 @@ export default function Home() {
                             gradientUnits="userSpaceOnUse"
                           >
                             {" "}
-                            <stop stop-color="#00CC00"></stop>{" "}
-                            <stop offset="0.1878" stop-color="#06C102"></stop>{" "}
-                            <stop offset="0.5185" stop-color="#17A306"></stop>{" "}
-                            <stop offset="0.9507" stop-color="#33740C"></stop>{" "}
-                            <stop offset="1" stop-color="#366E0D"></stop>{" "}
+                            <stop stopColor="#00CC00"></stop>{" "}
+                            <stop offset="0.1878" stopColor="#06C102"></stop>{" "}
+                            <stop offset="0.5185" stopColor="#17A306"></stop>{" "}
+                            <stop offset="0.9507" stopColor="#33740C"></stop>{" "}
+                            <stop offset="1" stopColor="#366E0D"></stop>{" "}
                           </linearGradient>{" "}
                           <linearGradient
                             id="paint1_linear"
@@ -528,13 +518,13 @@ export default function Home() {
                             {" "}
                             <stop
                               offset="0.2544"
-                              stop-color="#90D856"
+                              stopColor="#90D856"
                             ></stop>{" "}
-                            <stop offset="0.736" stop-color="#00CC00"></stop>{" "}
-                            <stop offset="0.7716" stop-color="#0BCD07"></stop>{" "}
-                            <stop offset="0.8342" stop-color="#29CF18"></stop>{" "}
-                            <stop offset="0.9166" stop-color="#59D335"></stop>{" "}
-                            <stop offset="1" stop-color="#90D856"></stop>{" "}
+                            <stop offset="0.736" stopColor="#00CC00"></stop>{" "}
+                            <stop offset="0.7716" stopColor="#0BCD07"></stop>{" "}
+                            <stop offset="0.8342" stopColor="#29CF18"></stop>{" "}
+                            <stop offset="0.9166" stopColor="#59D335"></stop>{" "}
+                            <stop offset="1" stopColor="#90D856"></stop>{" "}
                           </linearGradient>{" "}
                           <radialGradient
                             id="paint2_radial"
@@ -546,27 +536,27 @@ export default function Home() {
                           >
                             {" "}
                             <stop
-                              stop-color="#FBE07A"
+                              stopColor="#FBE07A"
                               stopOpacity="0.75"
                             ></stop>{" "}
                             <stop
                               offset="0.0803394"
-                              stop-color="#FBE387"
+                              stopColor="#FBE387"
                               stopOpacity="0.6897"
                             ></stop>{" "}
                             <stop
                               offset="0.5173"
-                              stop-color="#FDF2C7"
+                              stopColor="#FDF2C7"
                               stopOpacity="0.362"
                             ></stop>{" "}
                             <stop
                               offset="0.8357"
-                              stop-color="#FFFBF0"
+                              stopColor="#FFFBF0"
                               stopOpacity="0.1233"
                             ></stop>{" "}
                             <stop
                               offset="1"
-                              stop-color="white"
+                              stopColor="white"
                               stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
@@ -580,12 +570,12 @@ export default function Home() {
                           >
                             {" "}
                             <stop
-                              stop-color="#440063"
+                              stopColor="#440063"
                               stopOpacity="0.25"
                             ></stop>{" "}
                             <stop
                               offset="1"
-                              stop-color="#420061"
+                              stopColor="#420061"
                               stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
@@ -602,7 +592,7 @@ export default function Home() {
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
                     >
-                      <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
                       <g
                         id="SVGRepo_tracerCarrier"
                         strokeLinecap="round"
@@ -639,11 +629,11 @@ export default function Home() {
                             gradientUnits="userSpaceOnUse"
                           >
                             {" "}
-                            <stop stop-color="#00CC00"></stop>{" "}
-                            <stop offset="0.1878" stop-color="#06C102"></stop>{" "}
-                            <stop offset="0.5185" stop-color="#17A306"></stop>{" "}
-                            <stop offset="0.9507" stop-color="#33740C"></stop>{" "}
-                            <stop offset="1" stop-color="#366E0D"></stop>{" "}
+                            <stop stopColor="#00CC00"></stop>{" "}
+                            <stop offset="0.1878" stopColor="#06C102"></stop>{" "}
+                            <stop offset="0.5185" stopColor="#17A306"></stop>{" "}
+                            <stop offset="0.9507" stopColor="#33740C"></stop>{" "}
+                            <stop offset="1" stopColor="#366E0D"></stop>{" "}
                           </linearGradient>{" "}
                           <linearGradient
                             id="paint1_linear"
@@ -656,13 +646,13 @@ export default function Home() {
                             {" "}
                             <stop
                               offset="0.2544"
-                              stop-color="#90D856"
+                              stopColor="#90D856"
                             ></stop>{" "}
-                            <stop offset="0.736" stop-color="#00CC00"></stop>{" "}
-                            <stop offset="0.7716" stop-color="#0BCD07"></stop>{" "}
-                            <stop offset="0.8342" stop-color="#29CF18"></stop>{" "}
-                            <stop offset="0.9166" stop-color="#59D335"></stop>{" "}
-                            <stop offset="1" stop-color="#90D856"></stop>{" "}
+                            <stop offset="0.736" stopColor="#00CC00"></stop>{" "}
+                            <stop offset="0.7716" stopColor="#0BCD07"></stop>{" "}
+                            <stop offset="0.8342" stopColor="#29CF18"></stop>{" "}
+                            <stop offset="0.9166" stopColor="#59D335"></stop>{" "}
+                            <stop offset="1" stopColor="#90D856"></stop>{" "}
                           </linearGradient>{" "}
                           <radialGradient
                             id="paint2_radial"
@@ -674,27 +664,27 @@ export default function Home() {
                           >
                             {" "}
                             <stop
-                              stop-color="#FBE07A"
+                              stopColor="#FBE07A"
                               stopOpacity="0.75"
                             ></stop>{" "}
                             <stop
                               offset="0.0803394"
-                              stop-color="#FBE387"
+                              stopColor="#FBE387"
                               stopOpacity="0.6897"
                             ></stop>{" "}
                             <stop
                               offset="0.5173"
-                              stop-color="#FDF2C7"
+                              stopColor="#FDF2C7"
                               stopOpacity="0.362"
                             ></stop>{" "}
                             <stop
                               offset="0.8357"
-                              stop-color="#FFFBF0"
+                              stopColor="#FFFBF0"
                               stopOpacity="0.1233"
                             ></stop>{" "}
                             <stop
                               offset="1"
-                              stop-color="white"
+                              stopColor="white"
                               stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
@@ -708,12 +698,12 @@ export default function Home() {
                           >
                             {" "}
                             <stop
-                              stop-color="#440063"
+                              stopColor="#440063"
                               stopOpacity="0.25"
                             ></stop>{" "}
                             <stop
                               offset="1"
-                              stop-color="#420061"
+                              stopColor="#420061"
                               stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
@@ -732,7 +722,7 @@ export default function Home() {
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
                     >
-                      <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
                       <g
                         id="SVGRepo_tracerCarrier"
                         strokeLinecap="round"
@@ -769,11 +759,11 @@ export default function Home() {
                             gradientUnits="userSpaceOnUse"
                           >
                             {" "}
-                            <stop stop-color="#00CC00"></stop>{" "}
-                            <stop offset="0.1878" stop-color="#06C102"></stop>{" "}
-                            <stop offset="0.5185" stop-color="#17A306"></stop>{" "}
-                            <stop offset="0.9507" stop-color="#33740C"></stop>{" "}
-                            <stop offset="1" stop-color="#366E0D"></stop>{" "}
+                            <stop stopColor="#00CC00"></stop>{" "}
+                            <stop offset="0.1878" stopColor="#06C102"></stop>{" "}
+                            <stop offset="0.5185" stopColor="#17A306"></stop>{" "}
+                            <stop offset="0.9507" stopColor="#33740C"></stop>{" "}
+                            <stop offset="1" stopColor="#366E0D"></stop>{" "}
                           </linearGradient>{" "}
                           <linearGradient
                             id="paint1_linear"
@@ -786,13 +776,13 @@ export default function Home() {
                             {" "}
                             <stop
                               offset="0.2544"
-                              stop-color="#90D856"
+                              stopColor="#90D856"
                             ></stop>{" "}
-                            <stop offset="0.736" stop-color="#00CC00"></stop>{" "}
-                            <stop offset="0.7716" stop-color="#0BCD07"></stop>{" "}
-                            <stop offset="0.8342" stop-color="#29CF18"></stop>{" "}
-                            <stop offset="0.9166" stop-color="#59D335"></stop>{" "}
-                            <stop offset="1" stop-color="#90D856"></stop>{" "}
+                            <stop offset="0.736" stopColor="#00CC00"></stop>{" "}
+                            <stop offset="0.7716" stopColor="#0BCD07"></stop>{" "}
+                            <stop offset="0.8342" stopColor="#29CF18"></stop>{" "}
+                            <stop offset="0.9166" stopColor="#59D335"></stop>{" "}
+                            <stop offset="1" stopColor="#90D856"></stop>{" "}
                           </linearGradient>{" "}
                           <radialGradient
                             id="paint2_radial"
@@ -804,27 +794,27 @@ export default function Home() {
                           >
                             {" "}
                             <stop
-                              stop-color="#FBE07A"
+                              stopColor="#FBE07A"
                               stopOpacity="0.75"
                             ></stop>{" "}
                             <stop
                               offset="0.0803394"
-                              stop-color="#FBE387"
+                              stopColor="#FBE387"
                               stopOpacity="0.6897"
                             ></stop>{" "}
                             <stop
                               offset="0.5173"
-                              stop-color="#FDF2C7"
+                              stopColor="#FDF2C7"
                               stopOpacity="0.362"
                             ></stop>{" "}
                             <stop
                               offset="0.8357"
-                              stop-color="#FFFBF0"
+                              stopColor="#FFFBF0"
                               stopOpacity="0.1233"
                             ></stop>{" "}
                             <stop
                               offset="1"
-                              stop-color="white"
+                              stopColor="white"
                               stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
@@ -838,12 +828,12 @@ export default function Home() {
                           >
                             {" "}
                             <stop
-                              stop-color="#440063"
+                              stopColor="#440063"
                               stopOpacity="0.25"
                             ></stop>{" "}
                             <stop
                               offset="1"
-                              stop-color="#420061"
+                              stopColor="#420061"
                               stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
@@ -860,7 +850,7 @@ export default function Home() {
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
                     >
-                      <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
                       <g
                         id="SVGRepo_tracerCarrier"
                         strokeLinecap="round"
@@ -897,11 +887,11 @@ export default function Home() {
                             gradientUnits="userSpaceOnUse"
                           >
                             {" "}
-                            <stop stop-color="#00CC00"></stop>{" "}
-                            <stop offset="0.1878" stop-color="#06C102"></stop>{" "}
-                            <stop offset="0.5185" stop-color="#17A306"></stop>{" "}
-                            <stop offset="0.9507" stop-color="#33740C"></stop>{" "}
-                            <stop offset="1" stop-color="#366E0D"></stop>{" "}
+                            <stop stopColor="#00CC00"></stop>{" "}
+                            <stop offset="0.1878" stopColor="#06C102"></stop>{" "}
+                            <stop offset="0.5185" stopColor="#17A306"></stop>{" "}
+                            <stop offset="0.9507" stopColor="#33740C"></stop>{" "}
+                            <stop offset="1" stopColor="#366E0D"></stop>{" "}
                           </linearGradient>{" "}
                           <linearGradient
                             id="paint1_linear"
@@ -914,13 +904,13 @@ export default function Home() {
                             {" "}
                             <stop
                               offset="0.2544"
-                              stop-color="#90D856"
+                              stopColor="#90D856"
                             ></stop>{" "}
-                            <stop offset="0.736" stop-color="#00CC00"></stop>{" "}
-                            <stop offset="0.7716" stop-color="#0BCD07"></stop>{" "}
-                            <stop offset="0.8342" stop-color="#29CF18"></stop>{" "}
-                            <stop offset="0.9166" stop-color="#59D335"></stop>{" "}
-                            <stop offset="1" stop-color="#90D856"></stop>{" "}
+                            <stop offset="0.736" stopColor="#00CC00"></stop>{" "}
+                            <stop offset="0.7716" stopColor="#0BCD07"></stop>{" "}
+                            <stop offset="0.8342" stopColor="#29CF18"></stop>{" "}
+                            <stop offset="0.9166" stopColor="#59D335"></stop>{" "}
+                            <stop offset="1" stopColor="#90D856"></stop>{" "}
                           </linearGradient>{" "}
                           <radialGradient
                             id="paint2_radial"
@@ -932,27 +922,27 @@ export default function Home() {
                           >
                             {" "}
                             <stop
-                              stop-color="#FBE07A"
+                              stopColor="#FBE07A"
                               stopOpacity="0.75"
                             ></stop>{" "}
                             <stop
                               offset="0.0803394"
-                              stop-color="#FBE387"
+                              stopColor="#FBE387"
                               stopOpacity="0.6897"
                             ></stop>{" "}
                             <stop
                               offset="0.5173"
-                              stop-color="#FDF2C7"
+                              stopColor="#FDF2C7"
                               stopOpacity="0.362"
                             ></stop>{" "}
                             <stop
                               offset="0.8357"
-                              stop-color="#FFFBF0"
+                              stopColor="#FFFBF0"
                               stopOpacity="0.1233"
                             ></stop>{" "}
                             <stop
                               offset="1"
-                              stop-color="white"
+                              stopColor="white"
                               stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
@@ -966,12 +956,12 @@ export default function Home() {
                           >
                             {" "}
                             <stop
-                              stop-color="#440063"
+                              stopColor="#440063"
                               stopOpacity="0.25"
                             ></stop>{" "}
                             <stop
                               offset="1"
-                              stop-color="#420061"
+                              stopColor="#420061"
                               stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
@@ -988,7 +978,7 @@ export default function Home() {
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
                     >
-                      <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
                       <g
                         id="SVGRepo_tracerCarrier"
                         strokeLinecap="round"
@@ -1025,11 +1015,11 @@ export default function Home() {
                             gradientUnits="userSpaceOnUse"
                           >
                             {" "}
-                            <stop stop-color="#00CC00"></stop>{" "}
-                            <stop offset="0.1878" stop-color="#06C102"></stop>{" "}
-                            <stop offset="0.5185" stop-color="#17A306"></stop>{" "}
-                            <stop offset="0.9507" stop-color="#33740C"></stop>{" "}
-                            <stop offset="1" stop-color="#366E0D"></stop>{" "}
+                            <stop stopColor="#00CC00"></stop>{" "}
+                            <stop offset="0.1878" stopColor="#06C102"></stop>{" "}
+                            <stop offset="0.5185" stopColor="#17A306"></stop>{" "}
+                            <stop offset="0.9507" stopColor="#33740C"></stop>{" "}
+                            <stop offset="1" stopColor="#366E0D"></stop>{" "}
                           </linearGradient>{" "}
                           <linearGradient
                             id="paint1_linear"
@@ -1042,13 +1032,13 @@ export default function Home() {
                             {" "}
                             <stop
                               offset="0.2544"
-                              stop-color="#90D856"
+                              stopColor="#90D856"
                             ></stop>{" "}
-                            <stop offset="0.736" stop-color="#00CC00"></stop>{" "}
-                            <stop offset="0.7716" stop-color="#0BCD07"></stop>{" "}
-                            <stop offset="0.8342" stop-color="#29CF18"></stop>{" "}
-                            <stop offset="0.9166" stop-color="#59D335"></stop>{" "}
-                            <stop offset="1" stop-color="#90D856"></stop>{" "}
+                            <stop offset="0.736" stopColor="#00CC00"></stop>{" "}
+                            <stop offset="0.7716" stopColor="#0BCD07"></stop>{" "}
+                            <stop offset="0.8342" stopColor="#29CF18"></stop>{" "}
+                            <stop offset="0.9166" stopColor="#59D335"></stop>{" "}
+                            <stop offset="1" stopColor="#90D856"></stop>{" "}
                           </linearGradient>{" "}
                           <radialGradient
                             id="paint2_radial"
@@ -1060,27 +1050,27 @@ export default function Home() {
                           >
                             {" "}
                             <stop
-                              stop-color="#FBE07A"
+                              stopColor="#FBE07A"
                               stopOpacity="0.75"
                             ></stop>{" "}
                             <stop
                               offset="0.0803394"
-                              stop-color="#FBE387"
+                              stopColor="#FBE387"
                               stopOpacity="0.6897"
                             ></stop>{" "}
                             <stop
                               offset="0.5173"
-                              stop-color="#FDF2C7"
+                              stopColor="#FDF2C7"
                               stopOpacity="0.362"
                             ></stop>{" "}
                             <stop
                               offset="0.8357"
-                              stop-color="#FFFBF0"
+                              stopColor="#FFFBF0"
                               stopOpacity="0.1233"
                             ></stop>{" "}
                             <stop
                               offset="1"
-                              stop-color="white"
+                              stopColor="white"
                               stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
@@ -1094,12 +1084,12 @@ export default function Home() {
                           >
                             {" "}
                             <stop
-                              stop-color="#440063"
+                              stopColor="#440063"
                               stopOpacity="0.25"
                             ></stop>{" "}
                             <stop
                               offset="1"
-                              stop-color="#420061"
+                              stopColor="#420061"
                               stopOpacity="0"
                             ></stop>{" "}
                           </radialGradient>{" "}
@@ -1293,58 +1283,63 @@ export default function Home() {
             <Reservetime />
           </div>
         </section>
-        <section className="bg-[#f7f8fc] w-full pt-4">
-          <div className="md:max-w-[1250px] w-full m-auto mt-5 md:p-0 p-2">
-            <div className="text-center mb-10">
-              <p className="text-[#29b0cb] text-2xl">
-                <span className="text-[#253e5f]">نمونه کار </span>درمان سایت
-              </p>
+       <section className="bg-[#f7f8fc] w-full pt-4 ">
+  <div className="md:max-w-[1250px] w-full m-auto mt-5 md:p-0 p-2">
+    <div className="text-center mb-10">
+      <p className="text-[#29b0cb] text-2xl">
+        <span className="text-[#253e5f]">نمونه کار </span>درمان سایت
+      </p>
 
-              {/* Buttons wrapper */}
-              <div className="flex justify-center items-center mt-6">
-                <div className="flex w-full md:w-2/4 justify-center border rounded-full p-2">
-                  <div className="relative flex gap-4 rounded-full h-10 w-full md:mt-0 overflow-hidden">
-                    {/* Active highlight */}
-                    <div
-                      className="absolute top-0 left-0 h-full bg-[#1d546b] rounded-full transition-all duration-300"
-                      style={{
-                        width: "50%",
-                        transform:
-                          activeDiv === "second"
-                            ? "translateX(0%)"
-                            : "translateX(100%)",
-                      }}
-                    ></div>
+      {/* Buttons wrapper */}
+      <div className="flex justify-center items-center mt-6">
+        <div className="flex w-full md:w-2/4 justify-center border rounded-full p-2">
+          <div className="relative flex gap-4 rounded-full h-10 w-full md:mt-0 overflow-hidden">
+            {/* Active highlight */}
+            <div
+              className="absolute top-0 left-0 h-full bg-[#1d546b] rounded-full transition-all duration-300"
+              style={{
+                width: "50%",
+                transform:
+                  activeDiv === "second"
+                    ? "translateX(0%)"
+                    : "translateX(100%)",
+              }}
+            ></div>
 
-                    {/* Buttons */}
-
-                    <button
-                      onClick={() => handleClick("first")}
-                      className={`flex-1 z-10 text-sm md:text-md py-1 rounded-full h-10 transition-all duration-200 ${
-                        activeDiv === "first"
-                          ? "text-white"
-                          : "text-[#1d546b] hover:text-[#1d546b]"
-                      }`}
-                    >
-                      سئو سایت
-                    </button>
-                    <button
-                      onClick={() => handleClick("second")}
-                      className={`flex-1 z-10 text-sm md:text-md py-1 rounded-full h-10 transition-all duration-200 ${
-                        activeDiv === "second"
-                          ? "text-white"
-                          : "text-[#1d546b] hover:text-[#1d546b]"
-                      }`}
-                    >
-                      طراحی سایت
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <HomepageResume />
+            {/* Buttons */}
+            <button
+              onClick={() => handleClick("first")}
+              className={`flex-1 z-10 text-sm md:text-md py-1 rounded-full h-10 transition-all duration-200 ${
+                activeDiv === "first"
+                  ? "text-white"
+                  : "text-[#1d546b] hover:text-[#1d546b]"
+              }`}
+            >
+              سئو سایت
+            </button>
+            <button
+              onClick={() => handleClick("second")}
+              className={`flex-1 z-10 text-sm md:text-md py-1 rounded-full h-10 transition-all duration-200 ${
+                activeDiv === "second"
+                  ? "text-white"
+                  : "text-[#1d546b] hover:text-[#1d546b]"
+              }`}
+            >
+              طراحی سایت
+            </button>
           </div>
-        </section>
+        </div>
+      </div>
+    </div>
+    
+    {/* Conditional Rendering based on activeDiv */}
+    {activeDiv === "first" ? (
+      <HomepageResume />
+    ) : (
+      <CollaborationShowcase />
+    )}
+  </div>
+</section>
       </main>
     </>
   );

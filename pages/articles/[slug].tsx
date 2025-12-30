@@ -93,12 +93,6 @@ const BreadcrumbSchema = ({ post }: SchemaProps) => {
       {
         "@type": "ListItem",
         position: 3,
-        name: post?.category?.title || "دسته‌بندی",
-        item: `https://webofen.com/category/${categorySlug}`,
-      },
-      {
-        "@type": "ListItem",
-        position: 4,
         name: post?.title || "",
         item: typeof window !== "undefined" ? window.location.href : "",
       },
@@ -172,13 +166,12 @@ export default function PostPage({ post, viewCount }: Props) {
         author={post?.author?.name || ""}
       />
 
-      {/* اضافه کردن اسکیماها */}
       <ArticleSchema post={post} />
       <BreadcrumbSchema post={post} />
 
       <main className="md:w-[1250px] mx-auto p-4 relative articles">
         {/*Background Section */}
-        <div className="relative pt-20">
+        <div className="relative">
           <div className="w-full m-auto">
             {/* Breadcrumb Navigation */}
             <nav className="mb-6 px-4 text-gray-500 " aria-label="breadcrumb">
@@ -312,21 +305,62 @@ export default function PostPage({ post, viewCount }: Props) {
                     </span>
                   </div>
                 </div>
-                <div className="bg-gray-100 rounded-md p-2 mt-4 text-gray-500">
-                  <p> {post.description}</p>
-                </div>
               </div>
             </article>
           </div>
 
           <div className="flex flex-wrap w-full m-auto justify-between content">
             <div className="text-gray-700 mt-6 w-full md:w-4/5">
+              <div className="bg-[#0364af] rounded-md p-2 mb-4 text-sm text-white w-full">
+                <p> {post.description}</p>
+              </div>
               <InjectRelatedCategories
                 html={post.modifiedContent || ""}
                 relatedCategories={post.relatedCategories}
                 relatedPosts={relatedPosts}
               />
               <div className="bg-gray-100 mt-6 w-full h-1"></div>
+              {post.faqs && post.faqs.length > 0 && (
+                <div className="faq-section my-12">
+                  <div className="mb-8 border-r-4 border-blue-500 pr-4">
+                    <p className="text-2xl font-bold text-gray-800 mb-2">
+                      سوالات متداول
+                    </p>
+                  </div>
+
+                  <div className="space-y-3 bg-gray-50 rounded-2xl p-2 py-4">
+                    {post.faqs.map((faq) => (
+                      <details
+                        key={faq.id}
+                        className="group bg-white rounded-lg  border-gray-200 hover:border-gray-300 shadow-xs hover:shadow-sm transition-all duration-200 overflow-hidden"
+                      >
+                        <summary className="px-5 py-4 cursor-pointer flex items-center justify-between list-none">
+                          <p className="text-md font-semibold text-gray-800 text-right leading-7 flex-1">
+                            {faq.question}
+                          </p>
+                          <svg
+                            className="w-5 h-5 text-gray-400 group-open:text-blue-500 transition-transform duration-300 group-open:rotate-90 flex-shrink-0"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </summary>
+
+                        <div className="px-5 pb-4 border-t border-gray-100 pt-3">
+                          <p className="text-gray-600 leading-7 text-justify text-[15px] pr-3 border-r-2 border-blue-100">
+                            {faq.answer}
+                          </p>
+                        </div>
+                      </details>
+                    ))}
+                  </div>
+                </div>
+              )}
               <CommentForm
                 contentType="post"
                 pageSlug={typeof slug === "string" ? slug : ""}
@@ -339,7 +373,9 @@ export default function PostPage({ post, viewCount }: Props) {
                 <div>
                   {post.toc && post.toc.length > 0 && (
                     <div>
-                      <div className="text-gray-600 text-2xl mb-2">فهرست مطالب</div>
+                      <div className="text-gray-600 text-2xl mb-2">
+                        فهرست مطالب
+                      </div>
                       <nav className="toc-nav text-sm">
                         <ul>
                           {[...post.toc].reverse().map((item) => (
@@ -430,9 +466,12 @@ export default function PostPage({ post, viewCount }: Props) {
                     )}
                   </div>
                   <div className="w-full flex gap-6 p-2 mt-3 justify-center items-center">
-                    <Link href={"/instagram"}>
-                      <svg
-                        className="w-6 h-6 text-gray-400 hover:text-amber-700"
+         <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://instagram.com/webofen"
+              >                      <svg
+                        className="w-6 h-6 text-gray-400 hover:text-red -700"
                         viewBox="0 0 24 24"
                         id="meteor-icon-kit__solid-instagram"
                         fill="currentColor"
@@ -446,7 +485,7 @@ export default function PostPage({ post, viewCount }: Props) {
                           fill="currentColor"
                         />{" "}
                       </svg>{" "}
-                    </Link>{" "}
+                    </a>{" "}
                     <span
                       className="fake-link icon-twitter cursor-pointer"
                       onClick={() => {

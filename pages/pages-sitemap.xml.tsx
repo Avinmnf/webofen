@@ -5,11 +5,13 @@ const BASE_URL = (process.env.NEXT_PUBLIC_WEBOFEN || "http://localhost:3002").re
 export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   try {
     const urls = [
-      { slug: "", lastmod: "2025-10-08" },          // صفحه اصلی
-      { slug: "about-us", lastmod: "2025-10-07" },  // درباره ما
-      { slug: "contact-us", lastmod: "2025-10-07" }, // تماس با ما
-      { slug: "articles-sitemap.xml", lastmod: "2025-10-08" }, // لینک به sitemap articles
-      { slug: "products-sitemap.xml", lastmod: "2025-10-08" }, // لینک به sitemap products
+      { slug: "", lastmod: "2025-10-08" },
+      { slug: "about-us", lastmod: "2025-12-02" },
+      { slug: "contact-us", lastmod: "2025-12-02" },
+      { slug: "analyze", lastmod: "2025-12-02" },
+      { slug: "faq", lastmod: "2025-12-02" },
+      { slug: "articles-sitemap.xml", lastmod: "2025-10-08" },
+      { slug: "products-sitemap.xml", lastmod: "2025-10-08" },
     ];
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>

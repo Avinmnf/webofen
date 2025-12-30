@@ -1,14 +1,35 @@
 "use client";
 import { WaveBackground } from "./WaveBackground";
+import { useEffect } from "react";
 
 interface HeroSectionProps {
   url: string;
   setUrl: (url: string) => void;
   loading: boolean;
   handleAnalyze: (e: React.FormEvent<HTMLFormElement>) => void;
+  readOnly?: boolean;
+  onNewAnalysis?: () => void;
 }
 
-export const HeroSection = ({ url, setUrl, loading, handleAnalyze }: HeroSectionProps) => {
+export const HeroSection = ({ 
+  url, 
+  setUrl, 
+  loading, 
+  handleAnalyze,
+  readOnly = false,
+  onNewAnalysis
+}: HeroSectionProps) => {
+
+  // هنگام لود کامپوننت، بررسی کن اگر URL از localStorage آمده باشد
+  useEffect(() => {
+    if (!url) {
+      const savedUrl = localStorage.getItem('analysisUrl');
+      if (savedUrl) {
+        setUrl(savedUrl);
+      }
+    }
+  }, []);
+
   return (
     <div className="w-full bg-gradient-to-br from-blue-600/90 to-blue-700/90 text-white relative overflow-hidden">
       <WaveBackground />
@@ -29,23 +50,40 @@ export const HeroSection = ({ url, setUrl, loading, handleAnalyze }: HeroSection
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="flex-grow relative">
                   <input
-                    type="url"
+                    type="text"
+                    dir="ltr"
                     placeholder="https://example.com"
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
                     required
-                    className="w-full px-4 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent backdrop-blur-sm transition-all duration-300 focus:scale-[1.02]"
+                    className={`w-full px-12 py-4 rounded-xl bg-white/10 border ${readOnly ? 'border-yellow-300/50 bg-yellow-500/10' : 'border-white/20'} text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent backdrop-blur-sm transition-all duration-300 ${readOnly ? '' : 'focus:scale-[1.02]'} ${readOnly ? 'cursor-not-allowed' : ''}`}
+                    readOnly={readOnly}
+                    title={readOnly ? "در حال نمایش نتایج آنالیز قبلی - برای آنالیز جدید، دکمه آنالیز جدید را بزنید" : "آدرس سایت را وارد کنید"}
                   />
-                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clipRule="evenodd" />
-                    </svg>
+
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                    {readOnly ? (
+                      <span className="text-yellow-300">📊</span>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-200" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clipRule="evenodd" />
+                      </svg>
+                    )}
                   </div>
+
+                  {readOnly && (
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <span className="text-yellow-300 text-xs bg-yellow-900/50 px-2 py-1 rounded">
+                        نتایج قبلی
+                      </span>
+                    </div>
+                  )}
                 </div>
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="px-8 py-4 bg-white text-blue-600 hover:bg-blue-50 font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center min-w-[160px] hover:scale-105 active:scale-95"
+                  disabled={loading || readOnly}
+                  className={`px-8 py-4 ${readOnly ? 'bg-yellow-500 hover:bg-yellow-600 text-white' : 'bg-white text-blue-600 hover:bg-blue-50'} font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center min-w-[160px] hover:scale-105 active:scale-95`}
+                  title={readOnly ? "در حال نمایش نتایج آنالیز قبلی" : "شروع آنالیز"}
                 >
                   {loading ? (
                     <>
@@ -54,6 +92,11 @@ export const HeroSection = ({ url, setUrl, loading, handleAnalyze }: HeroSection
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
                       در حال بررسی...
+                    </>
+                  ) : readOnly ? (
+                    <>
+                      <span className="ml-2">📊</span>
+                      نمایش نتایج
                     </>
                   ) : (
                     <>
@@ -65,6 +108,26 @@ export const HeroSection = ({ url, setUrl, loading, handleAnalyze }: HeroSection
                   )}
                 </button>
               </div>
+              
+              {readOnly && (
+                <div className="bg-yellow-900/30 border border-yellow-500/30 rounded-lg p-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-yellow-200 text-sm">
+                      در حال نمایش نتایج آنالیز قبلی برای: <span className="font-bold">{url}</span>
+                    </p>
+                    {onNewAnalysis && (
+                      <button
+                        type="button"
+                        onClick={onNewAnalysis}
+                        className="text-xs bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded-lg transition-colors"
+                      >
+                        آنالیز جدید
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+              
               <p className="text-blue-200 text-sm flex items-center animate-pulse">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />

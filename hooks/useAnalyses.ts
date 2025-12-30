@@ -12,7 +12,11 @@ export interface UseAnalysesReturn {
   checkExistingAnalysis: (url: string) => Analysis | null;
 }
 
-export function useAnalyses(): UseAnalysesReturn {
+interface UseAnalysesProps {
+  phoneNumber?: string;
+}
+
+export function useAnalyses({ phoneNumber }: UseAnalysesProps = {}): UseAnalysesReturn {
   const [analyses, setAnalyses] = useState<Analysis[]>([]);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -23,23 +27,30 @@ export function useAnalyses(): UseAnalysesReturn {
   const fetchAnalyses = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/analyses');
+
+      let url = '/api/analyses';
+      if (phoneNumber) {
+        url += `?phoneNumber=${encodeURIComponent(phoneNumber)}`;
+      }
+
+      const res = await fetch(url);
       if (!res.ok) throw new Error('Failed to fetch analyses');
+
       const data = await res.json();
-      setAnalyses(data.analyses || []);
+      setAnalyses(Array.isArray(data.analyses) ? data.analyses : []);
     } catch (err: any) {
       setError(err.message || 'Unknown error');
+      setAnalyses([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // تابع sync برای بررسی لینک‌های تکراری
   const checkExistingAnalysis = (url: string): Analysis | null => {
     const normalized = url.trim().toLowerCase();
     const existing = analyses
       .filter(a => a.status === 'completed')
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) // آخرین آنالیز
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .find(a => a.url.trim().toLowerCase() === normalized);
     return existing || null;
   };
@@ -99,7 +110,7 @@ export function useAnalyses(): UseAnalysesReturn {
     await poll();
   };
 
-  useEffect(() => { fetchAnalyses(); }, []);
+  useEffect(() => { fetchAnalyses(); }, [phoneNumber]);
 
   return { analyses, analysis, loading, error, startAnalysis, resetError, refetch: fetchAnalyses, checkExistingAnalysis };
 }

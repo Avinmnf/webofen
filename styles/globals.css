@@ -33,9 +33,7 @@ code{
 text-align: left;
 display: block;
 padding: 5px 10px;
-background-color: #f8f8f8;
-border-radius: 10px;
-margin: 5px;
+width: fit-content;
 }
 table {
 text-indent: 0;
@@ -54,6 +52,79 @@ border: 1px solid;
 background: #0366b4;
 color: white;
 }
+.faq-section details[open] summary ~ * {
+  animation: sweep 0.3s ease-in-out;
+}
+
+@keyframes sweep {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth max-height transition */
+.faq-section .transition-all {
+  transition: max-height 0.3s ease-in-out;
+}
+.magnifier-lens {
+  position: absolute;
+  border: 2px solid #1d546b;
+  border-radius: 50%;
+  width: 150px;
+  height: 150px;
+  pointer-events: none;
+  display: none;
+  background: #fff;
+  box-shadow: 
+    0 0 0 1px rgba(0,0,0,0.1),
+    0 4px 20px rgba(0,0,0,0.3),
+    inset 0 0 20px rgba(255,255,255,0.8);
+  z-index: 1000;
+  cursor: none;
+  overflow: hidden;
+  /* Add a subtle zoom effect */
+  transform: scale(1);
+  transition: transform 0.1s ease;
+}
+
+.magnifier-lens:hover {
+  transform: scale(1.02);
+}
+
+.article-image-magnify {
+  cursor: zoom-in;
+  transition: transform 0.2s ease;
+}
+
+.article-image-magnify:hover {
+  transform: scale(1.01);
+}
+
+/* Optional: Add a loading state */
+.magnifier-lens:before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: none;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 @layer base {
 .content h1{font-size: 1.8rem; padding: 10px 0;}
 .content h2{font-size: 1.7rem;padding: 10px 0;}
@@ -68,9 +139,9 @@ color: white;
 .related {
   color: black;
 }
-.toc-level-1{margin-right: 2px; font-size: 1.2rem;}
+.toc-level-1{margin-right: 2px; font-size: 1rem;}
 .toc-level-2{margin-right: 5px; font-size: 1rem;}
-.toc-level-3{margin-right: 10px; font-size: 0.9rem;}
+.toc-level-3{margin-right: 10px; font-size: 1rem;}
 }
 .toc-sidebar {
   position: sticky;
@@ -131,10 +202,8 @@ p{
   width: 100%;
   height: 100%;
   object-fit: contain;
-  /* این خط باعث میشه پیکسل‌های سفید پاسخی شبیه "شفاف" داشته باشند */
   mix-blend-mode: multiply;
   will-change: filter, mix-blend-mode;
-  /* اگر نیاز به افزایش تضاد لبه‌ها داری */
   filter: contrast(1.2) saturate(1.05);
   background: transparent;
 }
@@ -162,24 +231,141 @@ p{
 }
 
 
-.mySwiper .swiper-pagination-bullet {
-  background-color: #d0d7da; /* default (inactive) */
-  opacity: 1;
-  width: 8px;
-  height: 8px;
-  transition: all 0.3s ease;
+pre {
+  direction: ltr;
+  text-align: left;
+  position: relative;
+  background-color: #f8f8f8;
+
 }
 
-.mySwiper .swiper-pagination-bullet-active {
-  background-color: #1d546b; /* your color */
-  width: 20px;
-  border-radius: 6px;
+code {
+  font-family: 'Fira Code', 'Consolas', 'Monaco', 'Andale Mono', monospace;
 }
 
-.mySwiper .swiper-pagination-bullet:hover {
-  background-color: #1d546b;
-  transform: scale(1.2);
+.code-block-container {
+  position: relative;
+  margin: 1.5rem 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
 }
+
+.code-block-container pre {
+  margin: 0 !important;
+  border-radius: 0 0 0.5rem 0.5rem;
+}
+
+.code-block-container code {
+  color: gray !important; /* text-gray-100 */
+  font-size: 0.875rem !important; /* text-sm */
+  overflow-x: auto;
+}
+
+/* دکمه کپی */
+.copy-code-button {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.copy-code-button:hover {
+  transform: translateY(-1px);
+}
+
+.copy-code-button:active {
+  transform: translateY(0);
+}
+
+/* کدهای خطی */
+.inline-code-container {
+  position: relative;
+}
+
+.inline-code-container code {
+  padding: 0.25rem 0.5rem;
+  color: #1f2937;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: monospace;
+}
+
+.copy-inline-code {
+  cursor: pointer;
+  z-index: 10;
+}
+
+.copy-inline-code:hover {
+  background-color: #374151 !important; /* bg-gray-700 */
+}
+
+/* هایلایت سینتکس (اختیاری) */
+.hljs {
+  background: transparent !important;
+}
+
+.hljs-keyword {
+  color: #f472b6 !important; /* pink-400 */
+}
+
+.hljs-string {
+  color: #34d399 !important; /* emerald-400 */
+}
+
+.hljs-number {
+  color: #60a5fa !important; /* blue-400 */
+}
+
+.hljs-comment {
+  color: #9ca3af !important; /* gray-400 */
+  font-style: italic;
+}
+
+.hljs-function {
+  color: #fbbf24 !important; /* amber-400 */
+}
+
+.hljs-params {
+  color: #a78bfa !important; /* violet-400 */
+}
+
+/* خط‌های کد */
+pre code .line-number {
+  display: inline-block;
+  width: 100%;
+  padding-right: 1em;
+  margin-right: 1em;
+  text-align: right;
+  color: #6b7280; /* gray-500 */
+  border-right: 1px solid #4b5563; /* gray-600 */
+  user-select: none;
+}
+
+/* انیمیشن برای موفقیت کپی */
+@keyframes copySuccess {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.copy-code-button.bg-green-600 svg {
+  animation: copySuccess 0.3s ease;
+}
+
+/* ریسپانسیو */
+@media (max-width: 768px) {
+  .code-block-container {
+    margin: 1rem 0;
+  }
+  
+  .code-block-container pre {
+    font-size: 0.75rem !important;
+  }
+  
+  .copy-code-button {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.75rem !important;
+  }
+}
+
 
 .slide-content {
   font-size: 1.25rem;
