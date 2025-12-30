@@ -31,7 +31,6 @@ export function useCheckout() {
 const handleCheckout = async ({
   customerName,
   customerPhone,
-  address,
   items,
   couponCode,
 }: CheckoutProps) => {
@@ -51,7 +50,6 @@ const handleCheckout = async ({
       body: JSON.stringify({
         customerName,
         customerPhone,
-        address,
         items,
         couponCode,
         status: "not_payed",

@@ -1,6 +1,8 @@
 'use client';
 
 import React from "react";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 import AnalysisLinks from "@/components/AnalysisLinks";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserOrders } from "@/hooks/useUserOrders";
@@ -33,28 +35,51 @@ const productVideoMap = [
 ];
 
 const DashboardHome = () => {
-  // Use the actual hooks from context
-  const { isLoggedIn, user } = useAuth(); 
+  const router = useRouter();
+  const { isLoggedIn, user, loading: authLoading } = useAuth();
   const { orders, loading: ordersLoading } = useUserOrders();
 
-  if (!isLoggedIn) {
+  // Redirect only when auth check is complete AND user is not logged in
+  useEffect(() => {
+    if (!authLoading && !isLoggedIn) {
+      // Add current path to redirect back after login
+      const currentPath = router.asPath;
+      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+    }
+  }, [isLoggedIn, authLoading, router]);
+
+  // Show loading while checking auth
+  if (authLoading) {
     return (
       <div className="h-screen flex items-center justify-center">
-        <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 text-center">
-          <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-          </div>
-          <p className="text-gray-700 font-medium">ابتدا باید وارد حساب کاربری خود شوید</p>
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+          <p className="text-gray-500 font-medium">
+            در حال بررسی احراز هویت...
+          </p>
         </div>
       </div>
     );
   }
 
-  if (ordersLoading) {
+  // If auth check is done and user is not logged in, show loading while redirecting
+  if (!isLoggedIn) {
     return (
       <div className="h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+          <p className="text-gray-500 font-medium">
+            در حال هدایت به صفحه ورود...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading while fetching orders
+  if (ordersLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
           <p className="text-gray-500 font-medium">در حال بارگذاری اطلاعات...</p>

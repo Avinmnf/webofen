@@ -7,8 +7,10 @@ import { Download, Mail, Copy, Check, ArrowLeft, Sparkles } from "lucide-react";
 import { useUserOrders } from "@/hooks/useUserOrders";
 import SuccessAnimation from "@/components/animations/SuccessAnimation";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 export default function PaymentSuccessPage() {
+  const router = useRouter();
   const { clearCart } = useCart();
   const { orders, loading: ordersLoading } = useUserOrders();
   const [confetti, setConfetti] = useState(false);
@@ -17,6 +19,7 @@ export default function PaymentSuccessPage() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    // Clear cart on successful payment
     clearCart();
     setConfetti(true);
     setPaymentDate(new Date().toLocaleDateString("fa-IR"));
@@ -26,190 +29,204 @@ export default function PaymentSuccessPage() {
   }, [clearCart]);
 
   useEffect(() => {
-    if (!ordersLoading && orders.length > 0) {
+    if (!ordersLoading && orders && orders.length > 0) {
       const latestOrder = orders[orders.length - 1];
-      setTrackingNumber(latestOrder.id);
+      setTrackingNumber(latestOrder.id || "");
     }
   }, [orders, ordersLoading]);
 
   const copyTrackingNumber = () => {
+    if (!trackingNumber) return;
+
     navigator.clipboard.writeText(trackingNumber);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleDownloadInvoice = () => {
+    // Implement invoice download logic here
+    console.log("Downloading invoice for tracking number:", trackingNumber);
+    // Example: window.open(`/api/invoice/${trackingNumber}`, '_blank');
+    alert("دریافت فاکتور به زودی فعال خواهد شد");
+  };
+
+  const handleBackToShop = () => {
+    router.push("/products");
+  };
+
   return (
     <>
-          <Head>
-        <title>ورود به حساب کاربری | وبوفن</title>
+      <Head>
+        <title>پرداخت موفق | وبوفن</title>
         <meta name="robots" content="noindex, nofollow" />
       </Head>
-    <div className=" min-h-screen bg-gradient-to-br from-white via-gray-50 to-blue-50/30 relative overflow-hidden">
-      {/* Minimal Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 -left-10 w-72 h-72 bg-gradient-to-r from-green-100/20 to-blue-100/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 -right-10 w-96 h-96 bg-gradient-to-r from-purple-100/10 to-pink-100/10 rounded-full blur-3xl"></div>
-      </div>
-
-      {/* Geometric Background Pattern */}
-      <div className="absolute inset-0 opacity-[0.02]">
-        <div className="absolute top-20 left-20 w-4 h-4 bg-gray-900 rounded-full"></div>
-        <div className="absolute top-40 right-32 w-3 h-3 bg-gray-900 rounded-full"></div>
-        <div className="absolute bottom-32 left-1/4 w-2 h-2 bg-gray-900 rounded-full"></div>
-        <div className="absolute bottom-20 right-20 w-5 h-5 bg-gray-900 rounded-full"></div>
-      </div>
-
-      <div className="relative z-10 max-w-[1250px] m-auto mx-auto py-12">
-        {/* Success Animation Container */}
-        <div className="relative mb-12">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-32 h-32 bg-gradient-to-br from-green-400/10 to-blue-400/10 rounded-full blur-xl"></div>
-          </div>
-          <div className="relative flex justify-center">
-            <SuccessAnimation />
-          </div>
+      <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-blue-50/30 relative overflow-hidden">
+        {/* Minimal Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 -left-10 w-72 h-72 bg-gradient-to-r from-green-100/20 to-blue-100/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/4 -right-10 w-96 h-96 bg-gradient-to-r from-purple-100/10 to-pink-100/10 rounded-full blur-3xl"></div>
         </div>
 
-        {/* Main Content Card */}
-        <div className="flex justify-between">
-          <div className="bg-white/70 w-2/3 backdrop-blur-xl rounded-3xl shadow-sm border border-white/60 p-8 mb-8 relative overflow-hidden">
-            {/* Accent Border */}
+        {/* Geometric Background Pattern */}
+        <div className="absolute inset-0 opacity-[0.02]">
+          <div className="absolute top-20 left-20 w-4 h-4 bg-gray-900 rounded-full"></div>
+          <div className="absolute top-40 right-32 w-3 h-3 bg-gray-900 rounded-full"></div>
+          <div className="absolute bottom-32 left-1/4 w-2 h-2 bg-gray-900 rounded-full"></div>
+          <div className="absolute bottom-20 right-20 w-5 h-5 bg-gray-900 rounded-full"></div>
+        </div>
 
-            <div className="text-center mb-8">
-
-              <h1 className="text-2xl font-bold text-gray-900 mb-3">
-                سفارش شما ثبت شد
-              </h1>
-              <p className="text-gray-600 leading-relaxed">
-                می‌توانید سفارش خود را در داشبورد مدیریت کنید
-              </p>
+        <div className="relative z-10 max-w-[1250px] mx-auto py-12 ">
+          {/* Success Animation Container */}
+          <div className="relative mb-12">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-32 h-32 bg-gradient-to-br from-green-400/10 to-blue-400/10 rounded-full blur-xl"></div>
             </div>
+            <div className="relative flex justify-center">
+              <SuccessAnimation />
+            </div>
+          </div>
 
-            {/* Order Details - Minimal Design */}
-            <div className="space-y-4 mb-8">
-              <div className="flex items-center justify-between p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
-                <span className="text-gray-600 text-sm">شماره پیگیری</span>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-gray-800 font-medium">
-                    {ordersLoading ? "..." : trackingNumber}
+          {/* Main Content */}
+          <div className="flex flex-col lg:flex-row gap-6 justify-between">
+            {/* Main Content Card */}
+            <div className="bg-white/70 w-full lg:w-2/3 backdrop-blur-xl rounded-3xl shadow-sm border border-white/60 p-6 lg:p-8 relative overflow-hidden">
+              <div className="text-center mb-8">
+                <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">
+                  سفارش شما ثبت شد
+                </h1>
+                <p className="text-gray-600 leading-relaxed text-sm lg:text-base">
+                  می‌توانید سفارش خود را در داشبورد مدیریت کنید
+                </p>
+              </div>
+
+              {/* Order Details */}
+              <div className="space-y-4 mb-8">
+                <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-gray-50/50 rounded-2xl border border-gray-100 gap-3">
+                  <span className="text-gray-600 text-sm whitespace-nowrap">شماره پیگیری</span>
+                  <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
+                    <span className="font-mono text-gray-800 font-medium truncate max-w-[200px]">
+                      {ordersLoading ? "در حال بارگذاری..." : trackingNumber || "در حال دریافت..."}
+                    </span>
+                    <button
+                      onClick={copyTrackingNumber}
+                      disabled={!trackingNumber}
+                      className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      aria-label="کپی شماره پیگیری"
+                    >
+                      {copied ? (
+                        <Check className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-gray-500" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-gray-50/50 rounded-2xl border border-gray-100 gap-3">
+                  <span className="text-gray-600 text-sm whitespace-nowrap">تاریخ پرداخت</span>
+                  <span className="font-medium text-gray-800">
+                    {paymentDate || "در حال بارگذاری..."}
                   </span>
-                  <button
-                    onClick={copyTrackingNumber}
-                    className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors duration-200"
-                  >
-                    {copied ? (
-                      <Check className="w-4 h-4 text-green-600" />
-                    ) : (
-                      <Copy className="w-4 h-4 text-gray-500" />
-                    )}
-                  </button>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
-                <span className="text-gray-600 text-sm">تاریخ پرداخت</span>
-                <span className="font-medium text-gray-800">
-                  {paymentDate || "..."}
-                </span>
-              </div>
-            </div>
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={handleDownloadInvoice}
+                  className="flex-1 bg-[#29b0cb] hover:bg-[#1d96af] text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 hover:shadow-lg flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={!trackingNumber}
+                >
+                  <Download className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  <span>دریافت فاکتور</span>
+                </button>
 
-            {/* Action Buttons - Minimal Style */}
-            <div className="flex gap-3">
-              <button className="flex-1 bg-[#29b0cb] hover:bg-blue-950 text-white py-3 rounded-md font-medium transition-all duration-200 hover:shadow-lg flex items-center justify-center gap-2 group">
-                <Download className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                <span className="text-white">دریافت فاکتور</span>
-              </button>
-              <Link
-                href={"/dashboard"}
-                className="flex-1 bg-white border-2 border-gray-200 hover:border-gray-300 text-gray-700 hover:text-gray-900 py-3 rounded-md font-medium transition-all duration-200 flex items-center justify-center gap-2 group"
-              >
-                <div className="flex items-center gap-2 group-hover:scale-110 transition-transform">
+                {/* Fixed Dashboard Link */}
+                <Link
+                  href="/dashboard"
+                  className="flex-1 bg-white border-2 border-gray-200 hover:border-gray-300 text-gray-700 hover:text-gray-900 py-3 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 group"
+                >
                   <svg
                     className="w-4 h-4"
                     viewBox="0 0 24 24"
-                    id="meteor-icon-kit__regular-dashboard"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                    <g
-                      id="SVGRepo_tracerCarrier"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    ></g>
-                    <g id="SVGRepo_iconCarrier">
-                      <path
-                        fill-rule="evenodd"
-                        clip-rule="evenodd"
-                        d="M3 2C2.44772 2 2 2.44772 2 3V6C2 6.55228 2.44772 7 3 7H6C6.55228 7 7 6.55228 7 6V3C7 2.44772 6.55228 2 6 2H3ZM3 0H6C7.65685 0 9 1.34315 9 3V6C9 7.65685 7.65685 9 6 9H3C1.34315 9 0 7.65685 0 6V3C0 1.34315 1.34315 0 3 0ZM14 16H21C22.6569 16 24 17.3431 24 19V21C24 22.6569 22.6569 24 21 24H14C12.3431 24 11 22.6569 11 21V19C11 17.3431 12.3431 16 14 16ZM14 18C13.4477 18 13 18.4477 13 19V21C13 21.5523 13.4477 22 14 22H21C21.5523 22 22 21.5523 22 21V19C22 18.4477 21.5523 18 21 18H14ZM3 11H6C7.65685 11 9 12.3431 9 14V21C9 22.6569 7.65685 24 6 24H3C1.34315 24 0 22.6569 0 21V14C0 12.3431 1.34315 11 3 11ZM3 13C2.44772 13 2 13.4477 2 14V21C2 21.5523 2.44772 22 3 22H6C6.55228 22 7 21.5523 7 21V14C7 13.4477 6.55228 13 6 13H3ZM21 0C22.6569 0 24 1.34315 24 3V11C24 12.6569 22.6569 14 21 14H14C12.3431 14 11 12.6569 11 11V3C11 1.34315 12.3431 0 14 0H21ZM13 3V11C13 11.5523 13.4477 12 14 12H21C21.5523 12 22 11.5523 22 11V3C22 2.44772 21.5523 2 21 2H14C13.4477 2 13 2.44772 13 3Z"
-                        fill="#545454"
-                      ></path>
-                    </g>
+                    <path
+                      fillRule="evenodd"
+                      clipRule="evenodd"
+                      d="M3 2C2.44772 2 2 2.44772 2 3V6C2 6.55228 2.44772 7 3 7H6C6.55228 7 7 6.55228 7 6V3C7 2.44772 6.55228 2 6 2H3ZM3 0H6C7.65685 0 9 1.34315 9 3V6C9 7.65685 7.65685 9 6 9H3C1.34315 9 0 7.65685 0 6V3C0 1.34315 1.34315 0 3 0ZM14 16H21C22.6569 16 24 17.3431 24 19V21C24 22.6569 22.6569 24 21 24H14C12.3431 24 11 22.6569 11 21V19C11 17.3431 12.3431 16 14 16ZM14 18C13.4477 18 13 18.4477 13 19V21C13 21.5523 13.4477 22 14 22H21C21.5523 22 22 21.5523 22 21V19C22 18.4477 21.5523 18 21 18H14ZM3 11H6C7.65685 11 9 12.3431 9 14V21C9 22.6569 7.65685 24 6 24H3C1.34315 24 0 22.6569 0 21V14C0 12.3431 1.34315 11 3 11ZM3 13C2.44772 13 2 13.4477 2 14V21C2 21.5523 2.44772 22 3 22H6C6.55228 22 7 21.5523 7 21V14C7 13.4477 6.55228 13 6 13H3ZM21 0C22.6569 0 24 1.34315 24 3V11C24 12.6569 22.6569 14 21 14H14C12.3431 14 11 12.6569 11 11V3C11 1.34315 12.3431 0 14 0H21ZM13 3V11C13 11.5523 13.4477 12 14 12H21C21.5523 12 22 11.5523 22 11V3C22 2.44772 21.5523 2 21 2H14C13.4477 2 13 2.44772 13 3Z"
+                      fill="#545454"
+                    />
                   </svg>
                   <span className="text-gray-600">داشبورد</span>
-                </div>
-              </Link>
+                </Link>
+              </div>
             </div>
-          </div>
 
-          {/* Next Steps - Minimal Design */}
-          <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-sm border border-white/60 p-6 mb-8">
-            <h3 className="font-semibold text-gray-800 mb-6 text-center text-lg">
-              مراحل بعدی
-            </h3>
-            <div className="space-y-4">
-              {[
-                { step: 1, text: "تایید نهایی سفارش در کمترین زمان" },
-                { step: 2, text: "وارد کردن مقادیر مورد نیاز در داشبورد" },
-                { step: 3, text: "انجام و تکمیل سفارش" },
-              ].map((item) => (
-                <div
-                  key={item.step}
-                  className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50/50 transition-colors duration-200 group"
-                >
-                  <div className="flex-shrink-0 w-8 h-8 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center text-gray-600 text-sm font-medium group-hover:border-gray-300 transition-colors">
-                    {item.step}
+            {/* Next Steps Card */}
+            <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-sm border border-white/60 p-6 w-full lg:w-1/3">
+              <h3 className="font-semibold text-gray-800 mb-6 text-center text-lg">
+                مراحل بعدی
+              </h3>
+              <div className="space-y-4">
+                {[
+                  { step: 1, text: "تایید نهایی سفارش در کمترین زمان" },
+                  { step: 2, text: "وارد کردن مقادیر مورد نیاز در داشبورد" },
+                  { step: 3, text: "انجام و تکمیل سفارش" },
+                ].map((item) => (
+                  <div
+                    key={item.step}
+                    className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50/50 transition-colors duration-200 group"
+                  >
+                    <div className="flex-shrink-0 w-8 h-8 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center text-gray-600 text-sm font-medium group-hover:border-gray-300 transition-colors">
+                      {item.step}
+                    </div>
+                    <span className="text-gray-700 text-sm leading-relaxed">
+                      {item.text}
+                    </span>
+                    <div className="flex-shrink-0 w-2 h-2 bg-green-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
-                  <span className="text-gray-700 text-sm leading-relaxed">
-                    {item.text}
-                  </span>
-                  <div className="flex-shrink-0 w-2 h-2 bg-green-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Support Info */}
+          <div className="mt-8">
+            <div className="bg-[#1d546b] backdrop-blur-xl rounded-2xl shadow-sm border border-white/60 p-6">
+              <p className="text-white text-sm mb-3 text-center">در صورت وجود هرگونه سوال</p>
+              <div className="flex justify-center">
+                <div className="font-mono text-gray-800 text-lg font-medium bg-white/90 rounded-xl py-2 px-6 inline-block text-center">
+                  ۱۴ ۵۹ ۵۱ ۸۸ - ۰۲۱
                 </div>
-              ))}
+              </div>
+              <p className="text-white/90 text-xs mt-3 text-center">پشتیبانی ۲۴ ساعته</p>
             </div>
           </div>
-        </div>
-        {/* Support Info - Minimal */}
-        <div className="text-center">
-          <div className="bg-[#0364af] backdrop-blur-xl rounded-2xl shadow-sm border border-white/60 p-6">
-            <p className="text-white text-sm mb-3">در صورت وجود هرگونه سوال</p>
-            <div className="font-mono text-gray-800 text-lg font-medium bg-gray-50/50 rounded-xl py-2 px-4 inline-block">
-              ۱۴ ۵۹ ۵۱ ۸۸ - ۰۲۱
-            </div>
-            <p className="text-white text-xs mt-3">پشتیبانی ۲۴ ساعته</p>
+
+          {/* Back Button */}
+          <div className="text-center mt-8">
+            <button
+              onClick={handleBackToShop}
+              className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800 py-2 px-4 rounded-xl hover:bg-white/50 transition-all duration-200 group"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              <span className="text-sm">بازگشت به فروشگاه</span>
+            </button>
           </div>
         </div>
 
-        {/* Back Button */}
-        <div className="text-center mt-8">
-          <button className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800 py-2 px-4 rounded-xl hover:bg-white/50 transition-all duration-200 group">
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            <span className="text-sm">بازگشت به فروشگاه</span>
-          </button>
-        </div>
+        {/* Copied Toast */}
+        {copied && (
+          <div className="z-50 fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-2xl shadow-lg animate-in slide-in-from-bottom-5 duration-300">
+            <div className="flex items-center gap-2 text-sm">
+              <Check className="w-4 h-4" />
+              شماره پیگیری کپی شد
+            </div>
+          </div>
+        )}
       </div>
-
-      {/* Copied Toast */}
-      {copied && (
-        <div className="z-50 fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-2xl shadow-lg animate-in slide-in-from-bottom-5 duration-300">
-          <div className="flex items-center gap-2 text-sm">
-            <Check className="w-4 h-4" />
-            شماره پیگیری کپی شد
-          </div>
-        </div>
-      )}
-    </div>
     </>
   );
 }
