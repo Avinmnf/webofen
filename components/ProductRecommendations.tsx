@@ -346,7 +346,7 @@ export const ProductRecommendations = ({
       case "5":
         return "bg-indigo-100";
       case "6":
-        return "bg-red-100";
+        return "bg-green-50";
       default:
         return "bg-gray-100";
     }

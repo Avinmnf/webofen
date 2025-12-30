@@ -111,7 +111,7 @@ const HeaderPanel: React.FC = () => {
       {/* Middle Section: Logo */}
       <div className="flex-1 w-4/12 flex justify-center">
       <a href="/">
-        <Image src="/homepage/logo.png" alt="Logo" width={160} height={50} />
+        <Image src="/logos/logo.png" alt="Logo" width={160} height={50} />
         </a>
       </div>
 
