@@ -11,7 +11,7 @@ const LoginPhonePage = () => {
   const [error, setError] = useState("");
   const [infoMessage, setInfoMessage] = useState("");
 
-  const { loginWithPhone } = useAuth();
+  const { loginWithPhone, redirectPath, clearRedirectPath } = useAuth();
   const router = useRouter();
 
   const sendOtp = async () => {
@@ -60,7 +60,12 @@ const LoginPhonePage = () => {
     try {
       const success = await loginWithPhone(phone, otp);
       if (success) {
-        router.push("/dashboard");
+        // Get the redirect path before clearing it
+        const pathToRedirect = redirectPath;
+        // Clear the redirect path so next login goes to dashboard
+        clearRedirectPath();
+        // Redirect to the stored path
+        router.push(pathToRedirect);
       } else {
         setError("کد تایید یا شماره تلفن اشتباه است");
       }
@@ -69,6 +74,7 @@ const LoginPhonePage = () => {
     }
     setLoading(false);
   };
+
 
   return (
     <>

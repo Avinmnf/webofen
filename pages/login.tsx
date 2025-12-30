@@ -10,7 +10,7 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const { login } = useAuth();
+  const { login, redirectPath, clearRedirectPath } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,13 +21,19 @@ const LoginPage = () => {
     const success = await login(email, password);
     
     if (success) {
-      router.push('/dashboard');
+      // Get the redirect path before clearing it
+      const pathToRedirect = redirectPath;
+      // Clear the redirect path so next login goes to dashboard
+      clearRedirectPath();
+      // Redirect to the stored path
+      router.push(pathToRedirect);
     } else {
       setError('ایمیل یا رمز عبور اشتباه است');
     }
     
     setLoading(false);
   };
+
 
   const handlePhoneLogin = () => {
     router.push('/login-phone');
