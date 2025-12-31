@@ -319,7 +319,7 @@ export const ProductRecommendations = ({
       case "1":
         return "bg-gradient-to-br from-red-50 ";
       case "2":
-        return "bg-gradient-to-br from-green-100 to-green-100";
+        return "bg-gradient-to-br from-green-50 ";
       case "3":
         return "bg-gradient-to-br from-blue-50";
       case "4":

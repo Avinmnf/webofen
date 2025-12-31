@@ -371,7 +371,7 @@ export default function AnalysisLinks({
                      hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors
                      flex items-center gap-1"
           >
-            <span>««</span>
+            <span>«</span>
             <span className="hidden sm:inline">ابتدا</span>
           </button>
           
@@ -427,7 +427,7 @@ export default function AnalysisLinks({
                      flex items-center gap-1"
           >
             <span className="hidden sm:inline">انتها</span>
-            <span>»»</span>
+            <span>»</span>
           </button>
         </div>
       </div>
@@ -481,7 +481,7 @@ export default function AnalysisLinks({
                   {showAllItems ? (
                     <>
                       <span>📄</span>
-                      نمایش صفحه‌بندی شده
+                      نمایش صفحه‌ بندی شده
                     </>
                   ) : (
                     <>
@@ -590,9 +590,9 @@ export default function AnalysisLinks({
                     </>
                   ) : (
                     <>
-                      <span className="font-bold">📄 نمایش صفحه‌بندی شده:</span>
+                      <span className="font-bold">📄 نمایش صفحه‌ بندی شده:</span>
                       <span className="font-medium mr-2"> {paginationData.startIndex.toLocaleString('fa-IR')}-{paginationData.endIndex.toLocaleString('fa-IR')}</span>
-                      از <span className="font-medium mr-2"> {paginationData.totalItems}</span>
+                       از <span className="font-medium mr-2"> {paginationData.totalItems}</span>
                       • صفحه <span className="font-medium"> {currentPage.toLocaleString('fa-IR')}</span> از{' '}
                       <span className="font-medium"> {paginationData.totalPages.toLocaleString('fa-IR')}</span>
                     </>
