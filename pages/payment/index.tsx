@@ -237,7 +237,7 @@ export default function CartPage() {
             </h1>
             <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
               <ShoppingBag className="w-4 h-4" />
-              <span>{lines.length} کالا</span>
+              <span>{lines.length} قرص</span>
             </div>
           </div>
 
@@ -255,13 +255,13 @@ export default function CartPage() {
                         {/* Product Image */}
                         <div className="flex-shrink-0">
                           <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-gray-100">
-                            {item.imageUrl ? (
-                              <Productvideo product={item.imageUrl} />
+                            {item.videoUrl ? (
+                              <Productvideo product={item.videoUrl} />
                             ) : (
                               <Image
                                 width={96}
                                 height={96}
-                                src={item.imageUrl || "/dashboard/backlink.png"}
+                                src={item.imageUrl|| ""}
                                 loader={({ src }) => src}
                                 alt={item.title}
                                 className="w-full h-full object-cover"

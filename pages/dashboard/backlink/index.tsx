@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import Image from "next/image";
 import { useOrderInput } from "@/hooks/useOrderInput";
 import { useUserOrders } from "@/hooks/useUserOrders";
@@ -8,10 +8,30 @@ import { useVipDeadline } from "@/hooks/useVipDeadline";
 import { useAuth } from "@/contexts/AuthContext";
 import SimpleProgress from "@/components/dashboard/AnimatedProgress";
 import CircularProgressWithTimesmall from "@/components/dashboard/AnimatedProgresssmall";
-import { Calendar } from "react-multi-date-picker";
+import { Calendar as DatePicker } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import TimePicker from "react-multi-date-picker/plugins/time_picker";
+import {
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Edit2,
+  Calendar,
+  Package,
+  Link as LinkIcon,
+  Crown,
+  History,
+  Filter,
+  Copy,
+  ExternalLink,
+  AlertTriangle,
+  PlayCircle,
+  AlertOctagon,
+  FileText,
+  Zap
+} from "lucide-react";
 
 interface Variant {
   product: {
@@ -35,7 +55,7 @@ export interface BacklinkItem {
   orderId: string;
   status: string;
   adminStatus?: string;
-  delayed?: string;
+  delayed?: boolean;
   completionTime?: string;
   deadline?: string;
   vipDeadline?: string;
@@ -43,20 +63,16 @@ export interface BacklinkItem {
   startTime: string;
   siteurl?: string;
   keyword: string;
+  imageUrl?: string;
+  videoUrl?: string;
   submittedValues?: { id: string; label: string; value: string }[];
   completionReport?: string;
   variant: Variant;
 }
 
-const statusProgressMap: Record<string, number> = {
-  pending: 0,
-  in_progress: 50,
-  completed: 100,
-  out_of_time: 100,
-};
-
 const BacklinkPage: React.FC = () => {
-  const { isLoggedIn } = useAuth();
+  
+  const { isLoggedIn, user } = useAuth();
   const {
     updateVipDeadline,
     loading: deadlineLoading,
@@ -66,28 +82,18 @@ const BacklinkPage: React.FC = () => {
   const { orders, loading, error, role } = useUserOrders();
   const [openCalendarId, setOpenCalendarId] = useState<string | null>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
-  const [selectedDate, setSelectedDate] = useState<Record<string, Date | null>>(
-    {}
-  );
-  const [inputValuesMap, setInputValuesMap] = useState<Record<string, any[]>>(
-    {}
-  );
-
+  const [selectedDate, setSelectedDate] = useState<Record<string, Date | null>>({});
+  const [inputValuesMap, setInputValuesMap] = useState<Record<string, any[]>>({});
   const [backlinksState, setBacklinksState] = useState<BacklinkItem[]>([]);
   const [completedOrderId, setCompletedOrderId] = useState<string | null>(null);
-  const [selectedOrderItemId, setSelectedOrderItemId] = useState<string | null>(
-    null
-  );
+  const [selectedOrderItemId, setSelectedOrderItemId] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [historyModalOpen, setHistoryModalOpen] = useState(false);
-  const [historyFilter, setHistoryFilter] = useState<
-    "all" | "completed" | "cancelled"
-  >("all");
-  const [showNotification, setShowNotification] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<"completed" | "cancelled" | null>(
-    null
-  );
+  const [historyFilter, setHistoryFilter] = useState<"all" | "completed" | "cancelled">("all");
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [showDelayNotification, setShowDelayNotification] = useState(false);
+  const [notificationItem, setNotificationItem] = useState<BacklinkItem | null>(null);
+  const [activeTab, setActiveTab] = useState<'active' | 'pending' | 'completed' | 'delayed'>('active');
 
   const {
     fields,
@@ -100,18 +106,40 @@ const BacklinkPage: React.FC = () => {
     fetchValues,
   } = useOrderInput(selectedOrderItemId);
 
-  const selectedItem = backlinksState.find(
-    (item) => item.id === selectedOrderItemId
-  );
-  const canEdit = selectedItem?.adminStatus === "pending";
+  // Calculate delayed items - SIMPLIFIED
+  const isDelayed = (item: BacklinkItem) => {
+    // If adminStatus is explicitly "out_of_time", return true
+    if (item.adminStatus === "out_of_time") return true;
 
-  // Map orders to backlinks
+    // delayed is a boolean from Keystone checkbox
+    return !!item.delayed;
+  };
+
+  // More robust HTML stripper that also handles special entities
+  const stripHtmlTags = (html: string): string => {
+    if (!html) return '';
+
+    // Create a temporary DOM element to parse HTML and get text content
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+
+    // Get text content and replace multiple spaces/newlines with single space
+    const text = tmp.textContent || tmp.innerText || '';
+    return text.replace(/\s+/g, ' ').trim();
+  };
+
+  // Process orders into backlink items
   useEffect(() => {
     const mappedBacklinks: BacklinkItem[] = orders.flatMap((order) =>
       order.items
         .filter((item) => item.variant?.product?.slug === "backlink")
         .map((item) => {
           const savedValues = inputValuesMap[item.id] || [];
+
+          // delayed should already be a boolean from Keystone
+          // If it's checked once, it stays checked
+          const delayedValue = !!item.delayed;
+
           return {
             id: item.id,
             slug: item.variant.product.slug,
@@ -126,12 +154,13 @@ const BacklinkPage: React.FC = () => {
             status: order.status,
             adminStatus: item.adminStatus,
             createdAt: order.createdAt,
+            imageUrl: item.variant.product.imageUrl,
+            videoUrl: item.variant.product.videoUrl,
+            completionTime: item.completionTime,
             siteurl:
-              item.inputValues?.find((iv) => iv.field?.label === "Site URL")
-                ?.value || "",
+              item.inputValues?.find((iv) => iv.field?.label === "Site URL")?.value || "",
             keyword:
-              item.inputValues?.find((iv) => iv.field?.label === "Keyword")
-                ?.value || "",
+              item.inputValues?.find((iv) => iv.field?.label === "Keyword")?.value || "",
             completionReport: item.completionReport || "",
             variant: item.variant,
             startTime: item.startTime,
@@ -142,13 +171,14 @@ const BacklinkPage: React.FC = () => {
               label: sv.label,
               value: sv.value,
             })),
+            delayed: delayedValue, // Already boolean from Keystone
           };
         })
     );
-
     setBacklinksState(mappedBacklinks);
   }, [orders, inputValuesMap]);
 
+  // Fetch input values
   useEffect(() => {
     const fetchAllValues = async () => {
       const map: Record<string, any[]> = {};
@@ -162,12 +192,96 @@ const BacklinkPage: React.FC = () => {
       }
       setInputValuesMap(map);
     };
-
     fetchAllValues();
   }, [orders]);
 
-  // for opening modal
-  const handleClick = async (id: string) => {
+  // Close calendar when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
+        setOpenCalendarId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectedItem = useMemo(() =>
+    backlinksState.find((item) => item.id === selectedOrderItemId),
+    [backlinksState, selectedOrderItemId]
+  );
+
+  const canEdit = selectedItem?.adminStatus === "pending";
+  const isVIP = role === "vipclient";
+
+  // Filter items
+  const activeItems = useMemo(() =>
+    backlinksState.filter(item =>
+      item.adminStatus === "in_progress" || item.adminStatus === "out_of_time"
+    ), [backlinksState]);
+
+  const pendingItems = useMemo(() =>
+    backlinksState.filter(item =>
+      item.adminStatus === "pending" &&
+      (!item.submittedValues || item.submittedValues.length === 0)
+    ), [backlinksState]);
+
+  const delayedItems = useMemo(() =>
+    backlinksState.filter(item => isDelayed(item)), [backlinksState]);
+
+  const completedItems = useMemo(() =>
+    backlinksState.filter(item => item.adminStatus === "completed"), [backlinksState]);
+
+  const mainActiveItem = activeItems[0];
+
+  // Auto-select tab based on content
+  useEffect(() => {
+    if (activeItems.length > 0) {
+      setActiveTab('active');
+    } else if (delayedItems.length > 0) {
+      setActiveTab('delayed');
+    } else if (pendingItems.length > 0) {
+      setActiveTab('pending');
+    } else if (completedItems.length > 0) {
+      setActiveTab('completed');
+    }
+  }, [activeItems.length, pendingItems.length, completedItems.length, delayedItems.length]);
+
+  // Status helpers
+  const getStatusIcon = (status?: string) => {
+    switch (status) {
+      case "pending": return <Clock className="w-4 h-4" />;
+      case "in_progress": return <Clock className="w-4 h-4 animate-pulse" />;
+      case "completed": return <CheckCircle className="w-4 h-4" />;
+      case "cancelled": return <XCircle className="w-4 h-4" />;
+      case "out_of_time": return <AlertCircle className="w-4 h-4" />;
+      default: return <Clock className="w-4 h-4" />;
+    }
+  };
+
+  const getStatusColor = (status?: string) => {
+    switch (status) {
+      case "pending": return "text-gray-600 bg-gray-100";
+      case "in_progress": return "text-blue-600 bg-blue-50";
+      case "completed": return "text-emerald-600 bg-emerald-50";
+      case "cancelled": return "text-red-600 bg-red-50";
+      case "out_of_time": return "text-amber-600 bg-amber-50";
+      default: return "text-gray-600 bg-gray-100";
+    }
+  };
+
+  const getStatusText = (status?: string) => {
+    switch (status) {
+      case "pending": return "در انتظار";
+      case "in_progress": return "در حال انجام";
+      case "completed": return "تکمیل شده";
+      case "cancelled": return "لغو شده";
+      case "out_of_time": return "تاخیر خورده";
+      default: return "نامشخص";
+    }
+  };
+
+  const handleItemClick = async (id: string) => {
     const item = backlinksState.find((i) => i.id === id);
     if (!item) return;
 
@@ -185,10 +299,6 @@ const BacklinkPage: React.FC = () => {
     }
   };
 
-  const selectedCompletedOrder = backlinksState.find(
-    (item) => item.id === completedOrderId
-  );
-
   const handleSubmit = async () => {
     try {
       await submitValues();
@@ -196,14 +306,14 @@ const BacklinkPage: React.FC = () => {
         prev.map((item) =>
           item.id === selectedOrderItemId
             ? {
-                ...item,
-                submittedValues:
-                  fields?.map((field) => ({
-                    id: field.id,
-                    label: field.label,
-                    value: values[field.id] || "",
-                  })) ?? [],
-              }
+              ...item,
+              submittedValues:
+                fields?.map((field) => ({
+                  id: field.id,
+                  label: field.label,
+                  value: values[field.id] || "",
+                })) ?? [],
+            }
             : item
         )
       );
@@ -213,936 +323,1087 @@ const BacklinkPage: React.FC = () => {
     }
   };
 
-  // API call to update deadline in database
-  const updateDeadlineInDB = async (itemId: string, deadlineDate: string) => {
-    try {
-      const response = await fetch(`/api/order-items/${itemId}/deadline`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ deadlineDate }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update deadline");
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error("Error updating deadline:", error);
-      throw error;
-    }
-  };
-  const handleUpdateVipDeadline = async (
-    itemId: string,
-    deadlineDate: string
-  ) => {
+  const handleUpdateVipDeadline = async (itemId: string, deadlineDate: string) => {
     try {
       await updateVipDeadline(itemId, deadlineDate);
-
-      // Update local state manually - use vipDeadline instead of deadline
       setBacklinksState((prev) =>
         prev.map((item) =>
           item.id === itemId
-            ? {
-                ...item,
-                vipDeadline: deadlineDate, // Update vipDeadline field
-              }
+            ? { ...item, vipDeadline: deadlineDate }
             : item
         )
       );
     } catch (error) {
-      console.error("Failed to update VIP deadline in component:", error);
+      console.error("Failed to update VIP deadline:", error);
     }
   };
 
-  const getProgress = (item: BacklinkItem) =>
-    statusProgressMap[item.adminStatus ?? "pending"] ?? 0;
-
-  const isDelayed = (item: BacklinkItem) => {
-    if (item.adminStatus === "out_of_time") return true;
-    if (!item.delayed) return false;
-
-    const delayedStr = item.delayed.toLowerCase().trim();
-    if (delayedStr === "true") return true;
-    if (delayedStr === "false") return false;
-
-    const delayedDate = new Date(delayedStr);
-    return !isNaN(delayedDate.getTime()) && delayedDate < new Date();
+  const copyToClipboard = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
+  // delayed item pop up
   useEffect(() => {
-    const delayedItems = backlinksState.filter(
-      (item) => item.adminStatus === "out_of_time"
-    );
-    if (delayedItems.length > 0) {
-      setShowNotification(true);
-    }
-  }, [backlinksState]);
+    if (delayedItems.length > 0 && !showDelayNotification) {
+      // Find the first delayed item
+      const firstDelayed = delayedItems[0];
+      if (firstDelayed) {
+        setNotificationItem(firstDelayed);
+        setShowDelayNotification(true);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        calendarRef.current &&
-        !calendarRef.current.contains(event.target as Node)
-      ) {
-        setOpenCalendarId(null);
+        // Auto-hide after 8 seconds
+        const timer = setTimeout(() => {
+          setShowDelayNotification(false);
+          setNotificationItem(null);
+        }, 8000);
+
+        return () => clearTimeout(timer);
       }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    }
+  }, [delayedItems, showDelayNotification]);
 
-  useEffect(() => {
-    setBacklinksState((prev) =>
-      prev.map((item) => ({
-        ...item,
-        submittedValues: inputValuesMap[item.id] || [],
-      }))
-    );
-  }, [inputValuesMap]);
-
-  // Filtering for different states
-  const inProgressItems = backlinksState.filter(
-    (item) => item.adminStatus === "in_progress"
-  );
-  const delayedItems = backlinksState.filter(
-    (item) => item.adminStatus === "out_of_time"
-  );
-  const canceledItems = backlinksState.filter(
-    (item) => item.adminStatus === "cancelled"
-  );
-  const normalItems = backlinksState.filter(
-    (item) =>
-      item.adminStatus !== "in_progress" &&
-      item.adminStatus !== "out_of_time" &&
-      item.adminStatus !== "cancelled"
-  );
-
-  const oneMonthAgo = new Date();
-  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-  const recentBacklinks = backlinksState.filter(
-    (item) => new Date(item.createdAt) >= oneMonthAgo
-  );
-  const bigInProgressItem = inProgressItems[0];
-  const otherInProgressItems = inProgressItems.slice(1);
-  const pendingBacklink = backlinksState.find((item) => item.status === "0");
-  const historyOrders = backlinksState.filter(
-    (item) =>
-      item.adminStatus === "completed" || new Date(item.createdAt) < oneMonthAgo
-  );
-
-  console.log(bigInProgressItem);
-  console.log("StartTime:", bigInProgressItem?.startTime);
-  console.log("Deadline:", bigInProgressItem?.deadline);
-  console.log("bigitem:", bigInProgressItem?.submittedValues);
-
-  if (!isLoggedIn)
+  // Loading states
+  if (!isLoggedIn) {
     return (
-      <p className="text-center py-10">ابتدا باید وارد حساب کاربری خود شوید</p>
-    );
-  if (loading) return <p className="text-center py-10">در حال بارگیری...</p>;
-  if (error) return <p className="text-center text-red-500 py-10">{error}</p>;
-
-  return (
-    <>
-      <div className="relative w-full">
-        <div className="w-full flex justify-end">
-          <button
-            onClick={() => setHistoryModalOpen(true)}
-            className="bg-[#f7f8fc] text-gray-700 font-semibold p-2 py-4 text-sm rounded-t-xl w-1/3 cursor-pointer"
-          >
-            تاریخچه
-          </button>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-gray-50">
+        <div className="text-center space-y-6 max-w-md mx-auto p-8">
+          <div className="w-20 h-20 mx-auto bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center">
+            <Package className="w-10 h-10 text-gray-400" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">ابتدا وارد شوید</h3>
+            <p className="text-gray-600 text-sm">
+              برای مشاهده سفارش‌های بک لینک، لطفاً ابتدا وارد حساب کاربری خود شوید.
+            </p>
+          </div>
         </div>
-        <div className="flex relative flex-col items-center text-gray-700 bg-[#f7f8fc] p-4 rounded-b-xl rounded-tr-xl space-y-8">
-          {/* big pill */}
-          {bigInProgressItem && (
-            <>
-              <div className="flex items-center relative flex-row-reverse w-full justify-between p-4">
-                {bigInProgressItem && (
-                  <SimpleProgress
-                    startTime={bigInProgressItem.startTime}
-                    deadline={bigInProgressItem.deadline || ""}
-                    completionTime={bigInProgressItem.completionTime}
-                    canceled={bigInProgressItem.adminStatus === "cancelled"}
-                  />
-                )}
+      </div>
+    );
+  }
 
-                <button
-                  onClick={() => handleClick(bigInProgressItem.id)}
-                  className="absolute left-14 w-20 h-16 flex items-center justify-center"
-                >
-                  <div className="relative w-full h-32 flex justify-center items-center overflow-hidden">
-                    <Image
-                      width={220}
-                      height={220}
-                      alt="Backlink"
-                      src={"/dashboard/backlink.png"}
-                      className="object-contain rotate-30"
-                    />
-                  </div>
-                </button>
-                <div className=" mt-2 text-sm w-1/3">
-                  <div className="flex gap-2 items-center">
-                    <p className="text-gray-600 font-semibold">تاریخ خرید: </p>
-                    <p className="text-gray-600">
-                      {new Date(bigInProgressItem.createdAt).toLocaleDateString(
-                        "fa-IR"
-                      )}
-                    </p>
-                  </div>
-                  <div className="flex gap-2 items-center">
-                    <p className="text-gray-600 font-semibold">تعداد:</p>
-                    <p className="text-gray-700">
-                      {bigInProgressItem.attributes
-                        .map((attr) => attr.value)
-                        .join(" / ")}
-                    </p>
-                  </div>
-                  <div className="flex gap-2 items-center mt-1">
-                    <div className="mt-1 text-sm">
-                      {bigInProgressItem.submittedValues?.length ? (
-                        <div className="mt-2 text-sm">
-                          {bigInProgressItem.submittedValues.map((bigitem) => (
-                            <div
-                              key={bigitem.id}
-                              className="flex gap-1 items-center"
-                            >
-                              <span className="font-semibold text-gray-600">
-                                {bigitem.label}:
-                              </span>
-                              <span className="text-gray-700">
-                                {bigitem.value || "—"}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-gray-400 mt-2">اطلاعات وارد نشده</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="h-1 w-full bg-gray-200 rounded-2xl"></div>
-            </>
-          )}
-          {/* Small pills */}
-          <div className="flex flex-col w-full gap-8">
-            {/* Active/Ongoing Pills */}
-            {[
-              ...otherInProgressItems,
-              ...delayedItems,
-              ...canceledItems,
-              ...normalItems,
-            ].filter(
-              (item) =>
-                (!item.submittedValues || item.submittedValues.length === 0) &&
-                item.adminStatus !== "completed" &&
-                item.adminStatus !== "canceled" &&
-                item.adminStatus !== "in_progress" &&
-                item.adminStatus !== "out_of_time"
-            ).length > 0 && (
-              <div>
-                <h3 className="text-gray-700 text-lg font-semibold mb-4">
-                  قرص های مصرف نشده
-                </h3>
-                <div className="flex flex-wrap justify-start bg-gray-200 rounded-xl p-6 gap-6 w-full">
-                  {[
-                    ...otherInProgressItems,
-                    ...delayedItems,
-                    ...canceledItems,
-                    ...normalItems,
-                  ]
-                    .filter(
-                      (item) =>
-                        (!item.submittedValues ||
-                          item.submittedValues.length === 0) &&
-                        item.adminStatus !== "completed" &&
-                        item.adminStatus !== "cancelled" &&
-                        item.adminStatus !== "in_progress" &&
-                        item.adminStatus !== "out_of_time"
-                    )
-                    .map((item) => {
-                      const variantName = item.attributes
-                        .map((a) => a.value)
-                        .join(" / ");
-                      const delayed = isDelayed(item);
-                      const canceled = item.adminStatus === "cancelled";
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-gray-50">
+        <div className="text-center space-y-6">
+          <div className="w-12 h-12 mx-auto border-3 border-gray-200 border-t-gray-900 rounded-full animate-spin"></div>
+          <div>
+            <p className="text-gray-700 font-medium">در حال بارگذاری سفارش‌ها</p>
+            <p className="text-gray-500 text-sm mt-1">لطفاً چند لحظه صبر کنید...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-                      return (
-                        <div
-                          key={item.id}
-                          className="flex flex-col items-center relative scale-90 "
-                        >
-                          <CircularProgressWithTimesmall
-                            startTime={item.startTime}
-                            deadline={item.deadline || undefined}
-                            completionTime={item.completionTime}
-                            delayed={delayed}
-                            canceled={canceled}
-                          />
-                          <button
-                            onClick={() => handleClick(item.id)}
-                            className="absolute top-4 w-12 h-12 flex items-center justify-center cursor-pointer"
-                          >
-                            <div className="relative w-full h-16 flex justify-center items-center overflow-hidden">
-                              <Image
-                                width={220}
-                                height={220}
-                                alt="Backlink"
-                                src={"/dashboard/backlink.png"}
-                                className="object-contain rotate-30"
-                              />
-                            </div>
-                          </button>
-                          <div className="text-center mt-2 text-sm">
-                            <p className="text-gray-600">خرید:</p>
-                            <p className="text-gray-600">
-                              {new Date(item.createdAt).toLocaleDateString(
-                                "fa-IR"
-                              )}
-                            </p>
-                            <p className="text-gray-600 mt-1">تعداد:</p>
-                            <p className="text-gray-700 font-semibold">
-                              {variantName}
-                            </p>
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-gray-50">
+        <div className="text-center space-y-6 max-w-md mx-auto p-8">
+          <div className="w-20 h-20 mx-auto bg-gradient-to-br from-red-50 to-red-100 rounded-2xl flex items-center justify-center">
+            <AlertCircle className="w-10 h-10 text-red-500" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">خطا در بارگذاری</h3>
+            <p className="text-gray-600 text-sm mb-4">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition text-sm font-medium"
+            >
+              تلاش مجدد
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-                            {/* Show submitted values for active pills */}
-                            {item?.submittedValues?.length ? (
-                              <div className="mt-1 text-xs">
-                                {item.submittedValues.map((input) => (
-                                  <div
-                                    key={input.id}
-                                    className="flex gap-1 items-center"
-                                  >
-                                    <span className="font-semibold text-gray-600">
-                                      {input.label}:
-                                    </span>
-                                    <span className="text-gray-700">
-                                      {input.value || "—"}
-                                    </span>
-                                  </div>
-                                ))}
-                              </div>
-                            ) : null}
-                          </div>
-                        </div>
-                      );
-                    })}
-                </div>
+  // Tab content components
+  const ActiveTabContent = () => (
+    <div className="space-y-8">
+      {/* Main Active Order */}
+      {mainActiveItem && (
+  <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border p-6 lg:p-8 shadow-sm">
+    <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+      {/* Content Section - Left */}
+      <div className="flex-1 space-y-6">
+        {/* Header with Status and Title */}
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${getStatusColor(mainActiveItem.adminStatus)}`}>
+              {getStatusIcon(mainActiveItem.adminStatus)}
+              <span className="text-sm font-medium">{getStatusText(mainActiveItem.adminStatus)}</span>
+            </div>
+            {isDelayed(mainActiveItem) && (
+              <span className="px-3 py-1.5 bg-amber-100 text-amber-700 rounded-full text-sm font-medium flex items-center gap-2">
+                <AlertTriangle className="w-3.5 h-3.5" />
+                تاخیر خورده
+              </span>
+            )}
+            {isVIP && mainActiveItem.vipDeadline && (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-emerald-50 to-emerald-100 border border-emerald-200 rounded-lg">
+                <Clock className="w-3.5 h-3.5 text-emerald-600" />
+                <span className="text-sm font-medium text-emerald-700">
+                  مهلت ویژه
+                </span>
               </div>
             )}
+          </div>
+          
+          {/* Product Title - moved up for better hierarchy */}
+          <h3 className="text-lg font-semibold text-gray-900">
+            {mainActiveItem.productTitle}
+          </h3>
+        </div>
+
+        {/* Details Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          <div className="space-y-4">
+            <div>
+              <p className="text-xs font-medium text-gray-500 mb-2">ویژگی‌ها</p>
+              <div className="flex flex-wrap gap-2">
+                {mainActiveItem.attributes.map((attr, idx) => (
+                  <span
+                    key={idx}
+                    className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium"
+                  >
+                    {attr.value}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-gray-500 mb-1">تاریخ خرید</p>
+              <p className="text-gray-900 font-medium text-sm">
+                {new Date(mainActiveItem.createdAt).toLocaleDateString("fa-IR")}
+              </p>
+            </div>
+          </div>
+          
+          <div className="space-y-3">
+            <p className="text-xs font-medium text-gray-500 mb-1">اطلاعات ثبت شده</p>
+            {mainActiveItem.submittedValues?.map((val) => (
+              <div key={val.id} className="flex items-center justify-between group">
+                <span className="text-sm text-gray-600">{val.label}:</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-gray-900 truncate max-w-[160px]">
+                    {val.value}
+                  </span>
+                  <button
+                    onClick={() => copyToClipboard(val.value, val.id)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-gray-600"
+                  >
+                    {copiedId === val.id ? (
+                      <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Action Button - Moved to bottom of content section */}
+        <div className="pt-4 border-t border-gray-100">
+          <button
+            onClick={() => handleItemClick(mainActiveItem.id)}
+            className="px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition font-medium text-sm flex items-center gap-2"
+          >
+            مشاهده جزئیات کامل
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Progress Bar Section - Right */}
+      <div className="lg:w-auto w-full flex flex-col items-center space-y-4">
+        <div className="relative">
+          <SimpleProgress
+            startTime={mainActiveItem.startTime}
+            deadline={mainActiveItem.deadline || ""}
+            completionTime={mainActiveItem.completionTime}
+            delayed={isDelayed(mainActiveItem)}
+            canceled={mainActiveItem.adminStatus === "cancelled"}
+            productImage={mainActiveItem.imageUrl}
+            videoUrl={mainActiveItem.videoUrl}
+            productTitle={mainActiveItem.productTitle}
+          />
+          
+          {/* VIP Deadline Badge - Positioned over progress circle */}
+          {isVIP && mainActiveItem.vipDeadline && (
+            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-white border border-emerald-200 rounded-full px-3 py-1.5 shadow-sm">
+              <div className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-emerald-600" />
+                <span className="text-xs font-medium text-emerald-700 whitespace-nowrap">
+                  {new Date(mainActiveItem.vipDeadline).toLocaleDateString("fa-IR")}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Delay Warning - Only show if delayed */}
+        {isDelayed(mainActiveItem) && (
+          <div className="text-center max-w-xs">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-lg">
+              <AlertTriangle className="w-4 h-4 text-amber-600" />
+              <div className="text-right">
+                <p className="text-xs font-medium text-amber-700">تاخیر در انجام سفارش</p>
+                <p className="text-xs text-amber-600 mt-0.5">تیم پشتیبانی در حال پیگیری است</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+)}
+
+      {/* Other Active Orders Grid */}
+      {activeItems.length > 1 && (
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">سایر سفارش‌های فعال</h3>
+            <span className="text-sm text-gray-500">{activeItems.length - 1} سفارش</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {activeItems.slice(1).map((item) => (
+              <div
+                key={item.id}
+                className="bg-white rounded-xl border p-5 hover:border-gray-300 transition cursor-pointer group"
+                onClick={() => handleItemClick(item.id)}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs ${getStatusColor(item.adminStatus)}`}>
+                    {getStatusIcon(item.adminStatus)}
+                    <span>{getStatusText(item.adminStatus)}</span>
+                  </div>
+                  <CircularProgressWithTimesmall
+                    startTime={item.startTime}
+                    deadline={item.deadline || undefined}
+                    completionTime={item.completionTime}
+                    delayed={isDelayed(item)}
+                    canceled={item.adminStatus === "cancelled"}
+                    productImage={item.imageUrl}
+                    videoUrl={item.videoUrl}
+                    productTitle={item.productTitle}
+                  />
+                </div>
+
+                <h4 className="font-semibold text-gray-900 mb-3 truncate">{item.productTitle}</h4>
+                <div className="flex flex-wrap gap-1.5 mb-4">
+                  {item.attributes.slice(0, 2).map((attr, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs"
+                    >
+                      {attr.value}
+                    </span>
+                  ))}
+                </div>
+
+                {item.submittedValues?.slice(0, 2).map((val) => (
+                  <div key={val.id} className="flex items-center justify-between text-sm mb-2">
+                    <span className="text-gray-600">{val.label}:</span>
+                    <span className="text-gray-900 font-medium truncate max-w-[120px]">
+                      {val.value}
+                    </span>
+                  </div>
+                ))}
+
+                {isDelayed(item) && (
+                  <div className="mt-4 pt-4 border-t border-amber-200">
+                    <div className="flex items-center gap-2 text-amber-600 text-xs">
+                      <AlertTriangle className="w-3 h-3" />
+                      <span>تاخیر خورده</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  const PendingTabContent = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">نیاز به ثبت اطلاعات</h2>
+          <p className="text-sm text-gray-500 mt-1">لطفاً اطلاعات سفارش‌های زیر را تکمیل کنید</p>
+        </div>
+        <span className="text-sm text-gray-500">{pendingItems.length} سفارش</span>
+      </div>
+
+      {pendingItems.length === 0 ? (
+        <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
+          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center">
+            <CheckCircle className="w-8 h-8 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">همه سفارش‌ها ثبت شدند</h3>
+          <p className="text-gray-600 max-w-md mx-auto">
+            تمام سفارش‌های در انتظار، اطلاعاتشان ثبت شده است.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {pendingItems.map((item) => (
+            <div
+              key={item.id}
+              className="bg-gradient-to-br from-white to-blue-50 rounded-xl border border-blue-200 p-6 hover:border-blue-300 transition"
+            >
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <Edit2 className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">تاریخ خرید</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      {new Date(item.createdAt).toLocaleDateString("fa-IR")}
+                    </p>
+                  </div>
+                </div>
+                <span className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium">
+                  ثبت نشده
+                </span>
+              </div>
+
+              <h4 className="font-semibold text-gray-900 mb-3">{item.productTitle}</h4>
+              <div className="flex flex-wrap gap-2 mb-6">
+                {item.attributes.map((attr, idx) => (
+                  <span
+                    key={idx}
+                    className="px-2.5 py-1 bg-blue-50 text-blue-700 rounded text-xs font-medium"
+                  >
+                    {attr.value}
+                  </span>
+                ))}
+              </div>
+
+              <button
+                onClick={() => handleItemClick(item.id)}
+                className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
+              >
+                ثبت اطلاعات سفارش
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const DelayedTabContent = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">سفارش‌های تاخیر خورده</h2>
+          <p className="text-sm text-gray-500 mt-1">این سفارش‌ها از مهلت تعیین شده گذشته‌اند</p>
+        </div>
+        <span className="text-sm text-gray-500">{delayedItems.length} سفارش</span>
+      </div>
+
+      {delayedItems.length === 0 ? (
+        <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
+          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center">
+            <CheckCircle className="w-8 h-8 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">سفارش تاخیر خورده‌ای ندارید</h3>
+          <p className="text-gray-600 max-w-md mx-auto">
+            همه سفارش‌های شما طبق برنامه در حال انجام هستند.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {delayedItems.map((item) => (
+            <div
+              key={item.id}
+              className="bg-gradient-to-br from-white to-red-50 rounded-xl border border-red-200 p-6 hover:border-red-300 transition cursor-pointer"
+              onClick={() => handleItemClick(item.id)}
+            >
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+                    <AlertTriangle className="w-6 h-6 text-red-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">تاریخ خرید</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      {new Date(item.createdAt).toLocaleDateString("fa-IR")}
+                    </p>
+                  </div>
+                </div>
+                <span className="px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-xs font-medium">
+                  تاخیر خورده
+                </span>
+              </div>
+
+              <h4 className="font-semibold text-gray-900 mb-3">{item.productTitle}</h4>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {item.attributes.map((attr, idx) => (
+                  <span
+                    key={idx}
+                    className="px-2.5 py-1 bg-red-50 text-red-700 rounded text-xs font-medium"
+                  >
+                    {attr.value}
+                  </span>
+                ))}
+              </div>
+
+              <div className="pt-4 border-t border-red-200">
+                <div className="flex items-center gap-2 text-red-600 text-sm mb-2">
+                  <Clock className="w-4 h-4" />
+                  <span>از مهلت گذشته</span>
+                </div>
+                <p className="text-xs text-gray-600">
+                  تیم پشتیبانی در حال پیگیری این سفارش است.
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const CompletedTabContent = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">سفارش‌های تکمیل شده</h2>
+          <p className="text-sm text-gray-500 mt-1">سفارش‌هایی که با موفقیت انجام شده‌اند</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-gray-500">{completedItems.length} سفارش</span>
+          <button
+            onClick={() => {
+              setHistoryModalOpen(true);
+              setHistoryFilter("completed");
+            }}
+            className="text-sm text-gray-600 hover:text-gray-900 transition font-medium flex items-center gap-2"
+          >
+            مشاهده همه
+            <History className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {completedItems.length === 0 ? (
+        <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
+          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center">
+            <FileText className="w-8 h-8 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">سفارش تکمیل شده‌ای ندارید</h3>
+          <p className="text-gray-600 max-w-md mx-auto">
+            سفارش‌های تکمیل شده در این بخش نمایش داده می‌شوند.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {completedItems.slice(0, 6).map((item) => (
+            <div
+              key={item.id}
+              className="bg-white rounded-xl border p-5 hover:border-emerald-300 transition cursor-pointer group"
+              onClick={() => handleItemClick(item.id)}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+                    <CheckCircle className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <span className="text-sm font-medium text-emerald-600">تکمیل شده</span>
+                </div>
+                <span className="text-xs text-gray-500">
+                  {new Date(item.completionTime || item.createdAt).toLocaleDateString("fa-IR")}
+                </span>
+              </div>
+
+              <h4 className="font-semibold text-gray-900 mb-3">{item.productTitle}</h4>
+              <div className="flex flex-wrap gap-1.5 mb-4">
+                {item.attributes.map((attr, idx) => (
+                  <span
+                    key={idx}
+                    className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs"
+                  >
+                    {attr.value}
+                  </span>
+                ))}
+              </div>
+
+              {item.completionReport && (
+                <div className="pt-4 border-t border-gray-200">
+                  <p className="text-xs text-gray-500 mb-2">گزارش تکمیل:</p>
+                  <p className="text-sm text-gray-700 line-clamp-2">
+                    {stripHtmlTags(item.completionReport)}
+                  </p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="h-full overflow-auto bg-gradient-to-b from-white to-gray-50">
+      {/* Header */}
+      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-sm border-b">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl text-gray-500">مدیریت سفارش‌های بک لینک</h1>
+            </div>
+            <div className="flex items-center gap-3">
+              {isVIP && (
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-amber-50 to-amber-100 border border-amber-200 rounded-lg">
+                  <Crown className="w-4 h-4 text-amber-600" />
+                  <span className="text-sm font-medium text-amber-700">کاربر ویژه</span>
+                </div>
+              )}
+              <button
+                onClick={() => setHistoryModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition"
+              >
+                <History className="w-4 h-4" />
+                تاریخچه
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {completedOrderId && selectedCompletedOrder && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center z-99 animate-fadeIn ">
-          <div className="bg-white w-[90%] max-w-lg rounded-3xl shadow-2xl p-6 relative">
-            <button
-              onClick={() => setCompletedOrderId(null)}
-              className="absolute top-4 right-4 text-2xl font-bold hover:text-red-500"
-            >
-              &times;
-            </button>
+      <div className="p-6  mx-auto">
+        {/* Tab Navigation */}
+        <div className="mb-8">
+          <div className="flex items-center gap-1 bg-gray-100 rounded-xl ">
+            {activeItems.length > 0 && (
+              <button
+                onClick={() => setActiveTab('active')}
+                className={`flex-1 px-4 py-3 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 ${activeTab === 'active'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+                  }`}
+              >
+                <PlayCircle className="w-4 h-4" />
+                در حال اجرا
+                <span className="text-xs bg-gray-100 px-2 py-0.5 rounded-full">
+                  {activeItems.length}
+                </span>
+              </button>
+            )}
 
-            <h2 className="text-xl font-bold mb-4 text-gray-800 text-center">
-              سفارش تکمیل‌شده
-            </h2>
+            {pendingItems.length > 0 && (
+              <button
+                onClick={() => setActiveTab('pending')}
+                className={`flex-1 px-4 py-3 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 ${activeTab === 'pending'
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+                  }`}
+              >
+                <Edit2 className="w-4 h-4" />
+                نیاز به ثبت
+                <span className="text-xs bg-blue-100 px-2 py-0.5 rounded-full">
+                  {pendingItems.length}
+                </span>
+              </button>
+            )}
 
-            <div className="mb-4">
-              <p className="text-gray-700">
-                <span className="font-semibold">محصول:</span>{" "}
-                {selectedCompletedOrder.productTitle}
-              </p>
-              <p className="text-gray-700">
-                <span className="font-semibold">تاریخ خرید:</span>{" "}
-                {new Date(selectedCompletedOrder.createdAt).toLocaleDateString(
-                  "fa-IR"
-                )}
-              </p>
-              <p className="text-gray-700">
-                <span className="font-semibold">تاریخ تکمیل:</span>{" "}
-                {selectedCompletedOrder.completionTime
-                  ? new Date(
-                      selectedCompletedOrder.completionTime
-                    ).toLocaleDateString("fa-IR")
-                  : "—"}
-              </p>
+            {delayedItems.length > 0 && (
+              <button
+                onClick={() => setActiveTab('delayed')}
+                className={`flex-1 px-4 py-3 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 ${activeTab === 'delayed'
+                  ? 'bg-white text-red-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+                  }`}
+              >
+                <AlertOctagon className="w-4 h-4" />
+                تاخیر خورده
+                <span className="text-xs bg-red-100 px-2 py-0.5 rounded-full">
+                  {delayedItems.length}
+                </span>
+              </button>
+            )}
 
-              <p className="text-gray-700">
-                <span className="font-semibold">تعداد:</span>{" "}
-                {selectedCompletedOrder.attributes
-                  .map((a) => a.value)
-                  .join(" / ")}
-              </p>
-            </div>
-
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-gray-800 mb-2">گزارش تکمیل</h3>
-              {selectedCompletedOrder.completionReport
-                ?.split("\n")
-                .map((line, idx) =>
-                  line.startsWith("http") ? (
-                    <div key={idx}>
-                      <a
-                        href={line}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 underline break-all"
-                      >
-                        {line}
-                      </a>
-                    </div>
-                  ) : (
-                    <p key={idx} className="text-gray-700">
-                      {line}
-                    </p>
-                  )
-                )}
-            </div>
+            {completedItems.length > 0 && (
+              <button
+                onClick={() => setActiveTab('completed')}
+                className={`flex-1 px-4 py-3 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 ${activeTab === 'completed'
+                  ? 'bg-white text-emerald-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+                  }`}
+              >
+                <CheckCircle className="w-4 h-4" />
+                تکمیل شده
+                <span className="text-xs bg-emerald-100 px-2 py-0.5 rounded-full">
+                  {completedItems.length}
+                </span>
+              </button>
+            )}
           </div>
         </div>
-      )}
-      {historyModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="bg-[#00172f] rounded-3xl w-full md:w-[60%] my-10 p-10 relative overflow-y-auto max-h-[120vh]">
-            {/* Close button */}
-            <button
-              onClick={() => setHistoryModalOpen(false)}
-              className="absolute top-4 right-4 text-2xl font-bold hover:text-red-200"
-            >
-              &times;
-            </button>
-            <div className="flex gap-2 flex-col md:flex-row justify-between items-center border border-gray-100 rounded-xl md:rounded-full p-4 mb-4">
-              <div className="flex items-center w-full md:w-1/3">
-                <div className="p-4 rounded-full bg-[#6fd6e5] ml-2">
-                  <svg
-                    className="w-5 h-5"
-                    viewBox="0 0 48 48"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
+
+        {/* Tab Content */}
+        <div className="">
+          {activeTab === 'active' && <ActiveTabContent />}
+          {activeTab === 'pending' && <PendingTabContent />}
+          {activeTab === 'delayed' && <DelayedTabContent />}
+          {activeTab === 'completed' && <CompletedTabContent />}
+        </div>
+
+        {/* Empty State */}
+        {backlinksState.length === 0 && (
+          <div className="text-center py-16">
+            <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center">
+              <Package className="w-10 h-10 text-gray-400" />
+            </div>
+            <p className="text-lg font-semibold text-gray-900 mb-2">سفارش بک لینکی ندارید</p>
+          </div>
+        )}
+      </div>
+
+      {/* Completed Order Modal */}
+      {completedOrderId && (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setCompletedOrderId(null)} />
+          <div className="absolute inset-0 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+              <div className="p-8">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-xl flex items-center justify-center">
+                      <CheckCircle className="w-6 h-6 text-emerald-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900">سفارش تکمیل شده</h3>
+                      <p className="text-sm text-gray-500 mt-1">با موفقیت انجام شد</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setCompletedOrderId(null)}
+                    className="text-gray-400 hover:text-gray-600 transition"
                   >
-                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                    <g
-                      id="SVGRepo_tracerCarrier"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    ></g>
-                    <g id="SVGRepo_iconCarrier">
-                      {" "}
-                      <rect
-                        width="48"
-                        height="48"
-                        fill="white"
-                        fill-opacity="0.01"
-                      ></rect>{" "}
-                      <path
-                        d="M5.81824 6.72729V14H13.091"
-                        stroke="#4f4f4f"
-                        stroke-width="4"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      ></path>{" "}
-                      <path
-                        d="M4 24C4 35.0457 12.9543 44 24 44V44C35.0457 44 44 35.0457 44 24C44 12.9543 35.0457 4 24 4C16.598 4 10.1351 8.02111 6.67677 13.9981"
-                        stroke="#4f4f4f"
-                        stroke-width="4"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      ></path>{" "}
-                      <path
-                        d="M24.005 12L24.0038 24.0088L32.4832 32.4882"
-                        stroke="#4f4f4f"
-                        stroke-width="4"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      ></path>{" "}
-                    </g>
-                  </svg>
+                    <XCircle className="w-5 h-5" />
+                  </button>
                 </div>
 
-                <h2 className="text-md text-gray-100 ">تاریخچه سفارش‌ها</h2>
-              </div>
-              {/* Filter buttons */}
-              <div className="relative flex justify-center gap-4 bg-gray-300 rounded-full h-12 w-full ">
-                {/* active background */}
-                <div
-                  className="absolute top-0 left-0 h-full bg-[#6FD6E5] rounded-full transition-all duration-300"
-                  style={{
-                    width: `${100 / 3}%`,
-                    transform:
-                      historyFilter === "all"
-                        ? "translateX(200%)"
-                        : historyFilter === "completed"
-                        ? "translateX(100%)"
-                        : " translateX(0%)",
-                  }}
-                ></div>
-
-                {/* Buttons */}
-                {["all", "completed", "cancelled"].map((f) => (
-                  <button
-                    key={f}
-                    onClick={() => setHistoryFilter(f as any)}
-                    className="flex-1 z-10 text-sm md:text-md h-12 rounded-full cursor-pointer relative flex items-center justify-center transition-colors duration-200
-        hover:text-gray-200 text-gray-700"
-                  >
-                    {f === "all"
-                      ? "همه"
-                      : f === "completed"
-                      ? "تکمیل شده"
-                      : "لغو شده"}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Orders Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {backlinksState
-                .filter((item) =>
-                  historyFilter === "all"
-                    ? true
-                    : item.adminStatus === historyFilter
-                )
-                .map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center bg-gray-50 rounded-xl p-4 shadow-sm hover:shadow-lg transition"
-                  >
-                    <button
-                      onClick={() => handleClick(item.id)}
-                      className="relative w-14 h-14 flex justify-center items-center"
-                    >
-                      <div
-                        className={`absolute w-12 h-12 flex justify-center items-center rounded-full border-2 ${
-                          item.adminStatus === "completed"
-                            ? "border-green-700 animate-bounce"
-                            : item.adminStatus === "cancelled"
-                            ? "border-red-800"
-                            : item.adminStatus === "in_progress"
-                            ? "border-orange-500"
-                            : "border-gray-200"
-                        }`}
-                      >
-                        <Image
-                          width={32}
-                          height={32}
-                          alt="Backlink"
-                          src={"/dashboard/backlink.png"}
-                          className="object-contain rotate-12"
-                        />
+                <div className="space-y-6">
+                  <div className="bg-gray-50 rounded-xl p-6">
+                    <h4 className="text-sm font-semibold text-gray-900 mb-4">جزئیات سفارش</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-3">
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-600">محصول:</span>
+                          <span className="text-sm font-medium text-gray-900">
+                            {backlinksState.find(item => item.id === completedOrderId)?.productTitle}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-600">تاریخ خرید:</span>
+                          <span className="text-sm font-medium text-gray-900">
+                            {new Date(
+                              backlinksState.find(item => item.id === completedOrderId)?.createdAt || ""
+                            ).toLocaleDateString("fa-IR")}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-600">تاریخ تکمیل:</span>
+                          <span className="text-sm font-medium text-gray-900">
+                            {(() => {
+                              const compTime = backlinksState.find(item => item.id === completedOrderId)?.completionTime;
+                              return compTime ? new Date(compTime).toLocaleDateString("fa-IR") : "ثبت نشده";
+                            })()}
+                          </span>
+                        </div>
                       </div>
-                    </button>
-
-                    <div className="ml-4 flex-1">
-                      <p className="text-gray-700 text-sm font-bold">
-                        تاریخ خرید:{" "}
-                        {new Date(item.createdAt).toLocaleDateString("fa-IR")}
-                      </p>
-                      <p className="text-gray-700 text-sm font-semibold">
-                        محصول: {item.productTitle}
-                      </p>
-                      <p className="text-gray-500 text-sm">
-                        وضعیت:{" "}
-                        {item.adminStatus === "completed"
-                          ? "تکمیل شده"
-                          : item.adminStatus === "cancelled"
-                          ? "لغو شده"
-                          : "در حال انجام"}
-                      </p>
+                      <div className="space-y-3">
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-600">ویژگی‌ها:</span>
+                          <div className="text-right">
+                            {backlinksState.find(item => item.id === completedOrderId)?.attributes.map((attr, idx) => (
+                              <span key={idx} className="block text-sm font-medium text-gray-900">
+                                {attr.value}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                ))}
+
+                  {backlinksState.find(item => item.id === completedOrderId)?.completionReport && (
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-900 mb-4">گزارش تکمیل</h4>
+                      <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6">
+                        <div className="space-y-3">
+                          {stripHtmlTags(
+                            backlinksState.find(item => item.id === completedOrderId)?.completionReport || ''
+                          )
+                            .split("\n")
+                            .map((line, idx) =>
+                              line.startsWith("http") ? (
+                                <div key={idx} className="flex items-center gap-2">
+                                  <LinkIcon className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                                  <a
+                                    href={line}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-emerald-700 hover:text-emerald-900 break-all font-medium"
+                                  >
+                                    {line}
+                                  </a>
+                                  <button
+                                    onClick={() => copyToClipboard(line, `link-${idx}`)}
+                                    className="text-emerald-400 hover:text-emerald-600 transition flex-shrink-0"
+                                  >
+                                    {copiedId === `link-${idx}` ? (
+                                      <CheckCircle className="w-4 h-4" />
+                                    ) : (
+                                      <Copy className="w-4 h-4" />
+                                    )}
+                                  </button>
+                                </div>
+                              ) : (
+                                <p key={idx} className="text-gray-700">{line}</p>
+                              )
+                            )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setCompletedOrderId(null)}
+                      className="flex-1 py-3.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition font-medium"
+                    >
+                      بستن
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       )}
-      {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 animate-fadeIn">
-          <div className="bg-gradient-to-br from-[#0B1120]/90 to-[#1C2233]/90 w-[90%] max-w-lg relative rounded-3xl shadow-2xl overflow-hidden border border-cyan-500/20 animate-scaleUp">
-            <button
-              onClick={() => setShowModal(false)}
-              className="absolute top-4 right-4 text-white text-3xl hover:text-red-500 transition-colors z-20"
-            >
-              &times;
-            </button>
 
-            <div className="relative w-full h-64 flex justify-center items-center overflow-hidden">
-              <Image
-                width={220}
-                height={220}
-                alt="Backlink"
-                src={"/dashboard/backlink.png"}
-                className="object-contain animate-float blur-[1px]"
-              />
-              <div className="absolute inset-0 flex items-end p-4">
-                <h2 className="text-2xl font-bold text-white text-center w-full drop-shadow-lg">
-                  ثبت اطلاعات سفارش بک لینک
-                </h2>
-              </div>
-            </div>
-
-            <div className="p-6 space-y-5">
-              <div
-                className={` space-y-5 relative ${
-                  role === "vipclient"
-                    ? "bg-white rounded-2xl text-black"
-                    : "bg-transparent"
-                }`}
-              >
-                {/* Crown for VIP users */}
-                {role === "vipclient" && (
-                  <svg
-                    className="w-8 h-8 absolute -top-3 rotate-35 -right-2 z-50"
-                    viewBox="0 -6 34 34"
-                    version="1.1"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="#000000"
+      {/* History Modal */}
+      {historyModalOpen && (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setHistoryModalOpen(false)} />
+          <div className="absolute inset-0 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+              <div className="p-8 border-b">
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">تاریخچه سفارش‌های بک لینک</h3>
+                    <p className="text-sm text-gray-500 mt-2">تمام سفارش‌های گذشته شما</p>
+                  </div>
+                  <button
+                    onClick={() => setHistoryModalOpen(false)}
+                    className="text-gray-400 hover:text-gray-600 transition"
                   >
-                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                    <g
-                      id="SVGRepo_tracerCarrier"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    ></g>
-                    <g id="SVGRepo_iconCarrier">
-                      {" "}
-                      <title>crown</title> <desc>Created with Sketch.</desc>{" "}
-                      <defs>
-                        {" "}
-                        <linearGradient
-                          x1="50%"
-                          y1="0%"
-                          x2="50%"
-                          y2="100%"
-                          id="linearGradient-1"
+                    <XCircle className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="flex gap-2">
+                  {["all", "completed", "cancelled"].map((filter) => (
+                    <button
+                      key={filter}
+                      onClick={() => setHistoryFilter(filter as any)}
+                      className={`px-5 py-2.5 rounded-lg text-sm font-medium transition ${historyFilter === filter
+                        ? "bg-gray-900 text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                    >
+                      {filter === "all" ? "همه" : filter === "completed" ? "تکمیل شده" : "لغو شده"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-8">
+                {backlinksState
+                  .filter((item) =>
+                    historyFilter === "all" ? true : item.adminStatus === historyFilter
+                  ).length === 0 ? (
+                  <div className="text-center py-12">
+                    <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                    <p className="text-gray-500">سفارشی در این دسته‌بندی یافت نشد</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {backlinksState
+                      .filter((item) =>
+                        historyFilter === "all" ? true : item.adminStatus === historyFilter
+                      )
+                      .map((item) => (
+                        <div
+                          key={item.id}
+                          className="bg-gray-50 rounded-xl p-5 hover:bg-gray-100 transition cursor-pointer group"
+                          onClick={() => handleItemClick(item.id)}
                         >
-                          {" "}
-                          <stop stop-color="#FFC923" offset="0%">
-                            {" "}
-                          </stop>{" "}
-                          <stop stop-color="#FFAD41" offset="100%">
-                            {" "}
-                          </stop>{" "}
-                        </linearGradient>{" "}
-                      </defs>{" "}
-                      <g
-                        id="icons"
-                        stroke="none"
-                        stroke-width="1"
-                        fill="none"
-                        fill-rule="evenodd"
-                      >
-                        {" "}
-                        <g
-                          id="ui-gambling-website-lined-icnos-casinoshunter"
-                          transform="translate(-1513.000000, -2041.000000)"
-                          fill="url(#linearGradient-1)"
-                          fill-rule="nonzero"
-                        >
-                          {" "}
-                          <g
-                            id="4"
-                            transform="translate(50.000000, 1871.000000)"
-                          >
-                            {" "}
-                            <path
-                              d="M1480.91651,170.219311 C1481.3389,170.433615 1481.67193,170.790192 1481.85257,171.227002 L1485.64818,180.405177 L1493.44429,170.905749 C1494.13844,170.059929 1495.39769,169.928221 1496.25688,170.61157 C1496.72686,170.98536 1497,171.548271 1497,172.143061 L1497,189.04671 C1497,190.677767 1495.65685,192 1494,192 L1466,192 C1464.34315,192 1463,190.677767 1463,189.04671 L1463,172.142612 C1463,171.055241 1463.89543,170.173752 1465,170.173752 C1465.60413,170.173752 1466.17588,170.442575 1466.55559,170.905145 L1474.35377,180.405143 L1478.1477,171.227264 C1478.54422,170.268054 1479.62151,169.783179 1480.60701,170.093228 L1480.75404,170.145737 L1480.91651,170.219311 Z"
-                              id="crown"
-                            >
-                              {" "}
-                            </path>{" "}
-                          </g>{" "}
-                        </g>{" "}
-                      </g>{" "}
-                    </g>
-                  </svg>
-                )}
-
-                {fields?.map((field) => (
-                  <div key={field.id} className="flex flex-col">
-                    <div className="flex items-center justify-between pr-4">
-                      <label className="text-sm text-gray-600 mb-1">
-                        {field.label}
-                      </label>
-                      {/* Render VIP timer if user is VIP */}
-                      {role === "vipclient" && selectedItem && (
-                        <>
-                          <button
-                            onClick={() =>
-                              setOpenCalendarId(
-                                openCalendarId === selectedItem.id
-                                  ? null
-                                  : selectedItem.id
-                              )
-                            }
-                            disabled={deadlineLoading}
-                            className={`px-4 py-2 rounded animate-pulse ${
-                              deadlineLoading
-                                ? "cursor-not-allowed"
-                                : "cursor-pointer"
-                            } text-white`}
-                          >
-                            <svg
-                              className="w-8 h-8"
-                              version="1.1"
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 100 100"
-                              enable-background="new 0 0 100 100"
-                              fill="#00000"
-                            >
-                              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                              <g
-                                id="SVGRepo_tracerCarrier"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              ></g>
-                              <g id="SVGRepo_iconCarrier">
-                                {" "}
-                                <g id="Download_x5F_25_x25_"> </g>{" "}
-                                <g id="Download_x5F_50_x25_"> </g>{" "}
-                                <g id="Download_x5F_75_x25_"> </g>{" "}
-                                <g id="Download_x5F_100_x25_"> </g>{" "}
-                                <g id="Upload"> </g> <g id="Next"> </g>{" "}
-                                <g id="Last"> </g> <g id="OK"> </g>{" "}
-                                <g id="Fail"> </g> <g id="Add"> </g>{" "}
-                                <g id="Spinner_x5F_0_x25_"> </g>{" "}
-                                <g id="Spinner_x5F_25_x25_"> </g>{" "}
-                                <g id="Spinner_x5F_50_x25_"> </g>{" "}
-                                <g id="Spinner_x5F_75_x25_"> </g>{" "}
-                                <g id="Brightest_x5F_25_x25_"> </g>{" "}
-                                <g id="Brightest_x5F_50_x25_"> </g>{" "}
-                                <g id="Brightest_x5F_75_x25_"> </g>{" "}
-                                <g id="Brightest_x5F_100_x25_"> </g>{" "}
-                                <g id="Reload"> </g> <g id="Forbidden"> </g>{" "}
-                                <g id="Clock"> </g> <g id="Compass"> </g>{" "}
-                                <g id="World"> </g> <g id="Speed"> </g>{" "}
-                                <g id="Microphone"> </g> <g id="Options"> </g>{" "}
-                                <g id="Chronometer">
-                                  {" "}
-                                  <circle
-                                    cx="73.375"
-                                    cy="30.812"
-                                    r="2"
-                                  ></circle>{" "}
-                                  <circle
-                                    fill="none"
-                                    stroke="#000000"
-                                    stroke-width="4"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-miterlimit="10"
-                                    cx="50.188"
-                                    cy="50"
-                                    r="23.188"
-                                  ></circle>{" "}
-                                  <path
-                                    fill="none"
-                                    stroke="#000000"
-                                    stroke-width="4"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-miterlimit="10"
-                                    d=" M41.45,21.292C44.215,20.452,47.149,20,50.188,20c3.018,0,5.931,0.446,8.678,1.274"
-                                  ></path>{" "}
-                                  <line
-                                    fill="none"
-                                    stroke="#000000"
-                                    stroke-width="4"
-                                    stroke-linecap="round"
-                                    stroke-miterlimit="10"
-                                    x1="48.644"
-                                    y1="50.45"
-                                    x2="58.544"
-                                    y2="40.55"
-                                  ></line>{" "}
-                                </g>{" "}
-                                <g id="Lock"> </g> <g id="User"> </g>{" "}
-                                <g id="Position"> </g>{" "}
-                                <g id="No_x5F_Signal"> </g>{" "}
-                                <g id="Low_x5F_Signal"> </g>{" "}
-                                <g id="Mid_x5F_Signal"> </g>{" "}
-                                <g id="High_x5F_Signal"> </g>{" "}
-                                <g id="Options_1_"> </g> <g id="Flash"> </g>{" "}
-                                <g id="No_x5F_Signal_x5F_02"> </g>{" "}
-                                <g id="Low_x5F_Signal_x5F_02"> </g>{" "}
-                                <g id="Mid_x5F_Signal_x5F_02"> </g>{" "}
-                                <g id="High_x5F_Signal_x5F_02"> </g>{" "}
-                                <g id="Favorite"> </g> <g id="Search"> </g>{" "}
-                                <g id="Stats_x5F_01"> </g>{" "}
-                                <g id="Stats_x5F_02"> </g>{" "}
-                                <g id="Turn_x5F_On_x5F_Off"> </g>{" "}
-                                <g id="Full_x5F_Height"> </g>{" "}
-                                <g id="Full_x5F_Width"> </g>{" "}
-                                <g id="Full_x5F_Screen"> </g>{" "}
-                                <g id="Compress_x5F_Screen"> </g>{" "}
-                                <g id="Chat"> </g> <g id="Bluetooth"> </g>{" "}
-                                <g id="Share_x5F_iOS"> </g>{" "}
-                                <g id="Share_x5F_Android"> </g>{" "}
-                                <g id="Love__x2F__Favorite"> </g>{" "}
-                                <g id="Hamburguer"> </g> <g id="Flying"> </g>{" "}
-                                <g id="Take_x5F_Off"> </g> <g id="Land"> </g>{" "}
-                                <g id="City"> </g> <g id="Nature"> </g>{" "}
-                                <g id="Pointer"> </g> <g id="Prize"> </g>{" "}
-                                <g id="Extract"> </g> <g id="Play"> </g>{" "}
-                                <g id="Pause"> </g> <g id="Stop"> </g>{" "}
-                                <g id="Forward"> </g> <g id="Reverse"> </g>{" "}
-                                <g id="Next_1_"> </g> <g id="Last_1_"> </g>{" "}
-                                <g id="Empty_x5F_Basket"> </g>{" "}
-                                <g id="Add_x5F_Basket"> </g>{" "}
-                                <g id="Delete_x5F_Basket"> </g>{" "}
-                                <g id="Error_x5F_Basket"> </g>{" "}
-                                <g id="OK_x5F_Basket"> </g>{" "}
-                              </g>
-                            </svg>
-                          </button>
-
-                          {deadlineError && (
-                            <div className="mt-2 text-red-400 text-sm text-center">
-                              {deadlineError}
-                              <button
-                                onClick={resetError}
-                                className="mr-2 text-red-200 hover:text-red-100"
-                              >
-                                ✕
-                              </button>
-                            </div>
-                          )}
-
-                          {openCalendarId === selectedItem.id && (
-                            <div
-                              ref={calendarRef}
-                              className="absolute bottom-0 left-1/2 -translate-x-1/2 z-50 bg-white border text-black rounded-md shadow-lg p-4"
-                              onMouseDown={(e) => e.stopPropagation()}
-                            >
-                              <Calendar
-                                calendar={persian}
-                                locale={persian_fa}
-                                value={
-                                  selectedDate[selectedItem.id] ||
-                                  (selectedItem.vipDeadline
-                                    ? new Date(selectedItem.vipDeadline)
-                                    : null)
-                                }
-                                onChange={(date) => {
-                                  if (!date) return;
-                                  setSelectedDate((prev) => ({
-                                    ...prev,
-                                    [selectedItem.id]: date.toDate(),
-                                  }));
-                                }}
-                                plugins={[<TimePicker position="bottom" />]}
-                              />
-                              <div className="flex justify-between mt-2">
-                                <button
-                                  className={`px-3 py-1 rounded text-white ${
-                                    deadlineLoading
-                                      ? "bg-gray-400 cursor-not-allowed"
-                                      : "bg-green-500 hover:bg-green-600"
-                                  }`}
-                                  onClick={() => {
-                                    const date = selectedDate[selectedItem.id];
-                                    if (!date || deadlineLoading) return;
-                                    handleUpdateVipDeadline(
-                                      selectedItem.id,
-                                      date.toISOString()
-                                    );
-                                    setOpenCalendarId(null);
-                                  }}
-                                  disabled={deadlineLoading}
-                                >
-                                  {deadlineLoading ? "..." : "تایید"}
-                                </button>
-                                <button
-                                  className={`px-3 py-1 rounded text-white ${
-                                    deadlineLoading
-                                      ? "bg-gray-400 cursor-not-allowed"
-                                      : "bg-red-500 hover:bg-red-600"
-                                  }`}
-                                  onClick={() => {
-                                    if (deadlineLoading) return;
-                                    handleUpdateVipDeadline(
-                                      selectedItem.id,
-                                      ""
-                                    );
-                                    setSelectedDate((prev) => ({
-                                      ...prev,
-                                      [selectedItem.id]: null,
-                                    }));
-                                    setOpenCalendarId(null);
-                                  }}
-                                  disabled={deadlineLoading}
-                                >
-                                  {deadlineLoading ? "..." : "حذف"}
-                                </button>
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${item.adminStatus === "completed"
+                                ? "bg-emerald-100"
+                                : item.adminStatus === "cancelled"
+                                  ? "bg-red-100"
+                                  : "bg-blue-100"
+                                }`}>
+                                {item.adminStatus === "completed" ? (
+                                  <CheckCircle className="w-5 h-5 text-emerald-600" />
+                                ) : item.adminStatus === "cancelled" ? (
+                                  <XCircle className="w-5 h-5 text-red-600" />
+                                ) : (
+                                  <Clock className="w-5 h-5 text-blue-600" />
+                                )}
+                              </div>
+                              <div>
+                                <h4 className="font-semibold text-gray-900">{item.productTitle}</h4>
+                                <p className="text-xs text-gray-500">
+                                  {new Date(item.createdAt).toLocaleDateString("fa-IR")}
+                                </p>
                               </div>
                             </div>
+                            <span className={`px-3 py-1 rounded text-xs font-medium ${item.adminStatus === "completed"
+                              ? "bg-emerald-100 text-emerald-800"
+                              : item.adminStatus === "cancelled"
+                                ? "bg-red-100 text-red-800"
+                                : "bg-blue-100 text-blue-800"
+                              }`}>
+                              {getStatusText(item.adminStatus)}
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-1.5 mb-3">
+                            {item.attributes.map((attr, idx) => (
+                              <span
+                                key={idx}
+                                className="px-2 py-1 bg-white text-gray-700 rounded text-xs"
+                              >
+                                {attr.value}
+                              </span>
+                            ))}
+                          </div>
+                          {item.completionReport && (
+                            <p className="text-sm text-gray-600 line-clamp-2">
+                              {stripHtmlTags(item.completionReport)}
+                            </p>
                           )}
-                        </>
-                      )}
-                    </div>
-                    <input
-                      type={field.fieldType === "number" ? "number" : "text"}
-                      name={field.id}
-                      placeholder={field.placeholder || field.label}
-                      value={values[field.id] || ""}
-                      onChange={(e) => handleChange(field.id, e.target.value)}
-                      className={`w-full px-4 py-2 rounded-xl border border-cyan-500/30 bg-[#1C2233] text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-500 outline-none transition-all duration-300 ${
-                        !canEdit
-                          ? "opacity-60 cursor-not-allowed"
-                          : "hover:ring-cyan-300"
-                      }`}
-                      required={field.required}
-                      disabled={!canEdit}
-                    />
+                        </div>
+                      ))}
                   </div>
-                ))}
+                )}
               </div>
-              <button
-                onClick={handleSubmit}
-                className={`w-full py-3 rounded-xl text-lg font-semibold text-white transition-all duration-300 ${
-                  !canEdit
-                    ? "bg-gray-600 cursor-not-allowed"
-                    : "bg-cyan-500 hover:bg-cyan-600 active:scale-95 shadow-lg"
-                }`}
-                disabled={!canEdit}
-              >
-                {!canEdit ? "ثبت شده" : "ثبت اطلاعات"}
-              </button>
-
-              {!canEdit ? (
-                <p className="text-sm text-gray-400 text-center">
-                  این سفارش قبلاً ثبت شده و دیگر قابل تغییر نیست.
-                </p>
-              ) : (
-                <ul className="text-sm text-gray-300 list-disc pl-5 space-y-1">
-                  <li>اطلاعات وارد شده پس از تایید، قابل ویرایش نیست.</li>
-                  <li>از صحت اطلاعات قبل از ارسال مطمئن شوید.</li>
-                  <li>پس از ثبت، وضعیت سفارش شما برای بررسی ارسال می‌شود.</li>
-                </ul>
-              )}
-
-              {inputLoading && (
-                <p className="text-cyan-400 text-sm animate-pulse">
-                  در حال بارگذاری...
-                </p>
-              )}
-              {inputError && (
-                <p className="text-red-400 text-sm animate-shake">
-                  {inputError}
-                </p>
-              )}
             </div>
           </div>
         </div>
       )}
-    </>
+
+      {/* Input Modal */}
+      {showModal && selectedItem && (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowModal(false)} />
+          <div className="absolute inset-0 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+              <div className="p-8">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center">
+                        <Edit2 className="w-6 h-6 text-blue-600" />
+                      </div>
+                      {isVIP && (
+                        <Crown className="w-5 h-5 text-amber-500 absolute -top-2 -right-2" />
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900">ثبت اطلاعات سفارش</h3>
+                      <p className="text-sm text-gray-500 mt-1">{selectedItem.productTitle}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="text-gray-400 hover:text-gray-600 transition"
+                  >
+                    <XCircle className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="space-y-6">
+                  {fields?.map((field) => (
+                    <div key={field.id}>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-sm font-medium text-gray-700">
+                          {field.label}
+                          {field.required && <span className="text-red-500 mr-1">*</span>}
+                        </label>
+                        {/* VIP Deadline Selector */}
+                        {isVIP && field.label === "Site URL" && (
+                          <div className="relative" ref={calendarRef}>
+                            <button
+                              type="button"
+                              onClick={() => setOpenCalendarId(openCalendarId === selectedItem.id ? null : selectedItem.id)}
+                              disabled={deadlineLoading}
+                              className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-amber-50 to-amber-100 border border-amber-200 rounded-lg text-sm font-medium text-amber-700 hover:border-amber-300 transition disabled:opacity-50"
+                            >
+                              <Clock className="w-4 h-4" />
+                              {selectedItem.vipDeadline
+                                ? `مهلت: ${new Date(selectedItem.vipDeadline).toLocaleDateString("fa-IR")}`
+                                : "تعیین مهلت ویژه"}
+                            </button>
+
+                            {openCalendarId === selectedItem.id && (
+                              <div className="absolute top-full left-0 mt-2 z-50 bg-white border shadow-xl rounded-xl p-4">
+                                <DatePicker
+                                  calendar={persian}
+                                  locale={persian_fa}
+                                  value={
+                                    selectedDate[selectedItem.id] ||
+                                    (selectedItem.vipDeadline
+                                      ? new Date(selectedItem.vipDeadline)
+                                      : null)
+                                  }
+                                  onChange={(date) => {
+                                    if (date) {
+                                      setSelectedDate(prev => ({
+                                        ...prev,
+                                        [selectedItem.id]: date.toDate()
+                                      }));
+                                    }
+                                  }}
+                                  plugins={[<TimePicker position="bottom" />]}
+                                />
+                                <div className="flex gap-2 mt-4">
+                                  <button
+                                    onClick={() => {
+                                      const date = selectedDate[selectedItem.id];
+                                      if (date) {
+                                        handleUpdateVipDeadline(selectedItem.id, date.toISOString());
+                                        setOpenCalendarId(null);
+                                      }
+                                    }}
+                                    className="flex-1 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-medium disabled:opacity-50"
+                                    disabled={!selectedDate[selectedItem.id] || deadlineLoading}
+                                  >
+                                    {deadlineLoading ? "..." : "تایید"}
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      if (!deadlineLoading) {
+                                        handleUpdateVipDeadline(selectedItem.id, "");
+                                        setSelectedDate(prev => ({ ...prev, [selectedItem.id]: null }));
+                                        setOpenCalendarId(null);
+                                      }
+                                    }}
+                                    className="flex-1 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium disabled:opacity-50"
+                                    disabled={deadlineLoading}
+                                  >
+                                    حذف
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      <input
+                        type={field.fieldType === "number" ? "number" : "text"}
+                        name={field.id}
+                        placeholder={field.placeholder || field.label}
+                        value={values[field.id] || ""}
+                        onChange={(e) => handleChange(field.id, e.target.value)}
+                        className="w-full px-4 py-3.5 rounded-xl border border-gray-300 focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 outline-none transition disabled:bg-gray-50 disabled:cursor-not-allowed"
+                        required={field.required}
+                        disabled={!canEdit}
+                      />
+                    </div>
+                  ))}
+
+                  {!canEdit ? (
+                    <div className="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-xl p-6">
+                      <div className="flex items-center gap-3 mb-3">
+                        <CheckCircle className="w-5 h-5 text-emerald-600" />
+                        <h4 className="font-medium text-gray-900">این سفارش قبلاً ثبت شده است</h4>
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        اطلاعات این سفارش قبلاً ثبت شده و دیگر قابل تغییر نیست. برای مشاهده جزئیات می‌توانید به صفحه تاریخچه مراجعه کنید.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6">
+                      <h4 className="font-medium text-gray-900 mb-3">توجه مهم</h4>
+                      <ul className="space-y-2 text-sm text-gray-700">
+                        <li className="flex items-start gap-2">
+                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0" />
+                          <span>اطلاعات وارد شده پس از تایید، قابل ویرایش نیستند.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0" />
+                          <span>از صحت اطلاعات قبل از ارسال مطمئن شوید.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0" />
+                          <span>پس از ثبت، وضعیت سفارش برای بررسی ارسال می‌شود.</span>
+                        </li>
+                      </ul>
+                    </div>
+                  )}
+
+                  {deadlineError && (
+                    <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm text-red-700">{deadlineError}</p>
+                        <button
+                          onClick={resetError}
+                          className="text-red-400 hover:text-red-600 transition"
+                        >
+                          <XCircle className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {inputError && (
+                    <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                      <p className="text-sm text-red-700">{inputError}</p>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={handleSubmit}
+                    disabled={!canEdit || inputLoading}
+                    className={`w-full py-4 rounded-xl font-semibold transition ${canEdit
+                      ? "bg-gradient-to-r from-gray-900 to-gray-800 hover:from-gray-800 hover:to-gray-700 text-white shadow-lg"
+                      : "bg-gray-200 text-gray-500 cursor-not-allowed"
+                      }`}
+                  >
+                    {inputLoading ? (
+                      <div className="flex items-center justify-center gap-3">
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>در حال ثبت اطلاعات...</span>
+                      </div>
+                    ) : !canEdit ? (
+                      "ثبت شده"
+                    ) : (
+                      "ثبت اطلاعات سفارش"
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
