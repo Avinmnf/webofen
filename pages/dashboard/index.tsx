@@ -1,12 +1,6 @@
 'use client';
 
-<<<<<<< HEAD
 import React, { useState } from "react";
-=======
-import React from "react";
-import { useEffect } from "react";
-import { useRouter } from "next/router";
->>>>>>> 858b5e6560ad269ab35fa65cbed43cb3a3d8ba64
 import AnalysisLinks from "@/components/AnalysisLinks";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserOrders } from "@/hooks/useUserOrders";
@@ -39,29 +33,13 @@ const productVideoMap = [
 ];
 
 const DashboardHome = () => {
-<<<<<<< HEAD
   const { isLoggedIn, user } = useAuth(); 
-=======
-  const router = useRouter();
-  const { isLoggedIn, user, loading: authLoading } = useAuth();
->>>>>>> 858b5e6560ad269ab35fa65cbed43cb3a3d8ba64
   const { orders, loading: ordersLoading } = useUserOrders();
   const [showAllOrders, setShowAllOrders] = useState(false);
   const [expandedAnalysis, setExpandedAnalysis] = useState(false);
 
-  // Redirect only when auth check is complete AND user is not logged in
-  useEffect(() => {
-    if (!authLoading && !isLoggedIn) {
-      // Add current path to redirect back after login
-      const currentPath = router.asPath;
-      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
-    }
-  }, [isLoggedIn, authLoading, router]);
-
-  // Show loading while checking auth
-  if (authLoading) {
+  if (!isLoggedIn) {
     return (
-<<<<<<< HEAD
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50/30 p-4">
         <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-2xl shadow-blue-100/50 border border-white/50 max-w-md w-full text-center transform transition-all duration-300 hover:scale-[1.02]">
           <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 ring-4 ring-blue-50">
@@ -74,19 +52,10 @@ const DashboardHome = () => {
           <button className="bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-3 px-6 md:px-8 rounded-xl hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300 transform hover:-translate-y-0.5 text-sm md:text-base">
             ورود / ثبت ‌نام
           </button>
-=======
-      <div className="h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
-          <p className="text-gray-500 font-medium">
-            در حال بررسی احراز هویت...
-          </p>
->>>>>>> 858b5e6560ad269ab35fa65cbed43cb3a3d8ba64
         </div>
       </div>
     );
   }
-<<<<<<< HEAD
   
   if (ordersLoading) {
     return (
@@ -97,30 +66,6 @@ const DashboardHome = () => {
           </div>
           <p className="mt-4 text-base md:text-lg font-semibold text-gray-700">در حال بارگذاری اطلاعات...</p>
           <p className="text-gray-500 text-sm mt-2">لطفاً چند لحظه صبر کنید</p>
-=======
-
-  // If auth check is done and user is not logged in, show loading while redirecting
-  if (!isLoggedIn) {
-    return (
-      <div className="h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
-          <p className="text-gray-500 font-medium">
-            در حال هدایت به صفحه ورود...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show loading while fetching orders
-  if (ordersLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
-          <p className="text-gray-500 font-medium">در حال بارگذاری اطلاعات...</p>
->>>>>>> 858b5e6560ad269ab35fa65cbed43cb3a3d8ba64
         </div>
       </div>
     );
@@ -538,7 +483,7 @@ const DashboardHome = () => {
               <p className="text-gray-500 mb-4 text-sm md:text-base">
                 برای مشاهده تحلیل‌ها و گزارشات کامل، روی دکمه بالا کلیک کنید
               </p>
-           
+            
             </div>
           )}
         </div>
