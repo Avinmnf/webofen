@@ -413,7 +413,40 @@ const DashboardHome = () => {
           {displayedOrders.length > 0 && (
             <div className="p-4 md:p-6 lg:p-8 border-t border-gray-100/50 bg-gradient-to-r from-gray-50/50 to-white">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3 md:gap-4">
-      {/* Analysis Links Section - با قابلیت آکاردئون */}
+                <div className="flex items-center gap-2 md:gap-3">
+                  <div className="flex items-center gap-1.5 md:gap-2">
+                    <div className="w-2 h-2 md:w-2.5 md:h-2.5 bg-blue-500 rounded-full"></div>
+                    <span className="text-gray-600 text-xs md:text-sm">نمایش {Math.min(totalDisplayedItems, totalOrders)} آیتم از {totalDisplayedItems}</span>
+                  </div>
+                </div>
+                {totalOrders > 5 && (
+                  <button
+                    onClick={() => setShowAllOrders(!showAllOrders)}
+                    className="text-blue-600 hover:text-blue-800 font-medium text-sm md:text-base flex items-center gap-1.5 md:gap-2 transition-colors"
+                  >
+                    {showAllOrders ? (
+                      <>
+                        <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h14M5 12l4-4m-4 4l4 4" />
+                        </svg>
+                        نمایش سفارشات کمتر
+                      </>
+                    ) : (
+                      <>
+                        مشاهده تمام سفارشات
+                        <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+        
+        {/* Analysis Links Section - با قابلیت آکاردئون اصلاح شده */}
         <div className="bg-gradient-to-br from-white to-gray-50/50 rounded-2xl md:rounded-3xl shadow-xl shadow-gray-100/50 border border-gray-100 overflow-hidden">
           <button
             onClick={() => setExpandedAnalysis(!expandedAnalysis)}
@@ -447,29 +480,19 @@ const DashboardHome = () => {
           </button>
           
           {/* محتوای تحلیل‌ها - فقط وقتی expandedAnalysis true باشد نمایش داده می‌شود */}
-          {expandedAnalysis && (
-            <div className="p-1 animate-fadeIn">
+          <div className={`transition-all duration-500 ease-in-out overflow-hidden ${
+            expandedAnalysis ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
+          }`}>
+            <div className="p-1">
               <AnalysisLinks 
                 compact={true}
                 showHeader={false}
                 itemsPerPage={10}
                 showAllByDefault={false}
               />
-           
             </div>
-          )}
-          
-          {/* حالت جمع شده - یک پیش‌نمایش کوچک */}
-          {!expandedAnalysis && (
-            <div className="p-4 md:p-6 text-center">
-            </div>
-          )}
+          </div>
         </div>
-              </div>
-            </div>
-          )}
-        </div>
-        
   
       </div>
     </div>
