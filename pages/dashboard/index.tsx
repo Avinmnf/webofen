@@ -148,7 +148,7 @@ const DashboardHome = () => {
       case 'pending': return 'در انتظار';
       case 'processing': return 'در حال پردازش';
       case 'cancelled': return 'لغو شده';
-      case 'in_progress': return 'در حال انجام';
+      case 'in_progress': return 'در حال پردازش';
       default: return status;
     }
   };
@@ -216,7 +216,7 @@ const DashboardHome = () => {
                   </svg>
                 </div>
                 <p className="text-3xl md:text-4xl font-bold text-gray-900">{totalOrders}</p>
-                <p className="text-gray-500 text-xs md:text-sm">کل سفارش‌ها</p>
+                <p className="text-gray-500 text-xs md:text-sm">کل سفارش‌ ها</p>
               </div>
             </div>
             <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-lg shadow-emerald-100/30 border border-gray-100 hover:shadow-xl hover:shadow-emerald-100/50 transition-all duration-300 transform hover:-translate-y-1">
@@ -413,15 +413,7 @@ const DashboardHome = () => {
           {displayedOrders.length > 0 && (
             <div className="p-4 md:p-6 lg:p-8 border-t border-gray-100/50 bg-gradient-to-r from-gray-50/50 to-white">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3 md:gap-4">
-                <div className="text-gray-600 text-sm text-center sm:text-right">
-                  نمایش {showAllOrders ? 'همه' : 'آخرین'} سفارش‌ها • {totalDisplayedItems} آیتم
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-        
-        {/* Analysis Links Section - با قابلیت آکاردئون */}
+      {/* Analysis Links Section - با قابلیت آکاردئون */}
         <div className="bg-gradient-to-br from-white to-gray-50/50 rounded-2xl md:rounded-3xl shadow-xl shadow-gray-100/50 border border-gray-100 overflow-hidden">
           <button
             onClick={() => setExpandedAnalysis(!expandedAnalysis)}
@@ -435,15 +427,15 @@ const DashboardHome = () => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">تحلیل‌ها و گزارشات</h3>
+                  <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">تحلیل‌ ها و گزارشات</h3>
                   <p className="text-gray-600 text-xs md:text-sm mt-1">
-                    {expandedAnalysis ? 'برای بستن کلیک کنید' : 'برای مشاهده تحلیل‌ها کلیک کنید'}
+                    {expandedAnalysis ? 'برای بستن کلیک کنید' : 'برای مشاهده تحلیل‌ ها کلیک کنید'}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3 md:gap-4 mt-3 sm:mt-0">
                 <span className={`px-3 py-1.5 md:px-4 md:py-2 ${expandedAnalysis ? 'bg-emerald-100 text-emerald-800' : 'bg-emerald-50 text-emerald-700'} font-medium rounded-xl transition-colors duration-300 text-sm md:text-base`}>
-                  {expandedAnalysis ? 'بستن' : 'مشاهده تحلیل‌ها'}
+                  {expandedAnalysis ? 'بستن' : 'مشاهده تحلیل‌ ها'}
                 </span>
                 <div className={`w-5 h-5 md:w-6 md:h-6 transition-transform duration-300 ${expandedAnalysis ? 'rotate-180' : ''}`}>
                   <svg className="w-5 h-5 md:w-6 md:h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -463,30 +455,22 @@ const DashboardHome = () => {
                 itemsPerPage={10}
                 showAllByDefault={false}
               />
-              <div className="p-3 md:p-4 border-t border-gray-100/50 text-center">
-                <button
-                  onClick={() => setExpandedAnalysis(false)}
-                  className="px-4 py-2 md:px-5 md:py-2.5 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-medium rounded-xl hover:shadow-lg hover:shadow-emerald-500/30 transition-all duration-300 flex items-center gap-2 mx-auto text-sm md:text-base"
-                >
-                  <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h14M5 12l4-4m-4 4l4 4" />
-                  </svg>
-                  بستن تحلیل‌ها
-                </button>
-              </div>
+           
             </div>
           )}
           
           {/* حالت جمع شده - یک پیش‌نمایش کوچک */}
           {!expandedAnalysis && (
             <div className="p-4 md:p-6 text-center">
-              <p className="text-gray-500 mb-4 text-sm md:text-base">
-                برای مشاهده تحلیل‌ها و گزارشات کامل، روی دکمه بالا کلیک کنید
-              </p>
-            
             </div>
           )}
         </div>
+              </div>
+            </div>
+          )}
+        </div>
+        
+  
       </div>
     </div>
   );

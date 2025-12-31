@@ -44,7 +44,7 @@ interface AnalysisLinksProps {
 export default function AnalysisLinks({ 
   compact = false, 
   showHeader = true,
-  itemsPerPage = 7,
+  itemsPerPage = 5,
   showAllByDefault = false
 }: AnalysisLinksProps) {
   const [allAnalyses, setAllAnalyses] = useState<Analysis[]>([]);
@@ -191,23 +191,6 @@ export default function AnalysisLinks({
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
       
-      // 6. بررسی و لاگ آنالیزهای امروز برای دیباگ
-      const today = new Date().toDateString();
-      const todayAnalyses = sorted.filter(item => 
-        new Date(item.createdAt).toDateString() === today
-      );
-      
-      console.log('کل آنالیزها:', sorted.length);
-      console.log('آنالیزهای امروز:', todayAnalyses.length);
-      todayAnalyses.forEach((item, index) => {
-        console.log(`آنالیز امروز ${index + 1}:`, {
-          id: item.id,
-          url: item.url,
-          createdAt: item.createdAt,
-          status: item.status
-        });
-      });
-      
       setAllAnalyses(sorted);
       setCurrentPage(1);
       setLastRefresh(new Date());
@@ -247,7 +230,7 @@ export default function AnalysisLinks({
   useEffect(() => {
     fetchAnalyses(true); // اولین بار با force refresh
     
-    // شروع polling هر 15 ثانیه
+    // شروع polling هر 30 ثانیه
     const interval = setInterval(() => {
       fetchAnalyses();
     }, 30000);
@@ -279,10 +262,10 @@ export default function AnalysisLinks({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'text-green-600 bg-green-50 border border-green-200';
-      case 'pending': return 'text-yellow-600 bg-yellow-50 border border-yellow-200';
-      case 'failed': return 'text-red-600 bg-red-50 border border-red-200';
-      default: return 'text-gray-600 bg-gray-50 border border-gray-200';
+      case 'completed': return 'bg-green-100 text-green-800';
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'failed': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -554,7 +537,7 @@ export default function AnalysisLinks({
         </div>
       )}
       
-      <div className={compact ? '' : 'p-4'}>
+      <div className={`${compact ? '' : 'p-4'} overflow-x-auto`}>
         {error ? (
           <div className={`${compact ? 'py-3' : 'py-6'} text-center`}>
             <div className="flex flex-col items-center gap-3">
@@ -580,12 +563,12 @@ export default function AnalysisLinks({
           </div>
         ) : (
           <>
-            <div className="mb-4 p-3 bg-gray-50 rounded-lg  border border-gray-200">
+            <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="text-sm text-gray-700 ">
+                <div className="text-sm text-gray-700">
                   {paginationData.showAll ? (
                     <>
-                      <span className="font-bold ">📋 نمایش همه:</span>
+                      <span className="font-bold">📋 نمایش همه:</span>
                       <span className="font-medium mr-2"> {paginationData.totalItems} آنالیز</span>
                     </>
                   ) : (
@@ -607,117 +590,134 @@ export default function AnalysisLinks({
               </div>
             </div>
             
-            <div className="space-y-3">
-              {paginationData.currentItems.map((analysis, index) => {
-                const rowNumber = paginationData.showAll 
-                  ? index + 1 
-                  : (currentPage - 1) * itemsPerPage + index + 1;
-                
-                return (
-                  <div 
-                    key={analysis.id} 
-                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-blue-50 
-                             rounded-xl border border-gray-200 transition-all duration-200 bg-white shadow-sm"
-                  >
-                    <div className="flex-1 min-w-0 mb-3 sm:mb-0">
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="flex-shrink-0 bg-blue-100 text-blue-700 w-8 h-8 rounded-lg 
-                                      flex items-center justify-center font-bold text-sm">
-                          {rowNumber}
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    ردیف
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    وضعیت
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    نوع تحلیل
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    آدرس سایت
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    تاریخ ایجاد
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    عملیات
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {paginationData.currentItems.map((analysis, index) => {
+                  const rowNumber = paginationData.showAll 
+                    ? index + 1 
+                    : (currentPage - 1) * itemsPerPage + index + 1;
+                  
+                  const isToday = new Date(analysis.createdAt).toDateString() === new Date().toDateString();
+                  
+                  return (
+                    <tr 
+                      key={analysis.id} 
+                      className="hover:bg-blue-50 transition-colors"
+                    >
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="flex items-center justify-center">
+                          <div className="bg-blue-100 text-blue-700 w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm">
+                            {rowNumber}
+                          </div>
                         </div>
-                        
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className={`text-xs px-3 py-1.5 rounded-full ${getStatusColor(analysis.status)} font-medium`}>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="flex flex-col gap-1">
+                          <span className={`inline-flex items-center justify-center px-3 py-1.5 rounded-full text-xs font-medium ${getStatusColor(analysis.status)}`}>
                             {getStatusText(analysis.status)}
                           </span>
-                          <span className={`text-xs px-3 py-1.5 rounded-lg font-medium ${
-                            analysis.analysisType === 'full' 
-                              ? 'bg-purple-100 text-purple-700 border border-purple-200' 
-                              : 'bg-blue-100 text-blue-700 border border-blue-200'
-                          }`}>
-                            {analysis.analysisType === 'full' ? 'آنالیز کامل' : 'آنالیز سریع'}
-                          </span>
-                          
-                          {/* نشانگر آنالیز امروز */}
-                          {new Date(analysis.createdAt).toDateString() === new Date().toDateString() && (
-                            <span className="text-xs px-2 py-1 bg-green-100 text-green-700 border border-green-300 rounded-lg font-medium">
+                          {isToday && (
+                            <span className="inline-flex items-center justify-center px-2 py-1 bg-green-100 text-green-700 border border-green-300 rounded-lg text-xs font-medium">
                               🆕 امروز
                             </span>
                           )}
                         </div>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        {/* URL سایت */}
-                        {analysis.url ? (
-                          <div className="flex items-start gap-2">
-                            <span className="text-gray-500 text-xs mt-0.5">🌐</span>
-                            <div>
-                              <div className="text-gray-500 text-xs mb-1">آدرس سایت:</div>
-                              <div 
-                                onClick={() => handleViewSite(analysis.url)}
-                                className="text-blue-700 text-sm font-medium truncate bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200 hover:bg-blue-100 cursor-pointer"
-                              >
-                                {formatUrl(analysis.url)}
-                                <span className="text-xs text-gray-500 mr-2">({analysis.url.length > 50 ? 'آدرس طولانی' : 'آدرس کوتاه'})</span>
-                              </div>
-                            </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium ${
+                          analysis.analysisType === 'full' 
+                            ? 'bg-purple-100 text-purple-700 border border-purple-200' 
+                            : 'bg-blue-100 text-blue-700 border border-blue-200'
+                        }`}>
+                          {analysis.analysisType === 'full' ? 'آنالیز کامل' : 'آنالیز سریع'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex flex-col gap-1">
+                          <div className="text-sm font-medium text-gray-900">
+                            <button
+                              onClick={() => handleViewSite(analysis.url)}
+                              className="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer text-right"
+                              title={analysis.url}
+                            >
+                              {formatUrl(analysis.url)}
+                            </button>
                           </div>
-                        ) : (
-                          <div className="text-gray-400 text-xs bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
-                            بدون آدرس سایت
-                          </div>
-                        )}
-                        
-                        <div className="flex flex-wrap items-center gap-4">
-                          <div className="flex items-center gap-2">
-                            <span className="text-gray-400 text-xs">📅</span>
-                            <span className="text-xs text-gray-600 font-medium" title={new Date(analysis.createdAt).toLocaleString('fa-IR')}>
-                              {formatDate(analysis.createdAt)}
-                            </span>
-                          </div>  
-                          
-                          {/* شناسه آنالیز */}
-                          <div className="flex items-center gap-2">
-                            <span className="text-gray-400 text-xs">🆔</span>
-                            <span className="text-xs text-gray-500 font-mono">
-                              {analysis.id.substring(0, 8)}...
-                            </span>
+                          <div className="text-xs text-gray-500">
+                            شناسه: {analysis.id.substring(0, 8)}...
                           </div>
                         </div>
-                      </div>
-                    </div>
-                    
-                    {/* دکمه‌های عملیاتی */}
-                    <div className="flex items-center gap-2 sm:flex-col sm:items-end">
-                      <div className="flex flex-col sm:flex-row gap-2">
-                        {/* دکمه مشاهده تحلیل در تب جدید */}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-400">📅</span>
+                          <span title={new Date(analysis.createdAt).toLocaleString('fa-IR')}>
+                            {formatDate(analysis.createdAt)}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
                         <button
                           onClick={(e) => handleViewAnalysisInNewTab(analysis, e)}
-                          className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl 
+                          className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg 
                                    hover:from-blue-700 hover:to-blue-800 transition-all flex items-center 
-                                   justify-center gap-2 shadow-sm cursor-pointer px-4 py-2.5 text-sm min-w-[140px] 
-                                   hover:shadow-md group relative"
+                                   justify-center gap-2 shadow-sm cursor-pointer px-4 py-2.5 text-sm m-auto
+                                   hover:shadow-md group"
                           title="مشاهده تحلیل در تب جدید"
                         >
-                          <span className="text-lg cursor-pointer">📊</span>
+                          <span className="text-lg ">📊</span>
                           <span>مشاهده تحلیل</span>
-                          <span className="absolute -top-2 -right-2 bg-blue-800 text-white text-xs px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                            🔗
-                          </span>
                         </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
             
             <Pagination />
             
             {allAnalyses.length > itemsPerPage && (
               <div className="text-center pt-4 mt-4 border-t border-gray-200">
-              
+                <button
+                  onClick={toggleDisplayMode}
+                  className="text-sm px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 
+                           border border-gray-300 rounded-lg transition-colors flex items-center gap-2 cursor-pointer mx-auto"
+                >
+                  {showAllItems ? (
+                    <>
+                      <span>📄</span>
+                      نمایش صفحه‌ بندی شده
+                    </>
+                  ) : (
+                    <>
+                      <span>📋</span>
+                      نمایش همه آنالیزها ({allAnalyses.length})
+                    </>
+                  )}
+                </button>
               </div>
             )}
           </>
