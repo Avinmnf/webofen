@@ -108,13 +108,16 @@ const BacklinkPage: React.FC = () => {
 
   // Calculate delayed items - SIMPLIFIED
   const isDelayed = (item: BacklinkItem) => {
+    // If item is completed, it's not delayed (even if delayed flag is true)
+    if (item.adminStatus === "completed") return false;
+    
     // If adminStatus is explicitly "out_of_time", return true
     if (item.adminStatus === "out_of_time") return true;
-
+  
     // delayed is a boolean from Keystone checkbox
     return !!item.delayed;
   };
-
+  
   // More robust HTML stripper that also handles special entities
   const stripHtmlTags = (html: string): string => {
     if (!html) return '';
@@ -216,9 +219,16 @@ const BacklinkPage: React.FC = () => {
 
   // Filter items
   const activeItems = useMemo(() =>
-    backlinksState.filter(item =>
-      item.adminStatus === "in_progress" || item.adminStatus === "out_of_time"
-    ), [backlinksState]);
+    backlinksState.filter(item => {
+      // Don't include completed items in active
+      if (item.adminStatus === "completed") return false;
+      
+      // Don't include delayed items in active (they have their own tab)
+      if (item.adminStatus === "out_of_time" || item.delayed) return false;
+      
+      // Only include in_progress or pending items
+      return item.adminStatus === "in_progress" || item.adminStatus === "pending";
+    }), [backlinksState]);
 
   const pendingItems = useMemo(() =>
     backlinksState.filter(item =>
