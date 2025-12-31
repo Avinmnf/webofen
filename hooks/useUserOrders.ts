@@ -13,6 +13,8 @@ export interface Variant {
     id: string;
     slug: string;
     title: string;
+    imageUrl?: string;
+    videoUrl?: string;
   };
   attributeValues: AttributeValue[];
 }
@@ -38,6 +40,7 @@ export interface OrderItem {
   deadline?: string;
   vipDeadline: string;
   inputValues?: OrderItemInputValue[];
+  completionTime: string;
   completionReport?: string;
   startTime: string;
 }
