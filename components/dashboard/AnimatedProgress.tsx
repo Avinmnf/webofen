@@ -138,9 +138,7 @@ const CircularProgressWithTime: React.FC<CircularProgressWithTimeProps> = ({
                 <AlertTriangle className="w-6 h-6 text-red-600" />
               </div>
             ) : (
-              <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
-                <Clock className="w-6 h-6 text-amber-600" />
-              </div>
+              ""
             )}
           </div>
 
