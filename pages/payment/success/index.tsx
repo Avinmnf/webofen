@@ -10,6 +10,8 @@ import SuccessAnimation from "@/components/animations/SuccessAnimation";
 import { useRouter } from "next/router";
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import Link from "next/link";
+import Image from "next/image";
 
 export default function PaymentSuccessPage() {
   const router = useRouter();
@@ -26,12 +28,25 @@ export default function PaymentSuccessPage() {
   const [latestOrder, setLatestOrder] = useState<any>(null);
   const invoiceRef = useRef<HTMLDivElement>(null);
 
+  const statusMap: Record<string, string> = {
+    Processing: "در حال بررسی",
+    Cancelled: "لغو شده",
+    waiting: "در حال پردازش",
+    pending: "در انتظار",
+    submitted: "تکمیل شده",
+    Completed: "تکمیل شده",
+    processing: "در حال پردازش",
+    completed: "تکمیل شده",
+    cancelled: "لغو شده",
+    paid: "پرداخت شده"
+  };
+
   // تابع برای ایجاد نام فایل امن
   const sanitizeFileName = (name: string) => {
     return name
-      .replace(/[<>:"/\\|?*]/g, '_') // جایگزینی کاراکترهای غیرمجاز
-      .replace(/\s+/g, '_') // جایگزینی فاصله با زیرخط
-      .replace(/__+/g, '_') // حذف زیرخط‌های تکراری
+      .replace(/[<>:"/\\|?*]/g, '_')
+      .replace(/\s+/g, '_')
+      .replace(/__+/g, '_')
       .trim();
   };
 
@@ -59,21 +74,22 @@ export default function PaymentSuccessPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // داده‌های فاکتور با استفاده از useMemo - بدون مالیات
+  // داده‌های فاکتور با استفاده از useMemo
   const invoiceData = useMemo(() => {
     if (latestOrder) {
       const subtotal = latestOrder.totalPrice || 3750000;
-      const tax = 0; // مالیات حذف شد
-      const total = subtotal; // جمع کل برابر با جمع آیتم‌ها
+      const total = subtotal;
       
       const items = latestOrder.items ? latestOrder.items.map((item: any) => ({
         name: item.variant?.product?.title || "محصول",
         quantity: item.quantity || 1,
-        price: item.finalPrice || item.price || 0
+        price: item.finalPrice || item.price || 0,
+        variant: item.variant,
+        status: item.status
       })) : [
-        { name: "پروژه وبسایت شرکتی", quantity: 1, price: 2500000 },
-        { name: "هاست و دامنه یکساله", quantity: 1, price: 500000 },
-        { name: "پشتیبانی ۶ ماهه", quantity: 1, price: 750000 },
+        { name: "پروژه وبسایت شرکتی", quantity: 1, price: 2500000, variant: null, status: 'completed' },
+        { name: "هاست و دامنه یکساله", quantity: 1, price: 500000, variant: null, status: 'completed' },
+        { name: "پشتیبانی ۶ ماهه", quantity: 1, price: 750000, variant: null, status: 'completed' },
       ];
 
       return {
@@ -83,7 +99,6 @@ export default function PaymentSuccessPage() {
           : paymentDate,
         items,
         subtotal,
-        tax,
         total,
         customer: {
           name: user?.name || "کاربر وبوفن",
@@ -98,12 +113,12 @@ export default function PaymentSuccessPage() {
       orderId: trackingNumber,
       date: paymentDate,
       items: [
-        { name: "پروژه وبسایت شرکتی", quantity: 1, price: 2500000 },
-        { name: "هاست و دامنه یکساله", quantity: 1, price: 500000 },
-        { name: "پشتیبانی ۶ ماهه", quantity: 1, price: 750000 },
+        { name: "پروژه وبسایت شرکتی", quantity: 1, price: 2500000, variant: null, status: 'completed' },
+        { name: "هاست و دامنه یکساله", quantity: 1, price: 500000, variant: null, status: 'completed' },
+        { name: "پشتیبانی ۶ ماهه", quantity: 1, price: 750000, variant: null, status: 'completed' },
       ],
       subtotal: 3750000,
-      tax: 0, // مالیات حذف شد
+      total: 3750000,
       customer: {
         name: user?.name || "کاربر وبوفن",
         email: user?.email || "user@example.com",
@@ -152,7 +167,7 @@ export default function PaymentSuccessPage() {
       clone.className = '';
       clone.style.cssText = `
         background-color: white;
-        padding: 32px;
+        padding: 20mm;
         width: 210mm;
         min-height: 297mm;
         font-family: Arial, Tahoma, sans-serif;
@@ -160,37 +175,105 @@ export default function PaymentSuccessPage() {
         color: #333;
       `;
       
+      // اضافه کردن لوگو به کلون - در سمت راست
+      const headerDiv = clone.querySelector('.invoice-header');
+      if (headerDiv) {
+        const logoContainer = document.createElement('div');
+        logoContainer.style.textAlign = 'right';
+        logoContainer.style.flexShrink = '0';
+        logoContainer.style.marginRight = '20px';
+        
+        const logoImg = document.createElement('img');
+        logoImg.src = '/logos/logo.png';
+        logoImg.alt = 'لوگو';
+        logoImg.style.width = '120px';
+        logoImg.style.height = 'auto';
+        logoImg.style.display = 'block';
+        
+        logoContainer.appendChild(logoImg);
+        headerDiv.appendChild(logoContainer);
+      }
+      
       replaceOklchStyles(clone);
       
       const tempDiv = document.createElement('div');
       tempDiv.style.position = 'fixed';
       tempDiv.style.left = '-9999px';
       tempDiv.style.top = '0';
+      tempDiv.style.width = '210mm';
+      tempDiv.style.backgroundColor = '#ffffff';
       document.body.appendChild(tempDiv);
       tempDiv.appendChild(clone);
 
       const canvas = await html2canvas(clone, {
-        scale: 1.5,
+        scale: 2,
         useCORS: true,
         logging: false,
         backgroundColor: "#ffffff",
         allowTaint: true,
         removeContainer: true,
         onclone: (clonedDoc, clonedElement) => {
+          // اطمینان از بارگیری لوگو
+          const logoImg = clonedElement.querySelector('img[alt="لوگو"]');
+          if (logoImg) {
+            (logoImg as HTMLImageElement).src = '/logos/logo.png';
+          }
+          
+          // اعمال استایل‌های PDF
           const allElements = clonedElement.querySelectorAll('*');
           allElements.forEach((el: Element) => {
             const htmlEl = el as HTMLElement;
-            htmlEl.removeAttribute('class');
             
-            const computedStyle = window.getComputedStyle(htmlEl);
-            const color = computedStyle.color;
-            const bgColor = computedStyle.backgroundColor;
-            
-            if (color.includes('oklch') || color.includes('oklab')) {
-              htmlEl.style.color = '#374151';
+            // استایل‌دهی به تگ‌های اصلی
+            if (el.tagName === 'H2') {
+              htmlEl.style.fontSize = '28px';
+              htmlEl.style.fontWeight = 'bold';
+              htmlEl.style.textAlign = 'right';
+              htmlEl.style.color = '#1e40af';
+              htmlEl.style.marginBottom = '20px';
+              htmlEl.style.fontFamily = 'Arial, Tahoma, sans-serif';
             }
-            if (bgColor.includes('oklch') || bgColor.includes('oklab')) {
-              htmlEl.style.backgroundColor = bgColor.includes('gradient') ? 'white' : '#f9fafb';
+            
+            if (el.tagName === 'H3') {
+              htmlEl.style.fontSize = '20px';
+              htmlEl.style.fontWeight = 'bold';
+              htmlEl.style.color = '#374151';
+              htmlEl.style.marginBottom = '15px';
+              htmlEl.style.borderBottom = '2px solid #e5e7eb';
+              htmlEl.style.paddingBottom = '8px';
+            }
+            
+            if (el.tagName === 'P') {
+              htmlEl.style.margin = '6px 0';
+              htmlEl.style.color = '#374151';
+              htmlEl.style.fontSize = '14px';
+              htmlEl.style.lineHeight = '1.6';
+            }
+            
+            if (el.tagName === 'TABLE') {
+              htmlEl.style.width = '100%';
+              htmlEl.style.borderCollapse = 'collapse';
+              htmlEl.style.marginTop = '20px';
+              htmlEl.style.marginBottom = '20px';
+              htmlEl.style.fontFamily = 'Arial, Tahoma, sans-serif';
+            }
+            
+            if (el.tagName === 'TH') {
+              htmlEl.style.backgroundColor = '#1e40af';
+              htmlEl.style.color = '#ffffff';
+              htmlEl.style.border = '1px solid #3b82f6';
+              htmlEl.style.padding = '12px';
+              htmlEl.style.textAlign = 'center';
+              htmlEl.style.fontWeight = '600';
+              htmlEl.style.fontSize = '14px';
+            }
+            
+            if (el.tagName === 'TD') {
+              htmlEl.style.border = '1px solid #d1d5db';
+              htmlEl.style.padding = '12px';
+              htmlEl.style.textAlign = 'center';
+              htmlEl.style.color = '#374151';
+              htmlEl.style.fontSize = '13px';
             }
           });
         }
@@ -207,15 +290,29 @@ export default function PaymentSuccessPage() {
       const imgHeight = canvas.height;
       const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
       const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      const imgY = 5;
+      const imgY = 0;
       
-      // ایجاد نام فایل با اسم شخص
+      // ایجاد نام فایل
       const customerName = invoiceData.customer.name || "کاربر";
       const safeCustomerName = sanitizeFileName(customerName);
       const safeTrackingNumber = sanitizeFileName(trackingNumber);
       const fileName = `فاکتور_${safeTrackingNumber}_${safeCustomerName}.pdf`;
       
       pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+      
+      // اضافه کردن صفحات بیشتر در صورت نیاز
+      let heightLeft = imgHeight * ratio;
+      let position = 0;
+      
+      if (heightLeft > pdfHeight) {
+        while (heightLeft > 0) {
+          position = heightLeft - pdfHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', imgX, position, imgWidth * ratio, imgHeight * ratio);
+          heightLeft -= pdfHeight;
+        }
+      }
+      
       pdf.save(fileName);
       
       setInvoiceGenerated(true);
@@ -241,7 +338,7 @@ export default function PaymentSuccessPage() {
       pdf.setR2L(true);
       
       pdf.setFontSize(20);
-      pdf.text('فاکتور فروش', 105, 20, { align: 'center' });
+      pdf.text('فاکتور فروش', 105, 20, { align: 'right' });
       
       pdf.setFontSize(12);
       pdf.text('وبوفن - پلتفرم تخصصی طراحی وبسایت', 105, 30, { align: 'center' });
@@ -289,8 +386,6 @@ export default function PaymentSuccessPage() {
       });
       
       y += 10;
-      // فقط جمع کل نمایش داده می‌شود (بدون مالیات)
-      
       y += 20;
       pdf.setFontSize(14);
       pdf.setDrawColor(41, 176, 203);
@@ -309,7 +404,6 @@ export default function PaymentSuccessPage() {
       pdf.text('ایمیل: info@webofun.com', 105, y + 5, { align: 'center' });
       pdf.text('با تشکر از اعتماد شما به وبوفن', 105, y + 15, { align: 'center' });
       
-      // ایجاد نام فایل با اسم شخص
       const customerName = invoiceData.customer.name || "کاربر";
       const safeCustomerName = sanitizeFileName(customerName);
       const safeTrackingNumber = sanitizeFileName(trackingNumber || invoiceData.orderId || "بدون-شماره");
@@ -333,7 +427,6 @@ export default function PaymentSuccessPage() {
     router.push("/products");
   };
 
-  // تابع جدید برای رفتن به داشبورد
   const handleGoToDashboard = async () => {
     setDashboardLoading(true);
     try {
@@ -349,13 +442,6 @@ export default function PaymentSuccessPage() {
   };
 
   const getOrderStatusText = (status: string) => {
-    const statusMap: Record<string, string> = {
-      pending: "در انتظار تایید",
-      processing: "در حال پردازش",
-      completed: "تکمیل شده",
-      cancelled: "لغو شده",
-      paid: "پرداخت شده"
-    };
     return statusMap[status] || status;
   };
 
@@ -365,7 +451,12 @@ export default function PaymentSuccessPage() {
       processing: "bg-blue-100 text-blue-700",
       completed: "bg-green-100 text-green-700",
       cancelled: "bg-red-100 text-red-700",
-      paid: "bg-green-100 text-green-700"
+      paid: "bg-green-100 text-green-700",
+      Processing: "bg-blue-100 text-blue-700",
+      Cancelled: "bg-red-100 text-red-700",
+      waiting: "bg-yellow-100 text-yellow-700",
+      submitted: "bg-green-100 text-green-700",
+      Completed: "bg-green-100 text-green-700",
     };
     return colorMap[status] || "bg-gray-100 text-gray-700";
   };
@@ -376,6 +467,21 @@ export default function PaymentSuccessPage() {
         <title>پرداخت موفق | وبوفن</title>
         <meta name="robots" content="noindex, nofollow" />
       </Head>
+      
+      {/* لوگو در صفحه اصلی - سمت راست */}
+      <div className="absolute top-6 right-6 z-20">
+        <div className="flex items-center justify-end">
+          <Image 
+            src="/logos/logo.png" 
+            alt="لوگو وبوفن" 
+            width={120} 
+            height={40}
+            className="h-10 w-auto"
+            priority
+          />
+        </div>
+      </div>
+      
       <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-blue-50/30 relative overflow-hidden">
         {/* بخش مخفی برای فاکتور */}
         <div className="fixed -left-[10000px] -top-[10000px]" aria-hidden="true">
@@ -384,7 +490,7 @@ export default function PaymentSuccessPage() {
             className="invoice-template"
             style={{
               backgroundColor: 'white',
-              padding: '32px',
+              padding: '20mm',
               width: '210mm',
               minHeight: '297mm',
               fontFamily: 'Arial, Tahoma, sans-serif',
@@ -393,269 +499,184 @@ export default function PaymentSuccessPage() {
               boxSizing: 'border-box'
             }}
           >
-            {/* هدر */}
-            <div style={{
-              borderBottom: '2px solid #e5e7eb',
-              paddingBottom: '24px',
-              marginBottom: '32px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start'
+            {/* هدر فاکتور با لوگو در سمت راست */}
+            <div className="invoice-header" style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'flex-start',
+              marginBottom: '30px', 
+              borderBottom: '3px solid #1e40af', 
+              paddingBottom: '20px' 
             }}>
-              <div>
-                <h1 style={{
-                  fontSize: '32px',
-                  fontWeight: 'bold',
-                  color: '#111827',
-                  margin: '0 0 8px 0'
-                }}>
-                  وبوفن
-                </h1>
-                <p style={{
-                  color: '#6b7280',
-                  margin: '0',
-                  fontSize: '14px'
-                }}>
-                  پلتفرم تخصصی طراحی وبسایت
-                </p>
-              </div>
-              <div style={{ textAlign: 'left' }}>
-                <h2 style={{
-                  fontSize: '24px',
-                  fontWeight: 'bold',
-                  color: '#29b0cb',
-                  margin: '0 0 8px 0'
-                }}>
+              {/* اطلاعات فاکتور در سمت چپ */}
+              <div style={{ textAlign: 'right', flex: 1 }}>
+                <h2 style={{ fontSize: '28px', textAlign: 'right', fontWeight: 'bold', color: '#1e40af', marginBottom: '10px' }}>
                   فاکتور فروش
                 </h2>
-                <p style={{ color: '#6b7280', margin: '4px 0', fontSize: '14px' }}>
-                  شماره: {invoiceData.orderId || 'در حال بارگذاری...'}
-                </p>
-                <p style={{ color: '#6b7280', margin: '4px 0', fontSize: '14px' }}>
-                  تاریخ: {invoiceData.date || 'در حال بارگذاری...'}
-                </p>
-                <p style={{ color: '#6b7280', margin: '4px 0', fontSize: '14px' }}>
-                  وضعیت: {getOrderStatusText(invoiceData.orderStatus)}
-                </p>
+                <div style={{ fontSize: '14px', color: '#374151' }}>
+                  <p><strong>تاریخ صدور:</strong> {invoiceData.date || new Date().toLocaleString("fa-IR")}</p>
+                  <p><strong>شماره فاکتور:</strong> INV-{invoiceData.orderId || 'در حال بارگذاری...'}</p>
+                </div>
               </div>
+              {/* لوگو در سمت راست (در PDF اضافه خواهد شد) */}
             </div>
 
-            {/* اطلاعات مشتری */}
-            <div style={{ marginBottom: '32px' }}>
-              <h3 style={{
-                fontSize: '18px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '16px'
-              }}>
-                اطلاعات مشتری
+            {/* اطلاعات سفارش */}
+            <div style={{ marginBottom: '25px' }}>
+              <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#374151', marginBottom: '15px' }}>
+                اطلاعات سفارش
               </h3>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: '16px',
-                backgroundColor: '#f9fafb',
-                padding: '16px',
-                borderRadius: '8px'
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: '1fr 1fr', 
+                gap: '15px',
+                backgroundColor: '#f0f9ff',
+                padding: '20px',
+                borderRadius: '10px',
+                border: '2px solid #e0f2fe'
               }}>
                 <div>
-                  <p style={{ color: '#6b7280', margin: '0 0 4px 0', fontSize: '14px' }}>نام:</p>
-                  <p style={{ fontWeight: '500', margin: '0', fontSize: '15px' }}>
-                    {userLoading ? 'در حال دریافت...' : invoiceData.customer.name}
-                  </p>
+                  <p style={{ color: '#374151', marginBottom: '8px' }}><strong>شناسه سفارش:</strong> {invoiceData.orderId}</p>
+                  <p style={{ color: '#374151', marginBottom: '8px' }}><strong>نام مشتری:</strong> {invoiceData.customer.name}</p>
+                  <p style={{ color: '#374151', marginBottom: '8px' }}><strong>تاریخ سفارش:</strong> {invoiceData.date}</p>
                 </div>
                 <div>
-                  <p style={{ color: '#6b7280', margin: '0 0 4px 0', fontSize: '14px' }}>ایمیل:</p>
-                  <p style={{ fontWeight: '500', margin: '0', fontSize: '15px' }}>
-                    {userLoading ? 'در حال دریافت...' : invoiceData.customer.email}
-                  </p>
-                </div>
-                <div>
-                  <p style={{ color: '#6b7280', margin: '0 0 4px 0', fontSize: '14px' }}>تلفن:</p>
-                  <p style={{ fontWeight: '500', margin: '0', fontSize: '15px' }}>
-                    {userLoading ? 'در حال دریافت...' : invoiceData.customer.phone}
-                  </p>
+                  <p style={{ color: '#374151', marginBottom: '8px' }}><strong>ایمیل:</strong> {invoiceData.customer.email}</p>
+                  <p style={{ color: '#374151', marginBottom: '8px' }}><strong>تلفن:</strong> {invoiceData.customer.phone}</p>
+                  <p style={{ color: '#374151', marginBottom: '8px' }}><strong>وضعیت سفارش:</strong> {getOrderStatusText(invoiceData.orderStatus)}</p>
                 </div>
               </div>
             </div>
 
             {/* جدول محصولات */}
-            <div style={{ marginBottom: '32px' }}>
-              <h3 style={{
-                fontSize: '18px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '16px'
-              }}>
-                جزئیات سفارش
+            <div style={{ marginBottom: '25px' }}>
+              <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#374151', marginBottom: '15px' }}>
+                جزئیات محصولات
               </h3>
-              <table style={{
-                width: '100%',
+              <table style={{ 
+                width: '100%', 
                 borderCollapse: 'collapse',
-                border: '1px solid #d1d5db'
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                overflow: 'hidden'
               }}>
                 <thead>
-                  <tr style={{ backgroundColor: '#f3f4f6' }}>
-                    <th style={{
-                      border: '1px solid #d1d5db',
-                      padding: '12px',
-                      fontWeight: '600',
-                      textAlign: 'center',
-                      fontSize: '14px'
-                    }}>
-                      نام کالا/خدمت
-                    </th>
-                    <th style={{
-                      border: '1px solid #d1d5db',
-                      padding: '12px',
-                      fontWeight: '600',
-                      textAlign: 'center',
-                      fontSize: '14px'
-                    }}>
-                      تعداد
-                    </th>
-                    <th style={{
-                      border: '1px solid #d1d5db',
-                      padding: '12px',
-                      fontWeight: '600',
-                      textAlign: 'center',
-                      fontSize: '14px'
-                    }}>
-                      مبلغ (ریال)
-                    </th>
-                    <th style={{
-                      border: '1px solid #d1d5db',
-                      padding: '12px',
-                      fontWeight: '600',
-                      textAlign: 'center',
-                      fontSize: '14px'
-                    }}>
-                      جمع (ریال)
-                    </th>
+                  <tr style={{ backgroundColor: '#1e40af' }}>
+                    <th style={{ border: '1px solid #3b82f6', padding: '14px', textAlign: 'center', fontWeight: '600', color: '#ffffff' }}>ردیف</th>
+                    <th style={{ border: '1px solid #3b82f6', padding: '14px', textAlign: 'center', fontWeight: '600', color: '#ffffff' }}>محصول</th>
+                    <th style={{ border: '1px solid #3b82f6', padding: '14px', textAlign: 'center', fontWeight: '600', color: '#ffffff' }}>تعداد</th>
+                    <th style={{ border: '1px solid #3b82f6', padding: '14px', textAlign: 'center', fontWeight: '600', color: '#ffffff' }}>قیمت واحد</th>
+                    <th style={{ border: '1px solid #3b82f6', padding: '14px', textAlign: 'center', fontWeight: '600', color: '#ffffff' }}>قیمت کل</th>
+                    <th style={{ border: '1px solid #3b82f6', padding: '14px', textAlign: 'center', fontWeight: '600', color: '#ffffff' }}>وضعیت</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {invoiceData.items.map((item:any, index:any) => (
-                    <tr key={index} style={{
-                      backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9fafb'
-                    }}>
-                      <td style={{
-                        border: '1px solid #d1d5db',
-                        padding: '12px',
-                        fontSize: '14px'
+                  {invoiceData.items.map((item: any, index: number) => {
+                    const getStatusStyle = (status: string) => {
+                      if (status === 'Completed' || status === 'submitted' || status === 'completed') {
+                        return { 
+                          backgroundColor: '#d1fae5', 
+                          color: '#065f46', 
+                          padding: '6px 12px', 
+                          borderRadius: '20px', 
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          display: 'inline-block'
+                        };
+                      } else if (status === 'Cancelled' || status === 'cancelled') {
+                        return { 
+                          backgroundColor: '#fee2e2', 
+                          color: '#991b1b', 
+                          padding: '6px 12px', 
+                          borderRadius: '20px', 
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          display: 'inline-block'
+                        };
+                      } else {
+                        return { 
+                          backgroundColor: '#fef3c7', 
+                          color: '#92400e', 
+                          padding: '6px 12px', 
+                          borderRadius: '20px', 
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          display: 'inline-block'
+                        };
+                      }
+                    };
+
+                    return (
+                      <tr key={index} style={{ 
+                        borderBottom: '1px solid #e5e7eb',
+                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9fafb'
                       }}>
-                        {item.name}
-                      </td>
-                      <td style={{
-                        border: '1px solid #d1d5db',
-                        padding: '12px',
-                        textAlign: 'center',
-                        fontSize: '14px'
-                      }}>
-                        {item.quantity}
-                      </td>
-                      <td style={{
-                        border: '1px solid #d1d5db',
-                        padding: '12px',
-                        textAlign: 'center',
-                        fontSize: '14px'
-                      }}>
-                        {item.price.toLocaleString()}
-                      </td>
-                      <td style={{
-                        border: '1px solid #d1d5db',
-                        padding: '12px',
-                        textAlign: 'center',
-                        fontSize: '14px'
-                      }}>
-                        {(item.price * item.quantity).toLocaleString()}
-                      </td>
-                    </tr>
-                  ))}
+                        <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center', color: '#374151' }}>{index + 1}</td>
+                        <td style={{ border: '1px solid #e5e7eb', padding: '12px', color: '#374151', fontWeight: '500' }}>{item.name}</td>
+                        <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center', color: '#374151' }}>{item.quantity || 0}</td>
+                        <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left', color: '#1e40af', fontWeight: '500' }}>
+                          {item.price ? `${item.price.toLocaleString("fa-IR")} تومان` : "—"}
+                        </td>
+                        <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left', color: '#1e40af', fontWeight: 'bold' }}>
+                          {item.price && item.quantity 
+                            ? `${(item.price * item.quantity).toLocaleString("fa-IR")} تومان`
+                            : "—"}
+                        </td>
+                        <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>
+                          <span style={getStatusStyle(item.status)}>
+                            {statusMap[item.status?.trim()] ?? item.status ?? "نامشخص"}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
 
-            {/* محاسبات نهایی - بدون مالیات */}
-            <div style={{
-              borderTop: '2px solid #e5e7eb',
-              paddingTop: '24px',
-              marginTop: '24px'
+            {/* جمع کل */}
+            <div style={{ 
+              backgroundColor: '#f0f9ff', 
+              padding: '24px', 
+              borderRadius: '12px',
+              border: '2px solid #e0f2fe',
+              marginTop: '30px'
             }}>
-              <div style={{
-                maxWidth: '400px',
-                marginLeft: 'auto'
-              }}>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  marginBottom: '12px',
-                  fontSize: '15px'
-                }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <p style={{ fontSize: '16px', color: '#374151' }}>
+                    <strong>تعداد آیتم‌ها:</strong> 
+                    <span style={{ marginRight: '8px', fontWeight: 'bold', color: '#1e40af' }}>
+                      {invoiceData.items.length}
+                    </span>
+                  </p>
                 </div>
-                {/* بخش مالیات حذف شد */}
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  fontSize: '18px',
-                  fontWeight: 'bold',
-                  borderTop: '1px solid #d1d5db',
-                  paddingTop: '16px',
-                  marginTop: '16px',
-                  color: '#29b0cb'
-                }}>
-                  <span>مبلغ قابل پرداخت:</span>
-                  {/* اصلاح این خطا */}
-                  <span>{(invoiceData.total || 3750000).toLocaleString()} ریال</span>
+                <div style={{ textAlign: 'left' }}>
+                  <p style={{ fontSize: '22px', fontWeight: 'bold', color: '#1e40af' }}>
+                    <strong>مبلغ قابل پرداخت:</strong> 
+                    <span style={{ marginRight: '12px', fontSize: '24px' }}>
+                      {Number(invoiceData.total || 0).toLocaleString("fa-IR")}
+                    </span>
+                    تومان
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* فوتر */}
-            <div style={{
-              marginTop: '48px',
-              paddingTop: '24px',
-              borderTop: '1px solid #e5e7eb',
-              fontSize: '13px',
-              color: '#6b7280'
+            {/* پاورقی */}
+            <div style={{ 
+              marginTop: '40px', 
+              paddingTop: '20px', 
+              borderTop: '2px dashed #e5e7eb',
+              textAlign: 'center',
+              color: '#6b7280',
+              fontSize: '13px'
             }}>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: '32px'
-              }}>
-                <div>
-                  <h4 style={{
-                    fontWeight: '600',
-                    color: '#374151',
-                    marginBottom: '8px',
-                    fontSize: '14px'
-                  }}>
-                    اطلاعات تماس
-                  </h4>
-                  <p style={{ margin: '4px 0' }}>تلفن: 14 59 51 88 - 021 </p>
-                  <p style={{ margin: '4px 0' }}>ایمیل: webofenco@gmail.com</p>
-                  <p style={{ margin: '4px 0' }}>آدرس: تهران - سهروردی شمالی - کوچه مهاجر - پلاک30</p>
-                </div>
-                <div>
-                  <h4 style={{
-                    fontWeight: '600',
-                    color: '#374151',
-                    marginBottom: '8px',
-                    fontSize: '14px'
-                  }}>
-                    شرایط و ضوابط
-                  </h4>
-                  <p style={{ margin: '4px 0' }}>
-                    این فاکتور به منزله رسید پرداخت بوده و قابل استناد می‌باشد.
-                  </p>
-                </div>
-              </div>
-              <div style={{ marginTop: '24px', textAlign: 'center' }}>
-                <p style={{ color: '#9ca3af' }}>
-                  با تشکر از اعتماد شما به وبوفن
-                </p>
-              </div>
+              <p style={{ marginBottom: '8px' }}>با تشکر از اعتماد شما</p>
+              <p style={{ marginBottom: '12px' }}>این فاکتور به صورت خودکار تولید شده و نیاز به مهر و امضا ندارد</p>
+              <p style={{ fontSize: '12px', color: '#9ca3af' }}>
+                تاریخ چاپ: {new Date().toLocaleString("fa-IR")}
+              </p>
             </div>
           </div>
         </div>
@@ -754,12 +775,12 @@ export default function PaymentSuccessPage() {
                 >
                   {generatingInvoice ? (
                     <>
-                      <div className="animate-spin  rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                       <span>در حال تولید فاکتور...</span>
                     </>
                   ) : (
                     <>
-                      <Download className="w-5 h-5  group-hover:scale-110 transition-transform" />
+                      <Download className="w-5 h-5 group-hover:scale-110 transition-transform" />
                       <span>دریافت فاکتور PDF</span>
                     </>
                   )}
@@ -783,7 +804,6 @@ export default function PaymentSuccessPage() {
                   )}
                 </button>
               </div>
-          
             </div>
 
             {/* Next Steps Card */}
@@ -857,7 +877,9 @@ export default function PaymentSuccessPage() {
               className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800 py-2 px-4 rounded-xl hover:bg-white/50 transition-all duration-200 group"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              <Link href="/">
               <span className="text-sm">بازگشت به فروشگاه</span>
+              </Link>
             </button>
           </div>
         </div>
