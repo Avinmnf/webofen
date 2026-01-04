@@ -5,22 +5,84 @@ import ConsultationModal from "@/components/ConsultationModal";
 import ClientsCarousel from "@/components/carousel/ClientsCarousel";
 import SEO from "@/components/seo";
 
-const SITE_URL = "https://webofen.com";
-
-// اسکیما برای صفحه درباره ما
+// Enhanced Schema for About Page
 function generateAboutPageSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "AboutPage",
     name: "درباره وبوفن",
-    description:
-      "تیم متخصص وبوفن در زمینه طراحی سایت، توسعه سیستم‌های اختصاصی و ارائه راهکارهای دیجیتال مارکتینگ",
+    description: "تیم متخصص وبوفن در زمینه طراحی سایت، توسعه سیستم‌های اختصاصی و ارائه راهکارهای دیجیتال مارکتینگ",
     url: "https://webofen.com/about-us",
+    publisher: {
+      "@type": "Organization",
+      name: "وبوفن",
+      url: "https://webofen.com",
+      logo: "https://webofen.com/logo.png",
+      description: "تیم متخصص طراحی سایت، توسعه سیستم‌های اختصاصی و ارائه راهکارهای دیجیتال مارکتینگ",
+      foundingDate: "2023",
+      areaServed: {
+        "@type": "Country",
+        name: "ایران"
+      },
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "تهران - سهروردی شمالی - کوچه مهاجر - پلاک 30",
+        addressLocality: "تهران",
+        addressCountry: "IR"
+      },
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        telephone: "+982188515914",
+        email: "webofenco@gmail.com",
+        availableLanguage: ["fa"]
+      },
+      sameAs: [
+        "https://instagram.com/webofen",
+        "https://t.me/webofenlearn"
+      ],
+      knowsAbout: [
+        "طراحی سایت اختصاصی",
+        "سیستم مدیریت محتوای اختصاصی (CMS)",
+        "سئو و بهینه‌سازی سایت",
+        "برنامه نویسی وب",
+        "تجربه کاربری (UX)",
+        "دیجیتال مارکتینگ"
+      ],
+      member: [
+        {
+          "@type": "OrganizationRole",
+          roleName: "تیم طراحی",
+          member: {
+            "@type": "Person",
+            name: "تیم طراحی وبوفن",
+            jobTitle: "طراح رابط کاربری و تجربه کاربری"
+          }
+        },
+        {
+          "@type": "OrganizationRole",
+          roleName: "تیم برنامه‌نویسی",
+          member: {
+            "@type": "Person",
+            name: "تیم توسعه وبوفن",
+            jobTitle: "برنامه‌نویس و توسعه‌دهنده"
+          }
+        },
+        {
+          "@type": "OrganizationRole",
+          roleName: "تیم سئو و دیجیتال مارکتینگ",
+          member: {
+            "@type": "Person",
+            name: "تیم سئو وبوفن",
+            jobTitle: "متخصص سئو و بازاریابی دیجیتال"
+          }
+        }
+      ]
+    },
     mainEntity: {
       "@type": "Organization",
       name: "وبوفن",
-      description:
-        "وبوفن یک تیم متخصص در طراحی سایت، توسعه سیستم‌های اختصاصی و ارائه راهکارهای دیجیتال است. هدف ما ایجاد وب‌سایت‌هایی است که علاوه بر ظاهر حرفه‌ای، از نظر سرعت، امنیت، بهینه‌سازی و تجربه کاربری در بهترین سطح ممکن باشند.",
+      description: "وبوفن یک تیم متخصص در طراحی سایت، توسعه سیستم‌های اختصاصی و ارائه راهکارهای دیجیتال است. هدف ما ایجاد وب‌سایت‌هایی است که علاوه بر ظاهر حرفه‌ای، از نظر سرعت، امنیت، بهینه‌سازی و تجربه کاربری در بهترین سطح ممکن باشند.",
       foundingDate: "2023",
       areaServed: "ایران",
       knowsAbout: [
@@ -47,11 +109,31 @@ function generateAboutPageSchema() {
           description: "ارائه راهکارهای بازاریابی دیجیتال",
         },
       ],
-    },
+    }
   };
 }
 
-// اسکیما برای FAQ
+// Generate Breadcrumb Schema
+function generateBreadcrumbSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "صفحه اصلی",
+        item: "https://webofen.com"
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "درباره ما",
+        item: "https://webofen.com/about-us"
+      }
+    ]
+  };
+}
 
 export default function AboutUs() {
   const [open, setOpen] = useState(false);
@@ -79,26 +161,45 @@ export default function AboutUs() {
     },
   ];
 
-  // تولید اسکیماها
+  // Generate all schemas
   const aboutPageSchema = generateAboutPageSchema();
+  const breadcrumbSchema = generateBreadcrumbSchema();
+  const allSchemas = [aboutPageSchema, breadcrumbSchema];
 
   return (
     <>
       <SEO
         title="درباره ما | تیم متخصص وبوفن در طراحی سایت و دیجیتال مارکتینگ"
         description="وبوفن یک تیم متخصص در طراحی سایت، توسعه سیستم‌های اختصاصی و ارائه راهکارهای دیجیتال. با سال‌ها تجربه در طراحی وبسایت‌های حرفه‌ای و سئو."
-        keywords="درباره وبوفن, تیم طراحی سایت, متخصص سئو, دیجیتال مارکتینگ, طراحی وبسایت, درباره ما"
+        keywords="درباره وبوفن, تیم طراحی سایت, متخصص سئو, دیجیتال مارکتینگ, طراحی وبسایت, درباره ما, تیم وبوفن"
         canonical="https://webofen.com/about-us"
         ogType="website"
         ogImage="https://webofen.com/images/og-about.jpg"
+        structuredData={allSchemas} // ✅ Pass schemas here, not separate script tag
+        section="درباره ما"
+        tags={["درباره وبوفن", "تیم طراحی سایت", "تخصص طراحی وب", "خدمات سئو", "تیم ایرانی"]}
       />
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutPageSchema) }}
-      />
+      {/* REMOVED THE SEPARATE SCRIPT TAG - SEO component handles it */}
 
       <main>
+        {/* Breadcrumb Navigation */}
+        <div className="max-w-[1250px] m-auto px-4 py-3">
+          <nav className="text-sm text-gray-600" aria-label="breadcrumb">
+            <ol className="flex flex-wrap items-center gap-2">
+              <li>
+                <a href="/" className="hover:text-[#29b0cb] transition-colors">
+                  صفحه اصلی
+                </a>
+              </li>
+              <li className="text-gray-400">/</li>
+              <li className="text-[#0364af] font-medium" aria-current="page">
+                درباره ما
+              </li>
+            </ol>
+          </nav>
+        </div>
+
         <section className="bg-[#f7f8fc] pb-4 w-full rounded-2xl">
           <div className="max-w-[1250px] m-auto flex flex-col md:flex-row justify-center md:py-20 py-5 px-4 gap-10">
             {/* Left content */}

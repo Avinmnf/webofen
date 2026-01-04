@@ -9,51 +9,220 @@ import SEO from "@/components/seo";
 
 const SITE_URL = "https://webofen.com";
 
-// اسکیما برای صفحه طراحی سایت
+// Enhanced Schema for Web Design page
 function generateWebDesignSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "Service",
-    name: "طراحی سایت اختصاصی با CMS",
-    description:
-      "طراحی سایت حرفه‌ای با CMS اختصاصی، سریع، امن و قابل توسعه برای کسب‌وکارهای ایرانی",
+    serviceType: "WebDesign",
+    name: "طراحی سایت اختصاصی با CMS | وبوفن",
+    description: "طراحی سایت حرفه‌ای با CMS اختصاصی، سریع، امن و قابل توسعه برای کسب‌وکارهای ایرانی",
     provider: {
       "@type": "Organization",
       name: "وبوفن",
-      description: "تیم متخصص طراحی سایت و دیجیتال مارکتینگ",
+      url: "https://webofen.com",
+      logo: "https://webofen.com/logo.png",
+      description: "تیم متخصص طراحی سایت، توسعه CMS اختصاصی و دیجیتال مارکتینگ",
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "تهران - سهروردی شمالی - کوچه مهاجر - پلاک 30",
+        addressLocality: "تهران",
+        addressCountry: "IR"
+      },
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        telephone: "+982188515914",
+        email: "webofenco@gmail.com",
+        availableLanguage: ["fa"]
+      }
     },
-    areaServed: "IR",
-    serviceType: "طراحی سایت",
-    offers: {
-      "@type": "Offer",
-      description: "طراحی سایت اختصاصی با CMS شخصی‌سازی شده",
+    areaServed: {
+      "@type": "Country",
+      name: "ایران"
     },
+    offers: [
+      {
+        "@type": "Offer",
+        name: "طراحی سایت اختصاصی",
+        description: "طراحی سایت با CMS کاملاً اختصاصی و شخصی‌سازی شده",
+        price: "قیمت بر اساس پروژه",
+        priceCurrency: "IRR"
+      },
+      {
+        "@type": "Offer",
+        name: "طراحی سایت شرکتی",
+        description: "طراحی وبسایت شرکتی حرفه‌ای با امکانات کامل",
+        price: "قیمت بر اساس پروژه",
+        priceCurrency: "IRR"
+      },
+      {
+        "@type": "Offer",
+        name: "طراحی سایت فروشگاهی",
+        description: "طراحی سایت فروشگاهی با درگاه پرداخت و پنل مدیریت پیشرفته",
+        price: "قیمت بر اساس پروژه",
+        priceCurrency: "IRR"
+      }
+    ],
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "خدمات طراحی سایت وبوفن",
+      itemListElement: [
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "طراحی رابط کاربری (UI)",
+            description: "طراحی مدرن و جذاب رابط کاربری"
+          }
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "تجربه کاربری (UX)",
+            description: "بهینه‌سازی تجربه کاربری برای تبدیل بیشتر"
+          }
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "سیستم مدیریت محتوا (CMS)",
+            description: "CMS اختصاصی و قابل توسعه"
+          }
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "سئو و بهینه‌سازی",
+            description: "بهینه‌سازی سایت برای موتورهای جستجو"
+          }
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "پشتیبانی و نگهداری",
+            description: "پشتیبانی فنی و بروزرسانی مستمر"
+          }
+        }
+      ]
+    },
+    audience: {
+      "@type": "Audience",
+      audienceType: ["Business owners", "Entrepreneurs", "Companies"]
+    },
+    serviceOutput: {
+      "@type": "WebSite",
+      name: "وبسایت اختصاصی",
+      description: "وبسایت بهینه‌شده و قابل توسعه"
+    }
   };
 }
 
-// اسکیما برای FAQ صفحه طراحی سایت
+// FAQ Schema
+function generateFAQSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "چرا باید سایت اختصاصی داشته باشم؟",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "سایت اختصاصی به شما کنترل کامل روی طراحی، امکانات و امنیت می‌دهد. برخلاف قالب‌های آماده، سایت اختصاصی کاملاً منطبق بر نیازهای کسب‌وکار شماست، سرعت بالاتری دارد، امنیت بیشتری دارد و در بلندمدت مقرون‌به‌صرفه‌تر است."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "تفاوت CMS اختصاصی با وردپرس چیست؟",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "CMS اختصاصی کاملاً مطابق نیازهای شما طراحی می‌شود، کدهای تمیزتر و بهینه‌تری دارد، امنیت بالاتری ارائه می‌دهد، سرعت لود بسیار بالاتری دارد و در آینده به راحتی قابل توسعه است. درحالی که وردپرس محدودیت‌های زیادی در شخصی‌سازی دارد."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "چه زمانی سایت من آماده می‌شود؟",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "زمان تحویل بستگی به پیچیدگی پروژه دارد. معمولاً پروژه‌های طراحی سایت بین ۲ تا ۶ هفته زمان می‌برند. ما پس از تعیین دقیق نیازهای شما، زمان‌بندی دقیق را اعلام می‌کنیم و در تمام مراحل شما را در جریان پیشرفت کار قرار می‌دهیم."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "آیا آموزش کار با CMS ارائه می‌دهید؟",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "بله، پس از تحویل پروژه، جلسه‌ای برای آموزش کامل کار با پنل مدیریت سایت برگزار می‌کنیم. همچنین ویدیوهای آموزشی و مستندات کامل در اختیار شما قرار می‌دهیم و پشتیبانی تلفنی و آنلاین ارائه می‌کنیم."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "هزینه طراحی سایت چقدر است؟",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "هزینه طراحی سایت بستگی به امکانات مورد نیاز، تعداد صفحات، پیچیدگی طراحی و زمان تحویل دارد. برای دریافت قیمت دقیق، می‌توانید از طریق فرم مشاوره رایگان با ما در تماس باشید تا پس از بررسی نیازهای شما، پیش‌فاکتور دقیق ارائه دهیم."
+        }
+      }
+    ]
+  };
+}
+
+// Breadcrumb Schema
+function generateBreadcrumbSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "صفحه اصلی",
+        item: "https://webofen.com"
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "خدمات",
+        item: "https://webofen.com/services"
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: "طراحی سایت",
+        item: "https://webofen.com/web-design"
+      }
+    ]
+  };
+}
 
 export default function WebDesign() {
   const [open, setOpen] = useState(false);
 
-  // تولید اسکیماها
+  // Generate all schemas
   const webDesignSchema = generateWebDesignSchema();
+  const faqSchema = generateFAQSchema();
+  const breadcrumbSchema = generateBreadcrumbSchema();
+
+  // Combine all schemas into an array
+  const allSchemas = [webDesignSchema, faqSchema, breadcrumbSchema];
 
   return (
     <>
       <SEO
         title="طراحی سایت اختصاصی با CMS | تیم متخصص وبوفن"
         description="طراحی سایت حرفه‌ای با CMS اختصاصی، سریع، امن و قابل توسعه. سیستم مدیریت محتوای شخصی‌سازی شده برای رشد کسب‌وکار شما"
-        keywords="طراحی سایت, CMS اختصاصی, طراحی وبسایت, سیستم مدیریت محتوا, سایت اختصاصی, برنامه نویسی سایت"
+        keywords="طراحی سایت, CMS اختصاصی, طراحی وبسایت, سیستم مدیریت محتوا, سایت اختصاصی, برنامه نویسی سایت, طراحی سایت فروشگاهی, طراحی سایت شرکتی"
         canonical="https://webofen.com/web-design"
         ogType="website"
         ogImage="https://webofen.com/images/og-web-design.jpg"
-      />
-
-      {/* Structured Data Schemas */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(webDesignSchema) }}
+        structuredData={allSchemas} // ✅ This will handle ALL schemas (Service, FAQ, Breadcrumb)
+        section="طراحی سایت"
+        tags={["طراحی سایت", "CMS اختصاصی", "برنامه نویسی وب", "دیجیتال مارکتینگ", "سئو"]}
       />
 
       <main>
