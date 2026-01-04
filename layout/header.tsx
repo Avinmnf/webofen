@@ -40,6 +40,8 @@ export default function Header() {
     { label: "وبلاگ", href: "/articles" },
     { label: "آنالیز وبسایت", href: "/analyze" },
     { label: "درباره ما", href: "/about-us" },
+    { label: "تماس با ما", href: "/contact-us" },
+
   ];
 
   // Find active index based on current path
