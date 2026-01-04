@@ -484,10 +484,10 @@ const DashboardHome = () => {
             expandedAnalysis ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
           }`}>
             <div className="p-1">
-              <AnalysisLinks 
+                  <AnalysisLinks 
                 compact={true}
                 showHeader={false}
-                itemsPerPage={10}
+                itemsPerPage={5}
                 showAllByDefault={false}
               />
             </div>

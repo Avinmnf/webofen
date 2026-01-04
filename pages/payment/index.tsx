@@ -427,7 +427,7 @@ export default function CartPage() {
                         value={customerName}
                         onChange={(e) => setCustomerName(e.target.value)}
                         placeholder="مثال: علی محمدی"
-                        className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                        className="w-full px-4 py-2.5 text-sm border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                       />
                     </div>
                     
@@ -441,7 +441,7 @@ export default function CartPage() {
                         value={customerPhone}
                         onChange={handlePhoneChange}
                         placeholder="مثال: 09123456789"
-                        className={`w-full px-4 py-2.5 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition ${
+                        className={`w-full px-4 py-2.5 text-sm text-black border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition ${
                           phoneError ? "border-red-300" : "border-gray-300"
                         }`}
                       />
