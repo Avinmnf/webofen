@@ -18,7 +18,6 @@ const AccountingPage: React.FC = () => {
   const { orders, loading, error } = useUserOrders();
   const invoiceRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  // تابع برای تنظیم ref بدون مشکل TypeScript
   const setInvoiceRef = (id: string) => (el: HTMLDivElement | null) => {
     invoiceRefs.current[id] = el;
   };
@@ -32,7 +31,6 @@ const AccountingPage: React.FC = () => {
         return;
       }
 
-      // مخفی کردن دکمه‌ها قبل از گرفتن عکس
       const buttons = invoiceElement.querySelectorAll('button');
       const originalStyles: Array<{display: string, visibility: string}> = [];
       
@@ -45,36 +43,31 @@ const AccountingPage: React.FC = () => {
         button.style.visibility = 'hidden';
       });
 
-      // اضافه کردن استایل‌های CSS به جای استفاده از کلاس‌های Tailwind
       const tempDiv = document.createElement('div');
       tempDiv.style.position = 'absolute';
       tempDiv.style.left = '-9999px';
       tempDiv.style.width = '210mm';
       tempDiv.style.backgroundColor = '#ffffff';
       
-      // کپی کردن محتوای invoiceElement به tempDiv
       tempDiv.innerHTML = invoiceElement.innerHTML;
       
-      // حذف کلاس‌های Tailwind و اضافه کردن استایل‌های مستقیم
       const elements = tempDiv.querySelectorAll('*') as NodeListOf<HTMLElement>;
       elements.forEach(el => {
-        // حذف کلاس‌های Tailwind
         if (el.className) {
           el.removeAttribute('class');
         }
         
-        // اعمال استایل‌های مستقیم بر اساس موقعیت
         if (el.tagName === 'H2') {
           el.style.fontSize = '24px';
           el.style.fontWeight = 'bold';
           el.style.textAlign = 'center';
-          el.style.color = '#1f2937';
+          el.style.color = '#000000';
           el.style.marginBottom = '16px';
         }
         
         if (el.tagName === 'P') {
           el.style.margin = '4px 0';
-          el.style.color = '#4b5563';
+          el.style.color = '#000000';
         }
         
         if (el.tagName === 'TABLE') {
@@ -87,7 +80,7 @@ const AccountingPage: React.FC = () => {
           el.style.backgroundColor = '#f3f4f6';
           el.style.border = '1px solid #d1d5db';
           el.style.padding = '8px';
-          el.style.color = '#374151';
+          el.style.color = '#000000';
           el.style.textAlign = 'center';
           el.style.fontWeight = '600';
         }
@@ -96,6 +89,7 @@ const AccountingPage: React.FC = () => {
           el.style.border = '1px solid #d1d5db';
           el.style.padding = '8px';
           el.style.textAlign = 'center';
+          el.style.color = '#000000';
         }
         
         if (el.classList?.contains('text-center')) {
@@ -109,7 +103,6 @@ const AccountingPage: React.FC = () => {
 
       document.body.appendChild(tempDiv);
 
-      // ایجاد عکس از عنصر
       const canvas = await html2canvas(tempDiv, {
         scale: 2,
         useCORS: true,
@@ -119,10 +112,8 @@ const AccountingPage: React.FC = () => {
         removeContainer: true,
       });
 
-      // حذف عنصر موقت
       document.body.removeChild(tempDiv);
 
-      // بازگرداندن استایل دکمه‌ها
       buttons.forEach((button, index) => {
         if (originalStyles[index]) {
           button.style.display = originalStyles[index].display;
@@ -130,7 +121,6 @@ const AccountingPage: React.FC = () => {
         }
       });
 
-      // ایجاد PDF
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
@@ -138,8 +128,8 @@ const AccountingPage: React.FC = () => {
       });
 
       const imgData = canvas.toDataURL('image/png');
-      const imgWidth = 210; // A4 width in mm
-      const pageHeight = 295; // A4 height in mm
+      const imgWidth = 210;
+      const pageHeight = 295;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       
       let heightLeft = imgHeight;
@@ -148,7 +138,6 @@ const AccountingPage: React.FC = () => {
       pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
 
-      // اگر محتوا بیشتر از یک صفحه بود
       while (heightLeft >= 0) {
         position = heightLeft - imgHeight;
         pdf.addPage();
@@ -164,25 +153,22 @@ const AccountingPage: React.FC = () => {
     }
   };
 
-  if (loading) return <p className="text-gray-500 text-center py-8">در حال بارگذاری سفارش‌ها...</p>;
-  if (error) return <p className="text-red-500 text-center py-8">خطا: {error}</p>;
-  if (!orders.length) return <p className="text-gray-500 text-center py-8">سفارشی یافت نشد.</p>;
+  if (loading) return <p className="text-black text-center py-8">در حال بارگذاری سفارش‌ها...</p>;
+  if (error) return <p className="text-black text-center py-8">خطا: {error}</p>;
+  if (!orders.length) return <p className="text-black text-center py-8">سفارشی یافت نشد.</p>;
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
-      {/* هدر بالا */}
       <div className="p-6 border-b bg-white shadow-sm">
-        <h1 className="text-2xl font-bold text-gray-700">تراکنش‌ها</h1>
+        <h1 className="text-2xl font-bold text-black">تراکنش‌ها</h1>
       </div>
 
-      {/* بخش اسکرول‌دار */}
       <div className="flex-1 overflow-y-auto p-6">
         {orders.map((order: Order) => (
           <div
             key={order.id}
             className="mb-6 bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:shadow-lg transition-all"
           >
-            {/* بخش مخفی برای PDF */}
             <div 
               ref={setInvoiceRef(order.id)}
               className="hidden"
@@ -195,12 +181,11 @@ const AccountingPage: React.FC = () => {
                 color: '#000000',
               }}
             >
-              {/* هدر فاکتور */}
-              <div style={{ textAlign: 'center', marginBottom: '30px', borderBottom: '2px solid #4f46e5', paddingBottom: '20px' }}>
-                <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1e40af', marginBottom: '10px' }}>
+              <div style={{ textAlign: 'center', marginBottom: '30px', borderBottom: '2px solid #000000', paddingBottom: '20px' }}>
+                <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: '#000000', marginBottom: '10px' }}>
                   فاکتور فروش
                 </h2>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: '#6b7280' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: '#000000' }}>
                   <div style={{ textAlign: 'right' }}>
                     <p><strong>تاریخ صدور:</strong> {new Date().toLocaleString("fa-IR")}</p>
                     <p><strong>شماره فاکتور:</strong> INV-{order.id}</p>
@@ -211,9 +196,8 @@ const AccountingPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* اطلاعات سفارش */}
               <div style={{ marginBottom: '25px' }}>
-                <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#374151', marginBottom: '15px' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#000000', marginBottom: '15px' }}>
                   اطلاعات سفارش
                 </h3>
                 <div style={{ 
@@ -226,21 +210,20 @@ const AccountingPage: React.FC = () => {
                   border: '1px solid #e5e7eb'
                 }}>
                   <div>
-                    <p><strong>شناسه سفارش:</strong> {order.id}</p>
-                    <p><strong>نام مشتری:</strong> {order.customerName}</p>
-                    <p><strong>تاریخ سفارش:</strong> {new Date(order?.createdAt || Date.now()).toLocaleString("fa-IR")}</p>
+                    <p style={{ color: '#000000' }}><strong>شناسه سفارش:</strong> {order.id}</p>
+                    <p style={{ color: '#000000' }}><strong>نام مشتری:</strong> {order.customerName}</p>
+                    <p style={{ color: '#000000' }}><strong>تاریخ سفارش:</strong> {new Date(order?.createdAt || Date.now()).toLocaleString("fa-IR")}</p>
                   </div>
                   <div>
-                    <p><strong>وضعیت سفارش:</strong> {statusMap[order.status?.trim()] ?? order.status}</p>
-                    <p><strong>تعداد اقلام:</strong> {order.items.length}</p>
-                    <p><strong>مبلغ کل:</strong> {Number(order.totalPrice || 0).toLocaleString("fa-IR")} تومان</p>
+                    <p style={{ color: '#000000' }}><strong>وضعیت سفارش:</strong> {statusMap[order.status?.trim()] ?? order.status}</p>
+                    <p style={{ color: '#000000' }}><strong>تعداد اقلام:</strong> {order.items.length}</p>
+                    <p style={{ color: '#000000' }}><strong>مبلغ کل:</strong> {Number(order.totalPrice || 0).toLocaleString("fa-IR")} تومان</p>
                   </div>
                 </div>
               </div>
 
-              {/* جدول محصولات */}
               <div style={{ marginBottom: '25px' }}>
-                <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#374151', marginBottom: '15px' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#000000', marginBottom: '15px' }}>
                   جزئیات محصولات
                 </h3>
                 <table style={{ 
@@ -250,46 +233,46 @@ const AccountingPage: React.FC = () => {
                 }}>
                   <thead>
                     <tr style={{ backgroundColor: '#f3f4f6' }}>
-                      <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'center', fontWeight: 'bold' }}>ردیف</th>
-                      <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'center', fontWeight: 'bold' }}>محصول</th>
-                      <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'center', fontWeight: 'bold' }}>ویژگی‌ها</th>
-                      <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'center', fontWeight: 'bold' }}>تعداد</th>
-                      <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'center', fontWeight: 'bold' }}>قیمت واحد</th>
-                      <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'center', fontWeight: 'bold' }}>قیمت کل</th>
-                      <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'center', fontWeight: 'bold' }}>وضعیت</th>
+                      <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'center', fontWeight: 'bold', color: '#000000' }}>ردیف</th>
+                      <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'center', fontWeight: 'bold', color: '#000000' }}>محصول</th>
+                      <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'center', fontWeight: 'bold', color: '#000000' }}>ویژگی‌ها</th>
+                      <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'center', fontWeight: 'bold', color: '#000000' }}>تعداد</th>
+                      <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'center', fontWeight: 'bold', color: '#000000' }}>قیمت واحد</th>
+                      <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'center', fontWeight: 'bold', color: '#000000' }}>قیمت کل</th>
+                      <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'center', fontWeight: 'bold', color: '#000000' }}>وضعیت</th>
                     </tr>
                   </thead>
                   <tbody>
                     {order.items.map((item, index) => {
                       const getStatusStyle = (status: string) => {
                         if (status === 'Completed' || status === 'submitted') {
-                          return { backgroundColor: '#d1fae5', color: '#065f46', padding: '4px 8px', borderRadius: '4px', fontSize: '12px' };
+                          return { backgroundColor: '#d1fae5', color: '#000000', padding: '4px 8px', borderRadius: '4px', fontSize: '12px' };
                         } else if (status === 'Cancelled') {
-                          return { backgroundColor: '#fee2e2', color: '#991b1b', padding: '4px 8px', borderRadius: '4px', fontSize: '12px' };
+                          return { backgroundColor: '#fee2e2', color: '#000000', padding: '4px 8px', borderRadius: '4px', fontSize: '12px' };
                         } else {
-                          return { backgroundColor: '#fef3c7', color: '#92400e', padding: '4px 8px', borderRadius: '4px', fontSize: '12px' };
+                          return { backgroundColor: '#fef3c7', color: '#000000', padding: '4px 8px', borderRadius: '4px', fontSize: '12px' };
                         }
                       };
 
                       return (
                         <tr key={item.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                          <td style={{ border: '1px solid #d1d5db', padding: '10px', textAlign: 'center' }}>{index + 1}</td>
-                          <td style={{ border: '1px solid #d1d5db', padding: '10px' }}>{item.variant?.product?.title || "محصول حذف‌شده"}</td>
-                          <td style={{ border: '1px solid #d1d5db', padding: '10px' }}>
+                          <td style={{ border: '1px solid #d1d5db', padding: '10px', textAlign: 'center', color: '#000000' }}>{index + 1}</td>
+                          <td style={{ border: '1px solid #d1d5db', padding: '10px', color: '#000000' }}>{item.variant?.product?.title || "محصول حذف‌شده"}</td>
+                          <td style={{ border: '1px solid #d1d5db', padding: '10px', color: '#000000' }}>
                             {item.variant?.attributeValues
                               ?.map((av) => `${av.attribute?.name || "ویژگی"}: ${av.value || "-"}`)
                               .join(", ") || "-"}
                           </td>
-                          <td style={{ border: '1px solid #d1d5db', padding: '10px', textAlign: 'center' }}>{item.quantity || 0}</td>
-                          <td style={{ border: '1px solid #d1d5db', padding: '10px', textAlign: 'left' }}>
+                          <td style={{ border: '1px solid #d1d5db', padding: '10px', textAlign: 'center', color: '#000000' }}>{item.quantity || 0}</td>
+                          <td style={{ border: '1px solid #d1d5db', padding: '10px', textAlign: 'left', color: '#000000' }}>
                             {item.finalPrice ? `${item.finalPrice.toLocaleString("fa-IR")} تومان` : "—"}
                           </td>
-                          <td style={{ border: '1px solid #d1d5db', padding: '10px', textAlign: 'left' }}>
+                          <td style={{ border: '1px solid #d1d5db', padding: '10px', textAlign: 'left', color: '#000000' }}>
                             {item.finalPrice && item.quantity 
                               ? `${(item.finalPrice * item.quantity).toLocaleString("fa-IR")} تومان`
                               : "—"}
                           </td>
-                          <td style={{ border: '1px solid #d1d5db', padding: '10px', textAlign: 'center' }}>
+                          <td style={{ border: '1px solid #d1d5db', padding: '10px', textAlign: 'center', color: '#000000' }}>
                             <span style={getStatusStyle(item.status)}>
                               {statusMap[item.status?.trim()] ?? item.status ?? "نامشخص"}
                             </span>
@@ -301,7 +284,6 @@ const AccountingPage: React.FC = () => {
                 </table>
               </div>
 
-              {/* جمع کل */}
               <div style={{ 
                 backgroundColor: '#f8fafc', 
                 padding: '20px', 
@@ -316,20 +298,19 @@ const AccountingPage: React.FC = () => {
                     </p>
                   </div>
                   <div style={{ textAlign: 'left' }}>
-                    <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e40af' }}>
+                    <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#000000' }}>
                       <strong>مبلغ قابل پرداخت:</strong> {Number(order.totalPrice || 0).toLocaleString("fa-IR")} تومان
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* فوتر */}
               <div style={{ 
                 marginTop: '40px', 
                 paddingTop: '20px', 
                 borderTop: '1px solid #e5e7eb',
                 textAlign: 'center',
-                color: '#6b7280',
+                color: '#000000',
                 fontSize: '14px'
               }}>
                 <p>با تشکر از اعتماد شما</p>
@@ -340,7 +321,6 @@ const AccountingPage: React.FC = () => {
               </div>
             </div>
 
-            {/* بخش نمایشی در صفحه */}
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-black">
                 <div>
@@ -357,17 +337,17 @@ const AccountingPage: React.FC = () => {
                   <strong>وضعیت:</strong>{" "}
                   <span className={`px-2 py-1 rounded-full text-xs ${
                     order.status === 'Completed' || order.status === 'submitted' 
-                      ? 'bg-green-100 text-green-800'
+                      ? 'bg-green-100 text-black'
                       : order.status === 'Cancelled'
-                      ? 'bg-red-100 text-red-800'
-                      : 'bg-yellow-100 text-yellow-800'
+                      ? 'bg-red-100 text-black'
+                      : 'bg-yellow-100 text-black'
                   }`}>
                     {statusMap[order.status?.trim()] ?? order.status}
                   </span>
                 </div>
               </div>
 
-              <div className="text-gray-700 text-lg">
+              <div className="text-black text-lg">
                 <strong>مبلغ کل:</strong>{" "}
                 {Number(order.totalPrice || 0).toLocaleString("fa-IR")} تومان
               </div>
@@ -405,10 +385,10 @@ const AccountingPage: React.FC = () => {
                         <td className="border p-3 text-black text-center">
                           <span className={`px-2 py-1 rounded-full text-xs ${
                             item.status === 'Completed' || item.status === 'submitted' 
-                              ? 'bg-green-100 text-green-800'
+                              ? 'bg-green-100 text-black'
                               : item.status === 'Cancelled'
-                              ? 'bg-red-100 text-red-800'
-                              : 'bg-yellow-100 text-yellow-800'
+                              ? 'bg-red-100 text-black'
+                              : 'bg-yellow-100 text-black'
                           }`}>
                             {statusMap[item.status?.trim()] ?? item.status ?? "نامشخص"}
                           </span>
