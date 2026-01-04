@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import { useRef } from "react";
 import { GetStaticProps } from "next";
 import { GetStaticPaths } from "next";
-import { GetServerSideProps } from "next";
 import CommentForm from "@/components/comments/comments";
 import CommentsList from "@/components/comments/CommentsList";
 import { Post } from "@/lib/models/post";
@@ -15,7 +14,7 @@ import SEO from "@/components/seo";
 import { InjectRelatedCategories } from "@/lib/functions/injectRelatedCategories";
 import { useRelatedPosts } from "@/hooks/useRelatedPosts";
 import { useReactions } from "@/hooks/useReactions";
-import { article } from "framer-motion/client";
+
 type Props = {
   post: Post;
   viewCount: number;
@@ -23,95 +22,189 @@ type Props = {
 
 interface SchemaProps {
   post: Post;
+  viewCount: number; // Add viewCount to the props
 }
 
-const ArticleSchema = ({ post }: SchemaProps) => {
+// Combined schema for article page - UPDATED: Added viewCount parameter
+const generateArticlePageSchema = (post: Post, viewCount: number) => {
   if (!post) return null;
 
-  const schemaData = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: post.seoTitle,
-    description: post.seoDescription,
-    image: post.imageUrl ? [post.imageUrl] : [],
-    datePublished: post.createdAt,
-    dateModified: post.updatedAt || post.createdAt,
-    author: {
-      "@type": "Person",
-      name: post.author?.name || "نویسنده ناشناس",
-      url: post.author?.url || "https://webofen.com", // می‌توانید URL پیش‌فرض سایت را بگذارید
-      image: post.author?.url || post.imageUrl || undefined,
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Webofen",
-      url: "https://webofen.com",
-    },
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": typeof window !== "undefined" ? window.location.href : "",
-    },
-    articleSection: post.category?.title,
-    keywords: post.tags ? post.tags.map((t) => t.name).join(", ") : "",
-    wordCount: post.content ? post.content.length : 0,
-    inLanguage: "fa-IR",
+  const SITE_URL = "https://webofen.com";
+  
+  // Helper function to normalize image URLs
+  const normalizeImageUrl = (url?: string): string => {
+    if (!url || url.trim() === '') {
+      return `${SITE_URL}/images/og-blog.jpg`;
+    }
+    
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    
+    if (url.startsWith('/')) {
+      return `${SITE_URL}${url}`;
+    }
+    
+    return `${SITE_URL}/${url}`;
   };
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
-    />
-  );
-};
+  const articleUrl = `${SITE_URL}/articles/${post.slug}`;
+  const imageUrl = normalizeImageUrl(post.imageUrl);
 
-// اسکیما برای Breadcrumb
-const BreadcrumbSchema = ({ post }: SchemaProps) => {
-  // استفاده از slug از post یا ایجاد یک slug ساده از title
-  const categorySlug =
-    post?.category?.slug ||
-    (post?.category?.title
-      ? post.category.title.toLowerCase().replace(/\s+/g, "-")
-      : "");
-
-  const breadcrumbSchema = {
+  return {
     "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
+    "@graph": [
+      // Organization Schema
       {
-        "@type": "ListItem",
-        position: 1,
-        name: "خانه",
-        item: "https://webofen.com",
+        "@type": "Organization",
+        "@id": `${SITE_URL}/#organization`,
+        "name": "وبوفن",
+        "url": SITE_URL,
+        "logo": {
+          "@type": "ImageObject",
+          "url": `${SITE_URL}/logo.png`,
+          "width": 180,
+          "height": 180,
+          "caption": "وبوفن"
+        },
+        "description": "وبوفن - پلتفرم تخصصی دیجیتال مارکتینگ و کسب درآمد آنلاین",
+        "sameAs": [
+          "https://t.me/webofenlearn",
+          "https://instagram.com/webofen"
+        ],
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "IR"
+        }
       },
+      // WebSite Schema
       {
-        "@type": "ListItem",
-        position: 2,
-        name: "مقالات",
-        item: "https://webofen.com/articles",
+        "@type": "WebSite",
+        "@id": `${SITE_URL}/#website`,
+        "url": SITE_URL,
+        "name": "وبوفن",
+        "description": "وبوفن - پلتفرم تخصصی دیجیتال مارکتینگ و کسب درآمد آنلاین",
+        "publisher": {
+          "@id": `${SITE_URL}/#organization`
+        },
+        "inLanguage": "fa-IR",
+        "potentialAction": [
+          {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": `${SITE_URL}/articles?search={search_term_string}`
+            },
+            "query-input": "required name=search_term_string"
+          }
+        ]
       },
+      // WebPage Schema (the article page itself)
       {
-        "@type": "ListItem",
-        position: 3,
-        name: post?.title || "",
-        item: typeof window !== "undefined" ? window.location.href : "",
+        "@type": "WebPage",
+        "@id": `${articleUrl}#webpage`,
+        "url": articleUrl,
+        "name": post.seoTitle || post.title,
+        "description": post.seoDescription || post.description || "",
+        "isPartOf": {
+          "@id": `${SITE_URL}/#website`
+        },
+        "primaryImageOfPage": {
+          "@type": "ImageObject",
+          "url": imageUrl
+        },
+        "breadcrumb": {
+          "@id": `${articleUrl}#breadcrumb`
+        },
+        "inLanguage": "fa-IR",
+        "potentialAction": [
+          {
+            "@type": "ReadAction",
+            "target": [articleUrl]
+          }
+        ]
       },
-    ],
+      // Breadcrumb Schema
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${articleUrl}#breadcrumb`,
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "خانه",
+            "item": SITE_URL
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "مقالات",
+            "item": `${SITE_URL}/articles`
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": post.title,
+            "item": articleUrl
+          }
+        ]
+      },
+      // Article Schema (the main content)
+      {
+        "@type": "Article",
+        "@id": `${articleUrl}#article`,
+        "headline": post.seoTitle || post.title,
+        "description": post.seoDescription || post.description || "",
+        "url": articleUrl,
+        "datePublished": post.createdAt,
+        "dateModified": post.updatedAt || post.createdAt,
+        "author": {
+          "@type": "Person",
+          "name": post.author?.name || "وبوفن",
+          "url": post.author?.url || SITE_URL
+        },
+        "publisher": {
+          "@id": `${SITE_URL}/#organization`
+        },
+        "mainEntityOfPage": {
+          "@id": `${articleUrl}#webpage`
+        },
+        "image": imageUrl,
+        "articleSection": post.category?.title || "دیجیتال مارکتینگ",
+        "keywords": post.tags ? post.tags.map((t) => t.name).join(", ") : "",
+        "wordCount": post.content ? Math.round(post.content.length / 5) : 0, // Approximate word count
+        "timeRequired": "PT5M", // Default 5 minutes - FIXED: Removed post.readtime which doesn't exist
+        "inLanguage": "fa-IR",
+        "interactionStatistic": [
+          {
+            "@type": "InteractionCounter",
+            "interactionType": "https://schema.org/ViewAction",
+            "userInteractionCount": viewCount || 0 // FIXED: Changed from 'views' to 'viewCount'
+          }
+        ]
+      },
+      // FAQ Schema (if exists)
+      ...(post.faqs && post.faqs.length > 0 ? [{
+        "@type": "FAQPage",
+        "@id": `${articleUrl}#faqpage`,
+        "mainEntity": post.faqs.map((faq, index) => ({
+          "@type": "Question",
+          "name": faq.question,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": faq.answer
+          }
+        }))
+      }] : [])
+    ]
   };
-
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-    />
-  );
 };
 
 export default function PostPage({ post, viewCount }: Props) {
   const [popupMessage, setPopupMessage] = useState("");
   const [popupVisible, setPopupVisible] = useState(false);
   const countedRef = useRef(false);
-  const shareUrl = "https://webofen.com/-";
+  const shareUrl = `https://webofen.com/articles/${post.slug}`;
 
   const { reactionCounts, handleReaction, loading, hasReacted } = useReactions(
     "post",
@@ -150,13 +243,17 @@ export default function PostPage({ post, viewCount }: Props) {
     type: "article",
   });
 
+  // Generate structured data - UPDATED: Pass viewCount parameter
+  const structuredData = generateArticlePageSchema(post, viewCount);
+
+
   return (
     <>
-      <SEO
-        title={post?.seoTitle || ""}
-        description={post?.seoDescription || ""}
+   <SEO
+        title={post?.seoTitle || post?.title || ""}
+        description={post?.seoDescription || post?.description || ""}
         keywords={post?.tags ? post.tags.map((t) => t.name).join(", ") : ""}
-        canonical={typeof window !== "undefined" ? window.location.href : ""}
+        canonical={`https://webofen.com/articles/${post.slug}`}
         ogImage={post?.imageUrl || ""}
         ogType="article"
         publishedTime={post?.createdAt || ""}
@@ -164,10 +261,17 @@ export default function PostPage({ post, viewCount }: Props) {
         section={post?.category?.title || ""}
         tags={post?.tags ? post.tags.map((t) => t.name) : []}
         author={post?.author?.name || ""}
+        structuredData={structuredData}
       />
 
-      <ArticleSchema post={post} />
-      <BreadcrumbSchema post={post} />
+      {/* Add structured data script */}
+      {structuredData && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+          key="article-schema"
+        />
+      )}
 
       <main className="md:w-[1250px] mx-auto p-4 relative articles">
         {/*Background Section */}

@@ -18,10 +18,12 @@ import Link from "next/link";
 import SEO from "@/components/seo";
 import Backlinkfeatures from "@/components/pillfeatures/Backlinkfeatures";
 import { useProductRating } from "@/hooks/useProductRating";
+
 type Props = { product: Product };
 
 export default function ProductDetailPage({ product }: Props) {
-  const { user, setRedirectPath } = useAuth(); const { addItem } = useCart();
+  const { user, setRedirectPath } = useAuth();
+  const { addItem } = useCart();
   const router = useRouter();
   const { slug } = router.query;
   const [skip, setSkip] = useState(0);
@@ -37,6 +39,7 @@ export default function ProductDetailPage({ product }: Props) {
   const [showVariantTooltip, setShowVariantTooltip] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [orderItemId, setOrderItemId] = useState<string | undefined>();
+
   const {
     rating: ratingData,
     loading,
@@ -119,15 +122,12 @@ export default function ProductDetailPage({ product }: Props) {
     },
   ];
 
-
   useEffect(() => {
     if (!user) {
       // Store the current product page URL for redirection after login
       setRedirectPath(router.asPath);
     }
   }, [user, router.asPath, setRedirectPath]);
-
-
 
   const tooltipMap: Record<string, string> = products.reduce((acc, product) => {
     acc[product.slug] = product.tooltip;
@@ -224,42 +224,71 @@ export default function ProductDetailPage({ product }: Props) {
     setShowToast(true);
     setTimeout(() => setShowToast(false), 7000);
   }
-  console.log(product);
+
+  // Calculate aggregate rating for SEO
+  const calculateAggregateRating = () => {
+    if (!product.reviews || product.reviews.length === 0) return undefined;
+
+    const totalRating = product.reviews.reduce((sum, r) => sum + r.rating, 0);
+    const averageRating = totalRating / product.reviews.length;
+
+    return {
+      ratingValue: averageRating.toFixed(1),
+      reviewCount: product.reviews.length,
+    };
+  };
+
+  // Prepare variants for SEO - FIXED to match SEO component type
+  const seoVariants = product.variants?.map((v, index) => ({
+    price: v.price / 10, // Convert Rials to Tomans for schema
+    stock: v.stock,
+    priceValidUntil: "2025-12-31", // Realistic expiration date
+    // Note: SEO component expects { price: number; stock: number; priceValidUntil?: string; }
+    // Don't add 'attributes' property as it's not in the type
+  }));
+
+  // Prepare reviews for SEO
+  const seoReviews = product.reviews?.map((r) => ({
+    rating: r.rating,
+    comment: r.comment,
+    user: {
+      name: r.user?.name || 'کاربر ناشناس',
+    },
+  }));
+
+  // Get the main image URL - ensure HTTPS
+  const getSecureImageUrl = (url: string | undefined) => {
+    if (!url) return "/images/og-default.jpg";
+    // Convert HTTP to HTTPS if needed
+    return url.replace(/^http:\/\//, 'https://');
+  };
+
+  const mainImageUrl = getSecureImageUrl(product.imageUrl);
+
+  // Prepare gallery images for SEO - ensure HTTPS
+  const seoGalleryUrls = (product.galleryUrls || []).map(url =>
+    url.replace(/^http:\/\//, 'https://')
+  );
+
   return (
     <>
       {/* --- SEO Component --- */}
       <SEO
-        title={product.seoTitle}
-        description={product.seoDescription}
-        canonical={`https://webofen.com/products/${product.slug ?? ""}`}
+        title={product.seoTitle || product.title}
+        description={product.seoDescription || product.description?.substring(0, 160) || ""}
+        canonical={`https://webofen.com/products/${product.slug || ""}`}
         ogType="product"
         product={{
           title: product.title,
-          description: product.description,
-          slug: product.slug ?? "",
-          imageUrl: product.imageUrl ?? "/images/og-default.jpg",
-          galleryUrls: product.galleryUrls,
-          sku: product.sku,
-          brand: product.brand,
-          variants: product.variants?.map((v) => ({
-            price: v.price,
-            stock: v.stock,
-          })),
-          reviews: product.reviews?.map((r) => ({
-            rating: r.rating,
-            comment: r.comment,
-            user: { name: r.user?.name },
-          })),
-          aggregateRating:
-            product.reviews && product.reviews.length > 0
-              ? {
-                ratingValue: (
-                  product.reviews.reduce((sum, r) => sum + r.rating, 0) /
-                  product.reviews.length
-                ).toFixed(1),
-                reviewCount: product.reviews.length,
-              }
-              : undefined,
+          description: product.seoDescription || product.description || "",
+          slug: product.slug || "",
+          imageUrl: mainImageUrl,
+          galleryUrls: seoGalleryUrls,
+          sku: product.id || "",
+          brand: product.brand || "",
+          variants: seoVariants,
+          reviews: seoReviews,
+          aggregateRating: calculateAggregateRating(),
         }}
       />
       <main>
@@ -323,8 +352,8 @@ export default function ProductDetailPage({ product }: Props) {
                             }))
                           }
                           className={`px-4 py-2 rounded-[100px] border ${selectedAttributes[attrName] === value
-                              ? "bg-green-600 text-white border-indigo-600"
-                              : "bg-white border-gray-300"
+                            ? "bg-green-600 text-white border-indigo-600"
+                            : "bg-white border-gray-300"
                             }`}
                         >
                           {value}
@@ -400,8 +429,8 @@ export default function ProductDetailPage({ product }: Props) {
 
                   <button
                     className={`flex p-2 rounded-3xl text-white items-center w-full cursor-pointer justify-center ${isAddToCartDisabled
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-green-700 hover:bg-green-800"
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-green-700 hover:bg-green-800"
                       }`}
                     disabled={isAddToCartDisabled}
                     onClick={handleAddToCart}

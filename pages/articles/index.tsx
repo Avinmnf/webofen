@@ -21,25 +21,27 @@ function isRecommended(post: Post) {
 }
 
 function normalizeImageUrl(url?: string): string {
-  if (!url) return `${SITE_URL}/images/og-blog.jpg`;
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  if (url.startsWith("/")) return `${SITE_URL}${url}`;
+  if (!url || url.trim() === '') {
+    return `${SITE_URL}/images/og-blog.jpg`;
+  }
+  
+  // If it's already a full URL
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  
+  // If it starts with slash
+  if (url.startsWith('/')) {
+    return `${SITE_URL}${url}`;
+  }
+  
+  // Otherwise, prepend with slash and SITE_URL
   return `${SITE_URL}/${url}`;
 }
 
 // تابع برای ایجاد اسکیما مقالات
 function generateArticleSchema(posts: Post[]) {
   return posts.map((post) => {
-    const SITE_URL = "https://webofen.com";
-
-    // بررسی تصویر
-    let imageUrl = post?.imageUrl?.trim();
-    if (!imageUrl || imageUrl === "") {
-      imageUrl = `${SITE_URL}/images/og-blog.jpg`;
-    } else if (!/^https?:\/\//.test(imageUrl)) {
-      imageUrl = `${SITE_URL}${imageUrl.startsWith("/") ? "" : "/"}${imageUrl}`;
-    }
-
     return {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -47,7 +49,7 @@ function generateArticleSchema(posts: Post[]) {
       description:
         post.description ||
         "مطالب آموزشی و مقالات تخصصی دیجیتال مارکتینگ در وبوفن.",
-      image: imageUrl,
+      image: normalizeImageUrl(post.imageUrl),
       author: {
         "@type": "Person",
         name: "وبوفن",
@@ -71,71 +73,142 @@ function generateArticleSchema(posts: Post[]) {
   });
 }
 
-// Combined schema for the blog page (WITHOUT WebSite schema)
+// Combined schema for the blog page (WITH WebSite schema - REQUIRED)
+// Combined schema for the blog page (WITH WebSite schema - REQUIRED)
 function generateBlogPageSchema(posts: Post[]) {
   const articleSchemas = posts.slice(0, 10).map((post) => ({
     "@type": "BlogPosting",
-    headline: post.title,
-    description: post.description,
-    url: `https://webofen.com/articles/${post.slug}`,
-    datePublished: post.createdAt,
-    dateModified: post.createdAt,
+    "@id": `https://webofen.com/articles/${post.slug}#blogposting`,
+    "headline": post.title,
+    "description": post.description,
+    "url": `https://webofen.com/articles/${post.slug}`,
+    "datePublished": post.createdAt,
+    "dateModified": post.createdAt,
+    "author": {
+      "@type": "Person",
+      "name": "وبوفن"
+    },
+    "publisher": {
+      "@id": "https://webofen.com/#organization"
+    },
+    "image": normalizeImageUrl(post.imageUrl),
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://webofen.com/articles/${post.slug}`
+    },
+    "inLanguage": "fa-IR",
+    "articleSection": post.category?.title || "دیجیتال مارکتینگ"
   }));
 
   return {
     "@context": "https://schema.org",
     "@graph": [
       {
+        "@type": "WebSite",
+        "@id": "https://webofen.com/#website",
+        "url": "https://webofen.com",
+        "name": "وبوفن",
+        "description": "وبوفن - پلتفرم تخصصی دیجیتال مارکتینگ و کسب درآمد آنلاین",
+        "publisher": {
+          "@id": "https://webofen.com/#organization"
+        },
+        "inLanguage": "fa-IR",
+        "potentialAction": [
+          {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://webofen.com/articles?search={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        ]
+      },
+      {
         "@type": "Organization",
         "@id": "https://webofen.com/#organization",
-        name: "وبوفن",
-        url: "https://webofen.com",
-        logo: "https://webofen.com/logo.png",
-        description: "وبوفن - پلتفرم تخصصی دیجیتال مارکتینگ و کسب درآمد آنلاین",
-        sameAs: ["https://t.me/webofenlearn", "https://instagram.com/webofen"],
-        contactPoint: {
-          "@type": "ContactPoint",
-          telephone: "+98-XXX-XXX-XXXX",
-          contactType: "پشتیبانی",
-          areaServed: "IR",
-          availableLanguage: ["fa", "en"],
+        "name": "وبوفن",
+        "url": "https://webofen.com",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://webofen.com/logo.png",
+          "width": 180,  // Changed from 600
+          "height": 180, // Changed from 60
+          "caption": "وبوفن"
         },
+        "description": "وبوفن - پلتفرم تخصصی دیجیتال مارکتینگ و کسب درآمد آنلاین",
+        "sameAs": [
+          "https://t.me/webofenlearn",
+          "https://instagram.com/webofen"
+        ],
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "IR"
+        }
       },
       {
         "@type": "Blog",
         "@id": "https://webofen.com/articles/#blog",
-        url: "https://webofen.com/articles",
-        name: "مقالات وبوفن",
-        description:
-          "آخرین مقالات وبوفن درباره دیجیتال مارکتینگ، کسب درآمد آنلاین و آموزش‌های کاربردی",
-        publisher: {
-          "@id": "https://webofen.com/#organization",
+        "url": "https://webofen.com/articles",
+        "name": "مقالات وبوفن",
+        "description": "آخرین مقالات وبوفن درباره دیجیتال مارکتینگ، کسب درآمد آنلاین و آموزش‌های کاربردی",
+        "publisher": {
+          "@id": "https://webofen.com/#organization"
         },
-        blogPost: articleSchemas,
-        inLanguage: "fa-IR",
+        "blogPost": articleSchemas,
+        "inLanguage": "fa-IR",
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "https://webofen.com/articles"
+        }
       },
       {
         "@type": "BreadcrumbList",
         "@id": "https://webofen.com/articles/#breadcrumb",
-        itemListElement: [
+        "itemListElement": [
           {
             "@type": "ListItem",
-            position: 1,
-            name: "خانه",
-            item: "https://webofen.com",
+            "position": 1,
+            "name": "خانه",
+            "item": "https://webofen.com"
           },
           {
             "@type": "ListItem",
-            position: 2,
-            name: "مقالات",
-            item: "https://webofen.com/articles",
-          },
-        ],
+            "position": 2,
+            "name": "مقالات",
+            "item": "https://webofen.com/articles"
+          }
+        ]
       },
-    ],
+      {
+        "@type": "WebPage",
+        "@id": "https://webofen.com/articles/#webpage",
+        "url": "https://webofen.com/articles",
+        "name": "مقالات وبوفن",
+        "headline": "مقالات وبوفن", // Added headline
+        "description": "آخرین مقالات وبوفن درباره دیجیتال مارکتینگ، کسب درآمد آنلاین و آموزش‌های کاربردی",
+        "isPartOf": {
+          "@id": "https://webofen.com/#website"
+        },
+        "about": {
+          "@id": "https://webofen.com/articles/#blog"
+        },
+        "breadcrumb": {
+          "@id": "https://webofen.com/articles/#breadcrumb"
+        },
+        "inLanguage": "fa-IR",
+        "potentialAction": [
+          {
+            "@type": "ReadAction",
+            "target": [
+              "https://webofen.com/articles"
+            ]
+          }
+        ]
+      }
+    ]
   };
 }
-
 export default function PostsPage({
   initialPosts,
   total,
@@ -573,6 +646,7 @@ export default function PostsPage({
   const activeFilters = Boolean(currentTag || searchQuery);
   const showLoadMore =
     hasMore && !currentTag && !searchQuery && !searchLoading && !isSearchMode;
+
 
   return (
     <>

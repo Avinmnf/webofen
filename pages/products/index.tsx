@@ -9,6 +9,13 @@ import Pills from "@/components/pills";
 import { useProducts } from "@/hooks/useproduct";
 import SEO from "@/components/seo";
 
+// Define FAQ item type
+interface FAQItem {
+  id: number;
+  question: string;
+  answer: string;
+}
+
 export default function ProductList() {
   const [page, setPage] = useState(1);
   const [activeDiv, setActiveDiv] = useState<string | null>("first");
@@ -77,12 +84,11 @@ export default function ProductList() {
     };
   };
 
-  // ساخت structured data داینامیک مخصوص صفحه محصولات
-  const generateDynamicStructuredData = () => {
-    const meta = getDynamicMetaData();
+  // ساخت structured data مخصوص صفحه محصولات - فقط ItemList
+  const generateItemListSchema = () => {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://webofen.com";
 
-    const itemListSchema = {
+    return {
       "@context": "https://schema.org",
       "@type": "ItemList",
       name: "لیست محصولات سئو وبوفن",
@@ -100,31 +106,9 @@ export default function ProductList() {
             `${siteUrl}/images/default-product.jpg`,
         })) || [],
     };
-
-    // 📍 Breadcrumb Schema
-    const breadcrumbSchema = {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          name: "صفحه اصلی",
-          item: `${siteUrl}`,
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: "محصولات سئو",
-          item: `${siteUrl}/products`,
-        },
-      ],
-    };
-
-    return [breadcrumbSchema, itemListSchema];
   };
 
-  // تابع برای ایجاد اسکیما هر محصول
+  // تابع برای ایجاد اسکیما هر محصول (برای استفاده در صفحات تک محصول)
   const generateProductSchema = (product: any) => {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://webofen.com";
     const productUrl = `${siteUrl}/products/${product.slug || ""}`;
@@ -223,7 +207,9 @@ export default function ProductList() {
 
     return productSchema;
   };
-  const faqs = [
+
+  // FAQ data - defined once at the top
+  const faqs: FAQItem[] = [
     {
       id: 1,
       question: "چطور می‌ توانم در وبوفن ثبت‌ نام کنم؟",
@@ -262,16 +248,93 @@ export default function ProductList() {
     },
   ];
 
+  // Generate FAQ Schema
+  const generateFAQSchema = () => {
+    return {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      name: "سوالات متداول داروخانه سئو وبوفن",
+      description: "پاسخ به سوالات متداول درباره داروخانه سئو و محصولات تخصصی وبوفن",
+      mainEntity: faqs.map((faq: FAQItem) => ({
+        "@type": "Question",
+        name: faq.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: faq.answer,
+        },
+      })),
+    };
+  };
+
+  // Generate WebPage Schema for the product listing page
+  const generateWebPageSchema = () => {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://webofen.com";
+    
+    return {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "داروخانه سئو وبوفن - لیست محصولات تخصصی سئو",
+      description: "درمان تخصصی مشکلات سئو سایت با قرص‌های تخصصی وبوفن",
+      url: `${siteUrl}/products`,
+      isPartOf: {
+        "@type": "WebSite",
+        name: "وبوفن",
+        url: siteUrl,
+      },
+      publisher: {
+        "@type": "Organization",
+        name: "وبوفن",
+        url: siteUrl,
+        logo: `${siteUrl}/logo.png`,
+        description: "تیم متخصص طراحی سایت، سئو و دیجیتال مارکتینگ",
+      },
+      mainEntity: {
+        "@type": "ItemList",
+        name: "محصولات سئو وبوفن",
+        description: "لیست محصولات تخصصی سئو و بهینه‌سازی سایت",
+      },
+    };
+  };
+
   const toggleFAQ = (index: number) => {
     setActiveIndex(activeIndex === index ? null : index);
   };
 
   const dynamicMeta = getDynamicMetaData();
-  const structuredDataArray = generateDynamicStructuredData();
+  
+  // Generate Breadcrumb Schema - فقط یک بار
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "صفحه اصلی",
+        item: "https://webofen.com",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "محصولات سئو", // ✅ این یکی رو نگه دارید
+        item: "https://webofen.com/products",
+      },
+    ],
+  };
+
+  const itemListSchema = generateItemListSchema();
+
+  const allSchemas = [
+    breadcrumbSchema,
+    generateWebPageSchema(),
+    generateFAQSchema(), 
+    itemListSchema,
+  ];
+
 
   return (
     <main>
-      <SEO
+       <SEO
         title={dynamicMeta.title}
         description={dynamicMeta.description}
         keywords={dynamicMeta.keywords}
@@ -283,7 +346,9 @@ export default function ProductList() {
         nofollow={false}
         author="وبوفن"
         locale="fa_IR"
-        structuredData={structuredDataArray}
+        structuredData={allSchemas}
+        section="محصولات سئو"
+        tags={["داروخانه سئو", "قرص سئو", "محصولات سئو", "درمان سئو", "SEO Clinic"]}
       />
 
       <div className="max-w-[1250px] m-auto p-4">
