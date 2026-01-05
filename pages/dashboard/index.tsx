@@ -245,8 +245,8 @@ const DashboardHome = () => {
         </div>
    
         {/* Recent Orders Section */}
-        <div className="bg-gradient-to-br from-white to-gray-50/50 rounded-2xl md:rounded-3xl shadow-xl shadow-gray-100/50 border border-gray-100 overflow-hidden">
-          <div className="p-4 md:p-6 lg:p-8 border-b border-gray-100/50 bg-gradient-to-r from-white to-blue-50/30">
+        <div className="bg-gradient-to-br from-white to-gray-50/50 rounded-2xl md:rounded-3xl shadow-xl shadow-gray-100/50 border border-gray-100   ">
+          <div className="p-10 md:p-6 lg:p-8 border-b border-gray-100/50 bg-gradient-to-r from-white to-blue-50/30">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4">
               <div className="flex items-center gap-3 md:gap-4">
                 <div className="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
@@ -263,7 +263,7 @@ const DashboardHome = () => {
                   {totalOrders > 5 && (
                     <button
                       onClick={() => setShowAllOrders(!showAllOrders)}
-                      className="px-4 py-2 md:px-5 md:py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-xl hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300 flex items-center gap-2 text-sm md:text-base"
+                      className="px-4 py-2 md:px-5  md:py-2.5 cursor-pointer bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-xl hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300 flex items-center gap-2 text-sm md:text-base"
                     >
                       {showAllOrders ? (
                         <>
@@ -274,7 +274,7 @@ const DashboardHome = () => {
                         </>
                       ) : (
                         <>
-                          <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 md:w-5 md:h-5 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                           </svg>
                           <span className="hidden sm:inline">مشاهده تمامی سفارشات</span>
@@ -288,7 +288,7 @@ const DashboardHome = () => {
             </div>
           </div>
           
-          <div className="overflow-x-auto -mx-4 md:mx-0">
+          <div className="overflow-x-auto  -mx-4 md:mx-0">
             {displayedOrders.length > 0 ? (
               <div className="min-w-full">
                 {/* جدول برای دسکتاپ */}
@@ -419,35 +419,14 @@ const DashboardHome = () => {
                     <span className="text-gray-600 text-xs md:text-sm">نمایش {Math.min(totalDisplayedItems, totalOrders)} آیتم از {totalDisplayedItems}</span>
                   </div>
                 </div>
-                {totalOrders > 5 && (
-                  <button
-                    onClick={() => setShowAllOrders(!showAllOrders)}
-                    className="text-blue-600 hover:text-blue-800 font-medium text-sm md:text-base flex items-center gap-1.5 md:gap-2 transition-colors"
-                  >
-                    {showAllOrders ? (
-                      <>
-                        <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h14M5 12l4-4m-4 4l4 4" />
-                        </svg>
-                        نمایش سفارشات کمتر
-                      </>
-                    ) : (
-                      <>
-                        مشاهده تمام سفارشات
-                        <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </>
-                    )}
-                  </button>
-                )}
+            
               </div>
             </div>
           )}
         </div>
         
         {/* Analysis Links Section - با قابلیت آکاردئون اصلاح شده */}
-        <div className="bg-gradient-to-br from-white to-gray-50/50 rounded-2xl md:rounded-3xl shadow-xl shadow-gray-100/50 border border-gray-100 overflow-hidden">
+    <div className="bg-gradient-to-br from-white to-gray-50/50 rounded-2xl md:rounded-3xl shadow-xl shadow-gray-100/50 border border-gray-100 overflow-hidden">
           <button
             onClick={() => setExpandedAnalysis(!expandedAnalysis)}
             className="w-full p-4 md:p-6 lg:p-8 border-b border-gray-100/50 bg-gradient-to-r from-white to-emerald-50/30 hover:bg-emerald-50/50 transition-all duration-300 text-left"
