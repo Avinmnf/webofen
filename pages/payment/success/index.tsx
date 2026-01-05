@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Download, Copy, Check, ArrowLeft, FileText, Home } from "lucide-react";
 import { useUserOrders } from "@/hooks/useUserOrders";
 import SuccessAnimation from "@/components/animations/SuccessAnimation";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import Link from "next/link";
@@ -427,18 +427,25 @@ export default function PaymentSuccessPage() {
     router.push("/products");
   };
 
-  const handleGoToDashboard = async () => {
+  const handleGoToDashboard = () => {
     setDashboardLoading(true);
-    try {
-       router.push("/dashboard");
-    } catch (error) {
-      console.error("خطا در انتقال به داشبورد:", error);
-      router.push("/dashboard");
-    } finally {
+    
+    // تاخیر برای نمایش انیمیشن لودینگ
+    setTimeout(() => {
+      // بررسی وضعیت لاگین کاربر
+      if (!isLoggedIn) {
+        // اگر کاربر لاگین نیست، به صفحه لاگین هدایت شود
+        router.push("/login?redirect=/dashboard");
+      } else {
+        // استفاده از window.location.href برای هدایت مستقیم و مطمئن
+        window.location.href = "/dashboard";
+      }
+      
+      // اگر بعد از 3 ثانیه هنوز در صفحه هستیم، لودینگ را متوقف کنیم
       setTimeout(() => {
         setDashboardLoading(false);
       }, 3000);
-    }
+    }, 1000);
   };
 
   const getOrderStatusText = (status: string) => {
@@ -786,6 +793,7 @@ export default function PaymentSuccessPage() {
                   )}
                 </button>
 
+                {/* دکمه رفتن به داشبورد */}
                 <button
                   onClick={handleGoToDashboard}
                   disabled={dashboardLoading}
@@ -878,7 +886,7 @@ export default function PaymentSuccessPage() {
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
               <Link href="/">
-              <span className="text-sm">بازگشت به فروشگاه</span>
+                <span className="text-sm cursor-pointer">بازگشت به فروشگاه</span>
               </Link>
             </button>
           </div>

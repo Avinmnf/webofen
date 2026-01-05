@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import AnalysisLinks from "@/components/AnalysisLinks";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserOrders } from "@/hooks/useUserOrders";
@@ -37,6 +37,22 @@ const DashboardHome = () => {
   const { orders, loading: ordersLoading } = useUserOrders();
   const [showAllOrders, setShowAllOrders] = useState(false);
   const [expandedAnalysis, setExpandedAnalysis] = useState(false);
+  const analysisRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // اسکرول به بخش تحلیل‌ها اگر تازه باز شده باشد
+    if (expandedAnalysis && analysisRef.current) {
+      const element = analysisRef.current;
+      setTimeout(() => {
+        if (element) {
+          element.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      }, 100);
+    }
+  }, [expandedAnalysis]);
 
   if (!isLoggedIn) {
     return (
@@ -176,6 +192,10 @@ const DashboardHome = () => {
     return sum + (order.items?.length || 0);
   }, 0);
 
+  const toggleAnalysis = () => {
+    setExpandedAnalysis(!expandedAnalysis);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/10 to-gray-50 p-3 md:p-4 lg:p-6 xl:p-8">
       <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
@@ -245,8 +265,8 @@ const DashboardHome = () => {
         </div>
    
         {/* Recent Orders Section */}
-        <div className="bg-gradient-to-br from-white to-gray-50/50 rounded-2xl md:rounded-3xl shadow-xl shadow-gray-100/50 border border-gray-100   ">
-          <div className="p-10 md:p-6 lg:p-8 border-b border-gray-100/50 bg-gradient-to-r from-white to-blue-50/30">
+        <div className="bg-gradient-to-br from-white to-gray-50/50 rounded-2xl md:rounded-3xl shadow-xl shadow-gray-100/50 border border-gray-100">
+          <div className="p-4 md:p-6 lg:p-8 border-b border-gray-100/50 bg-gradient-to-r from-white to-blue-50/30">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4">
               <div className="flex items-center gap-3 md:gap-4">
                 <div className="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
@@ -263,7 +283,8 @@ const DashboardHome = () => {
                   {totalOrders > 5 && (
                     <button
                       onClick={() => setShowAllOrders(!showAllOrders)}
-                      className="px-4 py-2 md:px-5  md:py-2.5 cursor-pointer bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-xl hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300 flex items-center gap-2 text-sm md:text-base"
+                      type="button"
+                      className="px-4 py-2 md:px-5 md:py-2.5 cursor-pointer bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-xl hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300 flex items-center gap-2 text-sm md:text-base"
                     >
                       {showAllOrders ? (
                         <>
@@ -274,7 +295,7 @@ const DashboardHome = () => {
                         </>
                       ) : (
                         <>
-                          <svg className="w-4 h-4 md:w-5 md:h-5 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                           </svg>
                           <span className="hidden sm:inline">مشاهده تمامی سفارشات</span>
@@ -288,7 +309,7 @@ const DashboardHome = () => {
             </div>
           </div>
           
-          <div className="overflow-x-auto  -mx-4 md:mx-0">
+          <div className="overflow-x-auto -mx-4 md:mx-0">
             {displayedOrders.length > 0 ? (
               <div className="min-w-full">
                 {/* جدول برای دسکتاپ */}
@@ -419,17 +440,16 @@ const DashboardHome = () => {
                     <span className="text-gray-600 text-xs md:text-sm">نمایش {Math.min(totalDisplayedItems, totalOrders)} آیتم از {totalDisplayedItems}</span>
                   </div>
                 </div>
-            
               </div>
             </div>
           )}
         </div>
         
-        {/* Analysis Links Section - با قابلیت آکاردئون اصلاح شده */}
-    <div className="bg-gradient-to-br from-white to-gray-50/50 rounded-2xl md:rounded-3xl shadow-xl shadow-gray-100/50 border border-gray-100 overflow-hidden">
-          <button
-            onClick={() => setExpandedAnalysis(!expandedAnalysis)}
-            className="w-full p-4 md:p-6 lg:p-8 border-b border-gray-100/50 bg-gradient-to-r from-white to-emerald-50/30 hover:bg-emerald-50/50 transition-all duration-300 text-left"
+        {/* Analysis Links Section */}
+        <div ref={analysisRef} className="bg-gradient-to-br from-white to-gray-50/50 rounded-2xl md:rounded-3xl shadow-xl shadow-gray-100/50 border border-gray-100 overflow-hidden">
+          <div 
+            onClick={toggleAnalysis}
+            className="w-full p-4 md:p-6 lg:p-8 border-b border-gray-100/50 bg-gradient-to-r from-white to-emerald-50/30 hover:bg-emerald-50/50 transition-all duration-300 cursor-pointer select-none"
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4">
               <div className="flex items-center gap-3 md:gap-4">
@@ -439,15 +459,15 @@ const DashboardHome = () => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">تحلیل‌ ها و گزارشات</h3>
+                  <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">تحلیل‌ها و گزارشات</h3>
                   <p className="text-gray-600 text-xs md:text-sm mt-1">
-                    {expandedAnalysis ? 'برای بستن کلیک کنید' : 'برای مشاهده تحلیل‌ ها کلیک کنید'}
+                    {expandedAnalysis ? 'برای بستن کلیک کنید' : 'برای مشاهده تحلیل‌ها کلیک کنید'}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3 md:gap-4 mt-3 sm:mt-0">
                 <span className={`px-3 py-1.5 md:px-4 md:py-2 ${expandedAnalysis ? 'bg-emerald-100 text-emerald-800' : 'bg-emerald-50 text-emerald-700'} font-medium rounded-xl transition-colors duration-300 text-sm md:text-base`}>
-                  {expandedAnalysis ? 'بستن' : 'مشاهده تحلیل‌ ها'}
+                  {expandedAnalysis ? 'بستن' : 'مشاهده تحلیل‌ها'}
                 </span>
                 <div className={`w-5 h-5 md:w-6 md:h-6 transition-transform duration-300 ${expandedAnalysis ? 'rotate-180' : ''}`}>
                   <svg className="w-5 h-5 md:w-6 md:h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -456,23 +476,20 @@ const DashboardHome = () => {
                 </div>
               </div>
             </div>
-          </button>
+          </div>
           
-          {/* محتوای تحلیل‌ها - فقط وقتی expandedAnalysis true باشد نمایش داده می‌شود */}
-          <div className={`transition-all duration-500 ease-in-out overflow-hidden ${
-            expandedAnalysis ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
-          }`}>
-            <div className="p-1">
-                  <AnalysisLinks 
+          {/* محتوای تحلیل‌ها */}
+          {expandedAnalysis && (
+            <div className="animate-fadeIn">
+              <AnalysisLinks 
                 compact={true}
                 showHeader={false}
                 itemsPerPage={5}
                 showAllByDefault={false}
               />
             </div>
-          </div>
+          )}
         </div>
-  
       </div>
     </div>
   );
