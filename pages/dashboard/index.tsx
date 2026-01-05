@@ -198,7 +198,7 @@ const DashboardHome = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/10 to-gray-50 p-3 md:p-4 lg:p-6 xl:p-8">
-      <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
+      <div className="max-w-full mx-auto space-y-6 md:space-y-8">
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 md:gap-6">
           <div className="bg-gradient-to-br from-white to-blue-50/50 rounded-2xl md:rounded-3xl p-4 md:p-6 lg:p-8 shadow-lg shadow-blue-100/50 border border-white/50 backdrop-blur-sm flex-1">
