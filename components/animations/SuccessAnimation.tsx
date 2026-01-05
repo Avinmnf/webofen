@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useRef, useState } from "react";
-import Lottie from "lottie-react";
+import Lottie, { LottieRefCurrentProps } from "lottie-react";
 import successAnimation from "./successAnimation.json";
 
 const SuccessAnimation = () => {
-  const lottieRef = useRef<any>(null);
+  const lottieRef = useRef<LottieRefCurrentProps>(null);
   const [animationFinished, setAnimationFinished] = useState(false);
 
   return (
@@ -16,16 +16,15 @@ const SuccessAnimation = () => {
           animationData={successAnimation}
           loop={false}
           autoplay={true}
-          onComplete={() => {
-            setAnimationFinished(true);
-          }}
+          onComplete={() => setAnimationFinished(true)}
+          className="w-full h-full"
         />
       ) : (
-        // نمایش یک تیک ثابت
+        // نمایش یک تیک ثابت پس از پایان انیمیشن
         <div className="w-full h-full flex items-center justify-center">
           <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center">
             <svg 
-              className="w-10 h-10 text-white" 
+              className="w-12 h-12 text-white" 
               fill="none" 
               stroke="currentColor" 
               viewBox="0 0 24 24" 
