@@ -50,6 +50,7 @@ export interface Order {
   role: string;
   id: string;
   customerName: string;
+  transactionId: string;
   status: string;
   totalPrice: number | string;
   createdAt: string;
@@ -88,10 +89,28 @@ export function useUserOrders(): UseUserOrdersResult {
         }
         const data = await res.json();
 
-        const normalizedOrders = (data.orders || []).map((o: Order) => ({
-          ...o,
-          totalPrice: Number(o.totalPrice) || 0, // always a number
-        }));
+        const normalizedOrders = (data.orders || [])
+          .filter((o: Order) => {
+            if (o.transactionId && o.transactionId.trim() !== '') {
+              return true;
+            }
+            if (o.status !== 'not_payed') {
+              return true;
+            }
+            return false;
+          })
+          .map((o: Order) => ({
+            ...o,
+            totalPrice: Number(o.totalPrice) || 0,
+          }));
+          
+        console.log('Filtered orders:', normalizedOrders.length, 'out of', data.orders?.length || 0);
+        console.log('Sample order:', normalizedOrders[0] ? {
+          id: normalizedOrders[0].id,
+          status: normalizedOrders[0].status,
+          transactionId: normalizedOrders[0].transactionId
+        } : 'No orders');
+          
         setOrders(normalizedOrders);
         setRole(data.role || null);
         setError(null);

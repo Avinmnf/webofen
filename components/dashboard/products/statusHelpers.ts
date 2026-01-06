@@ -52,13 +52,17 @@ export const getStatusConfig = (status?: string): StatusConfig => {
   };
   
   export const shouldShowProgressBar = (item: any): boolean => {
-    if (item.adminStatus === "completed" || item.adminStatus === "cancelled") {
+    // Don't show progress bar for completed, cancelled, or out_of_time items
+    if (item.adminStatus === "completed" || 
+        item.adminStatus === "cancelled" || 
+        item.adminStatus === "out_of_time") {
       return false;
     }
+    
+    // Only show progress bar for items that are in progress and have started
     return (item.adminStatus === "in_progress" && !!item.startTime) ||
-      (isDelayed(item) && !!item.startTime);
+           (isDelayed(item) && !!item.startTime);
   };
-  
   export const stripHtmlTags = (html: string): string => {
     if (!html) return '';
     if (typeof document === 'undefined') {
