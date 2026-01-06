@@ -349,6 +349,7 @@ export const ProductRecommendations = ({
         return "bg-green-50";
       default:
         return "bg-gray-100";
+
     }
   };
   return (
@@ -406,10 +407,10 @@ export const ProductRecommendations = ({
             <div className="flex items-center justify-between">
               <div>
                 <h4 className={`font-bold text-s mb-1 ${linkSeverityColors.text}`}>
-                  وضعیت لینک‌های شکسته
+                  وضعیت لینک‌ های شکسته
                 </h4>
                 <p className={`text-s ${linkSeverityColors.text}`}>
-                  تعداد لینک‌های شکسته: <strong>{brokenLinksCount}</strong>
+                  تعداد لینک‌ های شکسته: <strong>{brokenLinksCount}</strong>
                   <span className="mr-2 font-medium">
                     {linkBuildingSeverity === 'medium' && "(نیاز به لینک‌ سازی)"}
                     {linkBuildingSeverity === 'high' && "(نیاز فوری به لینک‌ سازی)"}
