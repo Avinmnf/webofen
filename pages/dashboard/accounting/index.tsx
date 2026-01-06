@@ -299,7 +299,8 @@ const AccountingPage: React.FC = () => {
                       فاکتور فروش
                     </h2>
                     <div style={{ fontSize: '14px', color: '#374151' }}>
-                      <p><strong>تاریخ صدور:</strong> {new Date().toLocaleString("fa-IR")}</p>
+                      {/* تاریخ صدور فاکتور با تاریخ سفارش یکسان است */}
+                      <p><strong>تاریخ صدور:</strong> {new Date(order?.createdAt || Date.now()).toLocaleString("fa-IR")}</p>
                       <p><strong>شماره فاکتور:</strong> INV-{order.id}</p>
                     </div>
                   </div>
@@ -463,8 +464,9 @@ const AccountingPage: React.FC = () => {
                 }}>
                   <p style={{ marginBottom: '8px' }}>با تشکر از اعتماد شما</p>
                   <p style={{ marginBottom: '12px' }}>این فاکتور به صورت خودکار تولید شده و نیاز به مهر و امضا ندارد</p>
+                  {/* تاریخ چاپ با تاریخ سفارش یکسان است */}
                   <p style={{ fontSize: '12px', color: '#9ca3af' }}>
-                    تاریخ چاپ: {new Date().toLocaleString("fa-IR")}
+                    تاریخ چاپ: {new Date(order?.createdAt || Date.now()).toLocaleString("fa-IR")}
                   </p>
                 </div>
               </div>
