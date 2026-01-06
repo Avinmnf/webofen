@@ -113,9 +113,7 @@ export default function PaymentSuccessPage() {
         variant: item.variant,
         status: item.status
       })) : [
-        { name: "پروژه وبسایت شرکتی", quantity: 1, price: 2500000, variant: null, status: 'completed' },
-        { name: "هاست و دامنه یکساله", quantity: 1, price: 500000, variant: null, status: 'completed' },
-        { name: "پشتیبانی ۶ ماهه", quantity: 1, price: 750000, variant: null, status: 'completed' },
+  
       ];
 
       return {
@@ -127,9 +125,7 @@ export default function PaymentSuccessPage() {
         subtotal,
         total,
         customer: {
-          name: user?.name || "کاربر وبوفن",
-          email: user?.email || "user@example.com",
-          phone: user?.phone || "09123456789"
+        
         },
         orderStatus: latestOrder.status || "completed"
       };
@@ -139,16 +135,11 @@ export default function PaymentSuccessPage() {
       orderId: trackingNumber,
       date: paymentDate,
       items: [
-        { name: "پروژه وبسایت شرکتی", quantity: 1, price: 2500000, variant: null, status: 'completed' },
-        { name: "هاست و دامنه یکساله", quantity: 1, price: 500000, variant: null, status: 'completed' },
-        { name: "پشتیبانی ۶ ماهه", quantity: 1, price: 750000, variant: null, status: 'completed' },
+ 
       ],
-      subtotal: 3750000,
-      total: 3750000,
+     
       customer: {
-        name: user?.name || "کاربر وبوفن",
-        email: user?.email || "user@example.com",
-        phone: user?.phone || "09123456789"
+     
       },
       orderStatus: "completed"
     };
