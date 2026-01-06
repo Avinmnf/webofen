@@ -884,7 +884,6 @@ export default function PaymentSuccessPage() {
                   ۱۴ ۵۹ ۵۱ ۸۸ - ۰۲۱
                 </div>
               </div>
-              <p className="text-white/90 text-xs mt-3 text-center">پشتیبانی ۲۴ ساعته</p>
             </div>
           </div>
 
