@@ -451,36 +451,18 @@ export default function PaymentSuccessPage() {
 
   const handleBackToShop = () => {
     setReturningToShop(true);
-    
-    // تاخیر برای نمایش لودینگ
-    setTimeout(() => {
-      router.push("/products");
-      // متوقف کردن لودینگ بعد از 3 ثانیه برای ایمنی
-      setTimeout(() => {
-        setReturningToShop(false);
-      }, 3000);
-    }, 1000);
+    // هدایت مستقیم بدون تاخیر - دقیقاً مانند دکمه داشبورد
+    window.location.href = "/products";
   };
 
   const handleGoToDashboard = () => {
     setDashboardLoading(true);
-    
-    // تاخیر برای نمایش انیمیشن لودینگ
-    setTimeout(() => {
-      // بررسی وضعیت لاگین کاربر
-      if (!isLoggedIn) {
-        // اگر کاربر لاگین نیست، به صفحه لاگین هدایت شود
-        router.push("/login?redirect=/dashboard");
-      } else {
-        // استفاده از window.location.href برای هدایت مستقیم و مطمئن
-        window.location.href = "/dashboard";
-      }
-      
-      // اگر بعد از 3 ثانیه هنوز در صفحه هستیم، لودینگ را متوقف کنیم
-      setTimeout(() => {
-        setDashboardLoading(false);
-      }, 3000);
-    }, 1000);
+    // هدایت مستقیم بدون تاخیر
+    if (!isLoggedIn) {
+      window.location.href = `/login?redirect=/dashboard`;
+    } else {
+      window.location.href = "/dashboard";
+    }
   };
 
   const getOrderStatusText = (status: string) => {
@@ -919,7 +901,7 @@ export default function PaymentSuccessPage() {
           <div className="text-center mt-8">
             <button
               onClick={handleBackToShop}
-              disabled={returningToShop}
+              disabled={returningToShop || dashboardLoading}
               className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800 py-2 px-4 rounded-xl hover:bg-white/50 transition-all duration-200 group disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {returningToShop ? (
@@ -953,28 +935,6 @@ export default function PaymentSuccessPage() {
             <div className="flex items-center gap-2 text-sm">
               <Check className="w-4 h-4" />
               فاکتور با موفقیت تولید شد
-            </div>
-          </div>
-        )}
-
-        {/* Shop Loading Overlay */}
-        {returningToShop && (
-          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center">
-            <div className="bg-white rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4 max-w-sm mx-4">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#29b0cb]"></div>
-              <p className="text-gray-700 font-medium">در حال انتقال به فروشگاه...</p>
-              <p className="text-gray-500 text-sm text-center">لطفاً چند لحظه صبر کنید</p>
-            </div>
-          </div>
-        )}
-
-        {/* Dashboard Loading Overlay */}
-        {dashboardLoading && (
-          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center">
-            <div className="bg-white rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4 max-w-sm mx-4">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#29b0cb]"></div>
-              <p className="text-gray-700 font-medium">در حال انتقال به داشبورد...</p>
-              <p className="text-gray-500 text-sm text-center">لطفاً چند لحظه صبر کنید</p>
             </div>
           </div>
         )}
