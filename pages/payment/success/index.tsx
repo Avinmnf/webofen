@@ -884,9 +884,10 @@ export default function PaymentSuccessPage() {
                   ۱۴ ۵۹ ۵۱ ۸۸ - ۰۲۱
                 </div>
               </div>
+              
             </div>
           </div>
-          
+
 
           {/* Back Button */}
           <div className="text-center mt-8">
