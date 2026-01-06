@@ -192,7 +192,7 @@ const InputModal: React.FC<InputModalProps> = ({
                     placeholder={field.placeholder || field.label}
                     value={values[field.id] || ""}
                     onChange={(e) => handleChange(field.id, e.target.value)}
-                    className="w-full px-4 py-3.5 rounded-xl border border-gray-300 focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 outline-none transition disabled:bg-gray-50 disabled:cursor-not-allowed"
+                    className="w-full text-black px-4 py-3.5 rounded-xl border border-gray-300 focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 outline-none transition disabled:bg-gray-50 disabled:cursor-not-allowed"
                     required={field.required}
                     disabled={!canEdit}
                   />

@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useMemo } from "react";
 import { useUserOrders, Order } from "@/hooks/useUserOrders";
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import Image from "next/image";
 
 const AccountingPage: React.FC = () => {
   const statusMap: Record<string, string> = {
@@ -18,6 +17,17 @@ const AccountingPage: React.FC = () => {
 
   const { orders, loading, error } = useUserOrders();
   const invoiceRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  // مرتب‌سازی سفارش‌ها از جدیدترین به قدیمی‌ترین
+  const sortedOrders = useMemo(() => {
+    if (!orders || orders.length === 0) return [];
+    
+    return [...orders].sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA; // نزولی (جدیدترین اول)
+    });
+  }, [orders]);
 
   const setInvoiceRef = (id: string) => (el: HTMLDivElement | null) => {
     invoiceRefs.current[id] = el;
@@ -236,16 +246,16 @@ const AccountingPage: React.FC = () => {
 
   if (loading) return <p className="text-black text-center py-8">در حال بارگذاری سفارش‌ها...</p>;
   if (error) return <p className="text-black text-center py-8">خطا: {error}</p>;
-  if (!orders.length) return <p className="text-black text-center py-8">سفارشی یافت نشد.</p>;
+  if (!sortedOrders.length) return <p className="text-black text-center py-8">سفارشی یافت نشد.</p>;
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
       <div className="p-6 border-b bg-white shadow-sm">
-        <h1 className="text-2xl font-bold text-black">تراکنش‌ها</h1>
+        <h1 className="text-2xl font-bold text-center text-black">تراکنش‌ ها</h1>
       </div>
 
       <div className="flex-1 overflow-y-auto p-6">
-        {orders.map((order: Order) => (
+        {sortedOrders.map((order: Order) => (
           <div
             key={order.id}
             className="mb-6 bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:shadow-lg transition-all"
@@ -289,7 +299,8 @@ const AccountingPage: React.FC = () => {
                       فاکتور فروش
                     </h2>
                     <div style={{ fontSize: '14px', color: '#374151' }}>
-                      <p><strong>تاریخ صدور:</strong> {new Date().toLocaleString("fa-IR")}</p>
+                      {/* تاریخ صدور فاکتور با تاریخ سفارش یکسان است */}
+                      <p><strong>تاریخ صدور:</strong> {new Date(order?.createdAt || Date.now()).toLocaleString("fa-IR")}</p>
                       <p><strong>شماره فاکتور:</strong> INV-{order.id}</p>
                     </div>
                   </div>
@@ -453,8 +464,9 @@ const AccountingPage: React.FC = () => {
                 }}>
                   <p style={{ marginBottom: '8px' }}>با تشکر از اعتماد شما</p>
                   <p style={{ marginBottom: '12px' }}>این فاکتور به صورت خودکار تولید شده و نیاز به مهر و امضا ندارد</p>
+                  {/* تاریخ چاپ با تاریخ سفارش یکسان است */}
                   <p style={{ fontSize: '12px', color: '#9ca3af' }}>
-                    تاریخ چاپ: {new Date().toLocaleString("fa-IR")}
+                    تاریخ چاپ: {new Date(order?.createdAt || Date.now()).toLocaleString("fa-IR")}
                   </p>
                 </div>
               </div>
@@ -466,7 +478,7 @@ const AccountingPage: React.FC = () => {
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-gradient-to-r from-blue-50 to-indigo-50 p-5 rounded-xl mb-4">
                 <div className="flex items-center space-x-4 space-x-reverse mb-4 md:mb-0">
                   <div className="hidden md:block">
-                
+                    {/* لوگو */}
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-gray-800">سفارش #{order.id}</h3>
