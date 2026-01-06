@@ -26,6 +26,8 @@ export default function PaymentSuccessPage() {
   const [invoiceGenerated, setInvoiceGenerated] = useState(false);
   const [dashboardLoading, setDashboardLoading] = useState(false);
   const [latestOrder, setLatestOrder] = useState<any>(null);
+  const [isClient, setIsClient] = useState(false);
+  const [returningToShop, setReturningToShop] = useState(false);
   const invoiceRef = useRef<HTMLDivElement>(null);
 
   const statusMap: Record<string, string> = {
@@ -41,6 +43,10 @@ export default function PaymentSuccessPage() {
     paid: "پرداخت شده"
   };
 
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   // تابع برای ایجاد نام فایل امن
   const sanitizeFileName = (name: string) => {
     return name
@@ -53,7 +59,10 @@ export default function PaymentSuccessPage() {
   useEffect(() => {
     clearCart();
     setConfetti(true);
-    setPaymentDate(new Date().toLocaleDateString("fa-IR"));
+    // فقط در سمت کلاینت تاریخ را تنظیم کن
+    if (typeof window !== 'undefined') {
+      setPaymentDate(new Date().toLocaleDateString("fa-IR"));
+    }
 
     const timer = setTimeout(() => setConfetti(false), 3000);
     return () => clearTimeout(timer);
@@ -76,6 +85,23 @@ export default function PaymentSuccessPage() {
 
   // داده‌های فاکتور با استفاده از useMemo
   const invoiceData = useMemo(() => {
+    // در سمت سرور مقدار پیش‌فرض برگردان
+    if (!isClient) {
+      return {
+        orderId: "",
+        date: "",
+        items: [],
+        subtotal: 0,
+        total: 0,
+        customer: {
+          name: "",
+          email: "",
+          phone: ""
+        },
+        orderStatus: ""
+      };
+    }
+
     if (latestOrder) {
       const subtotal = latestOrder.totalPrice || 3750000;
       const total = subtotal;
@@ -126,7 +152,7 @@ export default function PaymentSuccessPage() {
       },
       orderStatus: "completed"
     };
-  }, [latestOrder, trackingNumber, paymentDate, user]);
+  }, [latestOrder, trackingNumber, paymentDate, user, isClient]);
 
   const replaceOklchStyles = (element: HTMLElement) => {
     if (!element) return;
@@ -424,7 +450,16 @@ export default function PaymentSuccessPage() {
   };
 
   const handleBackToShop = () => {
-    router.push("/products");
+    setReturningToShop(true);
+    
+    // تاخیر برای نمایش لودینگ
+    setTimeout(() => {
+      router.push("/products");
+      // متوقف کردن لودینگ بعد از 3 ثانیه برای ایمنی
+      setTimeout(() => {
+        setReturningToShop(false);
+      }, 3000);
+    }, 1000);
   };
 
   const handleGoToDashboard = () => {
@@ -490,203 +525,205 @@ export default function PaymentSuccessPage() {
       </div>
       
       <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-blue-50/30 relative overflow-hidden">
-        {/* بخش مخفی برای فاکتور */}
-        <div className="fixed -left-[10000px] -top-[10000px]" aria-hidden="true">
-          <div 
-            ref={invoiceRef}
-            className="invoice-template"
-            style={{
-              backgroundColor: 'white',
-              padding: '20mm',
-              width: '210mm',
-              minHeight: '297mm',
-              fontFamily: 'Arial, Tahoma, sans-serif',
-              direction: 'rtl',
-              color: '#333',
-              boxSizing: 'border-box'
-            }}
-          >
-            {/* هدر فاکتور با لوگو در سمت راست */}
-            <div className="invoice-header" style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'flex-start',
-              marginBottom: '30px', 
-              borderBottom: '3px solid #1e40af', 
-              paddingBottom: '20px' 
-            }}>
-              {/* اطلاعات فاکتور در سمت چپ */}
-              <div style={{ textAlign: 'right', flex: 1 }}>
-                <h2 style={{ fontSize: '28px', textAlign: 'right', fontWeight: 'bold', color: '#1e40af', marginBottom: '10px' }}>
-                  فاکتور فروش
-                </h2>
-                <div style={{ fontSize: '14px', color: '#374151' }}>
-                  <p><strong>تاریخ صدور:</strong> {invoiceData.date || new Date().toLocaleString("fa-IR")}</p>
-                  <p><strong>شماره فاکتور:</strong> INV-{invoiceData.orderId || 'در حال بارگذاری...'}</p>
+        {/* بخش مخفی برای فاکتور - فقط در سمت کلاینت نمایش داده شود */}
+        {isClient && invoiceData && (
+          <div className="fixed -left-[10000px] -top-[10000px]" aria-hidden="true">
+            <div 
+              ref={invoiceRef}
+              className="invoice-template"
+              style={{
+                backgroundColor: 'white',
+                padding: '20mm',
+                width: '210mm',
+                minHeight: '297mm',
+                fontFamily: 'Arial, Tahoma, sans-serif',
+                direction: 'rtl',
+                color: '#333',
+                boxSizing: 'border-box'
+              }}
+            >
+              {/* هدر فاکتور با لوگو در سمت راست */}
+              <div className="invoice-header" style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'flex-start',
+                marginBottom: '30px', 
+                borderBottom: '3px solid #1e40af', 
+                paddingBottom: '20px' 
+              }}>
+                {/* اطلاعات فاکتور در سمت چپ */}
+                <div style={{ textAlign: 'right', flex: 1 }}>
+                  <h2 style={{ fontSize: '28px', textAlign: 'right', fontWeight: 'bold', color: '#1e40af', marginBottom: '10px' }}>
+                    فاکتور فروش
+                  </h2>
+                  <div style={{ fontSize: '14px', color: '#374151' }}>
+                    <p><strong>تاریخ صدور:</strong> {invoiceData.date || new Date().toLocaleString("fa-IR")}</p>
+                    <p><strong>شماره فاکتور:</strong> INV-{invoiceData.orderId || 'در حال بارگذاری...'}</p>
+                  </div>
+                </div>
+                {/* لوگو در سمت راست (در PDF اضافه خواهد شد) */}
+              </div>
+
+              {/* اطلاعات سفارش */}
+              <div style={{ marginBottom: '25px' }}>
+                <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#374151', marginBottom: '15px' }}>
+                  اطلاعات سفارش
+                </h3>
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: '1fr 1fr', 
+                  gap: '15px',
+                  backgroundColor: '#f0f9ff',
+                  padding: '20px',
+                  borderRadius: '10px',
+                  border: '2px solid #e0f2fe'
+                }}>
+                  <div>
+                    <p style={{ color: '#374151', marginBottom: '8px' }}><strong>شناسه سفارش:</strong> {invoiceData.orderId}</p>
+                    <p style={{ color: '#374151', marginBottom: '8px' }}><strong>نام مشتری:</strong> {invoiceData.customer.name}</p>
+                    <p style={{ color: '#374151', marginBottom: '8px' }}><strong>تاریخ سفارش:</strong> {invoiceData.date}</p>
+                  </div>
+                  <div>
+                    <p style={{ color: '#374151', marginBottom: '8px' }}><strong>ایمیل:</strong> {invoiceData.customer.email}</p>
+                    <p style={{ color: '#374151', marginBottom: '8px' }}><strong>تلفن:</strong> {invoiceData.customer.phone}</p>
+                    <p style={{ color: '#374151', marginBottom: '8px' }}><strong>وضعیت سفارش:</strong> {getOrderStatusText(invoiceData.orderStatus)}</p>
+                  </div>
                 </div>
               </div>
-              {/* لوگو در سمت راست (در PDF اضافه خواهد شد) */}
-            </div>
 
-            {/* اطلاعات سفارش */}
-            <div style={{ marginBottom: '25px' }}>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#374151', marginBottom: '15px' }}>
-                اطلاعات سفارش
-              </h3>
+              {/* جدول محصولات */}
+              <div style={{ marginBottom: '25px' }}>
+                <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#374151', marginBottom: '15px' }}>
+                  جزئیات محصولات
+                </h3>
+                <table style={{ 
+                  width: '100%', 
+                  borderCollapse: 'collapse',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '8px',
+                  overflow: 'hidden'
+                }}>
+                  <thead>
+                    <tr style={{ backgroundColor: '#1e40af' }}>
+                      <th style={{ border: '1px solid #3b82f6', padding: '14px', textAlign: 'center', fontWeight: '600', color: '#ffffff' }}>ردیف</th>
+                      <th style={{ border: '1px solid #3b82f6', padding: '14px', textAlign: 'center', fontWeight: '600', color: '#ffffff' }}>محصول</th>
+                      <th style={{ border: '1px solid #3b82f6', padding: '14px', textAlign: 'center', fontWeight: '600', color: '#ffffff' }}>تعداد</th>
+                      <th style={{ border: '1px solid #3b82f6', padding: '14px', textAlign: 'center', fontWeight: '600', color: '#ffffff' }}>قیمت واحد</th>
+                      <th style={{ border: '1px solid #3b82f6', padding: '14px', textAlign: 'center', fontWeight: '600', color: '#ffffff' }}>قیمت کل</th>
+                      <th style={{ border: '1px solid #3b82f6', padding: '14px', textAlign: 'center', fontWeight: '600', color: '#ffffff' }}>وضعیت</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {invoiceData.items.map((item: any, index: number) => {
+                      const getStatusStyle = (status: string) => {
+                        if (status === 'Completed' || status === 'submitted' || status === 'completed') {
+                          return { 
+                            backgroundColor: '#d1fae5', 
+                            color: '#065f46', 
+                            padding: '6px 12px', 
+                            borderRadius: '20px', 
+                            fontSize: '12px',
+                            fontWeight: '500',
+                            display: 'inline-block'
+                          };
+                        } else if (status === 'Cancelled' || status === 'cancelled') {
+                          return { 
+                            backgroundColor: '#fee2e2', 
+                            color: '#991b1b', 
+                            padding: '6px 12px', 
+                            borderRadius: '20px', 
+                            fontSize: '12px',
+                            fontWeight: '500',
+                            display: 'inline-block'
+                          };
+                        } else {
+                          return { 
+                            backgroundColor: '#fef3c7', 
+                            color: '#92400e', 
+                            padding: '6px 12px', 
+                            borderRadius: '20px', 
+                            fontSize: '12px',
+                            fontWeight: '500',
+                            display: 'inline-block'
+                          };
+                        }
+                      };
+
+                      return (
+                        <tr key={index} style={{ 
+                          borderBottom: '1px solid #e5e7eb',
+                          backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9fafb'
+                        }}>
+                          <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center', color: '#374151' }}>{index + 1}</td>
+                          <td style={{ border: '1px solid #e5e7eb', padding: '12px', color: '#374151', fontWeight: '500' }}>{item.name}</td>
+                          <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center', color: '#374151' }}>{item.quantity || 0}</td>
+                          <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left', color: '#1e40af', fontWeight: '500' }}>
+                            {item.price ? `${item.price.toLocaleString("fa-IR")} تومان` : "—"}
+                          </td>
+                          <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left', color: '#1e40af', fontWeight: 'bold' }}>
+                            {item.price && item.quantity 
+                              ? `${(item.price * item.quantity).toLocaleString("fa-IR")} تومان`
+                              : "—"}
+                          </td>
+                          <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>
+                            <span style={getStatusStyle(item.status)}>
+                              {statusMap[item.status?.trim()] ?? item.status ?? "نامشخص"}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* جمع کل */}
               <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: '1fr 1fr', 
-                gap: '15px',
-                backgroundColor: '#f0f9ff',
-                padding: '20px',
-                borderRadius: '10px',
-                border: '2px solid #e0f2fe'
+                backgroundColor: '#f0f9ff', 
+                padding: '24px', 
+                borderRadius: '12px',
+                border: '2px solid #e0f2fe',
+                marginTop: '30px'
               }}>
-                <div>
-                  <p style={{ color: '#374151', marginBottom: '8px' }}><strong>شناسه سفارش:</strong> {invoiceData.orderId}</p>
-                  <p style={{ color: '#374151', marginBottom: '8px' }}><strong>نام مشتری:</strong> {invoiceData.customer.name}</p>
-                  <p style={{ color: '#374151', marginBottom: '8px' }}><strong>تاریخ سفارش:</strong> {invoiceData.date}</p>
-                </div>
-                <div>
-                  <p style={{ color: '#374151', marginBottom: '8px' }}><strong>ایمیل:</strong> {invoiceData.customer.email}</p>
-                  <p style={{ color: '#374151', marginBottom: '8px' }}><strong>تلفن:</strong> {invoiceData.customer.phone}</p>
-                  <p style={{ color: '#374151', marginBottom: '8px' }}><strong>وضعیت سفارش:</strong> {getOrderStatusText(invoiceData.orderStatus)}</p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <p style={{ fontSize: '16px', color: '#374151' }}>
+                      <strong>تعداد آیتم‌ها:</strong> 
+                      <span style={{ marginRight: '8px', fontWeight: 'bold', color: '#1e40af' }}>
+                        {invoiceData.items.length}
+                      </span>
+                    </p>
+                  </div>
+                  <div style={{ textAlign: 'left' }}>
+                    <p style={{ fontSize: '22px', fontWeight: 'bold', color: '#1e40af' }}>
+                      <strong>مبلغ قابل پرداخت:</strong> 
+                      <span style={{ marginRight: '12px', fontSize: '24px' }}>
+                        {Number(invoiceData.total || 0).toLocaleString("fa-IR")}
+                      </span>
+                      تومان
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* جدول محصولات */}
-            <div style={{ marginBottom: '25px' }}>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#374151', marginBottom: '15px' }}>
-                جزئیات محصولات
-              </h3>
-              <table style={{ 
-                width: '100%', 
-                borderCollapse: 'collapse',
-                border: '2px solid #e5e7eb',
-                borderRadius: '8px',
-                overflow: 'hidden'
+              {/* پاورقی */}
+              <div style={{ 
+                marginTop: '40px', 
+                paddingTop: '20px', 
+                borderTop: '2px dashed #e5e7eb',
+                textAlign: 'center',
+                color: '#6b7280',
+                fontSize: '13px'
               }}>
-                <thead>
-                  <tr style={{ backgroundColor: '#1e40af' }}>
-                    <th style={{ border: '1px solid #3b82f6', padding: '14px', textAlign: 'center', fontWeight: '600', color: '#ffffff' }}>ردیف</th>
-                    <th style={{ border: '1px solid #3b82f6', padding: '14px', textAlign: 'center', fontWeight: '600', color: '#ffffff' }}>محصول</th>
-                    <th style={{ border: '1px solid #3b82f6', padding: '14px', textAlign: 'center', fontWeight: '600', color: '#ffffff' }}>تعداد</th>
-                    <th style={{ border: '1px solid #3b82f6', padding: '14px', textAlign: 'center', fontWeight: '600', color: '#ffffff' }}>قیمت واحد</th>
-                    <th style={{ border: '1px solid #3b82f6', padding: '14px', textAlign: 'center', fontWeight: '600', color: '#ffffff' }}>قیمت کل</th>
-                    <th style={{ border: '1px solid #3b82f6', padding: '14px', textAlign: 'center', fontWeight: '600', color: '#ffffff' }}>وضعیت</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {invoiceData.items.map((item: any, index: number) => {
-                    const getStatusStyle = (status: string) => {
-                      if (status === 'Completed' || status === 'submitted' || status === 'completed') {
-                        return { 
-                          backgroundColor: '#d1fae5', 
-                          color: '#065f46', 
-                          padding: '6px 12px', 
-                          borderRadius: '20px', 
-                          fontSize: '12px',
-                          fontWeight: '500',
-                          display: 'inline-block'
-                        };
-                      } else if (status === 'Cancelled' || status === 'cancelled') {
-                        return { 
-                          backgroundColor: '#fee2e2', 
-                          color: '#991b1b', 
-                          padding: '6px 12px', 
-                          borderRadius: '20px', 
-                          fontSize: '12px',
-                          fontWeight: '500',
-                          display: 'inline-block'
-                        };
-                      } else {
-                        return { 
-                          backgroundColor: '#fef3c7', 
-                          color: '#92400e', 
-                          padding: '6px 12px', 
-                          borderRadius: '20px', 
-                          fontSize: '12px',
-                          fontWeight: '500',
-                          display: 'inline-block'
-                        };
-                      }
-                    };
-
-                    return (
-                      <tr key={index} style={{ 
-                        borderBottom: '1px solid #e5e7eb',
-                        backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9fafb'
-                      }}>
-                        <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center', color: '#374151' }}>{index + 1}</td>
-                        <td style={{ border: '1px solid #e5e7eb', padding: '12px', color: '#374151', fontWeight: '500' }}>{item.name}</td>
-                        <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center', color: '#374151' }}>{item.quantity || 0}</td>
-                        <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left', color: '#1e40af', fontWeight: '500' }}>
-                          {item.price ? `${item.price.toLocaleString("fa-IR")} تومان` : "—"}
-                        </td>
-                        <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left', color: '#1e40af', fontWeight: 'bold' }}>
-                          {item.price && item.quantity 
-                            ? `${(item.price * item.quantity).toLocaleString("fa-IR")} تومان`
-                            : "—"}
-                        </td>
-                        <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>
-                          <span style={getStatusStyle(item.status)}>
-                            {statusMap[item.status?.trim()] ?? item.status ?? "نامشخص"}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            {/* جمع کل */}
-            <div style={{ 
-              backgroundColor: '#f0f9ff', 
-              padding: '24px', 
-              borderRadius: '12px',
-              border: '2px solid #e0f2fe',
-              marginTop: '30px'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <p style={{ fontSize: '16px', color: '#374151' }}>
-                    <strong>تعداد آیتم‌ها:</strong> 
-                    <span style={{ marginRight: '8px', fontWeight: 'bold', color: '#1e40af' }}>
-                      {invoiceData.items.length}
-                    </span>
-                  </p>
-                </div>
-                <div style={{ textAlign: 'left' }}>
-                  <p style={{ fontSize: '22px', fontWeight: 'bold', color: '#1e40af' }}>
-                    <strong>مبلغ قابل پرداخت:</strong> 
-                    <span style={{ marginRight: '12px', fontSize: '24px' }}>
-                      {Number(invoiceData.total || 0).toLocaleString("fa-IR")}
-                    </span>
-                    تومان
-                  </p>
-                </div>
+                <p style={{ marginBottom: '8px' }}>با تشکر از اعتماد شما</p>
+                <p style={{ marginBottom: '12px' }}>این فاکتور به صورت خودکار تولید شده و نیاز به مهر و امضا ندارد</p>
+                <p style={{ fontSize: '12px', color: '#9ca3af' }}>
+                  تاریخ چاپ: {new Date().toLocaleString("fa-IR")}
+                </p>
               </div>
-            </div>
-
-            {/* پاورقی */}
-            <div style={{ 
-              marginTop: '40px', 
-              paddingTop: '20px', 
-              borderTop: '2px dashed #e5e7eb',
-              textAlign: 'center',
-              color: '#6b7280',
-              fontSize: '13px'
-            }}>
-              <p style={{ marginBottom: '8px' }}>با تشکر از اعتماد شما</p>
-              <p style={{ marginBottom: '12px' }}>این فاکتور به صورت خودکار تولید شده و نیاز به مهر و امضا ندارد</p>
-              <p style={{ fontSize: '12px', color: '#9ca3af' }}>
-                تاریخ چاپ: {new Date().toLocaleString("fa-IR")}
-              </p>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
@@ -723,7 +760,7 @@ export default function PaymentSuccessPage() {
                 <p className="text-gray-600 leading-relaxed text-sm lg:text-base">
                   می‌توانید سفارش خود را در داشبورد مدیریت کنید
                 </p>
-                {user && isLoggedIn && (
+                {isClient && user && isLoggedIn && (
                   <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200 inline-block">
                     <p className="text-green-800 text-sm">
                       فاکتور با نام <strong>{user.name}</strong> صادر خواهد شد
@@ -738,7 +775,7 @@ export default function PaymentSuccessPage() {
                   <span className="text-gray-600 text-sm whitespace-nowrap">شماره پیگیری</span>
                   <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
                     <span className="font-mono text-gray-800 font-medium truncate max-w-[200px]">
-                      {ordersLoading ? "در حال بارگذاری..." : trackingNumber || "در حال دریافت..."}
+                      {ordersLoading ? "در حال بارگذاری..." : (isClient ? trackingNumber : "در حال دریافت...")}
                     </span>
                     <button
                       onClick={copyTrackingNumber}
@@ -758,12 +795,12 @@ export default function PaymentSuccessPage() {
                 <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-gray-50/50 rounded-2xl border border-gray-100 gap-3">
                   <span className="text-gray-600 text-sm whitespace-nowrap">تاریخ پرداخت</span>
                   <span className="font-medium text-gray-800">
-                    {paymentDate || "در حال بارگذاری..."}
+                    {isClient ? (paymentDate || "در حال بارگذاری...") : "در حال بارگذاری..."}
                   </span>
                 </div>
 
                 {/* وضعیت سفارش */}
-                {latestOrder && (
+                {isClient && latestOrder && (
                   <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-gray-50/50 rounded-2xl border border-gray-100 gap-3">
                     <span className="text-gray-600 text-sm whitespace-nowrap">وضعیت سفارش</span>
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${getOrderStatusColor(latestOrder.status)}`}>
@@ -882,18 +919,26 @@ export default function PaymentSuccessPage() {
           <div className="text-center mt-8">
             <button
               onClick={handleBackToShop}
-              className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800 py-2 px-4 rounded-xl hover:bg-white/50 transition-all duration-200 group"
+              disabled={returningToShop}
+              className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800 py-2 px-4 rounded-xl hover:bg-white/50 transition-all duration-200 group disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              <Link href="/">
-                <span className="text-sm cursor-pointer">بازگشت به فروشگاه</span>
-              </Link>
+              {returningToShop ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600"></div>
+                  <span className="text-sm">در حال انتقال...</span>
+                </>
+              ) : (
+                <>
+                  <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                  <span className="text-sm">بازگشت به فروشگاه</span>
+                </>
+              )}
             </button>
           </div>
         </div>
 
         {/* Copied Toast */}
-        {copied && (
+        {isClient && copied && (
           <div className="z-50 fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-2xl shadow-lg animate-in slide-in-from-bottom-5 duration-300">
             <div className="flex items-center gap-2 text-sm">
               <Check className="w-4 h-4" />
@@ -903,7 +948,7 @@ export default function PaymentSuccessPage() {
         )}
 
         {/* Invoice Generated Toast */}
-        {invoiceGenerated && (
+        {isClient && invoiceGenerated && (
           <div className="z-50 fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-2xl shadow-lg animate-in slide-in-from-bottom-5 duration-300">
             <div className="flex items-center gap-2 text-sm">
               <Check className="w-4 h-4" />
@@ -912,13 +957,24 @@ export default function PaymentSuccessPage() {
           </div>
         )}
 
+        {/* Shop Loading Overlay */}
+        {returningToShop && (
+          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center">
+            <div className="bg-white rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4 max-w-sm mx-4">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#29b0cb]"></div>
+              <p className="text-gray-700 font-medium">در حال انتقال به فروشگاه...</p>
+              <p className="text-gray-500 text-sm text-center">لطفاً چند لحظه صبر کنید</p>
+            </div>
+          </div>
+        )}
+
         {/* Dashboard Loading Overlay */}
         {dashboardLoading && (
           <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center">
-            <div className="bg-white rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4">
+            <div className="bg-white rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4 max-w-sm mx-4">
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#29b0cb]"></div>
               <p className="text-gray-700 font-medium">در حال انتقال به داشبورد...</p>
-              <p className="text-gray-500 text-sm">لطفاً چند لحظه صبر کنید</p>
+              <p className="text-gray-500 text-sm text-center">لطفاً چند لحظه صبر کنید</p>
             </div>
           </div>
         )}
