@@ -401,8 +401,8 @@ const BacklinkPage: React.FC = () => {
 
         {/* Main Active Order */}
         {mainActiveItem && (
-          <div className="bg-[#153e4c] p-5 rounded-2xl">
-            <div className="bg-white rounded-2xl border border-gray-200 p-6 lg:p-7 shadow-sm">
+          <div className="">
+            <div className="bg-gray-100 shadow-sm rounded-2xl border border-gray-200 p-6 lg:p-7 ">
               <div className="flex flex-col lg:flex-row gap-6 items-start">
                 {/* Content Section - Left */}
                 <div className="flex-1 space-y-5">
@@ -557,16 +557,19 @@ const BacklinkPage: React.FC = () => {
         {/* Section 2: Waiting for Admin Items (submitted but not started) */}
         {waitingItems.length > 0 && (
           <div className="mt-12">
-            <div className="flex items-center gap-3 mb-6 px-1">
-              <div className="p-2 bg-amber-50 rounded-xl">
+            <div className="flex justify-between items-center gap-3 mb-6 px-1">
+              <div className="flex items-center">
+              <div className="p-2 ml-2 bg-amber-50 rounded-xl">
                 <Clock className="w-5 h-5 text-amber-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 tracking-tight">در انتظار شروع کار</h3>
+                <p className="text-xl  text-gray-900 tracking-tight">در انتظار </p>
                 <p className="text-sm text-gray-500">اطلاعات ثبت شده، منتظر شروع کار توسط تیم فنی</p>
               </div>
-              <span className="px-2.5 py-0.5 bg-amber-50 text-amber-600 text-xs font-medium rounded-full border border-amber-100">
+              </div>
+              <span className="px-2.5 py-0.5 text-gray-500 text-xs font-medium">
                 {waitingItems.length}
+                سفارش
               </span>
             </div>
 
@@ -783,7 +786,7 @@ const BacklinkPage: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <p className="text-lg font-semibold text-gray-900">سفارش‌های تاخیر خورده</p>
+          <p className="text-lg  text-gray-900">سفارش‌های تاخیر خورده</p>
           <p className="text-sm text-gray-500 mt-1">این سفارش‌ها در حال پیگیری توسط ادمین ها هستند</p>
         </div>
         <span className="text-sm text-gray-500">{delayedItems.length} سفارش</span>
@@ -799,7 +802,7 @@ const BacklinkPage: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
          {delayedItems.map((item) => (
   <OrderItemCard
     key={item.id}
