@@ -327,7 +327,7 @@ export const ProductRecommendations = ({
       case "5":
         return "bg-gradient-to-br from-indigo-50 to-blue-50";
       case "6":
-        return "bg-gradient-to-br from-red-50 to-pink-50";
+        return "bg-gradient-to-br from-green-50 to-blue-50";
       default:
         return "bg-gradient-to-br from-gray-50 to-white";
     }
@@ -537,32 +537,7 @@ export const ProductRecommendations = ({
                   </div>
                 )}
                 {/* نمایش اطلاعات امنیتی برای محصول امنیت */}
-                {product.id === "6" && securityAnalysis && (
-                  <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded-md">
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="text-red-700 font-medium">امتیاز امنیتی:</span>
-                      <span className="text-red-800 font-bold">{securityAnalysis.securityScore}/100</span>
-                    </div>
-                    {!securityAnalysis.isHttps && (
-                      <div className="flex justify-between items-center text-xs mt-1">
-                        <span className="text-red-700 font-medium">مشکل اصلی:</span>
-                        <span className="text-red-600 font-bold">عدم استفاده از HTTPS</span>
-                      </div>
-                    )}
-                    {!securityAnalysis.hasValidSSL && (
-                      <div className="flex justify-between items-center text-xs mt-1">
-                        <span className="text-red-700 font-medium">مشکل امنیتی:</span>
-                        <span className="text-red-600 font-bold">گواهی SSL نا معتبر</span>
-                      </div>
-                    )}
-                    {securityAnalysis.securityIssues.length > 0 && (
-                      <div className="flex justify-between items-center text-xs mt-1">
-                        <span className="text-red-700 font-medium">مشکلات شناسایی شده:</span>
-                        <span className="text-red-600 font-bold">{securityAnalysis.securityIssues.length} مورد</span>
-                      </div>
-                    )}
-                  </div>
-                )}
+              
                 <div className="mt-2 flex flex-wrap gap-1 justify-center">
                   {getProductReasons(product.id, scores, sitemapData, isDuplicate, brokenLinksCount, securityAnalysis).map((reason, index) => (
                     <span 
