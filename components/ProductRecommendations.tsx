@@ -121,7 +121,7 @@ export const ProductRecommendations = ({
     const mappedScores = {
       performance: scores["performance"] ?? scores["عملکرد"],
       accessibility: scores["accessibility"] ?? scores["دسترس‌ پذیری"],
-      bestPractices: scores["bestPractices"] ?? scores["بهترین شیوه‌ها"],
+      bestPractices: scores["bestPractices"] ?? scores["بهترین شیوه ها"],
       seo: scores["seo"] ?? scores["سئو"],
     };
     const { performance, accessibility, bestPractices, seo } = mappedScores;
@@ -246,7 +246,7 @@ export const ProductRecommendations = ({
       <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 shadow-sm border border-green-100 text-center">
         <h2 className="font-bold text-xl text-green-700 mb-2">وضعیت وبسایت شما عالی است 🎉</h2>
         <p className="text-gray-700 text-sm">
-          تمام بخش‌های اصلی وبسایت شما (عملکرد، سئو، بهترین شیوه‌ها، دسترسی‌ پذیری) امتیاز بالای ۹۰ دارند.
+          تمام بخش‌ های اصلی وبسایت شما (عملکرد، سئو، بهترین شیوه‌ها، دسترسی‌ پذیری) امتیاز بالای ۹۰ دارند.
           <br />
           {sitemapData && sitemapData.totalLinks >= 200 && (
             <span className="text-green-600 font-medium mt-2 inline-block text-xs">
@@ -327,7 +327,7 @@ export const ProductRecommendations = ({
       case "5":
         return "bg-gradient-to-br from-indigo-50 to-blue-50";
       case "6":
-        return "bg-gradient-to-br from-red-50 to-pink-50";
+        return "bg-gradient-to-br from-green-50 to-blue-50";
       default:
         return "bg-gradient-to-br from-gray-50 to-white";
     }
@@ -336,19 +336,20 @@ export const ProductRecommendations = ({
   const getVideoBackground = (productId: string) => {
     switch(productId) {
       case "1":
-        return "bg-red-100";
+        return "bg-[#00182f]";
       case "2":
-        return "bg-green-100";
+        return "bg-[#00182f]";
       case "3":
-        return "bg-blue-100";
+        return "bg-[#00182f]";
       case "4":
-        return "bg-purple-100";
+        return "bg-[#00182f]";
       case "5":
-        return "bg-indigo-100";
+        return "bg-[#00182f]";
       case "6":
-        return "bg-green-50";
+        return "bg-[#00182f]";
       default:
-        return "bg-gray-100";
+        return "bg-[#00182f]";
+
     }
   };
   return (
@@ -358,8 +359,8 @@ export const ProductRecommendations = ({
         <div className="flex items-center space-x-2 space-x-reverse bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
           <span>
             {isDuplicate 
-              ? "بر اساس تحلیل امتیازها و سایت ‌مپ موجود" 
-              : "بر اساس تحلیل امتیازها و سایت ‌مپ"
+              ? "بر اساس تحلیل امتیاز ها و سایت ‌مپ موجود" 
+              : "بر اساس تحلیل امتیاز ها و سایت ‌مپ"
             }
             {securityAnalysis && " و امنیت"}
           </span>
@@ -372,7 +373,7 @@ export const ProductRecommendations = ({
             <div className="mr-2">
               <h4 className="font-bold text-yellow-800 text-s mb-1">تحلیل مجدد با لینک تکراری</h4>
               <p className="text-yellow-700 text-s">
-                از آنجایی که این لینک قبلاً تحلیل شده، از داده‌های موجود استفاده می‌شود.
+                از آنجایی که این لینک قبلاً تحلیل شده، از داده‌ های موجود استفاده می‌ شود.
               </p>
             </div>
           </div>
@@ -406,10 +407,10 @@ export const ProductRecommendations = ({
             <div className="flex items-center justify-between">
               <div>
                 <h4 className={`font-bold text-s mb-1 ${linkSeverityColors.text}`}>
-                  وضعیت لینک‌های شکسته
+                  وضعیت لینک‌ های شکسته
                 </h4>
                 <p className={`text-s ${linkSeverityColors.text}`}>
-                  تعداد لینک‌های شکسته: <strong>{brokenLinksCount}</strong>
+                  تعداد لینک‌ های شکسته: <strong>{brokenLinksCount}</strong>
                   <span className="mr-2 font-medium">
                     {linkBuildingSeverity === 'medium' && "(نیاز به لینک‌ سازی)"}
                     {linkBuildingSeverity === 'high' && "(نیاز فوری به لینک‌ سازی)"}
@@ -476,7 +477,7 @@ export const ProductRecommendations = ({
             <div className="mr-2">
               <h4 className="font-bold text-red-800 text-xs mb-1">مشکل در نمایش محصول امنیتی</h4>
               <p className="text-red-700 text-xs">
-                مشکلات امنیتی شناسایی شده است اما محصول امنیتی نمایش داده نمی‌شود. 
+                مشکلات امنیتی شناسایی شده است اما محصول امنیتی نمایش داده نمی‌ شود. 
                 این ممکن است به دلیل مشکل در منطق نمایش باشد.
               </p>
               <div className="mt-1 text-xs text-red-600">
@@ -536,32 +537,7 @@ export const ProductRecommendations = ({
                   </div>
                 )}
                 {/* نمایش اطلاعات امنیتی برای محصول امنیت */}
-                {product.id === "6" && securityAnalysis && (
-                  <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded-md">
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="text-red-700 font-medium">امتیاز امنیتی:</span>
-                      <span className="text-red-800 font-bold">{securityAnalysis.securityScore}/100</span>
-                    </div>
-                    {!securityAnalysis.isHttps && (
-                      <div className="flex justify-between items-center text-xs mt-1">
-                        <span className="text-red-700 font-medium">مشکل اصلی:</span>
-                        <span className="text-red-600 font-bold">عدم استفاده از HTTPS</span>
-                      </div>
-                    )}
-                    {!securityAnalysis.hasValidSSL && (
-                      <div className="flex justify-between items-center text-xs mt-1">
-                        <span className="text-red-700 font-medium">مشکل امنیتی:</span>
-                        <span className="text-red-600 font-bold">گواهی SSL نامعتبر</span>
-                      </div>
-                    )}
-                    {securityAnalysis.securityIssues.length > 0 && (
-                      <div className="flex justify-between items-center text-xs mt-1">
-                        <span className="text-red-700 font-medium">مشکلات شناسایی شده:</span>
-                        <span className="text-red-600 font-bold">{securityAnalysis.securityIssues.length} مورد</span>
-                      </div>
-                    )}
-                  </div>
-                )}
+              
                 <div className="mt-2 flex flex-wrap gap-1 justify-center">
                   {getProductReasons(product.id, scores, sitemapData, isDuplicate, brokenLinksCount, securityAnalysis).map((reason, index) => (
                     <span 
@@ -612,7 +588,7 @@ export const ProductRecommendations = ({
       </div>
       {products.length === 0 && !allMainAbove90 && (
         <div className="text-center py-4 text-gray-600 text-sm">
-          هیچ محصولی برای نمایش وجود ندارد. وضعیت وبسایت شما در همه زمینه‌ها مناسب است.
+          هیچ محصولی برای نمایش وجود ندارد. وضعیت وبسایت شما در همه زمینه‌ ها مناسب است.
         </div>
       )}
       {needsContentProduction && sitemapData && (
@@ -622,12 +598,12 @@ export const ProductRecommendations = ({
             <div className="mr-2">
               <h4 className="font-bold text-blue-800 text-s mb-1">نیاز به تولید محتوای بیشتر و ساختار دهی</h4>
               <p className="text-blue-700 text-s">
-                تعداد لینک‌های سایت‌مپ شما ({sitemapData.totalLinks}) کمتر از ۲۰۰ است.
-                برای بهبود رتبه سئو و افزایش visibility در موتورهای جستجو، 
-                تولید محتوای بیشتر و ساختاردهی مناسب محتواها (کلاسترینگ) ضروری است.
+                تعداد لینک‌های سایت‌ مپ شما ({sitemapData.totalLinks}) کمتر از ۲۰۰ است.
+                برای بهبود رتبه سئو و افزایش visibility در موتور های جستجو، 
+                تولید محتوای بیشتر و ساختاردهی مناسب محتوا ها (کلاسترینگ) ضروری است.
                 {isDuplicate && (
                   <span className="block mt-1 text-blue-800 font-medium text-s">
-                    🔄 این پیشنهاد بر اساس تحلیل تکراری و داده‌ های موجود ارائه می‌شود.
+                    🔄 این پیشنهاد بر اساس تحلیل تکراری و داده‌ های موجود ارائه می‌ شود.
                   </span>
                 )}
                 <strong className="block mt-1 text-s">توصیه: ابتدا قرص کلاسترینگ را خریداری کنید سپس تولید محتوا را آغاز نمایید.</strong>
@@ -650,14 +626,14 @@ export const ProductRecommendations = ({
               </h4>
               <p className={`text-s ${linkSeverityColors.text}`}>
                 {linkBuildingSeverity === 'medium' && 
-                  `تعداد لینک‌های شکسته سایت شما (${brokenLinksCount}) بین ۱۱ تا ۳۰ است. نیاز به اقدام برای لینک‌ سازی خارجی دارید.`
+                  `تعداد لینک‌ های شکسته سایت شما (${brokenLinksCount}) بین ۱۱ تا ۳۰ است. نیاز به اقدام برای لینک‌ سازی خارجی دارید.`
                 }
                 {linkBuildingSeverity === 'high' && 
-                  `تعداد لینک‌های شکسته سایت شما (${brokenLinksCount}) بیشتر از ۳۰ است که نیاز به لینک‌سازی فوری دارد. این لینک‌ های شکسته می‌ توانند بر رتبه سئوی شما تأثیر منفی بگذارند.`
+                  `تعداد لینک‌ های شکسته سایت شما (${brokenLinksCount}) بیشتر از ۳۰ است که نیاز به لینک‌سازی فوری دارد. این لینک‌ های شکسته می‌ توانند بر رتبه سئوی شما تأثیر منفی بگذارند.`
                 }
                 <strong className="block mt-1 text-s">
                   {linkBuildingSeverity === 'medium' && "توصیه: با استفاده از قرص لینک‌ سازی، بک ‌لینک‌ های باکیفیت و مرتبط بسازید."}
-                  {linkBuildingSeverity === 'high' && "توصیه: فوراً قرص لینک‌ سازی را خریداری کنید تا بک‌ لینک‌های باکیفیت بسازید."}
+                  {linkBuildingSeverity === 'high' && "توصیه: فوراً قرص لینک‌ سازی را خریداری کنید تا بک‌ لینک‌ های باکیفیت بسازید."}
                 </strong>
               </p>
             </div>
@@ -679,7 +655,7 @@ export const ProductRecommendations = ({
               </h4>
               <p className={`text-xs ${securitySeverityColors.text}`}>
                 {!securityAnalysis.isHttps && 
-                  "وبسایت شما از پروتکل ناامن HTTP استفاده می‌کند که می‌ تواند برای کاربران و اطلاعات آن‌ها خطرناک باشد."
+                  "وبسایت شما از پروتکل ناامن HTTP استفاده می‌ کند که می‌ تواند برای کاربران و اطلاعات آن‌ ها خطرناک باشد."
                 }
                 {securityAnalysis.isHttps && !securityAnalysis.hasValidSSL && 
                   "گواهی SSL وبسایت شما معتبر نیست که می‌ تواند باعث کاهش اعتماد کاربران و مشکلات امنیتی شود."
@@ -715,7 +691,7 @@ function getProductReasons(
   const seo = scores["seo"] ?? scores["سئو"]; 
   const performance = scores["performance"] ?? scores["عملکرد"];
   const accessibility = scores["accessibility"] ?? scores["دسترس ‌پذیری"];
-  const bestPractices = scores["bestPractices"] ?? scores["بهترین شیوه‌ها"];
+  const bestPractices = scores["bestPractices"] ?? scores["بهترین شیوه ها"];
   switch (productId) {
     case "1":
       if ([seo, performance, accessibility, bestPractices].some((s) => (s || 0) < 0.8)) {
@@ -759,7 +735,7 @@ function getProductReasons(
           reasons.push("عدم استفاده از HTTPS");
         }
         if (!securityAnalysis.hasValidSSL) {
-          reasons.push("گواهی SSL نامعتبر");
+          reasons.push("گواهی SSL نا معتبر");
         }
         if (securityAnalysis.securityScore < 80) {
           reasons.push("امتیاز امنیتی پایین");

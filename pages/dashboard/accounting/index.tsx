@@ -513,7 +513,7 @@ const AccountingPage: React.FC = () => {
                   <thead>
                     <tr className="bg-gradient-to-r from-blue-600 to-indigo-600">
                       <th className="border p-4 text-white text-center">محصول</th>
-                      <th className="border p-4 text-white text-center">ویژگی‌ها</th>
+                      <th className="border p-4 text-white text-center">ویژگی‌ ها</th>
                       <th className="border p-4 text-white text-center">تعداد</th>
                       <th className="border p-4 text-white text-center">قیمت کل</th>
                       <th className="border p-4 text-white text-center">وضعیت</th>
