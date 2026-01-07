@@ -1,4 +1,4 @@
-// OrderItemCard.tsx - Only changed delayed orders to look like waiting orders
+// OrderItemCard.tsx - All cards now look exactly like waiting orders
 import React, { useState, useEffect } from 'react';
 import { Copy, CheckCircle, Clock, AlertTriangle, Calendar, Tag, Hash, ChevronRight, Play, Package } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -315,63 +315,285 @@ const OrderItemCard: React.FC<OrderItemCardProps> = ({
               </div>
             ) : (
               // Show different content based on configuration
-              <div className="w-20 h-20 sm:w-30 sm:h-30 rounded-full flex items-center justify-center transition-all duration-500 overflow-hidden relative mx-auto">
-                {shouldShowImage && displayImage && !imageError ? (
-                  // Enhanced visible animation for images
+              <div className="rounded-full flex items-center justify-center transition-all duration-500 overflow-hidden relative mx-auto aspect-square">                {shouldShowImage && displayImage && !imageError ? (
+                // Enhanced visible animation for images
+                <motion.div
+                  className="w-29 h-29 relative"
+                  whileHover={{ scale: 1.1, rotate: -5 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                >
+                  {/* Enhanced gradient overlay with animation */}
                   <motion.div
-                    className="w-full h-full relative"
-                    whileHover={{ scale: 1.1, rotate: -5 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                  >
-                    {/* Enhanced gradient overlay with animation */}
-                    <motion.div
-                      className="absolute inset-0 rounded-full"
-                      animate={{}}
-                      transition={{
+                    className="absolute inset-0 rounded-full"
+                    animate={{}}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  />
+
+                  {/* Enhanced floating animation - More visible */}
+                  <motion.div
+                    className="w-full h-full"
+                    animate={{
+                      y: [0, -6, 0],
+                      rotate: [0, 1, 0, -2, 0],
+                    }}
+                    transition={{
+                      y: {
                         duration: 3,
                         repeat: Infinity,
                         ease: "easeInOut",
-                      }}
+                      },
+                      rotate: {
+                        duration: 4,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      },
+                    }}
+                  >
+                    <Image
+                      height={600}
+                      width={500}
+                      src={displayImage}
+                      alt={item.productTitle}
+                      className="w-full h-full object-cover p-2"
+                      onError={() => setImageError(true)}
                     />
-                    
-                    {/* Enhanced floating animation - More visible */}
+                  </motion.div>
+
+                  {/* Enhanced inner glow */}
+                  <motion.div
+                    className="absolute inset-0 rounded-full"
+                    animate={{
+                      boxShadow: [
+                        'inset 0 2px 8px rgba(255,255,255,0.8)',
+                        'inset 0 4px 12px rgba(255,255,255,0.9)',
+                        'inset 0 2px 8px rgba(255,255,255,0.8)',
+                      ],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                    }}
+                  />
+
+                  {/* Enhanced status overlay for processing */}
+                  {item.adminStatus === 'processing' && (
+                    <>
+                      {/* Highly visible pulse ring */}
+                      <motion.div
+                        className="absolute -inset-2 rounded-full border-2 border-[#f59e0b]"
+                        animate={{
+                          scale: [1, 1.15, 1],
+                          opacity: [0.3, 0.7, 0.3],
+                          borderWidth: [2, 3, 2],
+                        }}
+                        transition={{
+                          duration: 1.5,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
+                      />
+
+                      {/* Highly visible status indicator */}
+                      <div className="absolute -top-2 -right-2 z-30">
+                        <motion.div
+                          className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-white to-gray-50 rounded-full flex items-center justify-center shadow-lg border-2 border-[#f59e0b]/30"
+                          animate={{
+                            scale: [1, 1.2, 1],
+                            rotate: [0, 10, -10, 0],
+                            boxShadow: [
+                              '0 4px 12px rgba(245, 158, 11, 0.3)',
+                              '0 6px 20px rgba(245, 158, 11, 0.5)',
+                              '0 4px 12px rgba(245, 158, 11, 0.3)',
+                            ],
+                          }}
+                          transition={{
+                            scale: {
+                              duration: 1,
+                              repeat: Infinity,
+                            },
+                            rotate: {
+                              duration: 2,
+                              repeat: Infinity,
+                            },
+                            boxShadow: {
+                              duration: 1.5,
+                              repeat: Infinity,
+                            },
+                          }}
+                        >
+                          <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-[#f59e0b]" />
+                        </motion.div>
+                      </div>
+                    </>
+                  )}
+                </motion.div>
+              ) : (
+                // Highly visible status indicators without images
+                item.adminStatus === 'processing' ? (
+                  // Highly visible processing indicator
+                  <motion.div
+                    className="relative w-12 h-12 sm:w-16 sm:h-16"
+                    animate={{
+                      scale: [1, 1.08, 1],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    {/* Animated gradient background */}
                     <motion.div
-                      className="w-full h-full"
+                      className="absolute inset-0 rounded-full"
                       animate={{
-                        y: [0, -6, 0],
-                        rotate: [0, 1, 0, -2, 0],
+                        background: [
+                          'linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fef3c7 100%)',
+                          'linear-gradient(135deg, #fde68a 0%, #fef3c7 50%, #fde68a 100%)',
+                          'linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fef3c7 100%)',
+                        ],
                       }}
                       transition={{
-                        y: {
-                          duration: 3,
+                        duration: 3,
+                        repeat: Infinity,
+                      }}
+                    />
+
+                    {/* Highly visible animated ring */}
+                    <motion.div
+                      className="absolute -inset-2 rounded-full border-2 border-[#f59e0b]/60"
+                      animate={{
+                        rotate: 360,
+                        scale: [1, 1.1, 1],
+                        borderWidth: [2, 4, 2],
+                      }}
+                      transition={{
+                        rotate: {
+                          duration: 8,
+                          repeat: Infinity,
+                          ease: "linear",
+                        },
+                        scale: {
+                          duration: 1.5,
                           repeat: Infinity,
                           ease: "easeInOut",
                         },
-                        rotate: {
-                          duration: 4,
+                        borderWidth: {
+                          duration: 1,
                           repeat: Infinity,
-                          ease: "easeInOut",
                         },
                       }}
-                    >
-                      <Image
-                        height={600}
-                        width={500}
-                        src={displayImage}
-                        alt={item.productTitle}
-                        className="w-full h-full object-cover p-2"
-                        onError={() => setImageError(true)}
+                    />
+
+                    {/* Highly visible clock animation */}
+                    <div className="relative z-10 w-full h-full rounded-full flex items-center justify-center">
+                      <motion.div
+                        className="relative"
+                        animate={{
+                          rotate: [0, 15, 0, -15, 0],
+                          scale: [1, 1.1, 1],
+                        }}
+                        transition={{
+                          rotate: {
+                            duration: 3,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                          },
+                          scale: {
+                            duration: 1.5,
+                            repeat: Infinity,
+                          },
+                        }}
+                      >
+                        <Clock className="w-6 h-6 sm:w-10 sm:h-10 text-[#f59e0b] drop-shadow-lg" />
+                      </motion.div>
+                    </div>
+
+                    {/* Highly visible orbiting dots */}
+                    {[0, 90, 180, 270].map((degree, index) => (
+                      <motion.div
+                        key={index}
+                        className="absolute w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#5ac7d7] rounded-full shadow-lg"
+                        style={{
+                          top: '50%',
+                          left: '50%',
+                          transform: `translate(-50%, -50%) rotate(${degree}deg) translate(20px sm:translate(28px)`,
+                        }}
+                        animate={{
+                          opacity: [0.4, 1, 0.4],
+                          scale: [0.8, 1.4, 0.8],
+                          boxShadow: [
+                            '0 0 0 rgba(90, 199, 215, 0)',
+                            '0 0 8px rgba(90, 199, 215, 0.8)',
+                            '0 0 0 rgba(90, 199, 215, 0)',
+                          ],
+                        }}
+                        transition={{
+                          duration: 1.5,
+                          repeat: Infinity,
+                          delay: index * 0.3,
+                        }}
                       />
-                    </motion.div>
-                   
-                    {/* Enhanced inner glow */}
+                    ))}
+                  </motion.div>
+                ) : (
+                  // Highly visible pending/other status indicator
+                  <motion.div
+                    className="w-12 h-12 sm:w-16 sm:h-16 rounded-full relative"
+                    animate={{
+                      scale: [1, 1.05, 1],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                  >
+                    {/* Animated gradient background */}
+                    <motion.div
+                      className="absolute inset-0 rounded-full"
+                      animate={{
+                        background: [
+                          'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)',
+                          'linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 50%, #f8fafc 100%)',
+                          'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)',
+                        ],
+                      }}
+                      transition={{
+                        duration: 4,
+                        repeat: Infinity,
+                      }}
+                    />
+
+                    {/* Highly visible shimmer effect */}
+                    <motion.div
+                      className="absolute inset-0 rounded-full overflow-hidden"
+                      animate={{
+                        x: ['-100%', '200%'],
+                      }}
+                      transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
+                      style={{
+                        background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.8) 50%, transparent 100%)',
+                        backgroundSize: '50% 100%',
+                      }}
+                    />
+
+                    {/* Enhanced inner shadow with animation */}
                     <motion.div
                       className="absolute inset-0 rounded-full"
                       animate={{
                         boxShadow: [
-                          'inset 0 2px 8px rgba(255,255,255,0.8)',
-                          'inset 0 4px 12px rgba(255,255,255,0.9)',
-                          'inset 0 2px 8px rgba(255,255,255,0.8)',
+                          'inset 0 2px 8px rgba(0,0,0,0.08)',
+                          'inset 0 4px 12px rgba(0,0,0,0.12)',
+                          'inset 0 2px 8px rgba(0,0,0,0.08)',
                         ],
                       }}
                       transition={{
@@ -379,277 +601,54 @@ const OrderItemCard: React.FC<OrderItemCardProps> = ({
                         repeat: Infinity,
                       }}
                     />
-                    
-                    {/* Enhanced status overlay for processing */}
-                    {item.adminStatus === 'processing' && (
-                      <>
-                        {/* Highly visible pulse ring */}
-                        <motion.div
-                          className="absolute -inset-2 rounded-full border-2 border-[#f59e0b]"
-                          animate={{
-                            scale: [1, 1.15, 1],
-                            opacity: [0.3, 0.7, 0.3],
-                            borderWidth: [2, 3, 2],
-                          }}
-                          transition={{
-                            duration: 1.5,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                          }}
-                        />
-                        
-                        {/* Highly visible status indicator */}
-                        <div className="absolute -top-2 -right-2 z-30">
-                          <motion.div
-                            className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-white to-gray-50 rounded-full flex items-center justify-center shadow-lg border-2 border-[#f59e0b]/30"
-                            animate={{
-                              scale: [1, 1.2, 1],
-                              rotate: [0, 10, -10, 0],
-                              boxShadow: [
-                                '0 4px 12px rgba(245, 158, 11, 0.3)',
-                                '0 6px 20px rgba(245, 158, 11, 0.5)',
-                                '0 4px 12px rgba(245, 158, 11, 0.3)',
-                              ],
-                            }}
-                            transition={{
-                              scale: {
-                                duration: 1,
-                                repeat: Infinity,
-                              },
-                              rotate: {
-                                duration: 2,
-                                repeat: Infinity,
-                              },
-                              boxShadow: {
-                                duration: 1.5,
-                                repeat: Infinity,
-                              },
-                            }}
-                          >
-                            <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-[#f59e0b]" />
-                          </motion.div>
-                        </div>
-                      </>
-                    )}
-                  </motion.div>
-                ) : (
-                  // Highly visible status indicators without images
-                  item.adminStatus === 'processing' ? (
-                    // Highly visible processing indicator
-                    <motion.div
-                      className="relative w-12 h-12 sm:w-16 sm:h-16"
-                      animate={{
-                        scale: [1, 1.08, 1],
-                      }}
-                      transition={{
-                        duration: 1.5,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      }}
-                    >
-                      {/* Animated gradient background */}
-                      <motion.div
-                        className="absolute inset-0 rounded-full"
-                        animate={{
-                          background: [
-                            'linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fef3c7 100%)',
-                            'linear-gradient(135deg, #fde68a 0%, #fef3c7 50%, #fde68a 100%)',
-                            'linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fef3c7 100%)',
-                          ],
-                        }}
-                        transition={{
-                          duration: 3,
-                          repeat: Infinity,
-                        }}
-                      />
-                      
-                      {/* Highly visible animated ring */}
-                      <motion.div
-                        className="absolute -inset-2 rounded-full border-2 border-[#f59e0b]/60"
-                        animate={{
-                          rotate: 360,
-                          scale: [1, 1.1, 1],
-                          borderWidth: [2, 4, 2],
-                        }}
-                        transition={{
-                          rotate: {
-                            duration: 8,
-                            repeat: Infinity,
-                            ease: "linear",
-                          },
-                          scale: {
-                            duration: 1.5,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                          },
-                          borderWidth: {
-                            duration: 1,
-                            repeat: Infinity,
-                          },
-                        }}
-                      />
-                      
-                      {/* Highly visible clock animation */}
-                      <div className="relative z-10 w-full h-full rounded-full flex items-center justify-center">
+
+                    {/* Status icon with enhanced animation - Show Package icon for ALL non-processing statuses */}
+                    {item.adminStatus !== 'processing' && (
+                      <div className="absolute inset-0 flex items-center justify-center">
                         <motion.div
                           className="relative"
                           animate={{
-                            rotate: [0, 15, 0, -15, 0],
-                            scale: [1, 1.1, 1],
+                            y: [0, -3, 0],
+                            rotate: [0, 5, 0, -5, 0],
                           }}
                           transition={{
+                            y: {
+                              duration: 2,
+                              repeat: Infinity,
+                            },
                             rotate: {
                               duration: 3,
-                              repeat: Infinity,
-                              ease: "easeInOut",
-                            },
-                            scale: {
-                              duration: 1.5,
                               repeat: Infinity,
                             },
                           }}
                         >
-                          <Clock className="w-6 h-6 sm:w-10 sm:h-10 text-[#f59e0b] drop-shadow-lg" />
+                          <div className="absolute -inset-2 sm:-inset-3 bg-white/40 rounded-full blur-md" />
+                          <Package className="w-5 h-5 sm:w-7 sm:h-7 text-gray-600 relative z-10 drop-shadow-sm" />
                         </motion.div>
                       </div>
-                      
-                      {/* Highly visible orbiting dots */}
-                      {[0, 90, 180, 270].map((degree, index) => (
-                        <motion.div
-                          key={index}
-                          className="absolute w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#5ac7d7] rounded-full shadow-lg"
-                          style={{
-                            top: '50%',
-                            left: '50%',
-                            transform: `translate(-50%, -50%) rotate(${degree}deg) translate(20px sm:translate(28px)`,
-                          }}
-                          animate={{
-                            opacity: [0.4, 1, 0.4],
-                            scale: [0.8, 1.4, 0.8],
-                            boxShadow: [
-                              '0 0 0 rgba(90, 199, 215, 0)',
-                              '0 0 8px rgba(90, 199, 215, 0.8)',
-                              '0 0 0 rgba(90, 199, 215, 0)',
-                            ],
-                          }}
-                          transition={{
-                            duration: 1.5,
-                            repeat: Infinity,
-                            delay: index * 0.3,
-                          }}
-                        />
-                      ))}
-                    </motion.div>
-                  ) : (
-                    // Highly visible pending/other status indicator
+                    )}
+
+                    {/* Animated corner accent */}
                     <motion.div
-                      className="w-12 h-12 sm:w-16 sm:h-16 rounded-full relative"
+                      className="absolute top-0 right-0 w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-br from-gray-400 to-transparent rounded-tr-full"
                       animate={{
-                        scale: [1, 1.05, 1],
+                        opacity: [0.3, 0.8, 0.3],
+                        scale: [1, 1.2, 1],
                       }}
                       transition={{
-                        duration: 2,
+                        duration: 1.5,
                         repeat: Infinity,
-                        ease: "easeInOut",
                       }}
-                      whileHover={{ scale: 1.1, rotate: 5 }}
-                    >
-                      {/* Animated gradient background */}
-                      <motion.div
-                        className="absolute inset-0 rounded-full"
-                        animate={{
-                          background: [
-                            'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)',
-                            'linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 50%, #f8fafc 100%)',
-                            'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)',
-                          ],
-                        }}
-                        transition={{
-                          duration: 4,
-                          repeat: Infinity,
-                        }}
-                      />
-                      
-                      {/* Highly visible shimmer effect */}
-                      <motion.div
-                        className="absolute inset-0 rounded-full overflow-hidden"
-                        animate={{
-                          x: ['-100%', '200%'],
-                        }}
-                        transition={{
-                          duration: 1.5,
-                          repeat: Infinity,
-                          ease: "linear",
-                        }}
-                        style={{
-                          background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.8) 50%, transparent 100%)',
-                          backgroundSize: '50% 100%',
-                        }}
-                      />
-                      
-                      {/* Enhanced inner shadow with animation */}
-                      <motion.div
-                        className="absolute inset-0 rounded-full"
-                        animate={{
-                          boxShadow: [
-                            'inset 0 2px 8px rgba(0,0,0,0.08)',
-                            'inset 0 4px 12px rgba(0,0,0,0.12)',
-                            'inset 0 2px 8px rgba(0,0,0,0.08)',
-                          ],
-                        }}
-                        transition={{
-                          duration: 2,
-                          repeat: Infinity,
-                        }}
-                      />
-                      
-                      {/* Status icon with enhanced animation - Show Package icon for delayed AND pending orders */}
-                      {(item.adminStatus === 'pending' || delayed) && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <motion.div
-                            className="relative"
-                            animate={{
-                              y: [0, -3, 0],
-                              rotate: [0, 5, 0, -5, 0],
-                            }}
-                            transition={{
-                              y: {
-                                duration: 2,
-                                repeat: Infinity,
-                              },
-                              rotate: {
-                                duration: 3,
-                                repeat: Infinity,
-                              },
-                            }}
-                          >
-                            <div className="absolute -inset-2 sm:-inset-3 bg-white/40 rounded-full blur-md" />
-                            <Package className="w-5 h-5 sm:w-7 sm:h-7 text-gray-600 relative z-10 drop-shadow-sm" />
-                          </motion.div>
-                        </div>
-                      )}
-            
-                      {/* Animated corner accent */}
-                      <motion.div
-                        className="absolute top-0 right-0 w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-br from-gray-400 to-transparent rounded-tr-full"
-                        animate={{
-                          opacity: [0.3, 0.8, 0.3],
-                          scale: [1, 1.2, 1],
-                        }}
-                        transition={{
-                          duration: 1.5,
-                          repeat: Infinity,
-                        }}
-                      />
-                    </motion.div>
-                  )
-                )}
-                
+                    />
+                  </motion.div>
+                )
+              )}
+
                 {/* Highly visible hover effect */}
                 <motion.div
                   className="absolute -inset-2 rounded-full pointer-events-none"
                   initial={{ opacity: 0 }}
-                  animate={{ 
+                  animate={{
                     opacity: isHovered ? 1 : 0,
                     scale: isHovered ? 1.1 : 1,
                   }}
@@ -660,15 +659,22 @@ const OrderItemCard: React.FC<OrderItemCardProps> = ({
             )}
 
             {/* Status indicator ring */}
-            <motion.div
-              className="absolute -inset-1 rounded-full border-2 pointer-events-none"
-              style={{ borderColor: delayed ? '#ef4444' : getStatusColor(item.adminStatus) }}
-              animate={{
-                opacity: isHovered ? 0.3 : 0,
-                scale: isHovered ? 1.15 : 1,
-              }}
-              transition={{ duration: 0.3 }}
-            />
+           {/* Status indicator ring - Fixed to match image dimensions */}
+<motion.div
+  className="absolute rounded-full border-2 pointer-events-none"
+  style={{
+    borderColor: delayed ? '#ef4444' : getStatusColor(item.adminStatus),
+    width: 'calc(100% - 16px)',
+    height: 'calc(100% - 16px)',
+    top: '8px',
+    left: '8px',
+  }}
+  animate={{
+    opacity: isHovered ? 0.3 : 0,
+    scale: isHovered ? 1.15 : 1,
+  }}
+  transition={{ duration: 0.3 }}
+/>
           </div>
         </div>
       </div>

@@ -6,7 +6,6 @@ import { useUserOrders } from "@/hooks/useUserOrders";
 import { useVipDeadline } from "@/hooks/useVipDeadline";
 import { useAuth } from "@/contexts/AuthContext";
 import SimpleProgress from "@/components/dashboard/AnimatedProgress";
-import CircularProgressWithTimesmall from "@/components/dashboard/AnimatedProgresssmall";
 import { motion, AnimatePresence } from 'framer-motion';
 // Add these imports at the top of BacklinkPage
 import { Calendar, Tag, Hash, ExternalLink } from 'lucide-react';
@@ -344,7 +343,7 @@ const BacklinkPage: React.FC = () => {
     {
       id: 'active',
       label: 'در حال اجرا',
-      icon: <PlayCircle className="w-4 h-4" />,
+      icon: <PlayCircle className="w-3 h-3 sm:w-4 sm:h-4" />,
       count: activeItems.length + waitingForAdminItems.length,
       color: 'text-gray-900',
       bgColor: 'bg-gray-100'
@@ -352,7 +351,7 @@ const BacklinkPage: React.FC = () => {
     {
       id: 'pending',
       label: 'نیاز به ثبت',
-      icon: <Edit2 className="w-4 h-4" />,
+      icon: <Edit2 className="w-3 h-3 sm:w-4 sm:h-4" />,
       count: pendingItems.length,
       color: 'text-blue-600',
       bgColor: 'bg-blue-100'
@@ -360,7 +359,7 @@ const BacklinkPage: React.FC = () => {
     {
       id: 'delayed',
       label: 'تاخیر خورده',
-      icon: <AlertOctagon className="w-4 h-4" />,
+      icon: <AlertOctagon className="w-3 h-3 sm:w-4 sm:h-4" />,
       count: delayedItems.length,
       color: 'text-red-600',
       bgColor: 'bg-red-100'
@@ -368,7 +367,7 @@ const BacklinkPage: React.FC = () => {
     {
       id: 'completed',
       label: 'تکمیل شده',
-      icon: <CheckCircle className="w-4 h-4" />,
+      icon: <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />,
       count: completedItems.length,
       color: 'text-emerald-600',
       bgColor: 'bg-emerald-100'
@@ -401,189 +400,314 @@ const BacklinkPage: React.FC = () => {
 
         {/* Main Active Order */}
         {mainActiveItem && (
-          <div className="">
-            <div className="bg-gray-100 shadow-sm rounded-2xl border border-gray-200 p-6 lg:p-7 ">
-              <div className="flex flex-col lg:flex-row gap-6 items-start">
-                {/* Content Section - Left */}
-                <div className="flex-1 space-y-5">
-                  <div className="space-y-3">
-                    <div className="flex flex-wrap items-center gap-2">
-                      {isDelayed(mainActiveItem) && (
-                        <span className="px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-xs font-medium flex items-center gap-1.5">
-                          <AlertTriangle className="w-3 h-3" />
-                          تاخیر خورده
-                        </span>
-                      )}
-                      {isVIP && mainActiveItem.vipDeadline && (
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-emerald-50 to-emerald-100 border border-emerald-200 rounded-lg">
-                          <Clock className="w-3 h-3 text-emerald-600" />
-                          <span className="text-xs font-medium text-emerald-700">
-                            مهلت ویژه
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 leading-snug">
-                      {mainActiveItem.productTitle}
-                    </h3>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-xs font-medium text-gray-500 mb-1.5">ویژگی‌ها</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {mainActiveItem.attributes.map((attr, idx) => (
-                            <span
-                              key={idx}
-                              className="px-2.5 py-1 bg-blue-50 text-blue-700 border border-blue-100 rounded-lg text-xs font-medium"
-                            >
-                              {attr.value}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-xs font-medium text-gray-500 mb-1">تاریخ خرید</p>
-                        <p className="text-gray-900 font-medium text-sm">
-                          {new Date(mainActiveItem.createdAt).toLocaleDateString("fa-IR")}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2.5">
-                      {mainActiveItem.submittedValues?.map((val) => (
-                        <div key={val.id} className="flex items-center justify-between py-1.5 group hover:bg-gray-50 rounded px-1.5 -mx-1.5 transition-colors">
-                          <span className="text-sm text-gray-600">{val.label}:</span>
-                          <div className="flex items-center gap-2 min-w-0">
-                            <span className="text-sm font-medium text-gray-900 truncate max-w-[140px]">
-                              {val.value}
-                            </span>
-                            <button
-                              onClick={() => copyToClipboard(val.value, val.id)}
-                              className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors p-0.5 rounded"
-                            >
-                              {copiedId === val.id ? (
-                                <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                              ) : (
-                                <Copy className="w-3.5 h-3.5" />
-                              )}
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Progress Bar Section */}
-                <div className="lg:w-auto w-full">
-                  <div className="flex flex-col items-center gap-3">
-                    {shouldShowProgressBar(mainActiveItem) ? (
-                      <>
-                        <div className="relative">
-                          <div className="scale-90 lg:scale-100 transform-gpu">
-                            <SimpleProgress
-                              startTime={mainActiveItem.startTime}
-                              deadline={mainActiveItem.deadline || ""}
-                              completionTime={mainActiveItem.completionTime}
-                              delayed={isDelayed(mainActiveItem)}
-                              canceled={mainActiveItem.adminStatus === "cancelled"}
-                              productImage={mainActiveItem.imageUrl}
-                              videoUrl={mainActiveItem.videoUrl}
-                              productTitle={mainActiveItem.productTitle}
-                            />
-                            <div className="pt-4 flex justify-center">
-                              <button
-                                onClick={() => handleItemClick(mainActiveItem.id)}
-                                className="px-4 py-2 text-gray-600 rounded-lg transition-all duration-200 font-medium text-sm flex items-center gap-1.5"
-                              >
-                                مشاهده جزئیات
-                                <svg className="w-3.5 h-3.5 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="w-28 h-28 flex flex-col items-center justify-center">
-                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-2">
-                          <Clock className="w-6 h-6 text-gray-400" />
-                        </div>
-                        <div className="text-center">
-                          <span className="text-sm font-medium text-gray-600 block">در انتظار شروع</span>
-                          <span className="text-xs text-gray-500">به زودی شروع می‌شود</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ 
+      duration: 0.4,
+      ease: [0.22, 1, 0.36, 1] // Custom easing curve for smooth motion
+    }}
+    className="relative"
+  >
+    <div className="bg-[#153e4c] shadow-sm rounded-xl sm:rounded-2xl border border-gray-200 p-4 sm:p-6 lg:p-7 overflow-hidden">
+      {/* Slide-in content container */}
+      <div className="relative">
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 items-start">
+          {/* Content Section - Left */}
+          <motion.div
+            initial={{ x: -30, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="flex-1 space-y-4 sm:space-y-5 h-55 bg-white rounded-xl p-6"
+          >
+            <div className="space-y-2 sm:space-y-3">
+              <div className="flex flex-wrap items-center gap-2">
+                {isDelayed(mainActiveItem) && (
+                  <motion.span
+                    initial={{ rotate: -10, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    transition={{ 
+                      type: "spring",
+                      stiffness: 400,
+                      damping: 15,
+                      delay: 0.3
+                    }}
+                    className="px-2 py-1 sm:px-2.5 sm:py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-xs font-medium flex items-center gap-1.5"
+                  >
+                    <AlertTriangle className="w-3 h-3" />
+                    تاخیر خورده
+                  </motion.span>
+                )}
+                {isVIP && mainActiveItem.vipDeadline && (
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ 
+                      type: "spring",
+                      stiffness: 500,
+                      delay: 0.35
+                    }}
+                    className="flex items-center gap-1.5 px-2 py-1 sm:px-2.5 sm:py-1 bg-gradient-to-r from-emerald-50 to-emerald-100 border border-emerald-200 rounded-lg"
+                  >
+                    <Clock className="w-3 h-3 text-emerald-600" />
+                    <span className="text-xs font-medium text-emerald-700">
+                      مهلت ویژه
+                    </span>
+                  </motion.span>
+                )}
               </div>
+              
+              <motion.h3
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.4, delay: 0.25 }}
+                className="text-xl  font-semibold text-gray-900 leading-snug"
+              >
+                {mainActiveItem.productTitle}
+              </motion.h3>
             </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <p className="text-md font-medium text-gray-700 mb-1.5">ویژگی‌ها</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {mainActiveItem.attributes.map((attr, idx) => (
+                      <motion.span
+                        key={idx}
+                        initial={{ 
+                          scale: 0,
+                          rotate: -20 
+                        }}
+                        animate={{ 
+                          scale: 1,
+                          rotate: 0 
+                        }}
+                        transition={{ 
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 12,
+                          delay: 0.4 + idx * 0.08
+                        }}
+                        whileHover={{ 
+                          y: -2,
+                          boxShadow: "0 4px 12px rgba(59, 130, 246, 0.15)"
+                        }}
+                        className="px-2 py-1 sm:px-2.5 sm:py-1 bg-blue-50 text-blue-700 border border-blue-100 rounded-lg text-md font-medium cursor-default inline-block"
+                      >
+                        {attr.value}
+                      </motion.span>
+                    ))}
+                  </div>
+                </div>
+                
+                <motion.div
+                className="flex justify-between mt-6"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                >
+                  <p className="text-md font-medium text-gray-700 mb-1">تاریخ خرید</p>
+                  <p className="text-gray-900 font-medium text-md">
+                    {new Date(mainActiveItem.createdAt).toLocaleDateString("fa-IR")}
+                  </p>
+                </motion.div>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+              >
+                {mainActiveItem.submittedValues?.map((val, idx) => (
+                  <motion.div
+                    key={val.id}
+                    initial={{ x: 20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ 
+                      duration: 0.3,
+                      delay: 0.7 + idx * 0.1 
+                    }}
+                    whileHover={{ 
+                      x: -5,
+                      transition: { duration: 0.2 }
+                    }}
+                    className="flex items-center justify-between py-1.5 group hover:bg-gray-50 rounded px-1.5 -mx-1.5 transition-colors"
+                  >
+                    <span className="text-sm text-gray-600">{val.label}:</span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-sm font-medium text-gray-900 truncate max-w-[120px] sm:max-w-[140px]">
+                        {val.value}
+                      </span>
+                      <motion.button
+                        onClick={() => copyToClipboard(val.value, val.id)}
+                        whileHover={{ 
+                          scale: 1.2,
+                          rotate: 5 
+                        }}
+                        whileTap={{ scale: 0.9 }}
+                        className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors p-0.5 rounded"
+                      >
+                        {copiedId === val.id ? (
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ 
+                              type: "spring",
+                              stiffness: 500
+                            }}
+                          >
+                            <CheckCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-500" />
+                          </motion.div>
+                        ) : (
+                          <Copy className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                        )}
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
+          </motion.div>
+
+          {/* Progress Bar Section - Right side */}
+          <motion.div
+  initial={{ x: 30, opacity: 0, scale: 0.95 }}
+  animate={{ x: 0, opacity: 1, scale: 1 }}
+  transition={{ 
+    duration: 0.5,
+    delay: 0.3,
+    ease: [0.22, 1, 0.36, 1]
+  }}
+  className="lg:w-auto w-full"
+>
+  <div className="flex flex-col items-center gap-3">
+    {shouldShowProgressBar(mainActiveItem) ? (
+      <>
+        {/* Remove the animated container around SimpleProgress */}
+        <div className="relative">
+          <div className="scale-75 sm:scale-90 lg:scale-100 transform-gpu">
+            <SimpleProgress
+              startTime={mainActiveItem.startTime}
+              deadline={mainActiveItem.deadline || ""}
+              completionTime={mainActiveItem.completionTime}
+              delayed={isDelayed(mainActiveItem)}
+              canceled={mainActiveItem.adminStatus === "cancelled"}
+              productImage={mainActiveItem.imageUrl}
+              videoUrl={mainActiveItem.videoUrl}
+              productTitle={mainActiveItem.productTitle}
+            />
+            
+            <motion.div
+              className="pt-3 sm:pt-4 flex justify-center"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+            >
+              <motion.button
+                onClick={() => handleItemClick(mainActiveItem.id)}
+                whileHover={{ 
+                  scale: 1.05,
+                }}
+                whileTap={{ scale: 0.95 }}
+                className="px-3 sm:px-4 py-1.5 sm:py-2 text-white rounded-lg font-medium text-xs sm:text-sm flex items-center gap-1.5 transition-colors"
+              >
+                مشاهده جزئیات
+                <svg
+                  className="w-3 h-3 sm:w-3.5 sm:h-3.5 rtl:rotate-180"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </motion.button>
+            </motion.div>
           </div>
-        )}
+        </div>
+      </>
+    ) : (
+      <div className="w-24 h-24 sm:w-28 sm:h-28 flex flex-col items-center justify-center relative">
+        <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full flex items-center justify-center mb-2">
+          <Clock className="w-4 h-4 sm:w-6 sm:h-6 text-gray-400" />
+        </div>
+        <div className="text-center">
+          <span className="text-xs sm:text-sm font-medium text-gray-600 block">در انتظار شروع</span>
+          <span className="text-xs text-gray-500">به زودی شروع می‌شود</span>
+        </div>
+      </div>
+    )}
+  </div>
+</motion.div>
+        </div>
+      </div>
+      
+      {/* Subtle hover overlay */}
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-blue-500/0 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-xl sm:rounded-2xl"
+        whileHover={{ opacity: 1 }}
+      />
+    </div>
+  </motion.div>
+)}
 
         {trulyActiveItems.length > 0 && (
-          <div className="mt-12 bg-gray-100 rounded-2xl p-6">
-            <div className="flex items-center gap-3 mb-6 px-1">
-              <div className="p-2 bg-blue-50 rounded-xl">
-                <PlayCircle className="w-5 h-5 text-blue-600" />
+          <div className="mt-8 sm:mt-12 bg-gray-100 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+            <div className="flex items-center gap-3 mb-4 sm:mb-6 px-1">
+              <div className="p-1.5 sm:p-2 bg-blue-50 rounded-lg sm:rounded-xl">
+                <PlayCircle className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-lg font-semibold text-gray-900 tracking-tight">دیگر سفارش‌های در حال اجرا</p>
+                <p className="text-base sm:text-lg font-semibold text-gray-900 tracking-tight">دیگر سفارش‌های در حال اجرا</p>
               </div>
-              <span className="px-2.5 py-0.5 bg-blue-50 text-blue-600 text-xs font-medium rounded-full border border-blue-100">
+              <span className="px-2 py-0.5 sm:px-2.5 sm:py-0.5 bg-blue-50 text-blue-600 text-xs font-medium rounded-full border border-blue-100">
                 {trulyActiveItems.length}
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {trulyActiveItems.map((item) => (
-  <OrderItemCard
-    key={item.id}
-    item={item}
-    onClick={handleItemClick}
-    copyToClipboard={copyToClipboard}
-    copiedId={copiedId}
-    // No need to pass slug anymore - it's automatic!
-  />
-))}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-5">
+              {trulyActiveItems.map((item) => (
+                <OrderItemCard
+                  key={item.id}
+                  item={item}
+                  onClick={handleItemClick}
+                  copyToClipboard={copyToClipboard}
+                  copiedId={copiedId}
+                />
+              ))}
             </div>
           </div>
         )}
 
         {/* Section 2: Waiting for Admin Items (submitted but not started) */}
         {waitingItems.length > 0 && (
-          <div className="mt-12">
-            <div className="flex justify-between items-center gap-3 mb-6 px-1">
+          <div className="mt-8 sm:mt-12 bg-gray-200 p-6">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4 sm:mb-6 px-1">
               <div className="flex items-center">
-              <div className="p-2 ml-2 bg-amber-50 rounded-xl">
-                <Clock className="w-5 h-5 text-amber-600" />
+                <div className="p-1.5 sm:p-2 ml-2 bg-amber-50 rounded-lg sm:rounded-xl">
+                  <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />
+                </div>
+                <div>
+                  <p className="text-base sm:text-xl text-gray-900 tracking-tight">در انتظار </p>
+                  <p className="text-xs sm:text-sm text-gray-500">اطلاعات ثبت شده، منتظر شروع کار توسط تیم فنی</p>
+                </div>
               </div>
-              <div>
-                <p className="text-xl  text-gray-900 tracking-tight">در انتظار </p>
-                <p className="text-sm text-gray-500">اطلاعات ثبت شده، منتظر شروع کار توسط تیم فنی</p>
-              </div>
-              </div>
-              <span className="px-2.5 py-0.5 text-gray-500 text-xs font-medium">
+              <span className="text-xs sm:text-sm text-gray-500 mt-2 sm:mt-0">
                 {waitingItems.length}
                 سفارش
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-5">
-            {waitingItems.map((item) => (
-  <OrderItemCard
-    key={item.id}
-    item={item}
-    onClick={handleItemClick}
-    copyToClipboard={copyToClipboard}
-    copiedId={copiedId}
-    // No need to pass slug anymore - it's automatic!
-  />
-))}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-5">
+              {waitingItems.map((item) => (
+                <OrderItemCard
+                  key={item.id}
+                  item={item}
+                  onClick={handleItemClick}
+                  copyToClipboard={copyToClipboard}
+                  copiedId={copiedId}
+                />
+              ))}
             </div>
           </div>
         )}
@@ -594,41 +718,41 @@ const BacklinkPage: React.FC = () => {
   // Update the PendingTabContent component in BacklinkPage
 
   const PendingTabContent = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-8">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-8">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">نیاز به ثبت اطلاعات</h2>
-          <p className="text-sm text-gray-500 mt-2">لطفاً اطلاعات سفارش‌های زیر را تکمیل کنید</p>
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900">نیاز به ثبت اطلاعات</h2>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2">لطفاً اطلاعات سفارش‌های زیر را تکمیل کنید</p>
         </div>
-        <span className="px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium border border-blue-100">
+        <span className="mt-2 sm:mt-0 px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-50 text-blue-700 rounded-full text-xs sm:text-sm font-medium border border-blue-100">
           {pendingItems.length} سفارش
         </span>
       </div>
 
       {pendingItems.length === 0 ? (
-        <div className="text-center py-16 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200">
-          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-2xl flex items-center justify-center shadow-sm">
-            <CheckCircle className="w-10 h-10 text-emerald-600" />
+        <div className="text-center py-8 sm:py-16 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl sm:rounded-2xl border border-gray-200">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-sm">
+            <CheckCircle className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-600" />
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-3">همه سفارش‌ها ثبت شدند</h3>
-          <p className="text-gray-600 max-w-md mx-auto text-sm">
+          <h3 className="text-base sm:text-xl font-semibold text-gray-900 mb-2 sm:mb-3">همه سفارش‌ها ثبت شدند</h3>
+          <p className="text-gray-600 max-w-md mx-auto text-xs sm:text-sm">
             تمام سفارش‌های در انتظار، اطلاعاتشان ثبت شده است.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {pendingItems.map((item) => (
             <motion.div
               key={item.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               whileHover={{
-                y: -8,
+                y: -4,
                 transition: { type: "spring", stiffness: 300, damping: 20 }
               }}
               whileTap={{ scale: 0.98 }}
               onClick={() => handleItemClick(item.id)}
-              className="group relative bg-white rounded-2xl cursor-pointer overflow-hidden border border-blue-200"
+              className="group relative bg-white rounded-xl sm:rounded-2xl cursor-pointer overflow-hidden border border-blue-200"
               style={{
                 boxShadow: '0 8px 25px -5px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(59, 130, 246, 0.05)',
               }}
@@ -637,33 +761,33 @@ const BacklinkPage: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent opacity-50" />
 
               {/* Status badge */}
-              <div className="absolute top-4 right-4 z-10">
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 backdrop-blur-sm">
+              <div className="absolute top-3 sm:top-4 right-3 sm:right-4 z-10">
+                <div className="flex items-center gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 backdrop-blur-sm">
                   <motion.div
-                    className="w-2 h-2 rounded-full bg-blue-500"
+                    className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-500"
                     animate={{
                       scale: [1, 1.2, 1],
                       opacity: [0.7, 1, 0.7],
                     }}
                     transition={{ duration: 2, repeat: Infinity }}
                   />
-                  <Edit2 className="w-3 h-3" />
+                  <Edit2 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                   <span>نیاز به ثبت</span>
                 </div>
               </div>
 
               {/* Date badge */}
-              <div className="absolute top-4 left-4 z-10">
-                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full text-xs text-gray-600 border border-gray-200">
-                  <Calendar className="w-3 h-3" />
+              <div className="absolute top-3 sm:top-4 left-3 sm:left-4 z-10">
+                <div className="flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1.5 bg-white/90 backdrop-blur-sm rounded-full text-xs text-gray-600 border border-gray-200">
+                  <Calendar className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                   <span>{new Date(item.createdAt).toLocaleDateString("fa-IR")}</span>
                 </div>
               </div>
 
               {/* Main content */}
-              <div className="p-6 pt-16">
+              <div className="p-4 sm:p-6 pt-14 sm:pt-16">
                 {/* Icon section */}
-                <div className="flex justify-center mb-6">
+                <div className="flex justify-center mb-4 sm:mb-6">
                   <motion.div
                     className="relative"
                     animate={{
@@ -671,8 +795,8 @@ const BacklinkPage: React.FC = () => {
                     }}
                     transition={{ duration: 2, repeat: Infinity }}
                   >
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center group-hover:from-blue-200 group-hover:to-blue-100 transition-all duration-500 border-2 border-blue-100">
-                      <Edit2 className="w-10 h-10 text-blue-600 group-hover:text-blue-700 transition-colors duration-500" />
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center group-hover:from-blue-200 group-hover:to-blue-100 transition-all duration-500 border-2 border-blue-100">
+                      <Edit2 className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600 group-hover:text-blue-700 transition-colors duration-500" />
                     </div>
 
                     {/* Pulse effect */}
@@ -686,8 +810,8 @@ const BacklinkPage: React.FC = () => {
                 </div>
 
                 {/* Product title */}
-                <div className="mb-6 text-center">
-                  <h4 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-700 transition-colors duration-300">
+                <div className="mb-4 sm:mb-6 text-center">
+                  <h4 className="font-bold text-base sm:text-lg text-gray-900 mb-1.5 sm:mb-2 line-clamp-2 group-hover:text-blue-700 transition-colors duration-300">
                     {item.productTitle}
                   </h4>
 
@@ -705,23 +829,23 @@ const BacklinkPage: React.FC = () => {
 
                 {/* Attributes */}
                 {item.attributes.length > 0 && (
-                  <div className="mb-6">
-                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
-                      <Tag className="w-3.5 h-3.5" />
+                  <div className="mb-4 sm:mb-6">
+                    <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-500 mb-2 sm:mb-3">
+                      <Tag className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                       <span className="font-medium">ویژگی‌ها</span>
                     </div>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2">
                       {item.attributes.map((attr, idx) => (
                         <motion.div
                           key={idx}
-                          className="px-3 py-2 bg-blue-50 rounded-xl border border-blue-100"
+                          className="px-2 py-1.5 sm:px-3 sm:py-2 bg-blue-50 rounded-lg sm:rounded-xl border border-blue-100"
                           initial={false}
                           animate={{
                             scale: [1, 1.05, 1],
                           }}
                           transition={{ delay: idx * 0.1, duration: 0.5 }}
                         >
-                          <div className="text-xs text-blue-600 mb-1">{attr.name}</div>
+                          <div className="text-xs text-blue-600 mb-0.5 sm:mb-1">{attr.name}</div>
                           <div className="text-sm font-semibold text-gray-900">{attr.value}</div>
                         </motion.div>
                       ))}
@@ -731,18 +855,18 @@ const BacklinkPage: React.FC = () => {
 
                 {/* Order ID */}
                 <motion.div
-                  className="flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-blue-50/50 to-transparent mt-4"
+                  className="flex items-center justify-between p-2 sm:p-3 rounded-lg sm:rounded-xl bg-gradient-to-r from-blue-50/50 to-transparent mt-3 sm:mt-4"
                   animate={{
                     backgroundColor: ['#f0f9ff', '#e0f2fe', '#f0f9ff'],
                   }}
                   transition={{ duration: 3, repeat: Infinity }}
                 >
-                  <div className="flex items-center gap-3">
-                    <Hash className="w-4 h-4 text-blue-400" />
-                    <span className="text-sm text-gray-500">کد سفارش:</span>
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <Hash className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400" />
+                    <span className="text-xs sm:text-sm text-gray-500">کد سفارش:</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-900 font-mono font-semibold">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <span className="text-xs sm:text-sm text-gray-900 font-mono font-semibold">
                       {item.id.slice(-8)}
                     </span>
                     <motion.div
@@ -751,27 +875,27 @@ const BacklinkPage: React.FC = () => {
                       }}
                       transition={{ duration: 2, repeat: Infinity }}
                     >
-                      <ExternalLink className="w-4 h-4 text-blue-400" />
+                      <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400" />
                     </motion.div>
                   </div>
                 </motion.div>
 
                 {/* Action button */}
                 <motion.div
-                  className="mt-6"
+                  className="mt-4 sm:mt-6"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
                 >
                   <motion.button
-                    className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-lg shadow-blue-200"
+                    className="w-full py-2.5 sm:py-3.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 sm:gap-2 shadow-lg shadow-blue-200"
                     whileHover={{
                       scale: 1.02,
                       boxShadow: '0 10px 25px -5px rgba(59, 130, 246, 0.3)',
                     }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <Edit2 className="w-4 h-4" />
+                    <Edit2 className="w-3 h-3 sm:w-4 sm:h-4" />
                     ثبت اطلاعات سفارش
                   </motion.button>
                 </motion.div>
@@ -783,90 +907,88 @@ const BacklinkPage: React.FC = () => {
     </div>
   );
   const DelayedTabContent = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6">
         <div>
-          <p className="text-lg  text-gray-900">سفارش‌های تاخیر خورده</p>
-          <p className="text-sm text-gray-500 mt-1">این سفارش‌ها در حال پیگیری توسط ادمین ها هستند</p>
+          <p className="text-base sm:text-lg text-gray-900">سفارش‌های تاخیر خورده</p>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">این سفارش‌ها در حال پیگیری توسط ادمین ها هستند</p>
         </div>
-        <span className="text-sm text-gray-500">{delayedItems.length} سفارش</span>
+        <span className="text-xs sm:text-sm text-gray-500 mt-2 sm:mt-0">{delayedItems.length} سفارش</span>
       </div>
       {delayedItems.length === 0 ? (
-        <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
-          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center">
-            <CheckCircle className="w-8 h-8 text-gray-400" />
+        <div className="text-center py-8 sm:py-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl sm:rounded-2xl">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 bg-gradient-to-br from-gray-200 to-gray-300 rounded-xl sm:rounded-2xl flex items-center justify-center">
+            <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">سفارش تاخیر خورده‌ای ندارید</h3>
-          <p className="text-gray-600 max-w-md mx-auto">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1.5 sm:mb-2">سفارش تاخیر خورده‌ای ندارید</h3>
+          <p className="text-gray-600 max-w-md mx-auto text-xs sm:text-sm">
             همه سفارش‌های شما طبق برنامه در حال انجام هستند.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-         {delayedItems.map((item) => (
-  <OrderItemCard
-    key={item.id}
-    item={item}
-    onClick={handleItemClick}
-    copyToClipboard={copyToClipboard}
-    copiedId={copiedId}
-    // No need to pass slug anymore - it's automatic!
-  />
-))}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4">
+          {delayedItems.map((item) => (
+            <OrderItemCard
+              key={item.id}
+              item={item}
+              onClick={handleItemClick}
+              copyToClipboard={copyToClipboard}
+              copiedId={copiedId}
+            />
+          ))}
         </div>
       )}
     </div>
   );
 
   const CompletedTabContent = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">سفارش‌های تکمیل شده</h2>
-          <p className="text-sm text-gray-500 mt-1">سفارش‌هایی که با موفقیت انجام شده‌اند</p>
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900">سفارش‌های تکمیل شده</h2>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">سفارش‌هایی که با موفقیت انجام شده‌اند</p>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-gray-500">{completedItems.length} سفارش</span>
-
+        <div className="flex items-center gap-2 sm:gap-3 mt-2 sm:mt-0">
+          <span className="text-xs sm:text-sm text-gray-500">{completedItems.length} سفارش</span>
         </div>
       </div>
 
       {completedItems.length === 0 ? (
-        <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
-          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center">
-            <FileText className="w-8 h-8 text-gray-400" />
+        <div className="text-center py-8 sm:py-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl sm:rounded-2xl">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 bg-gradient-to-br from-gray-200 to-gray-300 rounded-xl sm:rounded-2xl flex items-center justify-center">
+            <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">سفارش تکمیل شده‌ای ندارید</h3>
-          <p className="text-gray-600 max-w-md mx-auto">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1.5 sm:mb-2">سفارش تکمیل شده‌ای ندارید</h3>
+          <p className="text-gray-600 max-w-md mx-auto text-xs sm:text-sm">
             سفارش‌های تکمیل شده در این بخش نمایش داده می‌شوند.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {completedItems.slice(0, 6).map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-xl border p-5 hover:border-emerald-300 transition cursor-pointer group"
+              className="bg-white rounded-lg sm:rounded-xl border p-3 sm:p-5 hover:border-emerald-300 transition cursor-pointer group"
               onClick={() => handleItemClick(item.id)}
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
-                    <CheckCircle className="w-4 h-4 text-emerald-600" />
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+                    <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-600" />
                   </div>
-                  <span className="text-sm font-medium text-emerald-600">تکمیل شده</span>
+                  <span className="text-xs sm:text-sm font-medium text-emerald-600">تکمیل شده</span>
                 </div>
                 <span className="text-xs text-gray-500">
                   {new Date(item.completionTime || item.createdAt).toLocaleDateString("fa-IR")}
                 </span>
               </div>
 
-              <h4 className="font-semibold text-gray-900 mb-3">{item.productTitle}</h4>
-              <div className="flex flex-wrap gap-1.5 mb-4">
+              <h4 className="font-semibold text-gray-900 text-sm sm:text-base mb-2 sm:mb-3">{item.productTitle}</h4>
+              <div className="flex flex-wrap gap-1 sm:gap-1.5 mb-3 sm:mb-4">
                 {item.attributes.map((attr, idx) => (
                   <span
                     key={idx}
-                    className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs"
+                    className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-gray-100 text-gray-700 rounded text-xs"
                   >
                     {attr.value}
                   </span>
@@ -874,9 +996,9 @@ const BacklinkPage: React.FC = () => {
               </div>
 
               {item.completionReport && (
-                <div className="pt-4 border-t border-gray-200">
-                  <p className="text-xs text-gray-500 mb-2">گزارش تکمیل:</p>
-                  <p className="text-sm text-gray-700 line-clamp-2">
+                <div className="pt-3 sm:pt-4 border-t border-gray-200">
+                  <p className="text-xs text-gray-500 mb-1.5 sm:mb-2">گزارش تکمیل:</p>
+                  <p className="text-xs sm:text-sm text-gray-700 line-clamp-2">
                     {stripHtmlTags(item.completionReport)}
                   </p>
                 </div>
@@ -898,7 +1020,7 @@ const BacklinkPage: React.FC = () => {
       historyFilter={historyFilter}
       onHistoryFilterChange={setHistoryFilter}
     >
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <TabNavigation
           tabs={tabs}
           activeTab={activeTab}

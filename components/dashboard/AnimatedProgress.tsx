@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { CircularProgressbarWithChildren, buildStyles } from "react-circular-progressbar";
 import { AlertTriangle, Clock, CheckCircle, XCircle } from "lucide-react";
-import Image from "next/image";
 
 interface CircularProgressWithTimeProps {
   startTime?: string;
@@ -72,9 +71,48 @@ const CircularProgressWithTime: React.FC<CircularProgressWithTimeProps> = ({
   // Determine status
   const showAsDelayed = delayed || (isPastDeadline && !completionTime);
 
-  // Check if we should show product image/video
-  const showProductMedia = !canceled && !completionTime && !showAsDelayed;
-  const mediaUrl = videoUrl || productImage;
+  // Get status icon and text
+  const getStatusContent = () => {
+    if (canceled) {
+      return {
+        icon: <XCircle className="w-6 h-6 text-gray-500" />,
+        percentageText: "0%",
+        percentageColor: "text-gray-600",
+        statusText: "لغو شده",
+        statusColor: "text-gray-500",
+        bgColor: "bg-gray-100"
+      };
+    } else if (completionTime) {
+      return {
+        icon: <CheckCircle className="w-6 h-6 text-emerald-600" />,
+        percentageText: "100%",
+        percentageColor: "text-emerald-600",
+        statusText: "تکمیل شده",
+        statusColor: "text-emerald-600",
+        bgColor: "bg-emerald-100"
+      };
+    } else if (showAsDelayed) {
+      return {
+        icon: <AlertTriangle className="w-6 h-6 text-red-600" />,
+        percentageText: `${Math.round(percentage)}%`,
+        percentageColor: "text-red-600",
+        statusText: "تاخیر خورده",
+        statusColor: "text-red-600",
+        bgColor: "bg-red-100"
+      };
+    } else {
+      return {
+        icon: <Clock className="w-6 h-6 text-amber-600" />,
+        percentageText: `${Math.round(percentage)}%`,
+        percentageColor: "text-amber-600",
+        statusText: "در حال انجام",
+        statusColor: "text-gray-700",
+        bgColor: "bg-amber-100"
+      };
+    }
+  };
+
+  const statusContent = getStatusContent();
 
   return (
     <div className="w-40 h-40">
@@ -90,85 +128,20 @@ const CircularProgressWithTime: React.FC<CircularProgressWithTimeProps> = ({
           }),
         })}
       >
-        {/* Center content */}
-        <div className="text-center">
-          {/* Product Image/Video or Status Icon */}
-          <div className="flex justify-center mb-2">
-            {showProductMedia && mediaUrl ? (
-              <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white shadow-md relative">
-                {videoUrl ? (
-                  // For video, show a video thumbnail or play icon
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200">
-                    <div className="relative">
-                      <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                        <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
-                      </div>
-                      <div className="absolute inset-0 border-2 border-white/30 rounded-full animate-ping"></div>
-                    </div>
-                  </div>
-                ) : (
-                  // For image
-                  // In the Image component, add onError handler
-                  <Image
-                    src={mediaUrl || 'https://via.placeholder.com/150/6b7280/ffffff?text=Product'}
-                    alt={productTitle}
-                    width={64}
-                    height={64}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = 'https://via.placeholder.com/150/6b7280/ffffff?text=Product';
-                      target.onerror = null; // Prevent infinite loop
-                    }}
-                  />
-                )}
-              </div>
-            ) : canceled ? (
-              <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                <XCircle className="w-6 h-6 text-gray-500" />
-              </div>
-            ) : completionTime ? (
-              <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-emerald-600" />
-              </div>
-            ) : showAsDelayed ? (
-              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
-              </div>
-            ) : (
-              ""
-            )}
-          </div>
+        {/* Center content - Always show percentage and status */}
+        <div className="text-center w-full h-full flex flex-col items-center justify-center">
+  
 
-          {/* Percentage */}
-          <div className="font-bold text-lg mb-1">
-            {canceled ? (
-              <span className="text-gray-600">0%</span>
-            ) : completionTime ? (
-              <span className="text-emerald-600">100%</span>
-            ) : showAsDelayed ? (
-              <span className="text-red-600">{Math.round(percentage)}%</span>
-            ) : (
-              <span className="text-amber-600">{Math.round(percentage)}%</span>
-            )}
+          {/* Large percentage */}
+          <div className={`font-bold text-2xl ${statusContent.percentageColor} mb-1`}>
+            {statusContent.percentageText}
           </div>
 
           {/* Status label */}
-          <div className="text-sm font-medium">
-            {canceled ? (
-              <span className="text-gray-500">لغو شده</span>
-            ) : completionTime ? (
-              <span className="text-emerald-600">تکمیل شده</span>
-            ) : showAsDelayed ? (
-              <div className="flex items-center justify-center gap-1">
-                <span className="text-red-600">تاخیر خورده</span>
-              </div>
-            ) : (
-              <span className="text-amber-600">در حال انجام</span>
-            )}
+          <div className={`text-sm font-medium ${statusContent.statusColor}`}>
+            {statusContent.statusText}
           </div>
+
         </div>
       </CircularProgressbarWithChildren>
     </div>
