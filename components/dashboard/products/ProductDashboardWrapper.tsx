@@ -430,7 +430,7 @@ const HistoryModal: React.FC<{
                     <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-1 sm:gap-2">
                       گزارش تکمیل سفارش
                     </h3>
-                    <div className="bg-white rounded-lg border border-gray-200 p-3 sm:p-4 max-h-48 sm:max-h-64 overflow-y-auto">
+                    <div className="bg-white text-black rounded-lg border border-gray-200 p-3 sm:p-4 max-h-48 sm:max-h-64 overflow-y-auto">
                       <div
                         className="prose prose-xs sm:prose-sm max-w-none"
                         dangerouslySetInnerHTML={{ __html: selectedItem.completionReport }}
